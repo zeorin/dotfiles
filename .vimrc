@@ -14,6 +14,9 @@ call pathogen#infect()
 " line numbers
 set number
 
+" Don't break words when wrapping lines
+set linebreak
+
 " Set colors
 colorscheme twilight
 
