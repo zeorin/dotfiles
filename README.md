@@ -1,8 +1,3 @@
 # Dotfiles
 
-My Linux dotfiles.
-
-## VIM
-
-VIM is my IDE of choice. Lots of power out of the box, and with the right extensions it absolutely shines.i
-Included are my `.vimrc` and `.gvimrc` files, and my `.vim/` folder.
+My Linux dotfiles. Primarily for my use, but you're welcome to have a look and use what you please.

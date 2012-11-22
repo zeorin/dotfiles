@@ -1,0 +1,9 @@
+[user]
+	name = Xandor Schiefer
+	email = zeorin@gmail.com
+[core]
+	editor = vim
+[merge]
+	tool = vimdiff
+[credential]
+	helper = cache
