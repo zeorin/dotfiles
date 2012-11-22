@@ -121,3 +121,6 @@
 	path = .vim/bundle/emmet
 	url = https://github.com/mattn/emmet-vim
 	ignore = dirty
+[submodule ".vim/bundle/ack"]
+	path = .vim/bundle/ack
+	url = https://github.com/mileszs/ack.vim.git
