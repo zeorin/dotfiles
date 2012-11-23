@@ -49,3 +49,6 @@
 [submodule ".vim/bundle/nerdtree"]
 	path = .vim/bundle/nerdtree
 	url = https://github.com/scrooloose/nerdtree.git
+[submodule ".vim/bundle/php-indent"]
+	path = .vim/bundle/php-indent
+	url = https://github.com/2072/PHP-Indenting-for-VIm.git
