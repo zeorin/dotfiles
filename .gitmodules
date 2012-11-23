@@ -34,3 +34,6 @@
 [submodule ".vim/bundle/css3-syntax"]
 	path = .vim/bundle/css3-syntax
 	url = https://github.com/hail2u/vim-css3-syntax.git
+[submodule ".vim/bundle/csscomb"]
+	path = .vim/bundle/csscomb
+	url = https://github.com/miripiruni/CSScomb-for-Vim.git
