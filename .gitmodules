@@ -1,0 +1,6 @@
+[submodule ".gitignore-boilerplates"]
+	path = .gitignore-boilerplates
+	url = https://github.com/simonwhitaker/gitignore-boilerplates.git
+[submodule ".oh-my-zsh"]
+	path = .oh-my-zsh
+	url = http://github.com/robbyrussell/oh-my-zsh.git
