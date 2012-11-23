@@ -37,3 +37,6 @@
 [submodule ".vim/bundle/csscomb"]
 	path = .vim/bundle/csscomb
 	url = https://github.com/miripiruni/CSScomb-for-Vim.git
+[submodule ".vim/bundle/editorconfig"]
+	path = .vim/bundle/editorconfig
+	url = https://github.com/editorconfig/editorconfig-vim.git
