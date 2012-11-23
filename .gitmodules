@@ -52,3 +52,6 @@
 [submodule ".vim/bundle/project"]
 	path = .vim/bundle/project
 	url = https://github.com/vimplugin/project.vim.git
+[submodule ".vim/bundle/php-html-enhanced"]
+	path = .vim/bundle/php-html-enhanced
+	url = https://github.com/vim-scripts/php.vim-html-enhanced.git
