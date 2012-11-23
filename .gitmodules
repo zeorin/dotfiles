@@ -55,3 +55,6 @@
 [submodule ".vim/bundle/php-html-enhanced"]
 	path = .vim/bundle/php-html-enhanced
 	url = https://github.com/vim-scripts/php.vim-html-enhanced.git
+[submodule ".vim/bundle/scss-syntax"]
+	path = .vim/bundle/scss-syntax
+	url = https://github.com/cakebaker/scss-syntax.vim.git
