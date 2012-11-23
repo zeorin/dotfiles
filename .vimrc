@@ -20,6 +20,9 @@ set linebreak
 " Set colors
 colorscheme twilight
 
+" Include matchit
+source $VIMRUNTIME/macros/matchit.vim
+
 " set tabs to display as 4 spaces wide
 set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
 
