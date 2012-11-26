@@ -44,6 +44,9 @@ au BufNewFile,BufRead *.scss set filetype=scss
 " Set working directory to current file on initial vim start
 cd %:p:h
 
+" Map - to move a line down
+nmap - ddp
+
 " Map NERDTreeTabsToggle to a key combination
 nmap <F8> :NERDTreeTabsToggle<CR>
 
