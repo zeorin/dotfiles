@@ -76,3 +76,6 @@
 [submodule ".vim/bundle/vcscommand"]
 	path = .vim/bundle/vcscommand
 	url = https://github.com/vim-scripts/vcscommand.vim.git
+[submodule ".vim/bundle/manpageview"]
+	path = .vim/bundle/manpageview
+	url = https://github.com/emezeske/manpageview.git
