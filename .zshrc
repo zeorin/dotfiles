@@ -34,9 +34,8 @@ plugins=(git gibo)
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
-export PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/android/tools:~/.bin/
+export PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/android/tools:~/.bin:$HOME/.rvm/bin:/usr/local/bin/android-sdk-linux/platform-tools
 
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 source ~/.rvm/scripts/rvm # Execute rvm scripts, need this to enable compass
 
 # Turn on colors in autocompletion
