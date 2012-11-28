@@ -45,14 +45,18 @@ zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # Set up aliases
-alias ls='ls --color'
+alias ls='ls -h --color'
 alias ..='cd ..'
 alias ~='cd ~'
+
+alias la='ls -a'
+alias ll='ls -a'
 
 alias -g L="|less"
 alias -g ...='../..'
 alias -g ....='../../..'
 alias -g .....='../../../..'
+alias -g ......='../../../../..'
 
 # Show time for long commands
 REPORTTIME=5
