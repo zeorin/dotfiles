@@ -79,3 +79,6 @@
 [submodule ".vim/bundle/manpageview"]
 	path = .vim/bundle/manpageview
 	url = https://github.com/emezeske/manpageview.git
+[submodule ".vim/bundle/loremipsum"]
+	path = .vim/bundle/loremipsum
+	url = https://github.com/vim-scripts/loremipsum.git
