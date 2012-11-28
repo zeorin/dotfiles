@@ -82,3 +82,6 @@ let g:user_zen_settings = {
 			\		},
 			\	},
 			\}
+
+" Better diff colors
+
