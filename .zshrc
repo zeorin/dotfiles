@@ -45,12 +45,12 @@ zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # Set up aliases
-alias ls='ls -h --color'
 alias ..='cd ..'
 alias ~='cd ~'
 
-alias la='ls -a'
-alias ll='ls -a'
+alias ls='ls -h --color'
+alias ll='ls -l'
+alias la='ls -la'
 
 alias -g L="|less"
 alias -g ...='../..'
