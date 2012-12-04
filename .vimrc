@@ -1,48 +1,66 @@
+""""""""""""""""""""""""
+"                      "
+" General VIm settings "
+"                      "
+""""""""""""""""""""""""
+
+" Use VIm, and not VI
 set nocompatible
-source $VIMRUNTIME/vimrc_example.vim
 
 " use visual terminal bell
 set vb
-
-" initialise pathogen
-call pathogen#infect()
-
-" no write backup
-"set nowb
-" no backup files
-"set nobk
 " line numbers
 set number
-
 " Don't break words when wrapping lines
 set linebreak
+" set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
+" files)
+set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
 
 " Set colors
 colorscheme twilight
 
-" Include matchit
-source $VIMRUNTIME/macros/matchit.vim
+" Nearly unlimited tabs
+set tabpagemax=99
 
-" set tabs to display as 4 spaces wide
-set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
+" Open each file (buffer) in it's own tab on first open
+augroup tabopen
+   autocmd!
+   autocmd VimEnter * nested if &buftype != "help" | tab sball | endif
+augroup END
+
+" Set working directory to current file on initial vim start
+cd %:p:h
+
+
+
+
+""""""""""""""""""
+"                "
+" Set up plugins "
+"                "
+""""""""""""""""""
 
 " set filetype plugins and indent ON (needed for sparkup)
 filetype indent plugin on
 
-" Nearly unlimited tabs
-set tabpagemax=99
+" Include matchit
+source $VIMRUNTIME/macros/matchit.vim
+
+" initialise pathogen
+call pathogen#infect()
+" Create help tags for pathogen plugins automatically
+:Helptags
+
 
 " automatically compile coffee-script files into javascript
 au BufWritePost *.coffee silent CoffeeMake!
 
 " set filetype for tpl files
-au BufNewFile,BufRead *.tpl set filetype=html
+autocmd BufNewFile,BufRead *.tpl set filetype=html
 
 " set filetype for scss files
-au BufNewFile,BufRead *.scss set filetype=scss
-
-" Set working directory to current file on initial vim start
-cd %:p:h
+autocmd BufNewFile,BufRead *.scss set filetype=scss
 
 " Do not open NERDTree on start
 let g:nerdtree_tabs_open_on_gui_startup = 0
@@ -83,6 +101,7 @@ iabbrev ssig Kind regards,<cr><cr>Xandor Schiefer<cr>079 706 5620<cr>zeorin@gmai
 
 " Set the leader
 let mapleader = ','
+let maplocalleader = '/'
 
 " Map NERDTreeTabsToggle to a key combination
 nnoremap <F8> :NERDTreeTabsToggle<CR>
@@ -113,7 +132,11 @@ inoremap jk <esc>
 inoremap <esc> <nop>
 
 " unmap keys I shouldn't be using
-noremap <up> <nop>
-noremap <down> <nop>
-noremap <left> <nop>
-noremap <right> <nop>
+nnoremap <up> <nop>
+nnoremap <down> <nop>
+nnoremap <left> <nop>
+nnoremap <right> <nop>
+inoremap <up> <nop>
+inoremap <down> <nop>
+inoremap <left> <nop>
+inoremap <right> <nop>

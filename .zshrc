@@ -48,7 +48,7 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 alias ..='cd ..'
 alias ~='cd ~'
 
-alias ls='ls -h --color'
+alias ls='ls -h --color --group-directories-first'
 alias ll='ls -l'
 alias la='ls -la'
 
