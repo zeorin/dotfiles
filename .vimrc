@@ -4,16 +4,16 @@
 "                "
 """"""""""""""""""
 
+" initialise pathogen
+call pathogen#infect()
+" Create help tags for pathogen plugins automatically
+call pathogen#helptags()
+
 " set filetype plugins and indent ON (needed for sparkup)
 filetype indent plugin on
 
 " Include matchit
 source $VIMRUNTIME/macros/matchit.vim
-
-" initialise pathogen
-call pathogen#infect()
-" Create help tags for pathogen plugins automatically
-:Helptags
 
 
 """"""""""""""""""""""""
