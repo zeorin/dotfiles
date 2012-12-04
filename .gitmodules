@@ -82,3 +82,6 @@
 [submodule ".vim/bundle/loremipsum"]
 	path = .vim/bundle/loremipsum
 	url = https://github.com/vim-scripts/loremipsum.git
+[submodule ".vim/bundle/solarized"]
+	path = .vim/bundle/solarized
+	url = https://github.com/altercation/vim-colors-solarized.git
