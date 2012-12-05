@@ -116,4 +116,4 @@
 	ignore = dirty
 [submodule "dircolors-solarized"]
 	path = dircolors-solarized
-	url = https://github.com/seebi/dircolors-solarized.git
+	url = https://github.com/huyz/dircolors-solarized.git
