@@ -41,8 +41,12 @@ source ~/.rvm/scripts/rvm # Execute rvm scripts, need this to enable compass
 # Turn on colors in autocompletion
 eval `dircolors ~/.dir_colors`
 
+# completion
 zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+# no autocorrect, thank you
+unsetopt correct_all
 
 # Set up aliases
 alias ..='cd ..'

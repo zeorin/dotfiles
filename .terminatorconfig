@@ -1,12 +1,20 @@
 [global_config]
+  title_transmit_fg_color = "#eee8d5"
+  title_inactive_fg_color = "#586e75"
+  title_receive_bg_color = "#268bd2"
+  title_transmit_bg_color = "#d33682"
+  title_receive_fg_color = "#fdf6e3"
+  title_inactive_bg_color = "#93a1a1"
 [keybindings]
 [profiles]
   [[default]]
     palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
+    copy_on_selection = True
     background_darkness = 0.88
     background_type = transparent
     cursor_color = "#eee8d5"
     foreground_color = "#eee8d5"
+    cursor_shape = underline
     font = Source Code Pro 11
     background_color = "#002b36"
     scrollback_infinite = True
