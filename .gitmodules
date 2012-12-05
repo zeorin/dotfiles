@@ -1,15 +1,12 @@
 [submodule ".gitignore-boilerplates"]
 	path = .gitignore-boilerplates
 	url = https://github.com/simonwhitaker/gitignore-boilerplates.git
-	ignore = dirty
 [submodule ".oh-my-zsh"]
 	path = .oh-my-zsh
 	url = http://github.com/robbyrussell/oh-my-zsh.git
-	ignore = dirty
 [submodule "gitignore-boilerplates-repo"]
 	path = gitignore-boilerplates-repo
 	url = https://github.com/simonwhitaker/gitignore-boilerplates.git
-	ignore = dirty
 [submodule ".vim/bundle/fugitive"]
 	path = .vim/bundle/fugitive
 	url = https://github.com/tpope/vim-fugitive.git
