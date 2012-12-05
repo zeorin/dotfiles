@@ -3,7 +3,7 @@
 	url = https://github.com/simonwhitaker/gitignore-boilerplates.git
 [submodule ".oh-my-zsh"]
 	path = .oh-my-zsh
-	url = http://github.com/robbyrussell/oh-my-zsh.git
+	url = https://github.com/zeorin/oh-my-zsh.git
 [submodule "gitignore-boilerplates-repo"]
 	path = gitignore-boilerplates-repo
 	url = https://github.com/simonwhitaker/gitignore-boilerplates.git
