@@ -7,6 +7,9 @@
 [submodule "gitignore-boilerplates-repo"]
 	path = gitignore-boilerplates-repo
 	url = https://github.com/simonwhitaker/gitignore-boilerplates.git
+[submodule "dircolors-solarized"]
+	path = dircolors-solarized
+	url = https://github.com/huyz/dircolors-solarized.git
 [submodule ".vim/bundle/fugitive"]
 	path = .vim/bundle/fugitive
 	url = https://github.com/tpope/vim-fugitive.git
@@ -111,6 +114,3 @@
 	path = .vim/bundle/solarized
 	url = https://github.com/altercation/vim-colors-solarized.git
 	ignore = dirty
-[submodule "dircolors-solarized"]
-	path = dircolors-solarized
-	url = https://github.com/huyz/dircolors-solarized.git

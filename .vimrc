@@ -137,6 +137,9 @@ autocmd BufNewFile,BufRead *.tpl set filetype=html
 " set filetype for scss files
 autocmd BufNewFile,BufRead *.scss set filetype=scss
 
+" set indentation for CSS files
+autocmd BufNewFile,BufRead *.css set shiftwidth=4
+
 " Do not open NERDTree on start
 let g:nerdtree_tabs_open_on_gui_startup = 0
 
