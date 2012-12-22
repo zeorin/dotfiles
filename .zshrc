@@ -62,6 +62,14 @@ alias -g ....='../../..'
 alias -g .....='../../../..'
 alias -g ......='../../../../..'
 
+# MTP aliases
+alias galaxys2-connect="go-mtpfs -allow-other=true /media/galaxys2"
+alias galaxys2-disconnect="umount /media/galaxys2"
+alias nexus7-connect="go-mtpfs -allow-other=true /media/nexus7"
+alias nexus7-disconnect="umount /media/nexus7"
+alias tf201-connect="go-mtpfs -allow-other=true /media/tf201"
+alias tf201-disconnect="umount /media/tf201"
+
 # Show time for long commands
 REPORTTIME=5
 TIMEFMT="%U user %S system %P cpu %*Es total"

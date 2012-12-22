@@ -16,7 +16,9 @@
     background_type = transparent
     cursor_color = "#eee8d5"
     foreground_color = "#eee8d5"
+    backspace_binding = automatic
     cursor_shape = underline
+    delete_binding = automatic
     font = Source Code Pro 11
     background_color = "#002b36"
     audible_bell = True
@@ -29,7 +31,9 @@
     background_type = transparent
     cursor_color = "#eee8d5"
     foreground_color = "#eee8d5"
+    backspace_binding = automatic
     cursor_shape = underline
+    delete_binding = automatic
     copy_on_selection = True
     background_color = "#002b36"
     audible_bell = True
@@ -41,7 +45,9 @@
     background_type = transparent
     cursor_color = "#002b36"
     foreground_color = "#002b36"
+    backspace_binding = automatic
     cursor_shape = underline
+    delete_binding = automatic
     copy_on_selection = True
     background_color = "#eee8d5"
     audible_bell = True
