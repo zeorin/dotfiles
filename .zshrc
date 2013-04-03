@@ -70,6 +70,9 @@ alias nexus7-disconnect="umount /media/nexus7"
 alias tf201-connect="go-mtpfs -allow-other=true /media/tf201"
 alias tf201-disconnect="umount /media/tf201"
 
+# source alias.sh aliases
+source ~/.aliases
+
 # Show time for long commands
 REPORTTIME=5
 TIMEFMT="%U user %S system %P cpu %*Es total"
