@@ -1,6 +1,7 @@
-### ignore 
+### ignore
 *~
 *.swp
+./.vim/.netrwhist
 
 ### /home/xandor/.gitignore-boilerplates/CodeIgniter.gitignore
 
