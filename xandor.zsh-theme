@@ -14,7 +14,7 @@ eval FG_GREEN='%{$fg_no_bold[green]%}'
 eval BG_DARK='%{$bg[black]%}'
 eval BG_LIGHT='%{$bg[white]%}'
 
-PROMPT='%{$FG_BASE01%}%p %{$FG_BASE1%}%c %{$FG_BASE0%}$(git_prompt_info)%{$FG_BASE0%} %{$FG_ORANGE%}%% % %{$reset_color%}'
+PROMPT='%{$FG_BASE01%}%P %{$FG_BASE1%}%1~ %{$FG_BASE0%}$(git_prompt_info)%{$FG_BASE0%} %{$FG_ORANGE%}%% % %{$reset_color%}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$reset_color%}%{$FG_YELLOW%}[ %{$FG_GREEN%}git%{$FG_BASE0%}:(%{$FG_ORANGE%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX=" %{$FG_YELLOW%}]%{$reset_color%}"
