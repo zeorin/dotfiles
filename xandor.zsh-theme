@@ -14,7 +14,14 @@ eval FG_GREEN='%{$fg_no_bold[green]%}'
 eval BG_DARK='%{$bg[black]%}'
 eval BG_LIGHT='%{$bg[white]%}'
 
-PROMPT='%{$FG_BASE00%}%20<...<%~%<< %{$FG_BASE0%}$(svn_prompt_info)%{$FG_BASE0%}%{$FG_BASE0%}$(git_prompt_info)%{$FG_BASE0%}%{$FG_GREEN%}%% %{$reset_color%}'
+# Check if connected via SSH
+function ssh_connection() {
+  if [[ -n $SSH_CONNECTION ]]; then
+    echo "%{$FG_MAGENTA%}[ssh] "
+  fi
+}
+
+PROMPT='$(ssh_connection)%{$FG_BASE00%}%20<...<%~%<< %{$FG_BASE0%}$(svn_prompt_info)%{$FG_BASE0%}%{$FG_BASE0%}$(git_prompt_info)%{$FG_BASE0%}%{$FG_GREEN%}%% %{$reset_color%}'
 RPROMPT='%{$FG_BASE01%}%T%{$reset_color%}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$FG_YELLOW%}git%{$FG_BASE00%}:%{$FG_BLUE%}"
