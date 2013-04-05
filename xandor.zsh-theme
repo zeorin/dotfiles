@@ -21,15 +21,15 @@ function ssh_connection() {
   fi
 }
 
-PROMPT='$(ssh_connection)%{$FG_BASE00%}%20<...<%~%<< %{$FG_BASE0%}$(svn_prompt_info)%{$FG_BASE0%}%{$FG_BASE0%}$(git_prompt_info)%{$FG_BASE0%}%{$FG_GREEN%}%% %{$reset_color%}'
+PROMPT='$(ssh_connection)%{$FG_BASE0%}%20<...<%~%<< $(svn_prompt_info)$(git_prompt_info)%{$FG_GREEN%}%% %{$reset_color%}'
 RPROMPT='%{$FG_BASE01%}%T%{$reset_color%}'
 
-ZSH_THEME_GIT_PROMPT_PREFIX="%{$FG_YELLOW%}git%{$FG_BASE00%}:%{$FG_BLUE%}"
+ZSH_THEME_GIT_PROMPT_PREFIX="%{$FG_YELLOW%}git%{$FG_BASE0%}:%{$FG_BLUE%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX=""
 ZSH_THEME_GIT_PROMPT_DIRTY=" %{$FG_RED%}✗  "
 ZSH_THEME_GIT_PROMPT_CLEAN=" "
 
-ZSH_THEME_SVN_PROMPT_PREFIX="%{$FG_YELLOW%}svn%{$FG_BASE00%}:%{$FG_BLUE%}"
+ZSH_THEME_SVN_PROMPT_PREFIX="%{$FG_YELLOW%}svn%{$FG_BASE0%}:%{$FG_BLUE%}"
 ZSH_THEME_SVN_PROMPT_SUFFIX=""
 ZSH_THEME_SVN_PROMPT_DIRTY=" %{$FG_RED%}✗  "
 ZSH_THEME_SVN_PROMPT_CLEAN=" "
