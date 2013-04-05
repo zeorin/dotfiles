@@ -38,7 +38,7 @@ export PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/u
 
 # Execute rvm scripts, need this to enable compass
 [[ -a '~/.rvm/scripts/rvm' ]] && print file exists
-[[ -a '~/.rvm/scripts/rvm' ]] && source ~/.rvm/scripts/rvm 
+[[ -a '~/.rvm/scripts/rvm' ]] && source ~/.rvm/scripts/rvm
 
 # Turn on colors in autocompletion
 eval `dircolors ~/.dir_colors`
@@ -69,6 +69,8 @@ alias ls='ls -h --color --group-directories-first'
 alias ll='ls -l'
 alias la='ls -la'
 
+alias grep='grep --color=auto'
+
 alias -g L="|less"
 alias -g ...='../..'
 alias -g ....='../../..'
@@ -92,11 +94,23 @@ TIMEFMT="%U user %S system %P cpu %*Es total"
 
 # Set up custom functions
 precmd() {
-  [[ -t 1 ]] || return
-  case $TERM in
-    (sun-cmd) print -Pn "\e]l%~\e\\"
-      ;;
-    (*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
-      ;;
-  esac
+	[[ -t 1 ]] || return
+	case $TERM in
+		(sun-cmd) print -Pn "\e]l%~\e\\"
+			;;
+		(*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
+			;;
+	esac
+
+	# History logs
+	if [ "$(id -u)" -ne 0 ]; then
+		FULL_CMD_LOG="$HOME/.logs/zsh-history-$(date -u "+%Y-%m-%d").log"
+		echo "$USER@`hostname`:`pwd` [$(date -u)] `\history -1`" >> ${FULL_CMD_LOG}
+	fi
 }
+
+# Better command history tracking
+export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
+if [[ ! -d ~/.logs ]] then
+	mkdir ~/.logs
+fi
