@@ -29,7 +29,7 @@ ZSH_THEME="xandor"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(debian gibo git git-extras git-flow github git-hubflow git-remote-branch gnu-utils history history-substring-search node npm svn)
+plugins=(debian gibo git git-extras git-flow github git-hubflow git-remote-branch gnu-utils history history-substring-search node npm svn zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -40,6 +40,17 @@ source ~/.rvm/scripts/rvm # Execute rvm scripts, need this to enable compass
 
 # Turn on colors in autocompletion
 eval `dircolors ~/.dir_colors`
+
+# Turn on syntax highlighting
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
+ZSH_HIGHLIGHT_STYLES[alias]='fg=default,bold'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=default,bold'
+ZSH_HIGHLIGHT_STYLES[command]='fg=default,bold'
+ZSH_HIGHLIGHT_STYLES[function]='fg=default,bold'
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=default,bold'
+ZSH_HIGHLIGHT_STYLES[path]='fg=default'
+ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=magenta,bold'
+ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 
 # completion
 zmodload -i zsh/complist
