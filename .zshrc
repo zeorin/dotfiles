@@ -37,8 +37,7 @@ source $ZSH/oh-my-zsh.sh
 export PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/android/tools:~/.bin:$HOME/.rvm/bin:/usr/local/bin/android-sdk-linux/platform-tools
 
 # Execute rvm scripts, need this to enable compass
-[[ -a '~/.rvm/scripts/rvm' ]] && print file exists
-[[ -a '~/.rvm/scripts/rvm' ]] && source ~/.rvm/scripts/rvm
+[[ -a "$HOME/.rvm/scripts/rvm" ]] && source $HOME/.rvm/scripts/rvm
 
 # Turn on colors in autocompletion
 eval `dircolors ~/.dir_colors`
