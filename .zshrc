@@ -34,7 +34,7 @@ plugins=(debian gibo git git-extras git-flow github git-hubflow git-remote-branc
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
-export PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/android/tools:~/.bin:$HOME/.rvm/bin:/usr/local/bin/android-sdk-linux/platform-tools
+export PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/android/tools:/opt/android/platform-tools:~/.bin:$HOME/.rvm/bin:/usr/local/bin/android-sdk-linux/platform-tools
 
 # Execute rvm scripts, need this to enable compass
 [[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
