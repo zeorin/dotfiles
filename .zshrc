@@ -34,13 +34,16 @@ plugins=(debian gibo git git-extras git-flow github git-hubflow git-remote-branc
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
-export PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/android/tools:~/.bin:$HOME/.rvm/bin:/usr/local/bin/android-sdk-linux/platform-tools
+export PATH=/usr/lib/lightdm/lightdm:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/opt/android/tools:/opt/android/platform-tools:~/.bin:$HOME/.rvm/bin:/usr/local/bin/android-sdk-linux/platform-tools
 
 # Execute rvm scripts, need this to enable compass
-[[ -a "$HOME/.rvm/scripts/rvm" ]] && source $HOME/.rvm/scripts/rvm
+[[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
 
 # Turn on colors in autocompletion
-eval `dircolors ~/.dir_colors`
+if [[ "$OSTYPE" == *gnu* ]]
+then
+	eval `dircolors ~/.dir_colors`
+fi
 
 # Turn on syntax highlighting
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
@@ -64,11 +67,18 @@ unsetopt correct_all
 alias ..='cd ..'
 alias ~='cd ~'
 
-alias ls='ls -h --color --group-directories-first'
+if [[ "$OSTYPE" == *gnu* ]]
+then
+	alias ls='ls -h --color --group-directories-first'
+
+	alias grep='grep --color=auto'
+fi
+if [[ "$OSTYPE" == *darwin* ]]
+then
+	alias ls='ls -hG'
+fi
 alias ll='ls -l'
 alias la='ls -la'
-
-alias grep='grep --color=auto'
 
 alias -g L="|less"
 alias -g ...='../..'
@@ -77,12 +87,15 @@ alias -g .....='../../../..'
 alias -g ......='../../../../..'
 
 # MTP aliases
-alias galaxys2-connect="go-mtpfs -allow-other=true /media/galaxys2"
-alias galaxys2-disconnect="umount /media/galaxys2"
-alias nexus7-connect="go-mtpfs -allow-other=true /media/nexus7"
-alias nexus7-disconnect="umount /media/nexus7"
-alias tf201-connect="go-mtpfs -allow-other=true /media/tf201"
-alias tf201-disconnect="umount /media/tf201"
+if [[ "$OSTYPE" == *gnu* ]]
+then
+	alias galaxys2-connect="go-mtpfs -allow-other=true /media/galaxys2"
+	alias galaxys2-disconnect="umount /media/galaxys2"
+	alias nexus7-connect="go-mtpfs -allow-other=true /media/nexus7"
+	alias nexus7-disconnect="umount /media/nexus7"
+	alias tf201-connect="go-mtpfs -allow-other=true /media/tf201"
+	alias tf201-disconnect="umount /media/tf201"
+fi
 
 # source alias.sh aliases
 source ~/.aliases

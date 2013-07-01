@@ -21,7 +21,7 @@ function ssh_connection() {
   fi
 }
 
-PROMPT='$(ssh_connection)%{$FG_BASE0%}%20<...<%~%<< $(svn_prompt_info)$(git_prompt_info)%{$FG_GREEN%}%% %{$reset_color%}'
+PROMPT='$(ssh_connection)%{$FG_BASE0%}%20<...<%~%<< $(svn_prompt_info)$(git_prompt_info)%(!.%{$FG_RED%}%#.%{$FG_GREEN%}%%) %{$reset_color%}'
 RPROMPT='%{$FG_BASE01%}%T%{$reset_color%}'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$FG_YELLOW%}git%{$FG_BASE0%}:%{$FG_BLUE%}"

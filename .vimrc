@@ -9,9 +9,6 @@ call pathogen#infect()
 " Create help tags for pathogen plugins automatically
 call pathogen#helptags()
 
-" set filetype plugins and indent ON (needed for sparkup)
-filetype indent plugin on
-
 " Include matchit
 source $VIMRUNTIME/macros/matchit.vim
 
@@ -36,7 +33,7 @@ set linebreak
 " set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
 " files)
 set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
-" keep 50 lines of command line history
+" keep 999 lines of command line history
 set history=999
 " show the cursor position all the time
 set ruler
@@ -71,7 +68,7 @@ if &t_Co > 2 || has("gui_running")
 	colorscheme solarized
 endif
 
-" Nearly unlimited tabs
+" Practically unlimited tabs
 set tabpagemax=99
 
 " Only do this part when compiled with support for autocommands.
@@ -89,6 +86,8 @@ if has("autocmd")
 
 		" For all text files set 'textwidth' to 78 characters.
 		autocmd FileType text setlocal textwidth=78
+		autocmd FileType mkd setlocal textwidth=78
+		autocmd FileType md setlocal textwidth=78
 
 		" When editing a file, always jump to the last known cursor position.
 		" Don't do it when the position is invalid or when inside an event handler
@@ -124,9 +123,6 @@ augroup END
 
 " Set working directory to current file on initial vim start
 cd %:p:h
-
-
-
 
 " automatically compile coffee-script files into javascript
 au BufWritePost *.coffee silent CoffeeMake!
@@ -207,14 +203,14 @@ vnoremap <leader>' <esc>`<i'<esc>`>la'<esc>
 
 " change ESC to jk
 inoremap jk <esc>
-inoremap <esc> <nop>
 
 " unmap keys I shouldn't be using
-nnoremap <up> <nop>
-nnoremap <down> <nop>
-nnoremap <left> <nop>
-nnoremap <right> <nop>
+inoremap <esc> <nop>
 inoremap <up> <nop>
 inoremap <down> <nop>
 inoremap <left> <nop>
 inoremap <right> <nop>
+nnoremap <up> <nop>
+nnoremap <down> <nop>
+nnoremap <left> <nop>
+nnoremap <right> <nop>
