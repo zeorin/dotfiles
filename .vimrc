@@ -69,7 +69,7 @@ if &t_Co > 2 || has("gui_running")
 endif
 
 " Practically unlimited tabs
-set tabpagemax=99
+set tabpagemax=999
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
@@ -168,6 +168,12 @@ let g:user_zen_settings = {
 			\		},
 			\	},
 			\}
+
+" SLIME settings
+" I use tmux, not screen
+let g:slime_target = "tmux"
+" default current window, pane 1
+let g:slime_default_config = {"socket_name": "default", "target_pane": ":.1"}
 
 " Useful abbreviations
 iabbrev @@ zeorin@gmail.com
