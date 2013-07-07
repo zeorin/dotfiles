@@ -27,4 +27,3 @@ function mcd() {
 alias l.='ls -d .* --color=auto'
 
 alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\'' -e '\''s/^/   /'\'' -e '\''s/-/|/'\'''
-

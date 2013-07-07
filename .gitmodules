@@ -117,3 +117,7 @@
 	path = .vim/bundle/vim-snippets
 	url = https://github.com/honza/vim-snippets
 	ignore = dirty
+[submodule ".vim/bundle/slime"]
+	path = .vim/bundle/slime
+	url = git://github.com/jpalardy/vim-slime.git
+	ignore = dirty

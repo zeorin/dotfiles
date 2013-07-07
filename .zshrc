@@ -56,6 +56,9 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=default'
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=magenta,bold'
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 
+# vi keybindings
+bindkey -v
+
 # completion
 zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
