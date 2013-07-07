@@ -1,0 +1,16 @@
+# Use VI keybindings for any program that uses GNU readline
+set editing-mode vi
+
+# Show all completions as soon as tab is pressed, even if there's more than one.
+set show-all-if-ambiguous on
+
+# Ignore case
+set completion-ignore-case on
+# on menu-complete, first display the common prefix, then cycle through the options when hitting tab
+set menu-complete-display-prefix on
+
+##################################3333
+# Keymaps for when we're in command mode
+set keymap vi-command
+
+
