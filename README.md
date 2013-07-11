@@ -1,3 +1,4 @@
 # Dotfiles
 
-My Linux dotfiles. Primarily for my use, but you're welcome to have a look and use what you please.
+These dotfiles are used to keep my various user accounts on different machines
+configured the same way.
