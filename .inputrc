@@ -14,3 +14,7 @@ set menu-complete-display-prefix on
 set keymap vi-command
 
 
+##################################3333
+# Keymaps for when we're in insert mode
+set keymap vi-insert
+	"jk": vi-movement-mode	# remap ESC to jk

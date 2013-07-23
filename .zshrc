@@ -58,6 +58,8 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 
 # vi keybindings
 bindkey -v
+# map JK to ESC in command mode
+bindkey -M viins 'jk' vi-cmd-mode
 
 # completion
 zmodload -i zsh/complist
