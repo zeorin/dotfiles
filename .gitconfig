@@ -3,7 +3,7 @@
 	email = zeorin@gmail.com
 [core]
 	editor = vim
-	excludesfile = /home/xandor/.gitignore
+	excludesfile = /home/ubuntu/.gitignore
 [merge]
 	tool = vimdiff
 [credential]
