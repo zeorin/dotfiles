@@ -119,5 +119,5 @@
 	ignore = dirty
 [submodule ".vim/bundle/slime"]
 	path = .vim/bundle/slime
-	url = git://github.com/jpalardy/vim-slime.git
+	url = https://github.com/jpalardy/vim-slime.git
 	ignore = dirty
