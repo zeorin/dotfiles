@@ -56,6 +56,9 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=default'
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=magenta,bold'
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 
+# Ignore vim backup files in autocompletion
+zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'
+
 # vi keybindings
 bindkey -v
 # map JK to ESC in command mode

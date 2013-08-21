@@ -41,6 +41,10 @@ set ruler
 set showcmd
 " do incremental searching
 set incsearch
+" ignore case sensitivity in searching
+set ignorecase
+" smart case sensitivity in searching
+set smartcase
 " Don't use Ex mode, use Q for formatting
 map Q gq
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
@@ -128,7 +132,7 @@ cd %:p:h
 au BufWritePost *.coffee silent CoffeeMake!
 
 " set filetype for tpl files
-autocmd BufNewFile,BufRead *.tpl set filetype=html
+autocmd BufNewFile,BufRead *.tpl set filetype=php
 
 " set filetype for scss files
 autocmd BufNewFile,BufRead *.scss set filetype=scss

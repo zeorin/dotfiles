@@ -1,0 +1,2 @@
+# ignore VIM's backup files
+--ignore-file=match:/.*~$/
