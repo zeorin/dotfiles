@@ -26,10 +26,6 @@
 	path = .vim/bundle/nerdtree-tabs
 	url = https://github.com/jistr/vim-nerdtree-tabs
 	ignore = dirty
-[submodule ".vim/bundle/zencoding"]
-	path = .vim/bundle/zencoding
-	url = https://github.com/mattn/zencoding-vim
-	ignore = dirty
 [submodule ".vim/bundle/autocomplpop"]
 	path = .vim/bundle/autocomplpop
 	url = https://github.com/vim-scripts/AutoComplPop.git
@@ -120,4 +116,8 @@
 [submodule ".vim/bundle/slime"]
 	path = .vim/bundle/slime
 	url = https://github.com/jpalardy/vim-slime.git
+	ignore = dirty
+[submodule ".vim/bundle/emmet"]
+	path = .vim/bundle/emmet
+	url = https://github.com/mattn/emmet-vim
 	ignore = dirty
