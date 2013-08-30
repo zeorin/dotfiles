@@ -18,3 +18,4 @@
 	unstage = reset HEAD --
 	last = log -1 HEAD
 	visual = !ungit
+	stash-unapply = !git stash show -p | git apply -R
