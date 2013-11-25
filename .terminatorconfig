@@ -17,6 +17,7 @@
     cursor_color = "#eee8d5"
     foreground_color = "#eee8d5"
     backspace_binding = automatic
+    scroll_on_output = False
     cursor_shape = underline
     delete_binding = automatic
     font = Source Code Pro 11
