@@ -10,4 +10,4 @@ set guioptions-=T
 set guioptions+=e
 
 " Set font
-set guifont=Source\ Code\ Pro\ 11
+set guifont=Source\ Code\ Pro\ 10

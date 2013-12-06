@@ -69,6 +69,7 @@ if &t_Co > 2 || has("gui_running")
 	syntax on
 	set hlsearch
 	set background=dark
+	let g:solarized_termtrans=1
 	colorscheme solarized
 endif
 
