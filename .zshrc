@@ -134,3 +134,6 @@ export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
 if [[ ! -d ~/.logs ]] then
 	mkdir ~/.logs
 fi
+
+# Promise specific settings
+export PROMISE_GIT_USER="xandor"
