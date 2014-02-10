@@ -14,9 +14,11 @@
     background_darkness = 0.88
     urgent_bell = True
     background_type = transparent
+    background_image = None
     cursor_color = "#eee8d5"
     foreground_color = "#eee8d5"
     backspace_binding = automatic
+    scroll_on_output = False
     cursor_shape = underline
     delete_binding = automatic
     font = Source Code Pro 11
@@ -29,6 +31,7 @@
     background_darkness = 0.88
     urgent_bell = True
     background_type = transparent
+    background_image = None
     cursor_color = "#eee8d5"
     foreground_color = "#eee8d5"
     backspace_binding = automatic
@@ -43,6 +46,7 @@
     background_darkness = 0.87
     urgent_bell = True
     background_type = transparent
+    background_image = None
     cursor_color = "#002b36"
     foreground_color = "#002b36"
     backspace_binding = automatic
