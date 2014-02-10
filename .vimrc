@@ -24,29 +24,52 @@ set nocompatible
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
+
 " use visual terminal bell
 set vb
+
 " line numbers
 set number
+
 " Don't break words when wrapping lines
 set linebreak
+
+" make wrapped lines more obvious
+let &showbreak="> "
+set cpoptions+=n
+
+" When turning wrap off, make it more obvious where we are on a line
+set listchars+=precedes:<,extends:>
+
+" When wrap is off, horizontally scroll a decent amount.
+set sidescroll=16
+
 " set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
 " files)
 set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
+set shiftround
+
 " keep 999 lines of command line history
 set history=999
+
 " show the cursor position all the time
 set ruler
+
 " display incomplete commands
 set showcmd
+
 " do incremental searching
 set incsearch
+
 " ignore case sensitivity in searching
 set ignorecase
+
 " smart case sensitivity in searching
 set smartcase
+
 " Don't use Ex mode, use Q for formatting
 map Q gq
+
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
@@ -69,6 +92,7 @@ if &t_Co > 2 || has("gui_running")
 	syntax on
 	set hlsearch
 	set background=dark
+	let g:solarized_termtrans=1
 	colorscheme solarized
 endif
 
@@ -128,17 +152,16 @@ augroup END
 " Set working directory to current file on initial vim start
 cd %:p:h
 
-" automatically compile coffee-script files into javascript
-au BufWritePost *.coffee silent CoffeeMake!
-
 " set filetype for tpl files
 autocmd BufNewFile,BufRead *.tpl set filetype=php
 
 " set filetype for scss files
 autocmd BufNewFile,BufRead *.scss set filetype=scss
 
-" set indentation for CSS files
+" set indentation for some file types that don't listen otherwise
 autocmd BufNewFile,BufRead *.css set shiftwidth=4
+autocmd BufNewFile,BufRead *.php set shiftwidth=4
+autocmd BufNewFile,BufRead *.js set shiftwidth=4
 
 " Do not open NERDTree on start
 let g:nerdtree_tabs_open_on_gui_startup = 0
