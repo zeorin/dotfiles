@@ -124,3 +124,8 @@
 [submodule ".vim/bundle/ack"]
 	path = .vim/bundle/ack
 	url = https://github.com/mileszs/ack.vim.git
+	ignore = dirty
+[submodule ".vim/bundle/hardmode"]
+	path = .vim/bundle/hardmode
+	url = git://github.com/wikitopian/hardmode.git
+	ignore = dirty
