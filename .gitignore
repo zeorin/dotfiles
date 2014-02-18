@@ -1,6 +1,7 @@
 ### ignore
 *~
 *.swp
+livereload.js
 
 ### /home/xandor/.gitignore-boilerplates/CodeIgniter.gitignore
 
