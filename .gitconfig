@@ -4,6 +4,9 @@
 [core]
 	editor = vim
 	excludesfile = /home/xandor/.gitignore
+	autocrlf = input
+	eol = lf
+	safecrlf = false
 [merge]
 	tool = vimdiff
 [credential]
