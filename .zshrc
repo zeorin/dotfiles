@@ -85,7 +85,7 @@ if [[ "$OSTYPE" == *darwin* ]]
 then
 	alias ls='ls -hG'
 fi
-alias ll='ls -l'
+alias l='ls -l'
 alias la='ls -la'
 
 alias -g L="|less"
