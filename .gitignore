@@ -1,6 +1,7 @@
 ### ignore
 *~
 *.swp
+*.swo
 livereload.js
 
 ### /home/xandor/.gitignore-boilerplates/CodeIgniter.gitignore
