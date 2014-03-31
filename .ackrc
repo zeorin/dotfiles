@@ -1,5 +1,6 @@
 # ignore VIM's backup files
 --ignore-file=match:/.*~$/
 
-# Add SVG as a file type
+# Add file types
 --type-set=svg:ext:svg
+--type-set=scss:ext:scss
