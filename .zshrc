@@ -75,6 +75,8 @@ unsetopt correct_all
 alias ..='cd ..'
 alias ~='cd ~'
 
+alias todo='~/bin/todo/todo.sh -d ~/bin/todo/todo.cfg'
+
 if [[ "$OSTYPE" == *gnu* ]]
 then
 	alias ls='ls -h --color --group-directories-first'
