@@ -88,7 +88,7 @@ then
 	alias ls='ls -hG'
 fi
 alias l='ls -l'
-alias la='ls -la'
+alias ll='ls -la'
 
 alias -g L="|less"
 alias -g ...='../..'
