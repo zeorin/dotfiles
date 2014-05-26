@@ -132,9 +132,12 @@
 [submodule ".vim/bundle/stylus"]
 	path = .vim/bundle/stylus
 	url = https://github.com/wavded/vim-stylus.git
+	ignore = dirty
 [submodule ".vim/bundle/coffee-script"]
 	path = .vim/bundle/coffee-script
 	url = https://github.com/kchmck/vim-coffee-script.git
+	ignore = dirty
 [submodule ".vim/bundle/ino"]
 	path = .vim/bundle/ino
 	url = https://github.com/jplaut/vim-arduino-ino.git
+	ignore = dirty
