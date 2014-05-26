@@ -158,6 +158,10 @@ autocmd BufNewFile,BufRead *.tpl set filetype=php
 " set filetype for scss files
 autocmd BufNewFile,BufRead *.scss set filetype=scss
 
+" set filetype for arduino files
+au BufRead,BufNewFile *.pde set filetype=arduino
+au BufRead,BufNewFile *.ino set filetype=arduino
+
 " set indentation for some file types that don't listen otherwise
 autocmd BufNewFile,BufRead *.css set shiftwidth=4
 autocmd BufNewFile,BufRead *.php set shiftwidth=4
