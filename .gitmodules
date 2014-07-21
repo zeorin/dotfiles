@@ -127,11 +127,17 @@
 	ignore = dirty
 [submodule ".vim/bundle/hardmode"]
 	path = .vim/bundle/hardmode
-	url = git://github.com/wikitopian/hardmode.git
+	url = https://github.com/wikitopian/hardmode.git
 	ignore = dirty
 [submodule ".vim/bundle/stylus"]
 	path = .vim/bundle/stylus
-	url = git@github.com:wavded/vim-stylus.git
+	url = https://github.com/wavded/vim-stylus.git
+	ignore = dirty
 [submodule ".vim/bundle/coffee-script"]
 	path = .vim/bundle/coffee-script
-	url = git@github.com:kchmck/vim-coffee-script.git
+	url = https://github.com/kchmck/vim-coffee-script.git
+	ignore = dirty
+[submodule ".vim/bundle/ino"]
+	path = .vim/bundle/ino
+	url = https://github.com/jplaut/vim-arduino-ino.git
+	ignore = dirty
