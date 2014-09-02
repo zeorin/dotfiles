@@ -34,7 +34,7 @@ plugins=(debian gibo git git-extras git-flow github git-hubflow git-remote-branc
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
-export PATH=$PATH:$HOME/.bin:$HOME/.rvm/bin
+export PATH=$PATH:$HOME/.bin:$HOME/.bin/todo.txt:$HOME/.rvm/bin
 
 # Execute rvm scripts, need this to enable compass
 [[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
@@ -75,7 +75,7 @@ unsetopt correct_all
 alias ..='cd ..'
 alias ~='cd ~'
 
-alias todo='~/bin/todo/todo.sh -d ~/bin/todo/todo.cfg'
+alias todo='~/.bin/todo.txt/todo.sh -d ~/.bin/todo.txt/todo.cfg'
 
 if [[ "$OSTYPE" == *gnu* ]]
 then
