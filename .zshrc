@@ -96,6 +96,8 @@ alias -g ....='../../..'
 alias -g .....='../../../..'
 alias -g ......='../../../../..'
 
+alias tmux='tmux -2'
+
 # MTP aliases
 if [[ "$OSTYPE" == *gnu* ]]
 then

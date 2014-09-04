@@ -145,3 +145,6 @@
 	path = irssi-colors-solarized
 	url = git@github.com:huyz/irssi-colors-solarized.git
 	ignore = dirty
+[submodule "tmux-colors-solarized"]
+	path = tmux-colors-solarized
+	url = git@github.com:seebi/tmux-colors-solarized.git
