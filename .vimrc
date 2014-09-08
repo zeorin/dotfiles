@@ -152,6 +152,9 @@ augroup END
 " Set working directory to current file on initial vim start
 cd %:p:h
 
+" set filetype for hbs files
+autocmd BufNewFile,BufRead *.hbs set filetype=html
+
 " set filetype for tpl files
 autocmd BufNewFile,BufRead *.tpl set filetype=php
 
