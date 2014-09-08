@@ -22,7 +22,7 @@
     scroll_on_output = False
     cursor_shape = underline
     delete_binding = automatic
-    font = Source Code Pro 10
+    font = Fira Mono Regular 10
     background_color = "#002b36"
     allow_bold = False
     scrollback_infinite = True
@@ -41,7 +41,7 @@
     backspace_binding = automatic
     cursor_shape = underline
     delete_binding = automatic
-    font = Source Code Pro 10
+    font = Fira Mono Regular 10
     background_color = "#002b36"
     allow_bold = False
     audible_bell = True
@@ -49,6 +49,7 @@
     palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
     copy_on_selection = True
     visible_bell = True
+    background_image = None
     background_darkness = 0.9
     urgent_bell = True
     background_type = transparent
@@ -56,7 +57,7 @@
     cursor_color = "#073642"
     foreground_color = "#657b83"
     cursor_shape = underline
-    font = Source Code Pro 10
+    font = Fira Mono Regular 10
     background_color = "#fdf6e3"
     allow_bold = False
     audible_bell = True
