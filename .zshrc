@@ -101,17 +101,6 @@ alias tmux='tmux -2'
 # Use hub instead of git if it's installed
 hub --version >/dev/null 2>&1 && alias hub=git
 
-# MTP aliases
-if [[ "$OSTYPE" == *gnu* ]]
-then
-	alias galaxys2-connect="go-mtpfs -allow-other=true /media/galaxys2"
-	alias galaxys2-disconnect="umount /media/galaxys2"
-	alias nexus7-connect="go-mtpfs -allow-other=true /media/nexus7"
-	alias nexus7-disconnect="umount /media/nexus7"
-	alias tf201-connect="go-mtpfs -allow-other=true /media/tf201"
-	alias tf201-disconnect="umount /media/tf201"
-fi
-
 # source alias.sh aliases
 source ~/.aliases
 
