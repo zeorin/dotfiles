@@ -38,6 +38,7 @@ export PATH=$PATH:$HOME/.bin:$HOME/.bin/todo.txt:$HOME/.rvm/bin
 
 # Execute rvm scripts, need this to enable compass
 [[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
+[[ -e "/usr/local/rvm/scripts/rvm" ]] && source /usr/local/rvm/scripts/rvm
 
 # Turn on colors in autocompletion
 if [[ "$OSTYPE" == *gnu* ]]
