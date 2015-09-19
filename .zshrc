@@ -100,7 +100,7 @@ alias -g ......='../../../../..'
 alias tmux='tmux -2'
 
 # Use hub instead of git if it's installed
-hub --version >/dev/null 2>&1 && alias hub=git
+hub --version >/dev/null 2>&1 && alias git=hub
 
 # source alias.sh aliases
 source ~/.aliases
