@@ -60,6 +60,9 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 # Ignore vim backup files in autocompletion
 zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'
 
+# Allow completions for git aliases
+setopt complete_aliases
+
 # vi keybindings
 bindkey -v
 # map JK to ESC in command mode
