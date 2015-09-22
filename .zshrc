@@ -61,7 +61,7 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'
 
 # Allow completions for git aliases
-setopt complete_aliases
+compdef hub=git
 
 # vi keybindings
 bindkey -v
