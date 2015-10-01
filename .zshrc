@@ -147,16 +147,21 @@ if [[ ! -d ~/.logs ]] then
 	mkdir ~/.logs
 fi
 
+# Create and enter directory
+mcd() {
+	mkdir -p "$1" && cd "$1";
+}
+
 
 # Switch between running program and shell real quick
 fancy-ctrl-z () {
-  if [[ $#BUFFER -eq 0 ]]; then
-    BUFFER="fg"
-    zle accept-line
-  else
-    zle push-input
-    zle clear-screen
-  fi
+	if [[ $#BUFFER -eq 0 ]]; then
+		BUFFER="fg"
+		zle accept-line
+	else
+		zle push-input
+		zle clear-screen
+	fi
 }
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
