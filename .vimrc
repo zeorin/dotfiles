@@ -51,9 +51,11 @@ call add(scripts, {'names': [
 	\'delimitMate',
 	\'easytags',
 	\'UltiSnips',
+	\'github:honza/vim-snippets',
 	\'Command-T',
 	\'vim-rooter',
-	\'vim-multiple-cursors'
+	\'vim-multiple-cursors',
+	\'vim-exchange'
 \], 'tag': 'general'})
 
 " Powerline is not managed by VAM
@@ -69,6 +71,13 @@ call add(scripts, {'name': 'github:marijnh/tern_for_vim', 'ft_regex': 'javascrip
 call add(scripts, {'name': 'github:tpope/vim-markdown', 'ft_regex': 'markdown'}) " Markdown
 call add(scripts, {'name': 'github:mustache/vim-mustache-handlebars', 'filename_regex': '\.hbs$'}) " Handlebars
 call add(scripts, {'names': ['github:StanAngeloff/php.vim', 'phpcomplete', 'github:2072/PHP-Indenting-for-VIm'], 'ft_regex': 'php'}) " PHP
+
+" Text/prose plugins
+call add(scripts, {'names': [
+	\'vim-pencil',
+	\'github:junegunn/limelight.vim',
+	\'github:junegunn/goyo.vim'
+\], 'ft_regex': '\(markdown\|mkd\|text\|mail\)'})
 
 " tell VAM about all scripts, and immediately activate plugins having the general tag
 call vam#Scripts(scripts, {'tag_regex': 'general'})
@@ -189,11 +198,9 @@ set complete+=kspell
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
-	set t_Co=16
 	syntax on
 	set hlsearch
 	set background=dark
-	let g:solarized_termtrans=1
 	colorscheme solarized
 endif
 
@@ -310,3 +317,41 @@ let g:easytags_async = 1
 set laststatus=2 " Always display the statusline in all windows
 set showtabline=2 " Always display the tabline, even if there is only one tab
 set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+
+" Limelight & Goyo
+let g:limelight_conceal_ctermfg = 10
+let g:limelight_conceal_guifg = '#586e75'
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+function! s:goyo_enter()
+  silent !tmux set status off
+  set noshowmode
+  set noshowcmd
+  set scrolloff=999
+  Limelight
+endfunction
+function! s:goyo_leave()
+  silent !tmux set status on
+  set showmode
+  set showcmd
+  set scrolloff=5
+  Limelight!
+endfunction
+autocmd! User GoyoEnter nested call <SID>goyo_enter()
+autocmd! User GoyoLeave nested call <SID>goyo_leave()
+
+" UltiSnips configuration
+let g:UltiSnipsExpandTrigger="<Tab>"
+let g:UltiSnipsJumpForwardTrigger="<C-b>"
+let g:UltiSnipsJumpBackwardTrigger="<C-z>"
+let g:UltiSnipsEditSplit="vertical"
+
+" Persistent undo
+let vimDir = '$HOME/.vim'
+if has('persistent_undo')
+    let myUndoDir = expand(vimDir . '/undo')
+    " Create dirs
+    call system('mkdir ' . myUndoDir)
+    let &undodir = myUndoDir
+    set undofile
+endif
