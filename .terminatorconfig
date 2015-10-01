@@ -12,7 +12,7 @@
     copy_on_selection = True
     visible_bell = True
     background_image = None
-    background_darkness = 0.9
+    background_darkness = 0.91
     urgent_bell = True
     background_type = transparent
     use_system_font = False
@@ -22,7 +22,7 @@
     scroll_on_output = False
     cursor_shape = underline
     delete_binding = automatic
-    font = Fira Mono Regular 10
+    font = Hack 10
     background_color = "#002b36"
     allow_bold = False
     scrollback_infinite = True
@@ -41,7 +41,7 @@
     backspace_binding = automatic
     cursor_shape = underline
     delete_binding = automatic
-    font = Fira Mono Regular 10
+    font = Hack 10
     background_color = "#002b36"
     allow_bold = False
     audible_bell = True
@@ -57,7 +57,7 @@
     cursor_color = "#073642"
     foreground_color = "#657b83"
     cursor_shape = underline
-    font = Fira Mono Regular 10
+    font = Hack 10
     background_color = "#fdf6e3"
     allow_bold = False
     audible_bell = True

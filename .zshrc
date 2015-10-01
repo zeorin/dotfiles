@@ -57,16 +57,28 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=default'
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=magenta,bold'
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 
+# Correct the TERM value if we're not inside a tmux session
+[[ $COLORTERM = gnome-terminal && ! $TERM = screen-256color ]] && TERM=xterm-256color
+
+# get Powerline if it's installed
+if (( $+commands[powerline] ))
+then
+	powerline-daemon -q
+	[[ -e "/usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh" ]] && source /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh
+fi
+
 # Ignore vim backup files in autocompletion
 zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'
 
-# Allow completions for git aliases
+# Allow completions for git aliases when git is wrapped by hub
 compdef hub=git
 
 # vi keybindings
 bindkey -v
 # map JK to ESC in command mode
 bindkey -M viins 'jk' vi-cmd-mode
+# VIm-style backspace
+bindkey "^?" backward-delete-char
 
 # completion
 zmodload -i zsh/complist
@@ -135,5 +147,16 @@ if [[ ! -d ~/.logs ]] then
 	mkdir ~/.logs
 fi
 
-# Promise specific settings
-export PROMISE_GIT_USER="xandor"
+
+# Switch between running program and shell real quick
+fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    BUFFER="fg"
+    zle accept-line
+  else
+    zle push-input
+    zle clear-screen
+  fi
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z

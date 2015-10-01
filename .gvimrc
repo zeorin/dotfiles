@@ -10,4 +10,4 @@ set guioptions-=T
 set guioptions+=e
 
 " Set font
-set guifont=Fira\ Mono\ Regular\ 10
+set guifont=Hack\ Regular\ 10

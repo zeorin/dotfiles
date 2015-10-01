@@ -1,0 +1,42 @@
+### ignore
+*~
+*.swp
+*.swo
+.DS_Store
+
+### /home/xandor/.gitignore-boilerplates/CodeIgniter.gitignore
+
+*/config/development
+*/logs/log-*.php
+*/logs/!index.html
+*/cache/*
+*/cache/!index.html
+
+
+### /home/xandor/.gitignore-boilerplates/Compass.gitignore
+
+.sass-cache
+
+
+### /home/xandor/.gitignore-boilerplates/Global/SASS.gitignore
+
+### SASS Ignores - "Sassy CSS" http://sass-lang.com/
+*.sass-cache
+
+
+### /home/xandor/.gitignore-boilerplates/Node.gitignore
+
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+
+npm-debug.log

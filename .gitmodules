@@ -10,141 +10,16 @@
 [submodule "dircolors-solarized"]
 	path = dircolors-solarized
 	url = git@github.com:seebi/dircolors-solarized.git
-[submodule ".vim/bundle/fugitive"]
-	path = .vim/bundle/fugitive
-	url = git@github.com:tpope/vim-fugitive.git
-	ignore = dirty
-[submodule ".vim/bundle/genutils"]
-	path = .vim/bundle/genutils
-	url = git@github.com:vim-scripts/genutils.git
-	ignore = dirty
-[submodule ".vim/bundle/gundo"]
-	path = .vim/bundle/gundo
-	url = git@github.com:sjl/gundo.vim.git
-	ignore = dirty
-[submodule ".vim/bundle/nerdtree-tabs"]
-	path = .vim/bundle/nerdtree-tabs
-	url = git@github.com:jistr/vim-nerdtree-tabs
-	ignore = dirty
-[submodule ".vim/bundle/autocomplpop"]
-	path = .vim/bundle/autocomplpop
-	url = git@github.com:vim-scripts/AutoComplPop.git
-	ignore = dirty
-[submodule ".vim/bundle/command-t"]
-	path = .vim/bundle/command-t
-	url = git@github.com:wincent/Command-T.git
-	ignore = dirty
-[submodule ".vim/bundle/css-color"]
-	path = .vim/bundle/css-color
-	url = git@github.com:skammer/vim-css-color.git
-	ignore = dirty
-[submodule ".vim/bundle/css3-syntax"]
-	path = .vim/bundle/css3-syntax
-	url = git@github.com:hail2u/vim-css3-syntax.git
-	ignore = dirty
-[submodule ".vim/bundle/csscomb"]
-	path = .vim/bundle/csscomb
-	url = git@github.com:miripiruni/CSScomb-for-Vim.git
-	ignore = dirty
-[submodule ".vim/bundle/editorconfig"]
-	path = .vim/bundle/editorconfig
-	url = git@github.com:editorconfig/editorconfig-vim.git
-	ignore = dirty
-[submodule ".vim/bundle/jade"]
-	path = .vim/bundle/jade
-	url = git@github.com:digitaltoad/vim-jade.git
-	ignore = dirty
-[submodule ".vim/bundle/markdown"]
-	path = .vim/bundle/markdown
-	url = git@github.com:plasticboy/vim-markdown.git
-	ignore = dirty
-[submodule ".vim/bundle/nerdtree"]
-	path = .vim/bundle/nerdtree
-	url = git@github.com:scrooloose/nerdtree.git
-	ignore = dirty
-[submodule ".vim/bundle/project"]
-	path = .vim/bundle/project
-	url = git@github.com:vimplugin/project.vim.git
-	ignore = dirty
-[submodule ".vim/bundle/php-html-enhanced"]
-	path = .vim/bundle/php-html-enhanced
-	url = git@github.com:vim-scripts/php.vim-html-enhanced.git
-	ignore = dirty
-[submodule ".vim/bundle/scss-syntax"]
-	path = .vim/bundle/scss-syntax
-	url = git@github.com:cakebaker/scss-syntax.vim.git
-	ignore = dirty
-[submodule ".vim/bundle/snipmate"]
-	path = .vim/bundle/snipmate
-	url = git@github.com:garbas/vim-snipmate.git
-	ignore = dirty
-[submodule ".vim/bundle/tlib"]
-	path = .vim/bundle/tlib
-	url = git@github.com:tomtom/tlib_vim.git
-	ignore = dirty
-[submodule ".vim/bundle/addon-mw-utils"]
-	path = .vim/bundle/addon-mw-utils
-	url = git@github.com:MarcWeber/vim-addon-mw-utils.git
-	ignore = dirty
-[submodule ".vim/bundle/syntastic"]
-	path = .vim/bundle/syntastic
-	url = git@github.com:scrooloose/syntastic.git
-	ignore = dirty
-[submodule ".vim/bundle/vcscommand"]
-	path = .vim/bundle/vcscommand
-	url = git@github.com:vim-scripts/vcscommand.vim.git
-	ignore = dirty
-[submodule ".vim/bundle/manpageview"]
-	path = .vim/bundle/manpageview
-	url = git@github.com:emezeske/manpageview.git
-	ignore = dirty
-[submodule ".vim/bundle/loremipsum"]
-	path = .vim/bundle/loremipsum
-	url = git@github.com:vim-scripts/loremipsum.git
-	ignore = dirty
-[submodule ".vim/bundle/solarized"]
-	path = .vim/bundle/solarized
-	url = git@github.com:altercation/vim-colors-solarized.git
-	ignore = dirty
 [submodule "zsh-syntax-highlighting"]
 	path = zsh-syntax-highlighting
 	url = git@github.com:zsh-users/zsh-syntax-highlighting.git
-[submodule ".vim/bundle/vim-snippets"]
-	path = .vim/bundle/vim-snippets
-	url = git@github.com:honza/vim-snippets
-	ignore = dirty
-[submodule ".vim/bundle/slime"]
-	path = .vim/bundle/slime
-	url = git@github.com:jpalardy/vim-slime.git
-	ignore = dirty
-[submodule ".vim/bundle/emmet"]
-	path = .vim/bundle/emmet
-	url = git@github.com:mattn/emmet-vim
-	ignore = dirty
-[submodule ".vim/bundle/ack"]
-	path = .vim/bundle/ack
-	url = git@github.com:mileszs/ack.vim.git
-	ignore = dirty
-[submodule ".vim/bundle/hardmode"]
-	path = .vim/bundle/hardmode
-	url = git@github.com:wikitopian/hardmode.git
-	ignore = dirty
-[submodule ".vim/bundle/stylus"]
-	path = .vim/bundle/stylus
-	url = git@github.com:wavded/vim-stylus.git
-	ignore = dirty
-[submodule ".vim/bundle/coffee-script"]
-	path = .vim/bundle/coffee-script
-	url = git@github.com:kchmck/vim-coffee-script.git
-	ignore = dirty
-[submodule ".vim/bundle/ino"]
-	path = .vim/bundle/ino
-	url = git@github.com:jplaut/vim-arduino-ino.git
-	ignore = dirty
 [submodule "irssi-colors-solarized"]
 	path = irssi-colors-solarized
 	url = git@github.com:huyz/irssi-colors-solarized.git
 	ignore = dirty
-[submodule "tmux-colors-solarized"]
-	path = tmux-colors-solarized
-	url = git@github.com:seebi/tmux-colors-solarized.git
+[submodule ".tmux/plugins/tmp"]
+	path = .tmux/plugins/tmp
+	url = https://github.com/tmux-plugins/tpm
+[submodule ".tmux/plugins/tpm"]
+	path = .tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm

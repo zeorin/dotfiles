@@ -4,10 +4,74 @@
 "                "
 """"""""""""""""""
 
-" initialise pathogen
-call pathogen#infect()
-" Create help tags for pathogen plugins automatically
-call pathogen#helptags()
+" VIm settings required for VAM
+set nocompatible | filetype indent plugin on | syn on
+
+fun! SetupVAM()
+	let c = get(g:, 'vim_addon_manager', {})
+	let g:vim_addon_manager = c
+	let c.plugin_root_dir = expand('$HOME', 1) . '/.vim/vim-addons'
+
+	" Force your ~/.vim/after directory to be last in &rtp always:
+	" let g:vim_addon_manager.rtp_list_hook = 'vam#ForceUsersAfterDirectoriesToBeLast'
+
+	" most used options you may want to use:
+	" let c.log_to_buf = 1
+	" let c.auto_install = 0
+	let &rtp.=(empty(&rtp)?'':',').c.plugin_root_dir.'/vim-addon-manager'
+	if !isdirectory(c.plugin_root_dir.'/vim-addon-manager/autoload')
+		execute '!git clone --depth=1 git://github.com/MarcWeber/vim-addon-manager '
+					\       shellescape(c.plugin_root_dir.'/vim-addon-manager', 1)
+	endif
+
+	" This provides the VAMActivate command, you could be passing plugin names, too
+	call vam#ActivateAddons([], {})
+endfun
+call SetupVAM()
+
+" Load plugins dynamically
+let scripts = []
+
+" General plugins
+call add(scripts, {'names': [
+	\'YouCompleteMe',
+	\'Solarized',
+	\'editorconfig-vim',
+	\'fugitive',
+	\'Gundo',
+	\'The_NERD_tree',
+	\'github:jistr/vim-nerdtree-tabs',
+	\'NERD_tree_Project',
+	\'Hardcore_Mode',
+	\'Syntastic',
+	\'Tagbar',
+	\'commentary',
+	\'ack',
+	\'vim-airline',
+	\'surround',
+	\'delimitMate',
+	\'easytags',
+	\'UltiSnips',
+	\'Command-T',
+	\'vim-rooter',
+	\'vim-multiple-cursors'
+\], 'tag': 'general'})
+
+" Filetype/language support
+call add(scripts, {'name': 'haml.zip', 'ft_regex': '\(haml\|sass\|scss\)'}) " HAML, SASS, SCSS
+call add(scripts, {'name': 'Better_CSS_Syntax_for_Vim', 'ft_regex': 'css'}) " CSS3
+call add(scripts, {'name': 'html5', 'ft_regex': 'html'}) " HTML5
+call add(scripts, {'name': 'github:marijnh/tern_for_vim', 'ft_regex': 'javascript'}) " JavaScript
+call add(scripts, {'name': 'github:tpope/vim-markdown', 'ft_regex': 'markdown'}) " Markdown
+call add(scripts, {'name': 'github:mustache/vim-mustache-handlebars', 'filename_regex': '\.hbs$'}) " Handlebars
+call add(scripts, {'names': ['github:StanAngeloff/php.vim', 'phpcomplete', 'github:2072/PHP-Indenting-for-VIm'], 'ft_regex': 'php'}) " PHP
+
+" tell VAM about all scripts, and immediately activate plugins having the general tag
+call vam#Scripts(scripts, {'tag_regex': 'general'})
+
+" YouCompleteMe options
+let g:ycm_key_list_select_completion = ['<C-n>']
+let g:ycm_key_list_previous_completion = ['<C-p>']
 
 " Include matchit
 source $VIMRUNTIME/macros/matchit.vim
@@ -19,8 +83,7 @@ source $VIMRUNTIME/macros/matchit.vim
 "                      "
 """"""""""""""""""""""""
 
-" Use VIm, and not VI
-set nocompatible
+set encoding=utf-8
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -67,6 +130,30 @@ set ignorecase
 " smart case sensitivity in searching
 set smartcase
 
+" better command line completion
+set wildmode=longest,list:full
+
+" better split window locations
+set splitright
+set splitbelow
+
+" easier navigation between split windows
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-h> <c-w>h
+nnoremap <c-l> <c-w>l
+
+" hyphens are typically part of function and variable names
+set iskeyword+=-
+" so are $ characters
+set iskeyword+=$
+
+" Let brace movement work even when braces aren't at col 0
+map [[ ?{<CR>w99[{
+map ][ /}<CR>b99]}
+map ]] j0[[%/{<CR>
+map [] k$][%?}<CR>
+
 " Don't use Ex mode, use Q for formatting
 map Q gq
 
@@ -76,24 +163,29 @@ inoremap <C-U> <C-G>u<C-U>
 
 " In many terminal emulators the mouse works just fine, thus enable it.
 if has('mouse')
-  set mouse=a
+	set mouse=a
 endif
 
 " Configure the use of backup files
 if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
+	set nobackup		" do not keep a backup file, use versions instead
 else
-  set backup		" keep a backup file
+	set backup		" keep a backup file
 endif
 
-" Highlight trailing whitespace
+" Highlight trailing white space
 autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
 :au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 :au InsertLeave * match ExtraWhitespace /\s\+$/
 
+" Spell check & word completion
+set spell spelllang=en_gb
+set complete+=kspell
+
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
 if &t_Co > 2 || has("gui_running")
+	set t_Co=16
 	syntax on
 	set hlsearch
 	set background=dark
@@ -119,8 +211,7 @@ if has("autocmd")
 
 		" For all text files set 'textwidth' to 78 characters.
 		autocmd FileType text setlocal textwidth=78
-		autocmd FileType mkd setlocal textwidth=78
-		autocmd FileType md setlocal textwidth=78
+		autocmd FileType markdown setlocal textwidth=78
 
 		" When editing a file, always jump to the last known cursor position.
 		" Don't do it when the position is invalid or when inside an event handler
@@ -144,107 +235,41 @@ endif " has("autocmd")
 " file it was loaded from, thus the changes you made.
 " Only define it when not defined already.
 if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
+	command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+				\ | wincmd p | diffthis
 endif
 
 " Open each file (buffer) in it's own tab on first open
 augroup tabopen
-   autocmd!
-   autocmd VimEnter * nested if &buftype != "help" | tab sball | endif
+	autocmd!
+	autocmd VimEnter * nested if &buftype != "help" | tab sball | endif
 augroup END
-
-" Set working directory to current file on initial vim start
-cd %:p:h
-
-" set filetype for hbs files
-autocmd BufNewFile,BufRead *.hbs set filetype=html
-
-" set filetype for tpl files
-autocmd BufNewFile,BufRead *.tpl set filetype=php
-
-" set filetype for scss files
-autocmd BufNewFile,BufRead *.scss set filetype=scss
-
-" set filetype for arduino files
-au BufRead,BufNewFile *.pde set filetype=arduino
-au BufRead,BufNewFile *.ino set filetype=arduino
-
-" set indentation for some file types that don't listen otherwise
-autocmd BufNewFile,BufRead *.css set shiftwidth=4
-autocmd BufNewFile,BufRead *.php set shiftwidth=4
-autocmd BufNewFile,BufRead *.js set shiftwidth=4
 
 " Do not open NERDTree on start
 let g:nerdtree_tabs_open_on_gui_startup = 0
-
-" allow autocomplpop to access snippets
-let g:acp_behaviorSnipmateLength=-1
-
-" Options for project.vim
-let g:proj_flags="imstg"
-
-" Options for Zen Coding
-let g:user_zen_settings = {
-			\	'indentation' : "\t",
-			\	'lang' : 'en',
-			\	'html' : {
-			\		'filters' : 'html'
-			\	},
-			\	'php' : {
-			\		'extends' : 'html',
-			\		'filters' : 'html,c',
-			\	},
-			\	'css' : {
-			\		'filters' : 'fc',
-			\	},
-			\	'javascript' : {
-			\		'snippets' : {
-			\			'jq' : "$(function() {\n\t${cursor}${child}\n});",
-			\			'jq:each' : "$.each(arr, function(index, item)\n\t${child}\n});",
-			\			'fn' : "(function() {\n\t${cursor}\n})();",
-			\			'tm' : "setTimeout(function() {\n\t${cursor}\n}, 100);",
-			\		},
-			\	},
-			\}
-
-" SLIME settings
-" I use tmux, not screen
-let g:slime_target = "tmux"
-" default current window, pane 1
-let g:slime_default_config = {"socket_name": "default", "target_pane": ":.1"}
-
-" Useful abbreviations
-iabbrev @@ zeorin@gmail.com
-iabbrev ssig Kind regards,<cr><cr>Xandor Schiefer<cr>079 706 5620<cr>zeorin@gmail.com
-
-" Set the leader
-let mapleader = ','
-let maplocalleader = '/'
-
 " Map NERDTreeTabsToggle to a key combination
 nnoremap <F8> :NERDTreeTabsToggle<CR>
+" Nerd Tree to find root of project
+let g:NTPNamesDirs = ['.git']
+
+" Syntastic options
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_quiet_messages = { "type": "style" }
+let g:syntastic_html_tidy_exec = '/usr/local/bin/tidy'
+
+" Set the leader
+map <Space> <Leader>
 
 " Map Gundo to F5
 nnoremap <F5> :GundoToggle<CR>
 
+" Map Tagbar to F9
+nnoremap <F9> :TagbarToggle<CR>
+
 " edit and source the vimrc file quickly
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
-
-" move the current line down
-nnoremap <leader>- ddp
-
-" move the current line up
-nnoremap <leader>_ ddkP
-
-" make the CURRENT word uppercase
-inoremap <leader><c-u> <esc>viwUea
-nnoremap <leader><c-u> viwUe
-
-" wrap current selection in quotes
-vnoremap <leader>" <esc>`<i"<esc>`>la"<esc>
-vnoremap <leader>' <esc>`<i'<esc>`>la'<esc>
 
 " change ESC to jk
 inoremap jk <esc>
@@ -259,3 +284,40 @@ nnoremap <up> <nop>
 nnoremap <down> <nop>
 nnoremap <left> <nop>
 nnoremap <right> <nop>
+
+" Current directory ought to be project root
+let g:rooter_patterns = ['.git/']
+
+" Airline configuration
+set laststatus=2
+let g:airline_powerline_fonts=1
+if !exists('g:airline_symbols')
+	let g:airline_symbols = {}
+endif
+let g:airline_left_sep = ''
+let g:airline_left_alt_sep = ''
+let g:airline_right_sep = ''
+let g:airline_right_alt_sep = ''
+let g:airline_symbols.branch = ''
+let g:airline_symbols.readonly = ''
+let g:airline_symbols.linenr = ''
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#tab_nr_type = 2
+let g:airline#extensions#tabline#left_sep = ''
+let g:airline#extensions#tabline#left_alt_sep = ''
+let g:airline#extensions#tabline#right_sep = ''
+let g:airline#extensions#tabline#right_alt_sep = ''
+
+" Easytags configuration
+let g:easytags_languages = {
+	\'javascript': {
+		\'cmd': '/usr/bin/jsctags',
+		\'args': [],
+		\'fileoutput_opt': '-f',
+		\'stdout_opt': '-f-',
+		\'recurse_flag': '-R'
+	\}
+\}
+set tags=.git/tags;,./tags,~/.vimtags;
+let g:easytags_dynamic_files = 2
+let g:easytags_async = 1
