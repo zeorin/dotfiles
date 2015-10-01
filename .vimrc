@@ -47,7 +47,6 @@ call add(scripts, {'names': [
 	\'Tagbar',
 	\'commentary',
 	\'ack',
-	\'vim-airline',
 	\'surround',
 	\'delimitMate',
 	\'easytags',
@@ -56,6 +55,11 @@ call add(scripts, {'names': [
 	\'vim-rooter',
 	\'vim-multiple-cursors'
 \], 'tag': 'general'})
+
+" Powerline is not managed by VAM
+python from powerline.vim import setup as powerline_setup
+python powerline_setup()
+python del powerline_setup
 
 " Filetype/language support
 call add(scripts, {'name': 'haml.zip', 'ft_regex': '\(haml\|sass\|scss\)'}) " HAML, SASS, SCSS
@@ -288,26 +292,6 @@ nnoremap <right> <nop>
 " Current directory ought to be project root
 let g:rooter_patterns = ['.git/']
 
-" Airline configuration
-set laststatus=2
-let g:airline_powerline_fonts=1
-if !exists('g:airline_symbols')
-	let g:airline_symbols = {}
-endif
-let g:airline_left_sep = ''
-let g:airline_left_alt_sep = ''
-let g:airline_right_sep = ''
-let g:airline_right_alt_sep = ''
-let g:airline_symbols.branch = ''
-let g:airline_symbols.readonly = ''
-let g:airline_symbols.linenr = ''
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#tab_nr_type = 2
-let g:airline#extensions#tabline#left_sep = ''
-let g:airline#extensions#tabline#left_alt_sep = ''
-let g:airline#extensions#tabline#right_sep = ''
-let g:airline#extensions#tabline#right_alt_sep = ''
-
 " Easytags configuration
 let g:easytags_languages = {
 	\'javascript': {
@@ -321,3 +305,8 @@ let g:easytags_languages = {
 set tags=.git/tags;,./tags,~/.vimtags;
 let g:easytags_dynamic_files = 2
 let g:easytags_async = 1
+
+" Powerline specific settings
+set laststatus=2 " Always display the statusline in all windows
+set showtabline=2 " Always display the tabline, even if there is only one tab
+set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
