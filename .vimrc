@@ -7,6 +7,9 @@
 " VIm settings required for VAM
 set nocompatible | filetype indent plugin on | syn on
 
+" Set the leader, needs to be done early
+let mapleader = "\<Space>"
+
 fun! SetupVAM()
 	let c = get(g:, 'vim_addon_manager', {})
 	let g:vim_addon_manager = c
@@ -55,7 +58,8 @@ call add(scripts, {'names': [
 	\'Command-T',
 	\'vim-rooter',
 	\'vim-multiple-cursors',
-	\'vim-exchange'
+	\'vim-exchange',
+	\'abolish'
 \], 'tag': 'general'})
 
 " Powerline is not managed by VAM
@@ -269,9 +273,6 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_quiet_messages = { "type": "style" }
 let g:syntastic_html_tidy_exec = '/usr/local/bin/tidy'
 
-" Set the leader
-map <Space> <Leader>
-
 " Map Gundo to F5
 nnoremap <F5> :GundoToggle<CR>
 
@@ -284,6 +285,10 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " change ESC to jk
 inoremap jk <esc>
+
+" easy semicolon insertion
+inoremap <leader>; <C-o>m`<C-o>A;<C-o>``
+inoremap <leader>: <C-o>A;
 
 " unmap keys I shouldn't be using
 inoremap <esc> <nop>
