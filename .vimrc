@@ -342,8 +342,9 @@ autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
 " UltiSnips configuration
 let g:UltiSnipsExpandTrigger="<Tab>"
+let g:UltiSnipsListSnippets="<C-a>"
 let g:UltiSnipsJumpForwardTrigger="<C-b>"
-let g:UltiSnipsJumpBackwardTrigger="<C-z>"
+let g:UltiSnipsJumpBackwardTrigger="<C-x>"
 let g:UltiSnipsEditSplit="vertical"
 
 " Persistent undo
