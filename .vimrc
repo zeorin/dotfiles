@@ -24,7 +24,7 @@ fun! SetupVAM()
 	let &rtp.=(empty(&rtp)?'':',').c.plugin_root_dir.'/vim-addon-manager'
 	if !isdirectory(c.plugin_root_dir.'/vim-addon-manager/autoload')
 		execute '!git clone --depth=1 git://github.com/MarcWeber/vim-addon-manager '
-					\       shellescape(c.plugin_root_dir.'/vim-addon-manager', 1)
+			\shellescape(c.plugin_root_dir.'/vim-addon-manager', 1)
 	endif
 
 	" This provides the VAMActivate command, you could be passing plugin names, too
@@ -74,8 +74,12 @@ call add(scripts, {'name': 'html5', 'ft_regex': 'html'}) " HTML5
 call add(scripts, {'name': 'github:marijnh/tern_for_vim', 'ft_regex': 'javascript'}) " JavaScript
 call add(scripts, {'name': 'github:tpope/vim-markdown', 'ft_regex': 'markdown'}) " Markdown
 call add(scripts, {'name': 'github:mustache/vim-mustache-handlebars', 'filename_regex': '\.hbs$'}) " Handlebars
-call add(scripts, {'names': ['github:StanAngeloff/php.vim', 'phpcomplete', 'github:2072/PHP-Indenting-for-VIm'], 'ft_regex': 'php'}) " PHP
-
+" PHP
+call add(scripts, {'names': [
+	\'github:StanAngeloff/php.vim',
+	\'phpcomplete',
+	\'github:2072/PHP-Indenting-for-VIm'
+\], 'ft_regex': 'php'})
 " Text/prose plugins
 call add(scripts, {'names': [
 	\'vim-pencil',
@@ -101,6 +105,9 @@ source $VIMRUNTIME/macros/matchit.vim
 """"""""""""""""""""""""
 
 set encoding=utf-8
+
+" Blank this out for now
+set listchars=
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -186,12 +193,17 @@ endif
 " Configure the use of backup files
 if has("vms")
 	set nobackup		" do not keep a backup file, use versions instead
+	set nobackup		" do not keep a backup file, use versions instead
 else
 	set backup		" keep a backup file
 endif
 
+" Make tabs and trailing white space visible
+set listchars+=tab:⏐\ ,trail:‧,nbsp:‧
+set list
+autocmd ColorScheme * highlight SpecialKey term=NONE ctermfg=10 ctermbg=NONE gui=NONE guifg=DarkGray guibg=NONE
 " Highlight trailing white space
-autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd ColorScheme * highlight ExtraWhitespace cterm=NONE ctermfg=red ctermbg=NONE guifg=red guibg=NONE
 :au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 :au InsertLeave * match ExtraWhitespace /\s\+$/
 
@@ -234,9 +246,9 @@ if has("autocmd")
 		" Also don't do it when the mark is in the first line, that is the default
 		" position when opening a file.
 		autocmd BufReadPost *
-					\ if line("'\"") > 1 && line("'\"") <= line("$") |
-					\   exe "normal! g`\"" |
-					\ endif
+			\ if line("'\"") > 1 && line("'\"") <= line("$") |
+			\   exe "normal! g`\"" |
+			\ endif
 
 	augroup END
 
@@ -251,7 +263,7 @@ endif " has("autocmd")
 " Only define it when not defined already.
 if !exists(":DiffOrig")
 	command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-				\ | wincmd p | diffthis
+		\ | wincmd p | diffthis
 endif
 
 " Open each file (buffer) in it's own tab on first open
@@ -329,18 +341,18 @@ let g:limelight_conceal_guifg = '#586e75'
 autocmd! User GoyoEnter Limelight
 autocmd! User GoyoLeave Limelight!
 function! s:goyo_enter()
-  silent !tmux set status off
-  set noshowmode
-  set noshowcmd
-  set scrolloff=999
-  Limelight
+	silent !tmux set status off
+	set noshowmode
+	set noshowcmd
+	set scrolloff=999
+	Limelight
 endfunction
 function! s:goyo_leave()
-  silent !tmux set status on
-  set showmode
-  set showcmd
-  set scrolloff=5
-  Limelight!
+	silent !tmux set status on
+	set showmode
+	set showcmd
+	set scrolloff=5
+	Limelight!
 endfunction
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
 autocmd! User GoyoLeave nested call <SID>goyo_leave()
@@ -355,9 +367,9 @@ let g:UltiSnipsEditSplit="vertical"
 " Persistent undo
 let vimDir = '$HOME/.vim'
 if has('persistent_undo')
-    let myUndoDir = expand(vimDir . '/undo')
-    " Create dirs
-    call system('mkdir ' . myUndoDir)
-    let &undodir = myUndoDir
-    set undofile
+	let myUndoDir = expand(vimDir . '/undo')
+	" Create dirs
+	call system('mkdir ' . myUndoDir)
+	let &undodir = myUndoDir
+	set undofile
 endif
