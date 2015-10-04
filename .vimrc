@@ -60,7 +60,8 @@ call add(scripts, {'names': [
 	\'vim-multiple-cursors',
 	\'vim-exchange',
 	\'abolish',
-	\'github:sickill/vim-pasta'
+	\'github:sickill/vim-pasta',
+	\'github:christoomey/vim-tmux-navigator'
 \], 'tag': 'general'})
 
 " Powerline is not managed by VAM
@@ -160,12 +161,6 @@ set wildmode=longest,list:full
 " better split window locations
 set splitright
 set splitbelow
-
-" easier navigation between split windows
-nnoremap <c-j> <c-w>j
-nnoremap <c-k> <c-w>k
-nnoremap <c-h> <c-w>h
-nnoremap <c-l> <c-w>l
 
 " hyphens are typically part of function and variable names
 set iskeyword+=-
