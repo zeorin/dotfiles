@@ -98,7 +98,6 @@ let g:ycm_key_list_previous_completion = ['<C-p>']
 " Include matchit
 source $VIMRUNTIME/macros/matchit.vim
 
-
 """"""""""""""""""""""""
 "                      "
 " General VIm settings "
@@ -374,3 +373,6 @@ if has('persistent_undo')
 	let &undodir = myUndoDir
 	set undofile
 endif
+
+" Map HardMode
+nnoremap <Leader>h :call ToggleHardMode()<CR>
