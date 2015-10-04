@@ -59,7 +59,8 @@ call add(scripts, {'names': [
 	\'vim-rooter',
 	\'vim-multiple-cursors',
 	\'vim-exchange',
-	\'abolish'
+	\'abolish',
+	\'github:sickill/vim-pasta'
 \], 'tag': 'general'})
 
 " Powerline is not managed by VAM
