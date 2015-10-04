@@ -45,7 +45,7 @@ call add(scripts, {'names': [
 	\'The_NERD_tree',
 	\'github:jistr/vim-nerdtree-tabs',
 	\'NERD_tree_Project',
-	\'Hardcore_Mode',
+	\'github:wikitopian/hardmode',
 	\'Syntastic',
 	\'Tagbar',
 	\'commentary',
@@ -116,7 +116,7 @@ set backspace=indent,eol,start
 set vb
 
 " line numbers
-set number
+set relativenumber
 
 " Don't break words when wrapping lines
 set linebreak
