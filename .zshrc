@@ -117,9 +117,6 @@ alias tmux='tmux -2'
 # Use hub instead of git if it's installed
 hub --version >/dev/null 2>&1 && alias git=hub
 
-# source alias.sh aliases
-source ~/.aliases
-
 # Show time for long commands
 REPORTTIME=5
 TIMEFMT="%U user %S system %P cpu %*Es total"
