@@ -137,10 +137,11 @@ set sidescroll=16
 " set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
 " files)
 set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
+set smarttab
 set shiftround
 
-" keep 999 lines of command line history
-set history=999
+" keep max lines of command line history
+set history=10000
 
 " show the cursor position all the time
 set ruler
@@ -158,7 +159,10 @@ set ignorecase
 set smartcase
 
 " better command line completion
-set wildmode=longest,list:full
+set wildmode=longest,full
+set wildmenu
+set fileignorecase
+set wildignorecase
 
 " better split window locations
 set splitright
@@ -207,6 +211,14 @@ autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=red ct
 " Spell check & word completion
 set spell spelllang=en_gb
 set complete+=kspell
+set complete-=i
+
+" Display as much as possible of a line that doesn't fit on screen
+set display=lastline
+
+" Better autoformat
+set formatoptions+=j	" Remove comment leader when joining lines
+set formatoptions-=o	" Don't automatically assume next line after comment is also comment
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -217,8 +229,11 @@ if &t_Co > 2 || has("gui_running")
 	colorscheme solarized
 endif
 
-" Practically unlimited tabs
-set tabpagemax=999
+" More page tabs allowed
+set tabpagemax=50
+
+" Reread changed files
+set autoread
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
