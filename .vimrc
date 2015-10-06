@@ -118,6 +118,8 @@ set vb
 
 " line numbers
 set relativenumber
+autocmd ColorScheme * highlight CursorLineNr gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
+
 
 " Don't break words when wrapping lines
 set linebreak
@@ -196,9 +198,9 @@ endif
 " Make tabs and trailing white space visible
 set listchars+=tab:⏐\ ,trail:‧,nbsp:‧
 set list
-autocmd ColorScheme * highlight SpecialKey term=NONE ctermfg=10 ctermbg=NONE gui=NONE guifg=DarkGray guibg=NONE
+autocmd ColorScheme * highlight SpecialKey gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
 " Highlight trailing white space
-autocmd ColorScheme * highlight ExtraWhitespace cterm=NONE ctermfg=red ctermbg=NONE guifg=red guibg=NONE
+autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=red ctermfg=red guibg=NONE ctermbg=NONE
 :au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 :au InsertLeave * match ExtraWhitespace /\s\+$/
 
