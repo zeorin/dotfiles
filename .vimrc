@@ -120,8 +120,6 @@ set vb
 
 " line numbers
 set relativenumber
-autocmd ColorScheme * highlight CursorLineNr gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
-
 
 " Don't break words when wrapping lines
 set linebreak
@@ -229,6 +227,16 @@ if &t_Co > 2 || has("gui_running")
 	set hlsearch
 	set background=dark
 	colorscheme solarized
+	" Fix some Solarized bugs
+	highlight CursorLineNr gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
+	highlight SignColumn gui=NONE term=NONE guibg=#073642 ctermbg=0
+	" Better Syntastic styles
+	highlight SyntasticWarningSign gui=NONE,bold term=NONE,bold guifg=#5f5faf ctermfg=13 guibg=#073642 ctermbg=0
+	highlight SyntasticErrorSign gui=NONE,bold term=NONE,bold guifg=#af0000 ctermfg=1 guibg=#073642 ctermbg=0
+	" Better git-gutter styles
+	highlight lineAdded gui=NONE,bold term=NONE,bold guifg=#5f8700 ctermfg=2 guibg=#073642 ctermbg=0
+	highlight lineModified gui=NONE,bold term=NONE,bold guifg=#af8700 ctermfg=3 guibg=#073642 ctermbg=0
+	highlight lineRemoved gui=NONE,bold term=NONE,bold guifg=#af0000 ctermfg=1 guibg=#073642 ctermbg=0
 endif
 
 " More page tabs allowed
