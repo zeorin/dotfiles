@@ -4,7 +4,7 @@
 "                "
 """"""""""""""""""
 
-" VIm settings required for VAM
+" Vim settings required for VAM
 set nocompatible | filetype indent plugin on | syn on
 
 " Set the leader, needs to be done early
@@ -41,6 +41,8 @@ call add(scripts, {'names': [
 	\'Solarized',
 	\'editorconfig-vim',
 	\'fugitive',
+	\'github:airblade/vim-gitgutter',
+	\'unimpaired',
 	\'Gundo',
 	\'The_NERD_tree',
 	\'github:jistr/vim-nerdtree-tabs',
@@ -101,7 +103,7 @@ source $VIMRUNTIME/macros/matchit.vim
 
 """"""""""""""""""""""""
 "                      "
-" General VIm settings "
+" General Vim settings "
 "                      "
 """"""""""""""""""""""""
 
@@ -388,3 +390,6 @@ endif
 
 " Map HardMode
 nnoremap <Leader>h :call ToggleHardMode()<CR>
+
+" Faster update for Git Gutter
+set updatetime=750
