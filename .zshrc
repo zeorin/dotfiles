@@ -70,6 +70,13 @@ fi
 # Ignore vim backup files in autocompletion
 zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'
 
+# Set Vim to default CLI editor if it's installed
+if (( $+commands[vim] ))
+then
+	export EDITOR=vim
+	export VISUAL=vim
+fi
+
 # Allow completions for git aliases when git is wrapped by hub
 compdef hub=git
 
