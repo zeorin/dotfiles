@@ -23,5 +23,6 @@
 	visual = !ungit
 	stash-unapply = !git stash show -p | git apply -R
 	assume-unchanged = !git ls-files -v | grep '^[[:lower:]]'
+	edit-dirty = !git status --porcelain | sed s/^...// | xargs $EDITOR
 [push]
 	default = current
