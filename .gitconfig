@@ -1,6 +1,6 @@
 [user]
 	name = Xandor Schiefer
-	email = zeorin@gmail.com
+	email = me@xandor.co.za
 [core]
 	editor = vim
 	excludesfile = ~/.cvsignore
