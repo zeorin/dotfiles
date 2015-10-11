@@ -381,6 +381,7 @@ function! s:goyo_leave()
 endfunction
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
 autocmd! User GoyoLeave nested call <SID>goyo_leave()
+nnoremap <Leader>g :Goyo<CR>
 
 " UltiSnips configuration
 let g:UltiSnipsExpandTrigger="<Tab>"
