@@ -134,6 +134,9 @@ set listchars+=precedes:<,extends:>
 " When wrap is off, horizontally scroll a decent amount.
 set sidescroll=16
 
+" Ingore backup files & git directories
+set wildignore+=*~,.git
+
 " set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
 " files)
 set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
@@ -401,3 +404,7 @@ nnoremap <Leader>h :call ToggleHardMode()<CR>
 
 " Faster update for Git Gutter
 set updatetime=750
+
+" Command-T settings
+let g:CommandTAlwaysShowDotFiles = 1
+let g:CommandTScanDotDirectories = 1
