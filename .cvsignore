@@ -3,6 +3,7 @@
 *.swp
 *.swo
 .DS_Store
+tags
 
 ### /home/xandor/.gitignore-boilerplates/CodeIgniter.gitignore
 
