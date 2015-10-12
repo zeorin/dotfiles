@@ -61,10 +61,11 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 [[ $COLORTERM = gnome-terminal && ! $TERM = screen-256color ]] && TERM=xterm-256color
 
 # get Powerline if it's installed
-if (( $+commands[powerline] ))
+if (( $+commands[powerline-daemon] ))
 then
 	powerline-daemon -q
 	[[ -e "/usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh" ]] && source /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh
+	[[ -e "/Library/Python/2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]] && export LC_ALL=en_ZA.UTF-8 && export LANG=en_ZA.UTF-8 && source /Library/Python/2.7/site-packages/powerline/bindings/zsh/powerline.zsh
 fi
 
 # Ignore vim backup files in autocompletion
@@ -170,10 +171,6 @@ fancy-ctrl-z () {
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
 
-# Try to attach to a Tmux session when using SSH to log in
-ssh () {
-	/usr/bin/ssh -t $@ /bin/sh -c 'tmux has-session > /dev/null 2>&1 && exec tmux attach || exec tmux'
-}
-
+# Load NVM if it exists
 export NVM_DIR="/home/xandor/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
