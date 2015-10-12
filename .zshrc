@@ -170,8 +170,3 @@ fancy-ctrl-z () {
 }
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
-
-# Try to attach to a Tmux session when using SSH to log in
-ssh () {
-	/usr/bin/ssh -t $@ /bin/sh -c 'tmux has-session > /dev/null 2>&1 && exec tmux attach || exec tmux'
-}
