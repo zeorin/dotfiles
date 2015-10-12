@@ -23,3 +23,6 @@
 [submodule ".tmux/plugins/tpm"]
 	path = .tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule "git-flow-completion"]
+	path = git-flow-completion
+	url = git@github.com:bobthecow/git-flow-completion.git

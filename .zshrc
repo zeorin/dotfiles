@@ -29,7 +29,7 @@ ZSH_THEME="xandor"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(debian gibo git git-extras git-flow github git-hubflow git-remote-branch gnu-utils history history-substring-search node npm svn zsh-syntax-highlighting)
+plugins=(debian gibo git git-extras git-flow github git-hubflow git-flow-completion git-remote-branch gnu-utils history history-substring-search node npm svn zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
