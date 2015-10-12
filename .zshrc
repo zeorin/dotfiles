@@ -174,3 +174,6 @@ bindkey '^Z' fancy-ctrl-z
 ssh () {
 	/usr/bin/ssh -t $@ /bin/sh -c 'tmux has-session > /dev/null 2>&1 && exec tmux attach || exec tmux'
 }
+
+export NVM_DIR="/home/xandor/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
