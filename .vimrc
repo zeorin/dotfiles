@@ -45,6 +45,7 @@ call add(scripts, {'names': [
 	\'unimpaired',
 	\'Gundo',
 	\'The_NERD_tree',
+	\'github:Xuyuanp/nerdtree-git-plugin',
 	\'github:jistr/vim-nerdtree-tabs',
 	\'NERD_tree_Project',
 	\'github:wikitopian/hardmode',
