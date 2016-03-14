@@ -10,6 +10,9 @@ set nocompatible | filetype indent plugin on | syn on
 " Set the leader, needs to be done early
 let g:mapleader = "\<Space>"
 
+" Powerline is not managed by VAM
+set rtp+=$HOME/.local/lib/python2.7/site-packages/powerline/bindings/vim/
+
 fun! SetupVAM()
 	let c = get(g:, 'vim_addon_manager', {})
 	let g:vim_addon_manager = c
@@ -66,11 +69,6 @@ call add(scripts, {'names': [
 	\'github:sickill/vim-pasta',
 	\'github:christoomey/vim-tmux-navigator'
 \], 'tag': 'general'})
-
-" Powerline is not managed by VAM
-python from powerline.vim import setup as powerline_setup
-python powerline_setup()
-python del powerline_setup
 
 " Filetype/language support
 call add(scripts, {'name': 'haml.zip', 'ft_regex': '\(haml\|sass\|scss\)'}) " HAML, SASS, SCSS

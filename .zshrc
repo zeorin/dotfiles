@@ -60,12 +60,10 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 # Correct the TERM value if we're not inside a tmux session
 [[ $COLORTERM = gnome-terminal && ! $TERM = screen-256color ]] && TERM=xterm-256color
 
-# get Powerline if it's installed
-if (( $+commands[powerline-daemon] ))
-then
-	powerline-daemon -q
-	[[ -e "/usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh" ]] && source /usr/local/lib/python2.7/dist-packages/powerline/bindings/zsh/powerline.zsh
-	[[ -e "/Library/Python/2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]] && export LC_ALL=en_ZA.UTF-8 && export LANG=en_ZA.UTF-8 && source /Library/Python/2.7/site-packages/powerline/bindings/zsh/powerline.zsh
+# init Powerline if it's installed
+if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
+	export PATH=$PATH:$HOME/.local/bin
+	source ~/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
 fi
 
 # Ignore vim backup files in autocompletion
