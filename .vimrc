@@ -67,7 +67,8 @@ call add(scripts, {'names': [
 	\'vim-exchange',
 	\'abolish',
 	\'github:sickill/vim-pasta',
-	\'github:christoomey/vim-tmux-navigator'
+	\'github:christoomey/vim-tmux-navigator',
+	\'github:ryanoasis/vim-devicons'
 \], 'tag': 'general'})
 
 " Filetype/language support
@@ -408,3 +409,17 @@ set updatetime=750
 " Command-T settings
 let g:CommandTAlwaysShowDotFiles = 1
 let g:CommandTScanDotDirectories = 1
+
+" Fix some devicons issues
+autocmd FileType nerdtree setlocal nolist
+let g:NERDTreeIndicatorMapCustom = {
+	\"Modified"  : "✹ ",
+	\"Staged"    : "✚ ",
+	\"Untracked" : "✭ ",
+	\"Renamed"   : "➜ ",
+	\"Unmerged"  : "═ ",
+	\"Deleted"   : "✖ ",
+	\"Dirty"     : "✗ ",
+	\"Clean"     : "✔︎ ",
+	\"Unknown"   : "? "
+\}
