@@ -1,8 +1,5 @@
-source $VIMRUNTIME/gvimrc_example.vim
-
-" set transparency=10
-set background=dark
-" highlight Normal guifg=gray guibg=black
+" Hide the mouse when typing text
+set mousehide
 
 " Hide toolbar for more screen estate
 set guioptions-=T
@@ -10,4 +7,4 @@ set guioptions-=T
 set guioptions+=e
 
 " Set font
-set guifont=Hack\ Regular\ 10
+set guifont=Knack\ 10
