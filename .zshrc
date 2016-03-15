@@ -1,3 +1,11 @@
+# If not running interactively, do not do anything
+[[ $- != *i* ]] && return
+if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
+	export PATH=$PATH:$HOME/.local/bin
+fi
+#  Start shell in tmux
+[[ -z "$TMUX" ]] && exec tmux
+
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
 
@@ -62,7 +70,6 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 
 # init Powerline if it's installed
 if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
-	export PATH=$PATH:$HOME/.local/bin
 	source ~/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
 fi
 
