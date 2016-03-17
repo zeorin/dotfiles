@@ -27,5 +27,5 @@
 [push]
 	default = current
 [pager]
-	diff = diff-so-fancy | less --tabs=4 -RFX
-	show = diff-so-fancy | less --tabs=4 -RFX
+	diff = diff-so-fancy | less --tabs=4 --pattern='^(added|deleted|modified): ' -RFX
+	show = diff-so-fancy | less --tabs=4 --pattern='^(added|deleted|modified): ' -RFX
