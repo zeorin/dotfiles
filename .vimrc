@@ -171,11 +171,6 @@ set wildignorecase
 set splitright
 set splitbelow
 
-" hyphens are typically part of function and variable names
-set iskeyword+=-
-" so are $ characters
-set iskeyword+=$
-
 " Let brace movement work even when braces aren't at col 0
 map [[ ?{<CR>w99[{
 map ][ /}<CR>b99]}
