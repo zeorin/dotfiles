@@ -409,3 +409,7 @@ let g:CommandTScanDotDirectories = 1
 autocmd FileType nerdtree setlocal nolist
 let g:WebDevIconsUnicodeDecorateFolderNodes = 1
 let g:DevIconsEnableFoldersOpenClose = 1
+
+" Fix a sass issue
+" https://github.com/tpope/vim-haml/issues/66
+autocmd BufRead,BufNewFile *.sass set filetype=css
