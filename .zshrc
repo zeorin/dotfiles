@@ -1,5 +1,8 @@
 # If not running interactively, do not do anything
 [[ $- != *i* ]] && return
+if [[ "$TERM" == linux ]]; then
+	source $HOME/.dotfiles/tty-solarized/tty-solarized-dark.sh
+fi
 if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
 	export PATH=$PATH:$HOME/.local/bin
 fi
