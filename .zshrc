@@ -68,9 +68,6 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=default'
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=magenta,bold'
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 
-# Correct the TERM value if we're not inside a tmux session
-[[ $COLORTERM = gnome-terminal && ! $TERM = screen-256color ]] && TERM=xterm-256color
-
 # init Powerline if it's installed
 if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
 	source ~/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
@@ -127,8 +124,6 @@ alias -g ...='../..'
 alias -g ....='../../..'
 alias -g .....='../../../..'
 alias -g ......='../../../../..'
-
-alias tmux='tmux -2'
 
 # Use hub instead of git if it's installed
 hub --version >/dev/null 2>&1 && alias git=hub

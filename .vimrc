@@ -413,3 +413,6 @@ let g:DevIconsEnableFoldersOpenClose = 1
 " Fix a sass issue
 " https://github.com/tpope/vim-haml/issues/66
 autocmd BufRead,BufNewFile *.sass set filetype=css
+
+" Set comments to be italic
+highlight Comment cterm=italic
