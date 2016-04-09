@@ -3,13 +3,13 @@ servers = (
   { address = "eu.irc6.net"; chatnet = "IRCnet"; port = "6667"; },
   { address = "open.ircnet.net"; chatnet = "IRCnet"; port = "6667"; },
   { address = "irc.efnet.org"; chatnet = "EFNet"; port = "6667"; },
-  { 
+  {
     address = "irc.undernet.org";
     chatnet = "Undernet";
     port = "6667";
   },
   { address = "irc.dal.net"; chatnet = "DALnet"; port = "6667"; },
-  { 
+  {
     address = "irc.quakenet.org";
     chatnet = "QuakeNet";
     port = "6667";
@@ -32,6 +32,24 @@ servers = (
     use_ssl = "yes";
     ssl_verify = "no";
     autoconnect = "yes";
+  },
+  {
+    address = "cloud.xandor.co.za";
+    chatnet = "gnome";
+    port = "7000";
+    password = "zeorin/gnome:b46deca83c5e8a5e4428cc31ccb92bc7";
+    use_ssl = "yes";
+    ssl_verify = "no";
+    autoconnect = "yes";
+  }
+  {
+    address = "cloud.xandor.co.za";
+    chatnet = "debian";
+    port = "7000";
+    password = "zeorin/debian:b46deca83c5e8a5e4428cc31ccb92bc7";
+    use_ssl = "yes";
+    ssl_verify = "no";
+    autoconnect = "yes";
   }
 );
 
@@ -43,7 +61,7 @@ chatnets = {
     max_whois = "4";
     max_query_chans = "5";
   };
-  EFNet = { 
+  EFNet = {
     type = "IRC";
     max_kicks = "4";
     max_msgs = "3";
@@ -67,7 +85,7 @@ chatnets = {
     max_msgs = "3";
     max_whois = "30";
   };
-  OFTC = { 
+  OFTC = {
     type = "IRC";
     max_kicks = "1";
     max_msgs = "3";
@@ -85,7 +103,7 @@ chatnets = {
     max_msgs = "3";
     max_whois = "30";
   };
-  Rizon = { 
+  Rizon = {
     type = "IRC";
     max_kicks = "1";
     max_msgs = "3";
@@ -100,6 +118,8 @@ chatnets = {
   SILC = { type = "SILC"; };
   Ubuntu = { type = "IRC"; };
   freenode = { type = "IRC"; };
+  gnome = { type = "IRC"; };
+  debian = { type = "IRC"; };
 };
 
 channels = (
@@ -285,3 +305,4 @@ settings = {
 hilights = (
   { text = "zeorin"; color = "%M"; nick = "yes"; word = "yes"; }
 );
+logs = { };
