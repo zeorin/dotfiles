@@ -37,6 +37,7 @@ let scripts = []
 
 " General plugins
 call add(scripts, {'names': [
+	\'sensible',
 	\'YouCompleteMe',
 	\'Solarized',
 	\'editorconfig-vim',
@@ -113,9 +114,6 @@ if !has('nvim')
 	set encoding=utf-8
 endif
 
-" Blank this out for now
-set listchars=
-
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
@@ -131,9 +129,6 @@ set linebreak
 " make wrapped lines more obvious
 let &showbreak="> "
 set cpoptions+=n
-
-" When turning wrap off, make it more obvious where we are on a line
-set listchars+=precedes:<,extends:>
 
 " When wrap is off, horizontally scroll a decent amount.
 set sidescroll=16
@@ -202,8 +197,8 @@ else
 endif
 
 " Make tabs and trailing white space visible
-set listchars+=tab:⏐\ ,trail:‧,nbsp:‧
 set list
+set listchars+=tab:\│\ ,trail:·
 autocmd ColorScheme * highlight SpecialKey gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
 " Highlight trailing white space
 autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=#dc322f ctermfg=1 guibg=NONE ctermbg=NONE
