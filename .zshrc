@@ -40,7 +40,7 @@ ZSH_THEME="xandor"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(debian gibo git git-extras git-flow github git-hubflow git-flow-completion git-remote-branch gnu-utils history history-substring-search node npm svn zsh-syntax-highlighting)
+plugins=(debian gibo git git-extras git-flow github git-hubflow git-flow-completion git-remote-branch gnu-utils history node npm svn zsh-syntax-highlighting history-substring-search)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -67,6 +67,10 @@ ZSH_HIGHLIGHT_STYLES[precommand]='fg=default,bold'
 ZSH_HIGHLIGHT_STYLES[path]='fg=default'
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=magenta,bold'
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
+
+# Use history-substring-search in vi mode also
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
 
 # init Powerline if it's installed
 if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
