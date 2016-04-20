@@ -109,7 +109,9 @@ source $VIMRUNTIME/macros/matchit.vim
 "                      "
 """"""""""""""""""""""""
 
-set encoding=utf-8
+if !has('nvim')
+	set encoding=utf-8
+endif
 
 " Blank this out for now
 set listchars=
