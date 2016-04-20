@@ -206,9 +206,9 @@ set listchars+=tab:⏐\ ,trail:‧,nbsp:‧
 set list
 autocmd ColorScheme * highlight SpecialKey gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
 " Highlight trailing white space
-autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=red ctermfg=red guibg=NONE ctermbg=NONE
-:au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-:au InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=#dc322f ctermfg=1 guibg=NONE ctermbg=NONE
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/
 
 " Spell check & word completion
 set spell spelllang=en_gb
@@ -233,12 +233,12 @@ if &t_Co > 2 || has("gui_running")
 	highlight CursorLineNr gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
 	highlight SignColumn gui=NONE term=NONE guibg=#073642 ctermbg=0
 	" Better Syntastic styles
-	highlight SyntasticWarningSign gui=NONE,bold term=NONE,bold guifg=#5f5faf ctermfg=13 guibg=#073642 ctermbg=0
-	highlight SyntasticErrorSign gui=NONE,bold term=NONE,bold guifg=#af0000 ctermfg=1 guibg=#073642 ctermbg=0
+	highlight SyntasticWarningSign gui=NONE,bold term=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#073642 ctermbg=0
+	highlight SyntasticErrorSign gui=NONE,bold term=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
 	" Better git-gutter styles
-	highlight lineAdded gui=NONE,bold term=NONE,bold guifg=#5f8700 ctermfg=2 guibg=#073642 ctermbg=0
-	highlight lineModified gui=NONE,bold term=NONE,bold guifg=#af8700 ctermfg=3 guibg=#073642 ctermbg=0
-	highlight lineRemoved gui=NONE,bold term=NONE,bold guifg=#af0000 ctermfg=1 guibg=#073642 ctermbg=0
+	highlight lineAdded gui=NONE,bold term=NONE,bold guifg=#859900 ctermfg=2 guibg=#073642 ctermbg=0
+	highlight lineModified gui=NONE,bold term=NONE,bold guifg=#b58900 ctermfg=3 guibg=#073642 ctermbg=0
+	highlight lineRemoved gui=NONE,bold term=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
 endif
 
 " More page tabs allowed
