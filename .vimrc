@@ -10,9 +10,6 @@ set nocompatible | filetype indent plugin on | syn on
 " Set the leader, needs to be done early
 let g:mapleader = "\<Space>"
 
-" Powerline is not managed by VAM
-set rtp+=$HOME/.local/lib/python2.7/site-packages/powerline/bindings/vim/
-
 fun! SetupVAM()
 	let c = get(g:, 'vim_addon_manager', {})
 	let g:vim_addon_manager = c
@@ -40,6 +37,7 @@ let scripts = []
 
 " General plugins
 call add(scripts, {'names': [
+	\'sensible',
 	\'YouCompleteMe',
 	\'Solarized',
 	\'editorconfig-vim',
@@ -68,7 +66,12 @@ call add(scripts, {'names': [
 	\'abolish',
 	\'github:sickill/vim-pasta',
 	\'github:christoomey/vim-tmux-navigator',
-	\'github:ryanoasis/vim-devicons'
+	\'vim-airline',
+	\'github:vim-airline/vim-airline-themes',
+	\'github:ryanoasis/vim-devicons',
+	\'vim-startify',
+	\'github:edkolev/tmuxline.vim',
+	\'github:edkolev/promptline.vim'
 \], 'tag': 'general'})
 
 " Filetype/language support
@@ -107,10 +110,9 @@ source $VIMRUNTIME/macros/matchit.vim
 "                      "
 """"""""""""""""""""""""
 
-set encoding=utf-8
-
-" Blank this out for now
-set listchars=
+if !has('nvim')
+	set encoding=utf-8
+endif
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -127,9 +129,6 @@ set linebreak
 " make wrapped lines more obvious
 let &showbreak="> "
 set cpoptions+=n
-
-" When turning wrap off, make it more obvious where we are on a line
-set listchars+=precedes:<,extends:>
 
 " When wrap is off, horizontally scroll a decent amount.
 set sidescroll=16
@@ -198,13 +197,13 @@ else
 endif
 
 " Make tabs and trailing white space visible
-set listchars+=tab:⏐\ ,trail:‧,nbsp:‧
 set list
+set listchars+=tab:\│\ ,trail:·
 autocmd ColorScheme * highlight SpecialKey gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
 " Highlight trailing white space
-autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=red ctermfg=red guibg=NONE ctermbg=NONE
-:au InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-:au InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=#dc322f ctermfg=1 guibg=NONE ctermbg=NONE
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/
 
 " Spell check & word completion
 set spell spelllang=en_gb
@@ -229,12 +228,12 @@ if &t_Co > 2 || has("gui_running")
 	highlight CursorLineNr gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
 	highlight SignColumn gui=NONE term=NONE guibg=#073642 ctermbg=0
 	" Better Syntastic styles
-	highlight SyntasticWarningSign gui=NONE,bold term=NONE,bold guifg=#5f5faf ctermfg=13 guibg=#073642 ctermbg=0
-	highlight SyntasticErrorSign gui=NONE,bold term=NONE,bold guifg=#af0000 ctermfg=1 guibg=#073642 ctermbg=0
+	highlight SyntasticWarningSign gui=NONE,bold term=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#073642 ctermbg=0
+	highlight SyntasticErrorSign gui=NONE,bold term=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
 	" Better git-gutter styles
-	highlight lineAdded gui=NONE,bold term=NONE,bold guifg=#5f8700 ctermfg=2 guibg=#073642 ctermbg=0
-	highlight lineModified gui=NONE,bold term=NONE,bold guifg=#af8700 ctermfg=3 guibg=#073642 ctermbg=0
-	highlight lineRemoved gui=NONE,bold term=NONE,bold guifg=#af0000 ctermfg=1 guibg=#073642 ctermbg=0
+	highlight lineAdded gui=NONE,bold term=NONE,bold guifg=#859900 ctermfg=2 guibg=#073642 ctermbg=0
+	highlight lineModified gui=NONE,bold term=NONE,bold guifg=#b58900 ctermfg=3 guibg=#073642 ctermbg=0
+	highlight lineRemoved gui=NONE,bold term=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
 endif
 
 " More page tabs allowed
@@ -350,7 +349,7 @@ set tags=.git/tags;,./tags,~/.vimtags;
 let g:easytags_dynamic_files = 2
 let g:easytags_async = 1
 
-" Powerline specific settings
+" Powerline-ish specific settings
 set laststatus=2 " Always display the statusline in all windows
 set showtabline=2 " Always display the tabline, even if there is only one tab
 set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
@@ -413,6 +412,16 @@ let g:DevIconsEnableFoldersOpenClose = 1
 " Fix a sass issue
 " https://github.com/tpope/vim-haml/issues/66
 autocmd BufRead,BufNewFile *.sass set filetype=css
+
+" Set Airline configuration
+" Use powerline glyphs
+let g:airline_powerline_fonts = 1
+" Use tabline
+let g:airline#extensions#tabline#enabled = 1
+" Show buffers when no tabs
+let g:airline#extensions#tabline#show_buffers = 1
+" Always show tabline
+let g:airline#extensions#tabline#show_tabs = 1
 
 " Set comments to be italic
 highlight Comment cterm=italic

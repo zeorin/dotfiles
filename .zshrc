@@ -3,9 +3,7 @@
 if [[ "$TERM" == linux ]]; then
 	source $HOME/.dotfiles/tty-solarized/tty-solarized-dark.sh
 fi
-if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
-	export PATH=$PATH:$HOME/.local/bin
-fi
+
 #  Start shell in tmux
 [[ -z "$TMUX" ]] && exec tmux
 
@@ -72,19 +70,28 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 
-# init Powerline if it's installed
-if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
-	source ~/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
-fi
+# Remove space on right prompt
+ZLE_RPROMPT_INDENT=0
+
+# Source promptline
+source ~/.shell_prompt.sh
 
 # Ignore vim backup files in autocompletion
 zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'
 
-# Set Vim to default CLI editor if it's installed
-if (( $+commands[vim] ))
+# Set Neovim or Vim or Vi to default CLI editor if one is installed
+if (( $+commands[nvim] ))
+then
+	export EDITOR=nvim
+	export VISUAL=nvim
+elif (( $+commands[vim] ))
 then
 	export EDITOR=vim
 	export VISUAL=vim
+elif (( $+commands[vi] ))
+then
+	export EDITOR=vi
+	export VISUAL=vi
 fi
 
 # Allow completions for git aliases when git is wrapped by hub
