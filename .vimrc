@@ -68,6 +68,7 @@ call add(scripts, {'names': [
 	\'vim-airline',
 	\'github:vim-airline/vim-airline-themes',
 	\'github:ryanoasis/vim-devicons',
+	\'vim-startify',
 	\'github:edkolev/tmuxline.vim',
 	\'github:edkolev/promptline.vim'
 \], 'tag': 'general'})
