@@ -3,9 +3,7 @@
 if [[ "$TERM" == linux ]]; then
 	source $HOME/.dotfiles/tty-solarized/tty-solarized-dark.sh
 fi
-if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
-	export PATH=$PATH:$HOME/.local/bin
-fi
+
 #  Start shell in tmux
 [[ -z "$TMUX" ]] && exec tmux
 
@@ -68,10 +66,11 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=default'
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=magenta,bold'
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 
-# init Powerline if it's installed
-if [[ -e "$HOME/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh" ]]; then
-	source ~/.local/lib/python2.7/site-packages/powerline/bindings/zsh/powerline.zsh
-fi
+# Remove space on right prompt
+ZLE_RPROMPT_INDENT=0
+
+# Source promptline
+source ~/.shell_prompt.sh
 
 # Ignore vim backup files in autocompletion
 zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'

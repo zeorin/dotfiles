@@ -10,9 +10,6 @@ set nocompatible | filetype indent plugin on | syn on
 " Set the leader, needs to be done early
 let g:mapleader = "\<Space>"
 
-" Powerline is not managed by VAM
-set rtp+=$HOME/.local/lib/python2.7/site-packages/powerline/bindings/vim/
-
 fun! SetupVAM()
 	let c = get(g:, 'vim_addon_manager', {})
 	let g:vim_addon_manager = c
@@ -68,7 +65,11 @@ call add(scripts, {'names': [
 	\'abolish',
 	\'github:sickill/vim-pasta',
 	\'github:christoomey/vim-tmux-navigator',
-	\'github:ryanoasis/vim-devicons'
+	\'vim-airline',
+	\'github:vim-airline/vim-airline-themes',
+	\'github:ryanoasis/vim-devicons',
+	\'github:edkolev/tmuxline.vim',
+	\'github:edkolev/promptline.vim'
 \], 'tag': 'general'})
 
 " Filetype/language support
@@ -350,7 +351,7 @@ set tags=.git/tags;,./tags,~/.vimtags;
 let g:easytags_dynamic_files = 2
 let g:easytags_async = 1
 
-" Powerline specific settings
+" Powerline-ish specific settings
 set laststatus=2 " Always display the statusline in all windows
 set showtabline=2 " Always display the tabline, even if there is only one tab
 set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
@@ -413,6 +414,16 @@ let g:DevIconsEnableFoldersOpenClose = 1
 " Fix a sass issue
 " https://github.com/tpope/vim-haml/issues/66
 autocmd BufRead,BufNewFile *.sass set filetype=css
+
+" Set Airline configuration
+" Use powerline glyphs
+let g:airline_powerline_fonts = 1
+" Use tabline
+let g:airline#extensions#tabline#enabled = 1
+" Show buffers when no tabs
+let g:airline#extensions#tabline#show_buffers = 1
+" Always show tabline
+let g:airline#extensions#tabline#show_tabs = 1
 
 " Set comments to be italic
 highlight Comment cterm=italic
