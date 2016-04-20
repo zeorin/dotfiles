@@ -191,14 +191,13 @@ endif
 " Configure the use of backup files
 if has("vms")
 	set nobackup		" do not keep a backup file, use versions instead
-	set nobackup		" do not keep a backup file, use versions instead
 else
 	set backup		" keep a backup file
 endif
 
-" Make tabs and trailing white space visible
+" Make tabs, non-breaking spaces and trailing white space visible
 set list
-set listchars+=tab:\│\ ,trail:·
+set listchars=tab:\│\ ,trail:·,extends:>,precedes:<,nbsp:+
 autocmd ColorScheme * highlight SpecialKey gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
 " Highlight trailing white space
 autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=#dc322f ctermfg=1 guibg=NONE ctermbg=NONE
