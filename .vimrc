@@ -197,8 +197,17 @@ endif
 
 " Make tabs, non-breaking spaces and trailing white space visible
 set list
-set listchars=tab:\│\ ,trail:·,extends:>,precedes:<,nbsp:+
-autocmd ColorScheme * highlight SpecialKey gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
+" Use a Musical Symbol Single Barline (0x1d100) to show a Tab, and
+" a Middle Dot (0x00B7) for trailing spaces
+set listchars=tab:\𝄀\ ,trail:·,extends:>,precedes:<,nbsp:+
+function! SetWhiteSpaceColor()
+	if &bg == "dark"
+		highlight SpecialKey gui=NONE cterm=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
+	elseif &bg == "light"
+		highlight SpecialKey gui=NONE cterm=NONE guifg=#93a1a1 ctermfg=14 guibg=NONE ctermbg=NONE
+	endif
+endfunction
+autocmd ColorScheme * call SetWhiteSpaceColor()
 " Highlight trailing white space
 autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=#dc322f ctermfg=1 guibg=NONE ctermbg=NONE
 autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
@@ -224,15 +233,15 @@ if &t_Co > 2 || has("gui_running")
 	set background=dark
 	colorscheme solarized
 	" Fix some Solarized bugs
-	highlight CursorLineNr gui=NONE term=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
-	highlight SignColumn gui=NONE term=NONE guibg=#073642 ctermbg=0
+	highlight CursorLineNr gui=NONE cterm=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
+	highlight SignColumn gui=NONE cterm=NONE guibg=#073642 ctermbg=0
 	" Better Syntastic styles
-	highlight SyntasticWarningSign gui=NONE,bold term=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#073642 ctermbg=0
-	highlight SyntasticErrorSign gui=NONE,bold term=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
+	highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#073642 ctermbg=0
+	highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
 	" Better git-gutter styles
-	highlight lineAdded gui=NONE,bold term=NONE,bold guifg=#859900 ctermfg=2 guibg=#073642 ctermbg=0
-	highlight lineModified gui=NONE,bold term=NONE,bold guifg=#b58900 ctermfg=3 guibg=#073642 ctermbg=0
-	highlight lineRemoved gui=NONE,bold term=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
+	highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg=#859900 ctermfg=2 guibg=#073642 ctermbg=0
+	highlight lineModified gui=NONE,bold cterm=NONE,bold guifg=#b58900 ctermfg=3 guibg=#073642 ctermbg=0
+	highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
 endif
 
 " More page tabs allowed
