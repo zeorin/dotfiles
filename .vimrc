@@ -237,6 +237,7 @@ autocmd InsertLeave * match ExtraWhitespace /\s\+$/
 set spell spelllang=en_gb
 set complete+=kspell
 set complete-=i
+autocmd FileType startify setlocal nospell
 
 " Display as much as possible of a line that doesn't fit on screen
 set display=lastline
