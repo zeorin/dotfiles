@@ -166,6 +166,26 @@ set wildmenu
 set fileignorecase
 set wildignorecase
 
+" For Emacs-style editing on the command-line:
+" start of line
+cnoremap <C-A> <Home>
+" back one character
+cnoremap <C-B> <Left>
+" delete character under cursor
+cnoremap <C-D> <Del>
+" end of line
+cnoremap <C-E> <End>
+" forward one character
+cnoremap <C-F> <Right>
+" recall newer command-line using current characters as search pattern
+cnoremap <C-N> <Down>
+" recall previous (older) command-line using current characters as search pattern
+cnoremap <C-P> <Up>
+" back one word
+cnoremap <Esc><C-B> <S-Left>
+" forward one word
+cnoremap <Esc><C-F> <S-Right>
+
 " better split window locations
 set splitright
 set splitbelow
