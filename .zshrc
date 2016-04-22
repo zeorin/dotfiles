@@ -70,9 +70,6 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 
-# Remove space on right prompt
-ZLE_RPROMPT_INDENT=0
-
 # Source promptline
 source ~/.shell_prompt.sh
 
