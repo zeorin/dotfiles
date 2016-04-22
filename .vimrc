@@ -47,7 +47,6 @@ call add(scripts, {'names': [
 	\'Gundo',
 	\'The_NERD_tree',
 	\'github:Xuyuanp/nerdtree-git-plugin',
-	\'github:jistr/vim-nerdtree-tabs',
 	\'NERD_tree_Project',
 	\'github:wikitopian/hardmode',
 	\'Syntastic',
@@ -166,6 +165,19 @@ set wildmenu
 set fileignorecase
 set wildignorecase
 
+" Switch buffers even if modified
+set hidden
+" Open empty buffer
+nnoremap <Leader>T :enew<Cr>
+" Move to next buffer
+nnoremap <Leader>l :bnext<Cr>
+" Move to previous buffer
+nnoremap <Leader>h :bprevious<Cr>
+" Close buffer and show previous
+nnoremap <Leader>bq :bprevious <Bar> :bdelete #<Cr>
+" Show open buffers
+nnoremap <Leader>bl :buffers<Cr>
+
 " For Emacs-style editing on the command-line:
 " start of line
 cnoremap <C-A> <Home>
@@ -265,9 +277,6 @@ if &t_Co > 2 || has("gui_running")
 	highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
 endif
 
-" More page tabs allowed
-set tabpagemax=50
-
 " Reread changed files
 set autoread
 
@@ -314,16 +323,8 @@ if !exists(":DiffOrig")
 		\ | wincmd p | diffthis
 endif
 
-" Open each file (buffer) in it's own tab on first open
-augroup tabopen
-	autocmd!
-	autocmd VimEnter * nested if &buftype != "help" | tab sball | endif
-augroup END
-
-" Do not open NERDTree on start
-let g:nerdtree_tabs_open_on_gui_startup = 0
-" Map NERDTreeTabsToggle to a key combination
-nnoremap <F8> :NERDTreeTabsToggle<CR>
+" Map NERDTreeToggle to a key combination
+nnoremap <F8> :NERDTreeToggle<CR>
 " Nerd Tree to find root of project
 let g:NTPNamesDirs = ['.git']
 
@@ -340,15 +341,15 @@ nnoremap <F5> :GundoToggle<CR>
 nnoremap <F9> :TagbarToggle<CR>
 
 " edit and source the vimrc file quickly
-nnoremap <leader>ev :vsplit $MYVIMRC<cr>
-nnoremap <leader>sv :source $MYVIMRC<cr>
+nnoremap <Leader>ev :vsplit $MYVIMRC<cr>
+nnoremap <Leader>sv :source $MYVIMRC<cr>
 
 " change ESC to jk
 inoremap jk <esc>
 
 " easy semicolon insertion
-inoremap <leader>; <C-o>m`<C-o>A;<C-o>``
-inoremap <leader>: <C-o>A;
+inoremap <Leader>; <C-o>m`<C-o>A;<C-o>``
+inoremap <Leader>: <C-o>A;
 
 " unmap keys I shouldn't be using
 inoremap <esc> <nop>
@@ -424,7 +425,7 @@ if has('persistent_undo')
 endif
 
 " Map HardMode
-nnoremap <Leader>h :call ToggleHardMode()<CR>
+nnoremap <Leader>hm :call ToggleHardMode()<CR>
 
 " Faster update for Git Gutter
 set updatetime=750
