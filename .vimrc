@@ -236,6 +236,46 @@ else
 	set backup		" keep a backup file
 endif
 
+" Create gui and cterm dictionaries for Solarized colors
+let g:sol = {
+	\"gui": {
+		\"base03": "#002b36",
+		\"base02": "#073642",
+		\"base01": "#586e75",
+		\"base00": "#657b83",
+		\"base0": "#839496",
+		\"base1": "#93a1a1",
+		\"base2": "#eee8d5",
+		\"base3": "#fdf6e3",
+		\"yellow": "#b58900",
+		\"orange": "#cb4b16",
+		\"red": "#dc322f",
+		\"magenta": "#d33682",
+		\"violet": "#6c71c4",
+		\"blue": "#268bd2",
+		\"cyan": "#2aa198",
+		\"green": "#719e07"
+	\},
+	\"cterm": {
+		\"base03": 8,
+		\"base02": 0,
+		\"base01": 10,
+		\"base00": 11,
+		\"base0": 12,
+		\"base1": 14,
+		\"base2": 7,
+		\"base3": 15,
+		\"yellow": 3,
+		\"orange": 9,
+		\"red": 1,
+		\"magenta": 5,
+		\"violet": 13,
+		\"blue": 4,
+		\"cyan": 6,
+		\"green": 2
+	\}
+\}
+
 " Make tabs, non-breaking spaces and trailing white space visible
 set list
 " Use a Musical Symbol Single Barline (0x1d100) to show a Tab, and
@@ -243,41 +283,41 @@ set list
 set listchars=tab:\𝄀\ ,trail:·,extends:>,precedes:<,nbsp:+
 function! SetWhiteSpaceColor()
 	if &background == "dark"
-		highlight SpecialKey gui=NONE cterm=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
+		exec 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE'
 	elseif &background == "light"
-		highlight SpecialKey gui=NONE cterm=NONE guifg=#93a1a1 ctermfg=14 guibg=NONE ctermbg=NONE
+		exec 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg=NONE ctermbg=NONE'
 	endif
 endfunction
 augroup whitespace
 	autocmd!
 	autocmd ColorScheme solarized call SetWhiteSpaceColor()
 	" Highlight trailing white space
-	autocmd ColorScheme solarized highlight ExtraWhitespace gui=NONE cterm=NONE guifg=#dc322f ctermfg=1 guibg=NONE ctermbg=NONE
+	exec 'autocmd ColorScheme solarized highlight ExtraWhitespace gui=NONE cterm=NONE guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg=NONE ctermbg=NONE'
 	autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 	autocmd InsertLeave * match ExtraWhitespace /\s\+$/
 augroup END
 " Fix some Solarized bugs
 function! SetMarginColors()
 	if &background == "dark"
-		highlight CursorLineNr gui=NONE cterm=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
-		highlight SignColumn gui=NONE cterm=NONE guibg=#073642 ctermbg=0 guibg=#073642 ctermbg=0
+		exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
+		exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 		" Better Syntastic styles
-		highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#073642 ctermbg=0
-		highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
+		exec 'highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.violet.' ctermfg='.g:sol.cterm.violet.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
+		exec 'highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 		" Better git-gutter styles
-		highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg=#859900 ctermfg=2 guibg=#073642 ctermbg=0
-		highlight lineModified gui=NONE,bold cterm=NONE,bold guifg=#b58900 ctermfg=3 guibg=#073642 ctermbg=0
-		highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
+		exec 'highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.green.' ctermfg='.g:sol.cterm.green.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
+		exec 'highlight lineModified gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
+		exec 'highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 	elseif &background == "light"
-		highlight CursorLineNr gui=NONE cterm=NONE guifg=#93a1a1 ctermfg=14 guibg=#eee8d5 ctermbg=7
-		highlight SignColumn gui=NONE cterm=NONE guibg=#eee8d5 ctermbg=0 guibg=#eee8d5 ctermbg=7
+		exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
+		exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 		" Better Syntastic styles
-		highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#eee8d5 ctermbg=7
-		highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#eee8d5 ctermbg=7
+		exec 'highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.violet.' ctermfg='.g:sol.cterm.violet.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
+		exec 'highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base1.' ctermbg='.g:sol.cterm.base2
 		" Better git-gutter styles
-		highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg=#859900 ctermfg=2 guibg=#eee8d5 ctermbg=7
-		highlight lineModified gui=NONE,bold cterm=NONE,bold guifg=#b58900 ctermfg=3 guibg=#eee8d5 ctermbg=7
-		highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#eee8d5 ctermbg=7
+		exec 'highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.green.' ctermfg='.g:sol.cterm.green.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
+		exec 'highlight lineModified gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base1.' ctermbg='.g:sol.cterm.base2
+		exec 'highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 	endif
 endfunction
 augroup margincolor
