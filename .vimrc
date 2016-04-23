@@ -516,12 +516,75 @@ let g:CommandTAlwaysShowDotFiles = 1
 let g:CommandTScanDotDirectories = 1
 
 " Fix some devicons issues
+let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+let g:DevIconsEnableFoldersOpenClose = 1
+if exists("g:loaded_webdevicons")
+	call webdevicons#refresh()
+endif
 augroup devicons
 	autocmd!
 	autocmd FileType nerdtree setlocal nolist
 augroup END
-let g:WebDevIconsUnicodeDecorateFolderNodes = 1
-let g:DevIconsEnableFoldersOpenClose = 1
+" NERDTree Devicons Icon highlighting
+function! NERDTreeHighlightIcons(icons)
+	for icon in a:icons
+		exec 'augroup '.icon[0].'_icon'
+		exec 'autocmd!'
+		exec 'autocmd FileType nerdtree,startify highlight '.icon[0].'_icon guifg='.icon[2].' ctermfg='.icon[3]
+		exec 'autocmd FileType nerdtree,startify syn match '.icon[0].'_icon #'.icon[1].'# containedin=NERDTreeFile,NERDTreeDir,StartifyFile'
+		exec 'augroup END'
+	endfor
+endfunction
+if !exists('g:nerdtree_icons_highlighted')
+	let g:nerdtree_icons_hightlighted = 1
+	call NERDTreeHighlightIcons([
+		\['text', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['folder', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['closedfolder', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['openfolder', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['stylus', '', g:sol.gui.orange, g:sol.cterm.orange],
+		\['sass', '', g:sol.gui.magenta, g:sol.cterm.magenta],
+		\['html', '', g:sol.gui.orange, g:sol.cterm.orange],
+		\['css', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['markdown', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['json', '', g:sol.gui.base01, g:sol.cterm.yellow],
+		\['javascript', '', g:sol.gui.yellow, g:sol.cterm.yellow],
+		\['ruby', '', g:sol.gui.red, g:sol.cterm.red],
+		\['php', '', g:sol.gui.violet, g:sol.cterm.violet],
+		\['python', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['coffee', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['mustache', '', g:sol.gui.orange, g:sol.cterm.orange],
+		\['conf', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['picture', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['twig', '', g:sol.gui.green, g:sol.cterm.green],
+		\['c', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['haskell', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['lua', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['java', '', g:sol.gui.red, g:sol.cterm.red],
+		\['shell', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['ocaml', 'λ', g:sol.gui.orange, g:sol.cterm.orange],
+		\['diff', '', g:sol.gui.orange, g:sol.cterm.orange],
+		\['database', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['clojure', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['clojurejs', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['scala', '', g:sol.gui.red, g:sol.cterm.red],
+		\['go', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['dart', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['xul', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['visualstudio', '', g:sol.gui.violet, g:sol.cterm.violet],
+		\['perl', '', g:sol.gui.violet, g:sol.cterm.violet],
+		\['rss', '', g:sol.gui.orange, g:sol.cterm.orange],
+		\['fsharp', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['rust', '', g:sol.gui.base01, g:sol.cterm.base01],
+		\['d', '', g:sol.gui.red, g:sol.cterm.red],
+		\['erlang', '', g:sol.gui.red, g:sol.cterm.red],
+		\['vim', '', g:sol.gui.green, g:sol.cterm.green],
+		\['illustrator', '', g:sol.gui.red, g:sol.cterm.red],
+		\['photoshop', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['typescript', '', g:sol.gui.blue, g:sol.cterm.blue],
+		\['julia', '', g:sol.gui.green, g:sol.cterm.green]
+	\])
+endif
 
 " Fix a sass issue
 " https://github.com/tpope/vim-haml/issues/66
