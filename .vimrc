@@ -525,65 +525,63 @@ augroup devicons
 	autocmd!
 	autocmd FileType nerdtree setlocal nolist
 augroup END
-" NERDTree Devicons Icon highlighting
-function! NERDTreeHighlightIcons(icons)
-	for icon in a:icons
-		exec 'augroup '.icon[0].'_icon'
-		exec 'autocmd!'
-		exec 'autocmd FileType nerdtree,startify highlight '.icon[0].'_icon guifg='.icon[2].' ctermfg='.icon[3]
-		exec 'autocmd FileType nerdtree,startify syn match '.icon[0].'_icon #'.icon[1].'# containedin=NERDTreeFile,NERDTreeDir,StartifyFile'
-		exec 'augroup END'
+" Devicons Icon colors
+function! DeviconsColors(config)
+	let colors = keys(a:config)
+	for color in colors
+		if color == 'normal'
+			if &background == 'dark'
+				let normalcolor = 'base01'
+			elseif &background == 'light'
+				let normalcolor = 'base1'
+			endif
+			exec 'augroup devicons_'.color
+			exec 'autocmd!'
+			exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[normalcolor].' ctermfg='.g:sol.cterm[normalcolor]
+			exec 'autocmd FileType nerdtree,startify syn match devicons_'.color.' /\v'.join(a:config[color], '|').'/ containedin=ALL'
+			exec 'augroup END'
+			" When the background changes, we need to change these colors
+			if !exists('g:devicons_colored')
+				exec 'autocmd ColorScheme solarized call DeviconsColors({''normal'': ['''.join(a:config[color], ''',''').''']})'
+			endif
+		elseif color == 'emphasize'
+			if &background == 'dark'
+				let emcolor = 'base1'
+			elseif &background == 'light'
+				let emcolor = 'base01'
+			endif
+			exec 'augroup devicons_'.color
+			exec 'autocmd!'
+			exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[emcolor].' ctermfg='.g:sol.cterm[emcolor]
+			exec 'autocmd FileType nerdtree,startify syn match devicons_'.color.' /\v'.join(a:config[color], '|').'/ containedin=ALL'
+			exec 'augroup END'
+			" When the background changes, we need to change these colors
+			if !exists('g:devicons_colored')
+				exec 'autocmd ColorScheme solarized call DeviconsColors({''emphasize'': ['''.join(a:config[color], ''',''').''']})'
+			endif
+		else
+			exec 'augroup devicons_'.color
+			exec 'autocmd!'
+			exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[color].' ctermfg='.g:sol.cterm[color]
+			exec 'autocmd FileType nerdtree,startify syn match devicons_'.color.' /\v'.join(a:config[color], '|').'/ containedin=ALL'
+			exec 'augroup END'
+		endif
 	endfor
+	let g:devicons_colored = 1
 endfunction
-if !exists('g:nerdtree_icons_highlighted')
-	let g:nerdtree_icons_hightlighted = 1
-	call NERDTreeHighlightIcons([
-		\['text', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['folder', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['closedfolder', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['openfolder', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['stylus', '', g:sol.gui.orange, g:sol.cterm.orange],
-		\['sass', '', g:sol.gui.magenta, g:sol.cterm.magenta],
-		\['html', '', g:sol.gui.orange, g:sol.cterm.orange],
-		\['css', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['markdown', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['json', '', g:sol.gui.base01, g:sol.cterm.yellow],
-		\['javascript', '', g:sol.gui.yellow, g:sol.cterm.yellow],
-		\['ruby', '', g:sol.gui.red, g:sol.cterm.red],
-		\['php', '', g:sol.gui.violet, g:sol.cterm.violet],
-		\['python', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['coffee', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['mustache', '', g:sol.gui.orange, g:sol.cterm.orange],
-		\['conf', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['picture', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['twig', '', g:sol.gui.green, g:sol.cterm.green],
-		\['c', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['haskell', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['lua', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['java', '', g:sol.gui.red, g:sol.cterm.red],
-		\['shell', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['ocaml', 'λ', g:sol.gui.orange, g:sol.cterm.orange],
-		\['diff', '', g:sol.gui.orange, g:sol.cterm.orange],
-		\['database', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['clojure', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['clojurejs', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['scala', '', g:sol.gui.red, g:sol.cterm.red],
-		\['go', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['dart', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['xul', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['visualstudio', '', g:sol.gui.violet, g:sol.cterm.violet],
-		\['perl', '', g:sol.gui.violet, g:sol.cterm.violet],
-		\['rss', '', g:sol.gui.orange, g:sol.cterm.orange],
-		\['fsharp', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['rust', '', g:sol.gui.base01, g:sol.cterm.base01],
-		\['d', '', g:sol.gui.red, g:sol.cterm.red],
-		\['erlang', '', g:sol.gui.red, g:sol.cterm.red],
-		\['vim', '', g:sol.gui.green, g:sol.cterm.green],
-		\['illustrator', '', g:sol.gui.red, g:sol.cterm.red],
-		\['photoshop', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['typescript', '', g:sol.gui.blue, g:sol.cterm.blue],
-		\['julia', '', g:sol.gui.green, g:sol.cterm.green]
-	\])
+if !exists('g:devicons_colored')
+	call DeviconsColors({
+		\'normal': ['', '', '', '', ''],
+		\'emphasize': ['', '', '', '', '', '', '', '', '', '', ''],
+		\'yellow': ['', '', ''],
+		\'orange': ['', '', '', 'λ', '', ''],
+		\'red': ['', '', '', '', '', '', '', '', ''],
+		\'magenta': [''],
+		\'violet': ['', '', '', ''],
+		\'blue': ['', '', '', '', '', '', '', '', '', '', '', '', ''],
+		\'cyan': ['', '', '', ''],
+		\'green': ['', '', '', '']
+	\})
 endif
 
 " Fix a sass issue
