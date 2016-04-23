@@ -126,7 +126,7 @@ set relativenumber
 set linebreak
 
 " make wrapped lines more obvious
-let &showbreak="> "
+let &showbreak="↳ "
 set cpoptions+=n
 
 " When wrap is off, horizontally scroll a decent amount.
@@ -137,7 +137,7 @@ set wildignore+=*~,.git
 
 " set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
 " files)
-set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
+set tabstop=4 softtabstop=4 noexpandtab
 set smarttab
 set shiftround
 
@@ -146,6 +146,15 @@ set history=10000
 
 " show the cursor position all the time
 set ruler
+
+" Highlight the line I'm on
+set cursorline
+
+" Highlight matching paired delimiter
+set showmatch
+
+" Only redraw when necessary
+set lazyredraw
 
 " display incomplete commands
 set showcmd
@@ -233,23 +242,57 @@ set list
 " a Middle Dot (0x00B7) for trailing spaces
 set listchars=tab:\𝄀\ ,trail:·,extends:>,precedes:<,nbsp:+
 function! SetWhiteSpaceColor()
-	if &bg == "dark"
+	if &background == "dark"
 		highlight SpecialKey gui=NONE cterm=NONE guifg=#586e75 ctermfg=10 guibg=NONE ctermbg=NONE
-	elseif &bg == "light"
+	elseif &background == "light"
 		highlight SpecialKey gui=NONE cterm=NONE guifg=#93a1a1 ctermfg=14 guibg=NONE ctermbg=NONE
 	endif
 endfunction
-autocmd ColorScheme * call SetWhiteSpaceColor()
-" Highlight trailing white space
-autocmd ColorScheme * highlight ExtraWhitespace gui=NONE cterm=NONE guifg=#dc322f ctermfg=1 guibg=NONE ctermbg=NONE
-autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+augroup whitespace
+	autocmd!
+	autocmd ColorScheme solarized call SetWhiteSpaceColor()
+	" Highlight trailing white space
+	autocmd ColorScheme solarized highlight ExtraWhitespace gui=NONE cterm=NONE guifg=#dc322f ctermfg=1 guibg=NONE ctermbg=NONE
+	autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+	autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+augroup END
+" Fix some Solarized bugs
+function! SetMarginColors()
+	if &background == "dark"
+		highlight CursorLineNr gui=NONE cterm=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
+		highlight SignColumn gui=NONE cterm=NONE guibg=#073642 ctermbg=0 guibg=#073642 ctermbg=0
+		" Better Syntastic styles
+		highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#073642 ctermbg=0
+		highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
+		" Better git-gutter styles
+		highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg=#859900 ctermfg=2 guibg=#073642 ctermbg=0
+		highlight lineModified gui=NONE,bold cterm=NONE,bold guifg=#b58900 ctermfg=3 guibg=#073642 ctermbg=0
+		highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
+	elseif &background == "light"
+		highlight CursorLineNr gui=NONE cterm=NONE guifg=#93a1a1 ctermfg=14 guibg=#eee8d5 ctermbg=7
+		highlight SignColumn gui=NONE cterm=NONE guibg=#eee8d5 ctermbg=0 guibg=#eee8d5 ctermbg=7
+		" Better Syntastic styles
+		highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#eee8d5 ctermbg=7
+		highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#eee8d5 ctermbg=7
+		" Better git-gutter styles
+		highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg=#859900 ctermfg=2 guibg=#eee8d5 ctermbg=7
+		highlight lineModified gui=NONE,bold cterm=NONE,bold guifg=#b58900 ctermfg=3 guibg=#eee8d5 ctermbg=7
+		highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#eee8d5 ctermbg=7
+	endif
+endfunction
+augroup margincolor
+	autocmd!
+	autocmd ColorScheme solarized call SetMarginColors()
+augroup END
 
 " Spell check & word completion
 set spell spelllang=en_gb
 set complete+=kspell
 set complete-=i
-autocmd FileType startify setlocal nospell
+augroup startify
+	autocmd!
+	autocmd FileType startify setlocal nospell
+augroup END
 
 " Display as much as possible of a line that doesn't fit on screen
 set display=lastline
@@ -260,22 +303,18 @@ set formatoptions-=o	" Don't automatically assume next line after comment is als
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-	syntax on
-	set hlsearch
-	set background=dark
-	colorscheme solarized
-	" Fix some Solarized bugs
-	highlight CursorLineNr gui=NONE cterm=NONE guifg=#586e75 ctermfg=10 guibg=#073642 ctermbg=0
-	highlight SignColumn gui=NONE cterm=NONE guibg=#073642 ctermbg=0
-	" Better Syntastic styles
-	highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg=#6c71c4 ctermfg=13 guibg=#073642 ctermbg=0
-	highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
-	" Better git-gutter styles
-	highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg=#859900 ctermfg=2 guibg=#073642 ctermbg=0
-	highlight lineModified gui=NONE,bold cterm=NONE,bold guifg=#b58900 ctermfg=3 guibg=#073642 ctermbg=0
-	highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg=#dc322f ctermfg=1 guibg=#073642 ctermbg=0
+syntax on
+set hlsearch
+nnoremap <Leader><Space> :nohlsearch<Cr>
+colorscheme solarized
+if !exists('g:background_style')
+	let g:background_style = "dark"
 endif
+let &background = g:background_style
+augroup backgroundswitch
+	autocmd!
+	autocmd ColorScheme solarized let g:background_style = &background
+augroup END
 
 " Reread changed files
 set autoread
@@ -294,8 +333,7 @@ if has("autocmd")
 		au!
 
 		" For all text files set 'textwidth' to 78 characters.
-		autocmd FileType text setlocal textwidth=78
-		autocmd FileType markdown setlocal textwidth=78
+		autocmd FileType text,markdown setlocal textwidth=78
 
 		" When editing a file, always jump to the last known cursor position.
 		" Don't do it when the position is invalid or when inside an event handler
@@ -387,8 +425,6 @@ set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusl
 " Limelight & Goyo
 let g:limelight_conceal_ctermfg = 10
 let g:limelight_conceal_guifg = '#586e75'
-autocmd! User GoyoEnter Limelight
-autocmd! User GoyoLeave Limelight!
 function! s:goyo_enter()
 	silent !tmux set status off
 	set noshowmode
@@ -403,8 +439,13 @@ function! s:goyo_leave()
 	set scrolloff=5
 	Limelight!
 endfunction
-autocmd! User GoyoEnter nested call <SID>goyo_enter()
-autocmd! User GoyoLeave nested call <SID>goyo_leave()
+augroup goyo
+	autocmd!
+	autocmd User GoyoEnter Limelight
+	autocmd User GoyoLeave Limelight!
+	autocmd User GoyoEnter nested call <SID>goyo_enter()
+	autocmd User GoyoLeave nested call <SID>goyo_leave()
+augroup END
 nnoremap <Leader>g :Goyo<CR>
 
 " UltiSnips configuration
@@ -435,13 +476,19 @@ let g:CommandTAlwaysShowDotFiles = 1
 let g:CommandTScanDotDirectories = 1
 
 " Fix some devicons issues
-autocmd FileType nerdtree setlocal nolist
+augroup devicons
+	autocmd!
+	autocmd FileType nerdtree setlocal nolist
+augroup END
 let g:WebDevIconsUnicodeDecorateFolderNodes = 1
 let g:DevIconsEnableFoldersOpenClose = 1
 
 " Fix a sass issue
 " https://github.com/tpope/vim-haml/issues/66
-autocmd BufRead,BufNewFile *.sass set filetype=css
+augroup sass
+	autocmd!
+	autocmd BufRead,BufNewFile *.sass set filetype=css
+augroup END
 
 " Set Airline configuration
 " Use powerline glyphs
