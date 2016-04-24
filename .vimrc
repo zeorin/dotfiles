@@ -174,6 +174,8 @@ set wildmenu
 set fileignorecase
 set wildignorecase
 
+" Enable code folding
+
 " Switch buffers even if modified
 set hidden
 " Open empty buffer
@@ -601,4 +603,8 @@ let g:airline#extensions#tabline#show_buffers = 1
 let g:airline#extensions#tabline#show_tabs = 1
 
 " Set comments to be italic
-highlight Comment cterm=italic
+highlight Comment gui=italic cterm=italic
+augroup italiccomments
+	autocmd!
+	autocmd ColorScheme * highlight Comment gui=italic cterm=italic
+augroup END
