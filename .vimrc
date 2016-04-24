@@ -427,7 +427,6 @@ inoremap jk <esc>
 
 " easy semicolon insertion
 inoremap <Leader>; <C-o>m`<C-o>A;<C-o>``
-inoremap <Leader>: <C-o>A;
 
 " unmap keys I shouldn't be using
 inoremap <esc> <nop>
