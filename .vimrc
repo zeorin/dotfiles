@@ -49,6 +49,7 @@ call add(scripts, {'names': [
 	\'github:Xuyuanp/nerdtree-git-plugin',
 	\'NERD_tree_Project',
 	\'github:wikitopian/hardmode',
+	\'github:kbarrette/mediummode',
 	\'Syntastic',
 	\'Tagbar',
 	\'commentary',
@@ -508,6 +509,9 @@ endif
 
 " Map HardMode
 nnoremap <Leader>hm :call ToggleHardMode()<CR>
+" Map MediumMode
+let g:mediummode_enabled = 0
+nnoremap <Leader>mm :MediumModeToggle<CR>
 
 " Faster update for Git Gutter
 set updatetime=750
