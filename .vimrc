@@ -122,9 +122,14 @@ set vb
 
 " line numbers
 set relativenumber
+" Show current line number in number column
+set number
 
 " Don't break words when wrapping lines
 set linebreak
+
+" check final line for Vim settings
+set modelines=1
 
 " make wrapped lines more obvious
 let &showbreak="↳ "
@@ -176,6 +181,10 @@ set fileignorecase
 set wildignorecase
 
 " Enable code folding
+set foldenable
+set foldlevelstart=10
+set foldnestmax=10
+set foldmethod=indent
 
 " Switch buffers even if modified
 set hidden
@@ -415,8 +424,8 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_quiet_messages = { "type": "style" }
 let g:syntastic_html_tidy_exec = '/usr/local/bin/tidy'
 
-" Map Gundo to F5
-nnoremap <F5> :GundoToggle<CR>
+" Map Gundo to leader shortcut
+nnoremap <Leader>u :GundoToggle<CR>
 
 " Map Tagbar to F9
 nnoremap <F9> :TagbarToggle<CR>
@@ -424,12 +433,32 @@ nnoremap <F9> :TagbarToggle<CR>
 " edit and source the vimrc file quickly
 nnoremap <Leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <Leader>sv :source $MYVIMRC<cr>
+" edit the zshrc file quickly
+nnoremap <Leader>ez :vsplit ~/.zshrc<cr>
 
 " change ESC to jk
 inoremap jk <esc>
 
-" easy semicolon insertion
+" easy semicolon at end of line in insert mode
 inoremap <Leader>; <C-o>m`<C-o>A;<C-o>``
+" easy comma at end of line in insert mode
+inoremap <Leader>, <C-o>m`<C-o>A,<C-o>``
+
+" save a vim session
+nnoremap <Leader>s :mksession<Cr>
+
+" Easier system clipboard usage
+vnoremap <Leader>y "+y
+vnoremap <Leader>d "+d
+nnoremap <Leader>p "+p
+nnoremap <Leader>P "+P
+vnoremap <Leader>p "+p
+vnoremap <Leader>P "+P
+
+" Automatically go to end of paste
+vnoremap <silent> p p`]
+nnoremap <silent> p p`]
+" vnoremap <silent> y y`] |" same for selection
 
 " unmap keys I shouldn't be using
 inoremap <esc> <nop>
