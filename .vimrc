@@ -38,6 +38,9 @@ let scripts = []
 " General plugins
 call add(scripts, {'names': [
 	\'sensible',
+	\'repeat',
+	\'speeddating',
+	\'sleuth',
 	\'YouCompleteMe',
 	\'Solarized',
 	\'editorconfig-vim',
@@ -53,6 +56,8 @@ call add(scripts, {'names': [
 	\'Syntastic',
 	\'Tagbar',
 	\'commentary',
+	\'github:tpope/vim-rsi',
+	\'endwise',
 	\'ack',
 	\'surround',
 	\'delimitMate',
@@ -199,25 +204,10 @@ nnoremap <Leader>bq :bprevious <Bar> :bdelete #<Cr>
 " Show open buffers
 nnoremap <Leader>bl :buffers<Cr>
 
-" For Emacs-style editing on the command-line:
-" start of line
-cnoremap <C-A> <Home>
-" back one character
-cnoremap <C-B> <Left>
-" delete character under cursor
-cnoremap <C-D> <Del>
-" end of line
-cnoremap <C-E> <End>
-" forward one character
-cnoremap <C-F> <Right>
 " recall newer command-line using current characters as search pattern
 cnoremap <C-N> <Down>
 " recall previous (older) command-line using current characters as search pattern
 cnoremap <C-P> <Up>
-" back one word
-cnoremap <Esc><C-B> <S-Left>
-" forward one word
-cnoremap <Esc><C-F> <S-Right>
 
 " better split window locations
 set splitright
