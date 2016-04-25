@@ -59,7 +59,7 @@ call add(scripts, {'names': [
 	\'easytags',
 	\'UltiSnips',
 	\'github:honza/vim-snippets',
-	\'Command-T',
+	\'github:ctrlpvim/ctrlp.vim',
 	\'vim-rooter',
 	\'vim-multiple-cursors',
 	\'vim-exchange',
@@ -447,6 +447,16 @@ inoremap <Leader>, <C-o>m`<C-o>A,<C-o>``
 " save a vim session
 nnoremap <Leader>s :mksession<Cr>
 
+" project search with Ag or Ack
+if executable('ag')
+	let g:ackprg = "ag --nogroup --nocolor --column"
+	nnoremap <Leader>a :Ack |
+elseif executable('ack') || executable ('ack-grep')
+	nnoremap <Leader>a :Ack |
+else
+	nnoremap <Leader>a :grep |
+endif
+
 " Easier system clipboard usage
 vnoremap <Leader>y "+y
 vnoremap <Leader>d "+d
@@ -545,9 +555,21 @@ nnoremap <Leader>mm :MediumModeToggle<CR>
 " Faster update for Git Gutter
 set updatetime=750
 
-" Command-T settings
-let g:CommandTAlwaysShowDotFiles = 1
-let g:CommandTScanDotDirectories = 1
+" ctrlp settings
+let g:ctrlp_match_window = 'bottom,order:ttb'
+let g:ctrlp_switch_buffer = 0
+let g:ctrlp_working_path_mode = 0
+let g:ctrlp_use_caching = 0
+if executable('ag')
+	" If the silver searcher is installed
+	let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+elseif executable('find')
+	" If unix OS
+	let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'find %s -type f']
+elseif executable('dir')
+	" If windows
+	let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files . -co --exclude-standard', 'dir %s /-n /b /s /a-d']
+endif
 
 " Fix some devicons issues
 let g:WebDevIconsUnicodeDecorateFolderNodes = 1

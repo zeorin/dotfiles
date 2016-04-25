@@ -133,6 +133,9 @@ alias -g ....='../../..'
 alias -g .....='../../../..'
 alias -g ......='../../../../..'
 
+# ag is the silver searcher, not apt-get (oh-my-zsh debian plugin)
+unalias ag
+
 # Use hub instead of git if it's installed
 hub --version >/dev/null 2>&1 && alias git=hub
 

@@ -3,4 +3,4 @@
 
 # Add file types
 --type-set=svg:ext:svg
---type-set=scss:ext:scss
+--type-set=sass:ext:sass,scss
