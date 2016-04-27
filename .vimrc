@@ -1,3 +1,12 @@
+"                     _       _             _
+"  _______  ___  _ __(_)_ __ ( )___  __   _(_)_ __ ___  _ __ ___
+" |_  / _ \/ _ \| '__| | '_ \|// __| \ \ / / | '_ ` _ \| '__/ __|
+"  / /  __/ (_) | |  | | | | | \__ \  \ V /| | | | | | | | | (__
+" /___\___|\___/|_|  |_|_| |_| |___/ (_)_/ |_|_| |_| |_|_|  \___|
+"
+"
+" This is the personal .vimrc of zeorin. Enjoy.
+"
 """"""""""""""""""
 "                "
 " Set up plugins "
@@ -151,7 +160,7 @@ set wildignore+=*~,.git
 
 " set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
 " files)
-set tabstop=4 softtabstop=4 noexpandtab
+set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
 set smarttab
 set shiftround
 
@@ -656,3 +665,5 @@ augroup italiccomments
 	autocmd!
 	autocmd ColorScheme * highlight Comment gui=italic cterm=italic
 augroup END
+
+" vim: set foldmethod=marker
