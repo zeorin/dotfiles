@@ -10,6 +10,9 @@ set nocompatible | filetype indent plugin on | syn on
 " Set the leader, needs to be done early
 let g:mapleader = "\<Space>"
 
+let g:vim_addon_manager = {}
+let g:vim_addon_manager.auto_install = 1
+
 fun! SetupVAM()
 	let c = get(g:, 'vim_addon_manager', {})
 	let g:vim_addon_manager = c
