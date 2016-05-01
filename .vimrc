@@ -106,6 +106,7 @@ set list
 set listchars=tab:\𝄀\ ,trail:·,extends:>,precedes:<,nbsp:+
 
 " Spell check & word completion
+" TODO: Figure out how to support smart quotes in spell check
 set spell spelllang=en_gb
 set complete+=kspell
 set complete-=i
@@ -260,6 +261,11 @@ let textlikeft = markdownft + ['text', 'mail', 'gitcommit']
 Plug 'reedes/vim-pencil', { 'on': [] } " Rethinking Vim as a tool for writers;
 Plug 'junegunn/goyo.vim', { 'on': [] } " Distraction-free writing
 Plug 'junegunn/limelight.vim', { 'on': [] } " Hyper-focus writing
+" Plug 'reedes/vim-lexical', { 'for': textlikeft } " Build on Vim’s spell/thes/dict completion
+Plug 'reedes/vim-litecorrect' " Light-weight auto-correction
+Plug 'kana/vim-textobj-user' " Create your own text objects
+Plug 'reedes/vim-textobj-quote' "  Use ‘curly’ quote characters
+Plug 'mattly/vim-markdown-enhancements', { 'for': markdownft } " Support for MultiMarkdown, CriticMark, etc.
 
 " Plugin settings & tweaks {{{2
 
@@ -535,6 +541,9 @@ endif
 let s:textlikeft_plugins_loaded = 0
 augroup textlike
 	autocmd!
+	" Init for all file types
+	autocmd FileType *
+		\   call litecorrect#init()
 	" Init for text-like file types
 	autocmd FileType * if index(textlikeft, &filetype) >= 0 |
 		\   if !s:textlikeft_plugins_loaded
@@ -544,6 +553,49 @@ augroup textlike
 			\ | call plug#load('limelight.vim')
 		\ | endif
 		\ | call pencil#init()
+		\ | call textobj#quote#init()
+		\ | silent let g:textobj#quote#educate = 1 " For smart quotes toggling
+	\ | endif
+	" Init for non-text-like file types
+	autocmd FileType * if index(textlikeft, &filetype) < 0 |
+		\   call textobj#quote#init({'educate': 0})
+		\ | silent let g:textobj#quote#educate = 1 " For smart quotes in comments & for toggling
+		\ | endif
+augroup END
+
+" Smart quotes toggle {{{4
+function! s:ToggleEducate()
+	if g:textobj#quote#educate
+		silent NoEducate
+		silent let g:textobj#quote#educate = 0 " For smart quotes in comments
+		echom "Smart quotes off"
+	else
+		silent Educate
+		silent let g:textobj#quote#educate = 1 " For smart quotes in comments
+		echom "Smart quotes on"
+	endif
+endfunction
+nnoremap <Leader>' :call <SID>ToggleEducate()<Cr>
+
+" Smart quotes in comments {{{4
+function! s:SmartQuotesInComments()
+	" Respect the setting above, only do smart quotes in comments
+	" If the educate variable is truthy
+	if g:textobj#quote#educate
+		if synIDattr(synID(line('.'),col('.')-1,1),'name') =~? 'comment'
+			exec 'silent Educate'
+		else
+			exec 'silent NoEducate'
+		endif
+	endif
+endfunction
+augroup smartquotes
+	autocmd!
+	autocmd InsertCharPre * if index(textlikeft, &filetype) < 0 |
+		\   call <SID>SmartQuotesInComments()
+	\ | endif
+	autocmd InsertLeave * if index(textlikeft, &filetype) < 0 |
+		\   exec 'silent NoEducate'
 	\ | endif
 augroup END
 
