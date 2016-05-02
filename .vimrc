@@ -568,7 +568,7 @@ augroup textlike
 		\ | endif
 		\ | call pencil#init()
 		\ | call textobj#quote#init()
-		\ | call textobj#sentence()
+		\ | call textobj#sentence#init()
 		\ | silent let g:textobj#quote#educate = 1 " For smart quotes toggling
 	\ | endif
 	" Init for non-text-like file types
@@ -623,7 +623,7 @@ function! s:goyo_enter()
 	set scrolloff=999
 	Limelight
 	GitGutterDisable
-	SyntasticToggleMode
+	silent SyntasticToggleMode
 endfunction
 function! s:goyo_leave()
 	silent !tmux set status on
@@ -631,7 +631,7 @@ function! s:goyo_leave()
 	set scrolloff=1
 	Limelight!
 	GitGutterEnable
-	SyntasticToggleMode
+	silent SyntasticToggleMode
 endfunction
 augroup goyo_limelight
 	autocmd!
