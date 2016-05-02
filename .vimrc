@@ -283,7 +283,8 @@ Plug '2072/php-indenting-for-vim', { 'for': 'php' } " Updated official PHP inden
 " Text-like {{{4
 " Define text-like file types
 let markdownft = ['markdown', 'mkd']
-let textlikeft = markdownft + ['text', 'mail', 'gitcommit']
+let vcsft = ['git', 'gitsendemail', '*commit*', '*COMMIT*']
+let textlikeft = markdownft + vcsft + ['text', 'mail']
 
 Plug 'reedes/vim-pencil', { 'on': [] } " Rethinking Vim as a tool for writers;
 Plug 'junegunn/goyo.vim', { 'on': [] } " Distraction-free writing
