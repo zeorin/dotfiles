@@ -4,38 +4,98 @@
 "  / /  __/ (_) | |  | | | | | \__ \  \ V /| | | | | | | | | (__
 " /___\___|\___/|_|  |_|_| |_| |___/ (_)_/ |_|_| |_| |_|_|  \___|
 "
-"
-" This is the personal .vimrc of zeorin. Enjoy.
-"
+
+" This is the personal .vimrc of Xandor Schiefer.
+
 " Goals are:
-" * Ease of use, mostly extending Vim whilst not changing built-in
-"   functionality (except in a few cases, e.g. clipboard registers)
-" * extend vanilla Vim to include more IDE-like features,
-"   like auto-completion, git integration, linting, snippets, etc.,
-"   that one might expect from a modern editor
-" * Some writing-focused tweaks & plugins. Text editors aren’t
-"   just for code
-" * Tmux integration—because Tmux is awesome
-" * performance; adding lots of plugins and functionality can make Vim
-"   slow—this is not Emacs—utilize lazy-loading to keep it snappy
+" * ease of use, mostly extending Vim whilst not changing built-in
+"   functionality (except in a few cases, e.g. clipboard registers);
+" * extend vanilla Vim to include more IDE-like features, like auto-
+"   completion, git integration, linting, snippets, etc., that one might
+"   expect from a modern editor;
+" * some writing-focused tweaks & plugins. Text editors aren’t just for code;
+" * tmux integration: because tmux is awesome;
+" * performance: adding lots of plugins and functionality can make Vim slow—
+"   this is not Emacs—utilize lazy-loading to keep it snappy;
 " * Linux, Mac, Windows, and NeoVim compatibility; one .vimrc to rule
-"   them all
-" * Support for local modification with .vimrc.local
-" * Making it look attractive—default Vim is ugly
+"   them all;
+" * support for local modification with .vimrc.before and .vimrc.after;
+" * making it look attractive—default Vim is ugly.
 
-" Vim settings {{{1
+" This file is licensed under the MIT License. The various plugins are licensed
+" under their own licenses. Please see their documentation for more information.
 
-set nocompatible | filetype indent plugin on | syn on
+" The MIT License (MIT) {{{
+
+" Copyright ⓒ 2016 Xandor Schiefer
+
+" Permission is hereby granted, free of charge, to any person obtaining a copy
+" of this software and associated documentation files (the "Software"), to
+" deal in the Software without restriction, including without limitation the
+" rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+" sell copies of the Software, and to permit persons to whom the Software is
+" furnished to do so, subject to the following conditions:
+
+" The above copyright notice and this permission notice shall be included in
+" all copies or substantial portions of the Software.
+
+" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+" IN THE SOFTWARE.
+
+" }}}
+
+" Platform detection {{{
+	silent function! OSX()
+		return has('macunix')
+	endfunction
+	silent function! LINUX()
+		return has('unix') && !has('macunix') && !has('win32unix')
+	endfunction
+	silent function! WINDOWS()
+		return  (has('win32') || has('win64'))
+	endfunction
+" }}}
+
+" Vim settings {{{
+
+	" Very basic defaults (as per NeoVim defaults) {{{
+		if !has('nvim')
+			set nocompatible " Don’t try to be just Vi
+			filetype indent plugin on " Turn on file type detection
+			set autoindent " Keep current indent if no other indent rule
+			set autoread " Reload file if it’s changed on the file system
+			set backspace=indent,eol,start " Allow backspacing over everything
+			set complete=.,w,b,u,t " Scan all buffers and include tags
+			set display=lastline " Display as much as possible of a line
+			set encoding=utf-8 " UTF-8 encoding
+			set formatoptions=tcqj " Auto-wrap text, better comment formatting
+			set history=10000 " Maximum command and search history
+			set hlsearch " Highlight search results
+			set incsearch " Jump to results as you type
+			set langnoremap " 'langmap' doesn’t mess with mappings
+			set laststatus=2 " Status line is always shown
+			set listchars=tab:>\ ,trail:-,nbsp:+ " Default white space characters
+			set mouse=a " Enable mouse
+			set nrformats=bin,hex " Recognize binary and hexadecimal numbers
+			" For sessions, save & restore the following:
+			set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize
+			set smarttab " Respect shiftwidth setting
+			set tabpagemax=50 " Maximum number of tabs to be opened
+			set tags=./tags;,tags " Default locations for tags files
+			set ttyfast " Assume a modern terminal, fast ‘connection’
+			set viminfo+=! " Keep all-caps global variables
+			set wildmenu " List possible completions on status line
+		endif
+		syntax on " Turn on syntax highlighting
+	" }}}
 
 " Set the leader, needs to be done early
 let g:mapleader = "\<Space>"
-
-if !has('nvim')
-	set encoding=utf-8
-endif
-
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
 
 " use visual terminal bell
 set vb
@@ -64,11 +124,7 @@ set wildignore+=*~,.git
 " set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
 " files)
 set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
-set smarttab
 set shiftround
-
-" keep max lines of command line history
-set history=10000
 
 " show the cursor position all the time
 set ruler
@@ -85,9 +141,6 @@ set lazyredraw
 " display incomplete commands
 set showcmd
 
-" do incremental searching
-set incsearch
-
 " ignore case sensitivity in searching
 set ignorecase
 
@@ -96,7 +149,6 @@ set smartcase
 
 " better command line completion
 set wildmode=longest,full
-set wildmenu
 set fileignorecase
 set wildignorecase
 
@@ -113,11 +165,6 @@ set hidden
 set splitright
 set splitbelow
 
-" In many terminal emulators the mouse works just fine, thus enable it.
-if has('mouse')
-	set mouse=a
-endif
-
 " Configure the use of backup files
 if has("vms")
 	set nobackup		" do not keep a backup file, use versions instead
@@ -127,36 +174,15 @@ endif
 
 " Make tabs, non-breaking spaces and trailing white space visible
 set list
-" Use a Musical Symbol Single Barline (0x1d100) to show a Tab, and
-" a Middle Dot (0x00B7) for trailing spaces
-set listchars=tab:\𝄀\ ,trail:·,extends:>,precedes:<,nbsp:+
+" Use a Musical Symbol Single Barline (0x1d100) to show a Tab,
+" a Middle Dot (0x00B7) for trailing spaces,
+" and the negation symbol (0x00AC) for non-breaking spaces
+set listchars=tab:𝄀\ ,trail:·,extends:→,precedes:←,nbsp:¬
 
 " Spell check & word completion
 " TODO: Figure out how to support smart quotes in spell check
 set spell spelllang=en_gb
 set complete+=kspell
-set complete-=i
-
-" Display as much as possible of a line that doesn't fit on screen
-set display=lastline
-
-" Better autoformat
-set formatoptions+=j	" Remove comment leader when joining lines
-set formatoptions-=o	" Don't automatically assume next line after comment is also comment
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-syntax on
-set hlsearch
-
-" Reread changed files
-set autoread
-
-" Enable file type detection.
-" Use the default filetype settings, so that mail gets 'tw' set to 72,
-" 'cindent' is on in C files, etc.
-" Also load indent files, to automatically do language-dependent indenting.
-filetype plugin indent on
 
 " Put these in an autocmd group, so that we can delete them easily.
 augroup vimrcEx
@@ -178,10 +204,9 @@ augroup vimrcEx
 augroup END
 
 " Where to look for tags files
-set tags=.git/tags;,./tags,~/.vimtags;
+let &tags= '.git/tags;' + &tags
 
 " Powerline-ish specific settings
-set laststatus=2 " Always display the statusline in all windows
 set showtabline=2 " Always display the tabline, even if there is only one tab
 set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
 
@@ -204,6 +229,8 @@ augroup italiccomments
 	autocmd!
 	autocmd ColorScheme * highlight Comment gui=italic cterm=italic
 augroup END
+
+" }}}
 
 " Plugins {{{1
 
@@ -266,8 +293,8 @@ Plug 'vim-airline/vim-airline' " Powerline-style status- and tab/buffer-line
 Plug 'vim-airline/vim-airline-themes' " Collection of airline themes
 Plug 'edkolev/tmuxline.vim' " Set tmux theme to airline theme
 Plug 'edkolev/promptline.vim' " Set shell theme to airline theme
+Plug 'zeorin/vim-startify', { 'branch': 'devicons-tweak' } " Fancy start screen
 Plug 'ryanoasis/vim-devicons' " Pretty font icons like Seti-UI
-Plug 'zeorin/vim-startify', { 'branch': 'devicons-tweak'} " Fancy start screen
 
 " Tmux {{{3
 Plug 'christoomey/vim-tmux-navigator' " Seamless navigation between tmux panes and vim splits
@@ -304,6 +331,11 @@ Plug 'mattly/vim-markdown-enhancements', { 'for': markdownft } " Support for Mul
 " settings should trump vim-sleuth settings for any given buffer.
 
 " General Vim tweaks {{{3
+
+" Easyclip {{{4
+" Easyclip remaps the mark mapping, remap mark to gm
+nnoremap gm m
+let g:EasyClipUseSubstituteDefaults = 1 " s is the substitution mapping
 
 " Rooter {{{4
 let g:rooter_patterns = ['.git/']
@@ -393,12 +425,6 @@ let g:airline#extensions#tabline#enabled = 1 " Use tabline
 let g:airline#extensions#tabline#show_tabs = 1 " Always show tabline
 let g:airline#extensions#tabline#show_buffers = 1 " Show buffers when no tabs
 
-" Startify no spell check {{{4
-augroup startify
-	autocmd!
-	autocmd FileType startify setlocal nospell
-augroup END
-
 " Solarized color dictionaries {{{4
 let g:sol = {
 	\"gui": {
@@ -439,17 +465,45 @@ let g:sol = {
 	\}
 \}
 
-" Set white space colors {{{4
-function! SetWhiteSpaceColor()
-	if &background == "dark"
-		exec 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE'
-	elseif &background == "light"
-		exec 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg=NONE ctermbg=NONE'
-	endif
-endfunction
+" Startify {{{4
+augroup startify
+	autocmd!
+	" No need to show spelling ‘errors’
+	autocmd FileType startify setlocal nospell
+	" Better header colour
+	exec 'autocmd FileType startify if &background == ''dark'' | '.
+		\ 'highlight StartifyHeader guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
+		\ 'else | '.
+		\ 'highlight StartifyHeader guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
+		\ 'endif'
+	" Better section colour
+	exec 'autocmd FileType startify highlight StartifySection guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
+	" Better file colour
+	exec 'autocmd FileType startify if &background == ''dark'' | '.
+		\ 'highlight StartifyFile guifg='.g:sol.gui.base0.' ctermfg='.g:sol.cterm.base0.' | '.
+		\ 'else | '.
+		\ 'highlight StartifyFile guifg='.g:sol.gui.base00.' ctermfg='.g:sol.cterm.base00.' | '.
+		\ 'endif'
+	" Better special colour
+	exec 'autocmd FileType startify highlight StartifySpecial gui=italic cterm=italic guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow
+	" Hide those ugly brackets
+	exec 'autocmd FileType startify if &background == ''dark'' | '.
+		\ 'highlight StartifyBracket guifg='.g:sol.gui.base03.' ctermfg='.g:sol.cterm.base03.' | '.
+		\ 'else | '.
+		\ 'highlight StartifyBracket guifg='.g:sol.gui.base3.' ctermfg='.g:sol.cterm.base3.' | '.
+		\ 'endif'
+augroup END
+
+" Set white space colours {{{4
 augroup whitespace
 	autocmd!
-	autocmd ColorScheme solarized call SetWhiteSpaceColor()
+	exec 'autocmd ColorScheme solarized if &background == ''dark'' | '.
+		\ 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE | '.
+		\ 'highlight NonText gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE | '.
+		\ 'else | '.
+		\ 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg=NONE ctermbg=NONE | '.
+		\ 'highlight NonText gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg=NONE ctermbg=NONE | '.
+		\ 'endif'
 	" Highlight trailing white space
 	exec 'autocmd ColorScheme solarized highlight ExtraWhitespace gui=NONE cterm=NONE guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg=NONE ctermbg=NONE'
 	autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
@@ -495,7 +549,6 @@ augroup backgroundswitch
 	autocmd ColorScheme solarized let g:background_style = &background
 augroup END
 
-
 " Devicons {{{4
 let g:WebDevIconsUnicodeDecorateFolderNodes = 1
 let g:DevIconsEnableFoldersOpenClose = 1
@@ -505,65 +558,48 @@ endif
 augroup devicons
 	autocmd!
 	autocmd FileType nerdtree setlocal nolist
+	autocmd FileType nerdtree syntax match hideBracketsInNerdTree "\]" contained conceal containedin=ALL
+	autocmd FileType nerdtree syntax match hideBracketsInNerdTree "\[" contained conceal containedin=ALL
+	autocmd FileType nerdtree setlocal conceallevel=3
+	autocmd FileType nerdtree setlocal concealcursor=nvic
 augroup END
-" Devicons Icon colors {{{5
 function! DeviconsColors(config)
 	let colors = keys(a:config)
-	for color in colors
-		if color == 'normal'
-			if &background == 'dark'
-				let normalcolor = 'base01'
-			elseif &background == 'light'
-				let normalcolor = 'base1'
+	augroup devicons_colors
+		autocmd!
+		for color in colors
+			if color == 'normal'
+				exec 'autocmd FileType nerdtree,startify if &background == ''dark'' | '.
+					\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
+					\ 'else | '.
+					\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
+					\ 'endif'
+			elseif color == 'emphasize'
+				exec 'autocmd FileType nerdtree,startify if &background == ''dark'' | '.
+					\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
+					\ 'else | '.
+					\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
+					\ 'endif'
+			else
+				exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[color].' ctermfg='.g:sol.cterm[color]
 			endif
-			exec 'augroup devicons_'.color
-			exec 'autocmd!'
-			exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[normalcolor].' ctermfg='.g:sol.cterm[normalcolor]
-			exec 'autocmd FileType nerdtree,startify syn match devicons_'.color.' /\v'.join(a:config[color], '|').'/ containedin=ALL'
-			exec 'augroup END'
-			" When the background changes, we need to change these colors
-			if !exists('g:devicons_colored')
-				exec 'autocmd ColorScheme solarized call DeviconsColors({''normal'': ['''.join(a:config[color], ''',''').''']})'
-			endif
-		elseif color == 'emphasize'
-			if &background == 'dark'
-				let emcolor = 'base1'
-			elseif &background == 'light'
-				let emcolor = 'base01'
-			endif
-			exec 'augroup devicons_'.color
-			exec 'autocmd!'
-			exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[emcolor].' ctermfg='.g:sol.cterm[emcolor]
-			exec 'autocmd FileType nerdtree,startify syn match devicons_'.color.' /\v'.join(a:config[color], '|').'/ containedin=ALL'
-			exec 'augroup END'
-			" When the background changes, we need to change these colors
-			if !exists('g:devicons_colored')
-				exec 'autocmd ColorScheme solarized call DeviconsColors({''emphasize'': ['''.join(a:config[color], ''',''').''']})'
-			endif
-		else
-			exec 'augroup devicons_'.color
-			exec 'autocmd!'
-			exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[color].' ctermfg='.g:sol.cterm[color]
-			exec 'autocmd FileType nerdtree,startify syn match devicons_'.color.' /\v'.join(a:config[color], '|').'/ containedin=ALL'
-			exec 'augroup END'
-		endif
-	endfor
-	let g:devicons_colored = 1
+			exec 'autocmd FileType nerdtree,startify syntax match devicons_'.color.' /\v'.join(a:config[color], '|').'/ containedin=ALL'
+		endfor
+	augroup END
 endfunction
-if !exists('g:devicons_colored')
-	call DeviconsColors({
-		\'normal': ['', '', '', '', ''],
-		\'emphasize': ['', '', '', '', '', '', '', '', '', '', ''],
-		\'yellow': ['', '', ''],
-		\'orange': ['', '', '', 'λ', '', ''],
-		\'red': ['', '', '', '', '', '', '', '', ''],
-		\'magenta': [''],
-		\'violet': ['', '', '', ''],
-		\'blue': ['', '', '', '', '', '', '', '', '', '', '', '', ''],
-		\'cyan': ['', '', '', ''],
-		\'green': ['', '', '', '']
-	\})
-endif
+let g:devicons_colors = {
+	\'normal': ['', '', '', '', ''],
+	\'emphasize': ['', '', '', '', '', '', '', '', '', '', ''],
+	\'yellow': ['', '', ''],
+	\'orange': ['', '', '', 'λ', '', ''],
+	\'red': ['', '', '', '', '', '', '', '', ''],
+	\'magenta': [''],
+	\'violet': ['', '', '', ''],
+	\'blue': ['', '', '', '', '', '', '', '', '', '', '', '', ''],
+	\'cyan': ['', '', '', ''],
+	\'green': ['', '', '', '']
+\}
+call DeviconsColors(g:devicons_colors)
 
 " Filetype {{{3
 
@@ -661,8 +697,10 @@ nnoremap <Leader>g :Goyo<CR>
 
 call plug#end()
 
-" Set colorscheme
+" Set Colorscheme
 colorscheme solarized
+
+" }}}1
 
 " Mappings {{{1
 
@@ -744,6 +782,12 @@ nnoremap <up> <nop>
 nnoremap <down> <nop>
 nnoremap <left> <nop>
 nnoremap <right> <nop>
+
+" Local settings {{{1
+
+if filereadable(expand("~/.vimrc.local"))
+	source ~/.vimrc.local
+endif
 
 " }}}1
 
