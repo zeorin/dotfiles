@@ -6,6 +6,22 @@
 "
 "
 " This is the personal .vimrc of zeorin. Enjoy.
+"
+" Goals are:
+" * Ease of use, mostly extending Vim whilst not changing built-in
+"   functionality (except in a few cases, e.g. clipboard registers)
+" * extend vanilla Vim to include more IDE-like features,
+"   like auto-completion, git integration, linting, snippets, etc.,
+"   that one might expect from a modern editor
+" * Some writing-focused tweaks & plugins. Text editors aren’t
+"   just for code
+" * Tmux integration—because Tmux is awesome
+" * performance; adding lots of plugins and functionality can make Vim
+"   slow—this is not Emacs—utilize lazy-loading to keep it snappy
+" * Linux, Mac, Windows, and NeoVim compatibility; one .vimrc to rule
+"   them all
+" * Support for local modification with .vimrc.local
+" * Making it look attractive—default Vim is ugly
 
 " Vim settings {{{1
 
