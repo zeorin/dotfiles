@@ -210,8 +210,9 @@ Plug 'scrooloose/syntastic' " Syntax checking hacks
 Plug 'scrooloose/nerdtree' " File tree explorer
 Plug 'janlay/NERD-tree-project' " Try to find project dir
 Plug 'airblade/vim-rooter' " Working directory is always project root
+Plug 'svermeulen/vim-easyclip' " Better clipboard functionality
 Plug 'wikitopian/hardmode' " Hard mode
-Plug 'kbarrette/mediummode' " Less... hard
+Plug 'kbarrette/mediummode' " Less… hard
 
 " Searching, finding, tagging {{{3
 Plug 'ctrlpvim/ctrlp.vim' " Fuzzy file, buffer, mru, tag, etc finder
@@ -264,7 +265,9 @@ Plug 'junegunn/limelight.vim', { 'on': [] } " Hyper-focus writing
 " Plug 'reedes/vim-lexical', { 'for': textlikeft } " Build on Vim’s spell/thes/dict completion
 Plug 'reedes/vim-litecorrect' " Light-weight auto-correction
 Plug 'kana/vim-textobj-user' " Create your own text objects
-Plug 'reedes/vim-textobj-quote' "  Use ‘curly’ quote characters
+Plug 'reedes/vim-textobj-quote' " Use ‘curly’ quote characters
+Plug 'reedes/vim-textobj-sentence', { 'on': [] } " Improved native sentence text object and motion;
+Plug 'reedes/vim-wordy', { 'for': textlikeft } " Uncover usage problems in your writing
 Plug 'mattly/vim-markdown-enhancements', { 'for': markdownft } " Support for MultiMarkdown, CriticMark, etc.
 
 " Plugin settings & tweaks {{{2
@@ -551,9 +554,11 @@ augroup textlike
 			\ | call plug#load('vim-pencil')
 			\ | call plug#load('goyo.vim')
 			\ | call plug#load('limelight.vim')
+			\ | call plug#load('vim-textobj-sentence')
 		\ | endif
 		\ | call pencil#init()
 		\ | call textobj#quote#init()
+		\ | call textobj#sentence()
 		\ | silent let g:textobj#quote#educate = 1 " For smart quotes toggling
 	\ | endif
 	" Init for non-text-like file types
