@@ -81,7 +81,7 @@
 			set laststatus=2 " Status line is always shown
 			set listchars=tab:>\ ,trail:-,nbsp:+ " Default white space characters
 			set mouse=a " Enable mouse
-			set nrformats=bin,hex " Recognize binary and hexadecimal numbers
+			set nrformats=hex " Recognize hexadecimal numbers
 			" For sessions, save & restore the following:
 			set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize
 			set smarttab " Respect shiftwidth setting
