@@ -287,17 +287,17 @@ Plug 'sirver/ultisnips' " The ultimate snippet solution for Vim
 Plug 'honza/vim-snippets' " Community-maintained default snippets
 Plug 'mattn/emmet-vim' " Emmet support
 
+" Tmux {{{3
+Plug 'christoomey/vim-tmux-navigator' " Seamless navigation between tmux panes and vim splits
+Plug 'zeorin/tmuxline.vim', { 'branch': 'utf8-suppress-error' } " Set tmux theme to airline theme
+
 " Appearance {{{3
 Plug 'altercation/vim-colors-solarized' " Precision colors for machines and people
 Plug 'vim-airline/vim-airline' " Powerline-style status- and tab/buffer-line
 Plug 'vim-airline/vim-airline-themes' " Collection of airline themes
-Plug 'edkolev/tmuxline.vim' " Set tmux theme to airline theme
 Plug 'edkolev/promptline.vim' " Set shell theme to airline theme
 Plug 'zeorin/vim-startify', { 'branch': 'devicons-tweak' } " Fancy start screen
 Plug 'ryanoasis/vim-devicons' " Pretty font icons like Seti-UI
-
-" Tmux {{{3
-Plug 'christoomey/vim-tmux-navigator' " Seamless navigation between tmux panes and vim splits
 
 " Filetype {{{3
 
