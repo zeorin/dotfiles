@@ -180,7 +180,6 @@ set list
 set listchars=tab:𝄀\ ,trail:·,extends:→,precedes:←,nbsp:¬
 
 " Spell check & word completion
-" TODO: Figure out how to support smart quotes in spell check
 set spell spelllang=en_gb
 set complete+=kspell
 
