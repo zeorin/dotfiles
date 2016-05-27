@@ -344,6 +344,17 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 let g:syntastic_quiet_messages = { "type": "style" }
 let g:syntastic_html_tidy_exec = '/usr/local/bin/tidy'
+let g:syntastic_error_symbol = "\u2717"
+let g:syntastic_style_error_symbol = "S\u2717"
+let g:syntastic_warning_symbol = "\u26A0"
+let g:syntastic_style_warning_symbol = "S\u26A0"
+augroup syntastic_checkers
+	autocmd!
+	" Only use jshint if there’s a .jshintrc in the project root
+	autocmd FileType javascript if filereadable(".jshintrc") && executable("jshint") |
+		\   let b:syntastic_checkers = ["jshint"]
+		\ | endif
+augroup END
 
 " Gundo {{{4
 nnoremap <Leader>u :GundoToggle<CR>
