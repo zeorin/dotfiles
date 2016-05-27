@@ -620,14 +620,13 @@ augroup textlike
 		\ | endif
 		\ | call pencil#init()
 		\ | call textobj#quote#init()
-		\ | call textobj#sentence#init()
-		\ | silent let g:textobj#quote#educate = 1 " For smart quotes toggling
+		\ | call textobj#sentence#init({'educate': 1})
 	\ | endif
 	" Init for non-text-like file types
 	autocmd FileType * if index(textlikeft, &filetype) < 0 |
 		\   call textobj#quote#init({'educate': 0})
 		\ | silent let g:textobj#quote#educate = 1 " For smart quotes in comments & for toggling
-		\ | endif
+	\ | endif
 augroup END
 
 " Smart quotes toggle {{{4
