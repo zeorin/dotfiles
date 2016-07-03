@@ -179,7 +179,7 @@ set list
 " and the negation symbol (0x00AC) for non-breaking spaces
 set listchars=tab:𝄀\ ,trail:·,extends:→,precedes:←,nbsp:¬
 
-" Spell check & word completion
+" Spell check & spelling completion for spell check on
 set spell spelllang=en_gb
 set complete+=kspell
 
@@ -295,7 +295,7 @@ Plug 'altercation/vim-colors-solarized' " Precision colors for machines and peop
 Plug 'vim-airline/vim-airline' " Powerline-style status- and tab/buffer-line
 Plug 'vim-airline/vim-airline-themes' " Collection of airline themes
 Plug 'edkolev/promptline.vim' " Set shell theme to airline theme
-Plug 'zeorin/vim-startify', { 'branch': 'devicons-tweak' } " Fancy start screen
+Plug 'mhinz/vim-startify' " Fancy start screen
 Plug 'ryanoasis/vim-devicons' " Pretty font icons like Seti-UI
 
 " Filetype {{{3
