@@ -22,8 +22,9 @@
 " * support for local modification with .vimrc.before and .vimrc.after;
 " * making it look attractive—default Vim is ugly.
 
-" This file is licensed under the MIT License. The various plugins are licensed
-" under their own licenses. Please see their documentation for more information.
+" This file is licensed under the MIT License. The various plugins are
+" licensed under their own licenses. Please see their documentation for more
+" information.
 
 " The MIT License (MIT) {{{
 
@@ -100,6 +101,21 @@
 	endfunction
 " }}}
 
+" Some useful variables {{{
+	if OSX() || LINUX()
+		if has('nvim')
+			let vimDir = '$HOME/.config/nvim/'
+			let vimRc = '$HOME/.config/nvim/init.vim'
+		else
+			let vimDir = '$HOME/.vim/'
+			let vimRc = '$HOME/.vimrc'
+		endif
+	elseif WINDOWS()
+		let vimDir = '$HOME/vimfiles/'
+		let vimRc = '$HOME/_vimrc'
+	endif
+" }}}
+
 " Start plugin manager {{{
 
 	" Install vim-plug if necessary
@@ -157,33 +173,35 @@
 		autocmd ColorScheme * highlight Comment gui=italic cterm=italic
 	augroup END
 
+	" Show the textwidth visually
+	set colorcolumn=+1,+2
+
 " }}}
 
 " General functionality {{{
 
-	" Match paired character(s) {{{
-		Plug 'matchit.zip' " (Possibly) updated matchit
-	" }}}
+	" Match paired characters
+	Plug 'matchit.zip' " (Possibly) updated matchit
+	Plug 'tpope/vim-unimpaired' " Pairs of handy bracket mappings
 
-	" Sensible default settings we can all agree on {{{
-		" See ~/.vim/plugged/vim-sensible/plugin/sensible.vim for the actual settings.
-		" Although the plugin is defined here, it’s only loaded near the end of
-		" the script.
-		Plug 'tpope/vim-sensible'
-	" }}}
+	" Sensible default settings we can all agree on
+	" See ~/.vim/plugged/vim-sensible/plugin/sensible.vim for the actual
+	" settings. Although the plugin is defined here, it’s only loaded near
+	" the end of the script.
+	Plug 'tpope/vim-sensible'
 
-	Plug 'tpope/vim-speeddating' " Use CTRL-A/CTRL-X to increment dates, times, and more
+	" set tabs to display as 4 spaces wide (might be overwritten by
+	" .editorconfig files)
+	set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
+	set shiftround
+	Plug 'tpope/vim-sleuth' " Heuristically set buffer options, like tabs/spaces
+	Plug 'editorconfig/editorconfig-vim' " EditorConfig support
 
 	" When wrap is off, horizontally scroll a decent amount.
 	set sidescroll=16
 
 	" check final line for Vim settings
 	set modelines=1
-
-	" set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
-	" files)
-	set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
-	set shiftround
 
 	" Only redraw when necessary
 	set lazyredraw
@@ -215,8 +233,17 @@
 	set splitright
 	set splitbelow
 
-	" Keep a backup file
+	" Stop backup files from littering all over the system
+	let myBackupDir = expand(vimDir . 'tmp/backup/')
+	call system('mkdir -p ' . myBackupDir)
+	let &backupdir = myBackupDir . ',' . &backupdir
+	" Keep backup files
 	set backup
+
+	" Stop swap files from littering all over the system
+	let mySwapDir = expand(vimDir . 'tmp/swap//')
+	call system('mkdir -p ' . mySwapDir)
+	let &directory = mySwapDir . ',' . &directory
 
 	" Spell check & word completion
 	set spell spelllang=en_gb
@@ -224,51 +251,51 @@
 
 	" Put these in an autocmd group, so that we can delete them easily.
 	augroup vimrcEx
-	au!
+		autocmd!
 
-	" For all text files set 'textwidth' to 78 characters.
-	autocmd FileType text,markdown setlocal textwidth=78
+		" For all text files set 'textwidth' to 78 characters.
+		autocmd FileType text,markdown setlocal textwidth=78
 
-	" When editing a file, always jump to the last known cursor position.
-	" Don't do it when the position is invalid or when inside an event handler
-	" (happens when dropping a file on gvim).
-	" Also don't do it when the mark is in the first line, that is the default
-	" position when opening a file.
-	autocmd BufReadPost *
-		\ if line("'\"") > 1 && line("'\"") <= line("$") |
-		\   exe "normal! g`\"" |
-		\ endif
-
+		" When editing a file, always jump to the last known cursor position.
+		" Don't do it when the position is invalid or when inside an event
+		" handler (happens when dropping a file on gvim). Also don't do it
+		" when the mark is in the first line, that is the default position
+		" when opening a file.
+		autocmd BufReadPost *
+			\ if line("'\"") > 1 && line("'\"") <= line("$") |
+			\   exe "normal! g`\"" |
+			\ endif
 	augroup END
 
 	" Where to look for tags files
 	let &tags= '.git/tags;' + &tags
 
 	" Persistent undo
-	let vimDir = '$HOME/.vim'
 	if has('persistent_undo')
-	let myUndoDir = expand(vimDir . '/undo')
-	" Create dirs
-	call system('mkdir ' . myUndoDir)
-	let &undodir = myUndoDir
-	set undofile
+		let myUndoDir = expand(vimDir . 'tmp/undo//')
+		" Create dirs
+		call system('mkdir -p ' . myUndoDir)
+		let &undodir = myUndoDir
+		set undofile
 	endif
 
 	" Faster update for Git Gutter
 	set updatetime=750
+
+	" Make it easy to comment
+	Plug 'tpope/vim-commentary' " Comment stuff out
+
+	" Use CTRL-A/CTRL-X to increment dates, times, and more
+	Plug 'tpope/vim-speeddating'
 
 " }}}
 
 " Plugin list {{{2
 
 " General Vim tweaks {{{3
-Plug 'tpope/vim-sleuth' " Heuristically set buffer options, like tabs/spaces
-Plug 'tpope/vim-unimpaired' " Pairs of handy bracket mappings
-Plug 'tpope/vim-commentary' " Comment stuff out
 Plug 'tpope/vim-surround' " Quoting/parenthesizing made simple
 Plug 'tpope/vim-abolish' " Easily search for, substitute, and abbreviate multiple variants of a word
 Plug 'sickill/vim-pasta' " Better indentation when pasting
-Plug 'editorconfig/editorconfig-vim' " EditorConfig support
 Plug 'sjl/gundo.vim' " Visualize Vim's undo tree
 Plug 'scrooloose/syntastic' " Syntax checking hacks
 Plug 'scrooloose/nerdtree' " File tree explorer

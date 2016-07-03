@@ -73,9 +73,6 @@ bindkey -M vicmd 'j' history-substring-search-down
 # Source promptline
 source ~/.shell_prompt.sh
 
-# Ignore vim backup files in autocompletion
-zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'
-
 # Set Neovim or Vim or Vi to default CLI editor if one is installed
 if (( $+commands[nvim] ))
 then
