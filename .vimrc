@@ -49,6 +49,45 @@
 
 " }}}
 
+" Very basic defaults (in line with NeoVim defaults) {{{
+	if !has('nvim')
+		set nocompatible " Don’t try to be just Vi
+		filetype indent plugin on " Turn on file type detection
+		set autoindent " Keep current indent if no other indent rule
+		set autoread " Reload file if it’s changed on the file system
+		set backspace=indent,eol,start " Allow backspacing over everything
+		set complete=.,w,b,u,t " Scan all buffers and include tags
+		set display=lastline " Display as much as possible of a line
+		set encoding=utf-8 " UTF-8 encoding
+		set formatoptions=tcqj " Auto-wrap text, better comment formatting
+		set history=10000 " Maximum command and search history
+		set hlsearch " Highlight search results
+		set incsearch " Jump to results as you type
+		set langnoremap " 'langmap' doesn’t mess with mappings
+		set laststatus=2 " Status line is always shown
+		set listchars=tab:>\ ,trail:-,nbsp:+ " Default white space characters
+		set mouse=a " Enable mouse
+		set nrformats=hex " Recognize hexadecimal numbers
+		" For sessions, save & restore the following:
+		set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize
+		set smarttab " Respect shiftwidth setting
+		set tabpagemax=50 " Maximum number of tabs to be opened
+		set tags=./tags;,tags " Default locations for tags files
+		set ttyfast " Assume a modern terminal, fast ‘connection’
+		set viminfo+=! " Keep all-caps global variables
+		set wildmenu " List possible completions on status line
+	endif
+	syntax on " Turn on syntax highlighting
+" }}}
+
+" Load local ‘before’ settings {{{
+
+	if filereadable(expand("~/.vimrc.before"))
+		source ~/.vimrc.before
+	endif
+
+" }}}
+
 " Platform detection {{{
 	silent function! OSX()
 		return has('macunix')
@@ -61,130 +100,130 @@
 	endfunction
 " }}}
 
-" Vim settings {{{
+" Start plugin manager {{{
 
-	" Very basic defaults (as per NeoVim defaults) {{{
-		if !has('nvim')
-			set nocompatible " Don’t try to be just Vi
-			filetype indent plugin on " Turn on file type detection
-			set autoindent " Keep current indent if no other indent rule
-			set autoread " Reload file if it’s changed on the file system
-			set backspace=indent,eol,start " Allow backspacing over everything
-			set complete=.,w,b,u,t " Scan all buffers and include tags
-			set display=lastline " Display as much as possible of a line
-			set encoding=utf-8 " UTF-8 encoding
-			set formatoptions=tcqj " Auto-wrap text, better comment formatting
-			set history=10000 " Maximum command and search history
-			set hlsearch " Highlight search results
-			set incsearch " Jump to results as you type
-			set langnoremap " 'langmap' doesn’t mess with mappings
-			set laststatus=2 " Status line is always shown
-			set listchars=tab:>\ ,trail:-,nbsp:+ " Default white space characters
-			set mouse=a " Enable mouse
-			set nrformats=hex " Recognize hexadecimal numbers
-			" For sessions, save & restore the following:
-			set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize
-			set smarttab " Respect shiftwidth setting
-			set tabpagemax=50 " Maximum number of tabs to be opened
-			set tags=./tags;,tags " Default locations for tags files
-			set ttyfast " Assume a modern terminal, fast ‘connection’
-			set viminfo+=! " Keep all-caps global variables
-			set wildmenu " List possible completions on status line
-		endif
-		syntax on " Turn on syntax highlighting
+	" Install vim-plug if necessary
+	if empty(glob('~/.vim/autoload/plug.vim'))
+		silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+			\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+		autocmd VimEnter * PlugInstall | source $MYVIMRC
+	endif
+
+	call plug#begin('~/.vim/plugged')
+
+" }}}
+
+" Appearance {{{
+
+	" use visual terminal bell
+	set vb
+
+	" line numbers
+	set relativenumber
+	" Show current line number in number column
+	set number
+
+	" Don't break words when wrapping lines
+	set linebreak
+
+	" make wrapped lines more obvious
+	let &showbreak="↳ "
+	set cpoptions+=n
+
+	" Make tabs, non-breaking spaces and trailing white space visible
+	set list
+	" Use a Musical Symbol Single Barline (0x1d100) to show a Tab,
+	" a Middle Dot (0x00B7) for trailing spaces,
+	" and the negation symbol (0x00AC) for non-breaking spaces
+	set listchars=tab:𝄀\ ,trail:·,extends:→,precedes:←,nbsp:¬
+
+	" Highlight the line I'm on
+	set cursorline
+
+	" Highlight matching paired delimiter
+	set showmatch
+
+	" display incomplete commands
+	set showcmd
+
+	" Powerline-ish specific settings
+	set showtabline=2 " Always display the tabline, even if there is only one tab
+	set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+
+	" Set comments to be italic
+	highlight Comment gui=italic cterm=italic
+	augroup italiccomments
+		autocmd!
+		autocmd ColorScheme * highlight Comment gui=italic cterm=italic
+	augroup END
+
+" }}}
+
+" General functionality {{{
+
+	" Match paired character(s) {{{
+		Plug 'matchit.zip' " (Possibly) updated matchit
 	" }}}
 
-" Set the leader, needs to be done early
-let g:mapleader = "\<Space>"
+	" Sensible default settings we can all agree on {{{
+		" See ~/.vim/plugged/vim-sensible/plugin/sensible.vim for the actual settings.
+		" Although the plugin is defined here, it’s only loaded near the end of
+		" the script.
+		Plug 'tpope/vim-sensible'
+	" }}}
 
-" use visual terminal bell
-set vb
+	Plug 'tpope/vim-speeddating' " Use CTRL-A/CTRL-X to increment dates, times, and more
 
-" line numbers
-set relativenumber
-" Show current line number in number column
-set number
+	" When wrap is off, horizontally scroll a decent amount.
+	set sidescroll=16
 
-" Don't break words when wrapping lines
-set linebreak
+	" check final line for Vim settings
+	set modelines=1
 
-" check final line for Vim settings
-set modelines=1
+	" set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
+	" files)
+	set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
+	set shiftround
 
-" make wrapped lines more obvious
-let &showbreak="↳ "
-set cpoptions+=n
+	" Only redraw when necessary
+	set lazyredraw
 
-" When wrap is off, horizontally scroll a decent amount.
-set sidescroll=16
+	" ignore case sensitivity in searching
+	set ignorecase
 
-" Ingore backup files & git directories
-set wildignore+=*~,.git
+	" smart case sensitivity in searching
+	set smartcase
 
-" set tabs to display as 4 spaces wide (might be overwritten by .editorconfig
-" files)
-set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
-set shiftround
+	" better command line completion
+	set wildmode=longest,full
+	set fileignorecase
+	set wildignorecase
 
-" show the cursor position all the time
-set ruler
+	" Ingore backup files & git directories
+	set wildignore+=*~,.git
 
-" Highlight the line I'm on
-set cursorline
+	" Enable code folding
+	set foldenable
+	set foldlevelstart=10
+	set foldnestmax=10
+	set foldmethod=indent
 
-" Highlight matching paired delimiter
-set showmatch
+	" Switch buffers even if modified
+	set hidden
 
-" Only redraw when necessary
-set lazyredraw
+	" better split window locations
+	set splitright
+	set splitbelow
 
-" display incomplete commands
-set showcmd
+	" Keep a backup file
+	set backup
 
-" ignore case sensitivity in searching
-set ignorecase
+	" Spell check & word completion
+	set spell spelllang=en_gb
+	set complete+=kspell
 
-" smart case sensitivity in searching
-set smartcase
-
-" better command line completion
-set wildmode=longest,full
-set fileignorecase
-set wildignorecase
-
-" Enable code folding
-set foldenable
-set foldlevelstart=10
-set foldnestmax=10
-set foldmethod=indent
-
-" Switch buffers even if modified
-set hidden
-
-" better split window locations
-set splitright
-set splitbelow
-
-" Configure the use of backup files
-if has("vms")
-	set nobackup		" do not keep a backup file, use versions instead
-else
-	set backup		" keep a backup file
-endif
-
-" Make tabs, non-breaking spaces and trailing white space visible
-set list
-" Use a Musical Symbol Single Barline (0x1d100) to show a Tab,
-" a Middle Dot (0x00B7) for trailing spaces,
-" and the negation symbol (0x00AC) for non-breaking spaces
-set listchars=tab:𝄀\ ,trail:·,extends:→,precedes:←,nbsp:¬
-
-" Spell check & spelling completion for spell check on
-set spell spelllang=en_gb
-set complete+=kspell
-
-" Put these in an autocmd group, so that we can delete them easily.
-augroup vimrcEx
+	" Put these in an autocmd group, so that we can delete them easily.
+	augroup vimrcEx
 	au!
 
 	" For all text files set 'textwidth' to 78 characters.
@@ -200,61 +239,34 @@ augroup vimrcEx
 		\   exe "normal! g`\"" |
 		\ endif
 
-augroup END
+	augroup END
 
-" Where to look for tags files
-let &tags= '.git/tags;' + &tags
+	" Where to look for tags files
+	let &tags= '.git/tags;' + &tags
 
-" Powerline-ish specific settings
-set showtabline=2 " Always display the tabline, even if there is only one tab
-set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
-
-" Persistent undo
-let vimDir = '$HOME/.vim'
-if has('persistent_undo')
+	" Persistent undo
+	let vimDir = '$HOME/.vim'
+	if has('persistent_undo')
 	let myUndoDir = expand(vimDir . '/undo')
 	" Create dirs
 	call system('mkdir ' . myUndoDir)
 	let &undodir = myUndoDir
 	set undofile
-endif
+	endif
 
-" Faster update for Git Gutter
-set updatetime=750
-
-" Set comments to be italic
-highlight Comment gui=italic cterm=italic
-augroup italiccomments
-	autocmd!
-	autocmd ColorScheme * highlight Comment gui=italic cterm=italic
-augroup END
+	" Faster update for Git Gutter
+	set updatetime=750
 
 " }}}
-
-" Plugins {{{1
-
-" Install vim-plug if necessary
-if empty(glob('~/.vim/autoload/plug.vim'))
-	silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-		\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-	autocmd VimEnter * PlugInstall | source $MYVIMRC
-endif
-
-call plug#begin('~/.vim/plugged')
 
 " Plugin list {{{2
 
 " General Vim tweaks {{{3
-Plug 'tpope/vim-sensible' " Sensible default settings we can all agree on
-Plug 'tpope/vim-repeat' " Plugin mappings can be repeated with .
-Plug 'tpope/vim-speeddating' " Use CTRL-A/CTRL-X to increment dates, times, and more
 Plug 'tpope/vim-sleuth' " Heuristically set buffer options, like tabs/spaces
 Plug 'tpope/vim-unimpaired' " Pairs of handy bracket mappings
-Plug 'tpope/vim-rsi' " Readline style insertion
 Plug 'tpope/vim-commentary' " Comment stuff out
 Plug 'tpope/vim-surround' " Quoting/parenthesizing made simple
 Plug 'tpope/vim-abolish' " Easily search for, substitute, and abbreviate multiple variants of a word
-Plug 'matchit.zip' " (Possibly) updated matchit
 Plug 'sickill/vim-pasta' " Better indentation when pasting
 Plug 'editorconfig/editorconfig-vim' " EditorConfig support
 Plug 'sjl/gundo.vim' " Visualize Vim's undo tree
@@ -308,7 +320,7 @@ Plug '2072/php-indenting-for-vim', { 'for': 'php' } " Updated official PHP inden
 
 " Text-like {{{4
 " Define text-like file types
-let markdownft = ['markdown', 'mkd']
+let markdownft = ['markdown']
 let vcsft = ['git', 'gitsendemail', '*commit*', '*COMMIT*']
 let textlikeft = markdownft + vcsft + ['text', 'mail']
 
@@ -630,8 +642,7 @@ augroup textlike
 			\ | call plug#load('vim-textobj-sentence')
 		\ | endif
 		\ | call pencil#init()
-		\ | call textobj#quote#init()
-		\ | call textobj#sentence#init({'educate': 1})
+		\ | call textobj#quote#init({'educate': 1})
 	\ | endif
 	" Init for non-text-like file types
 	autocmd FileType * if index(textlikeft, &filetype) < 0 |
@@ -704,100 +715,122 @@ nnoremap <Leader>g :Goyo<CR>
 
 " }}}2
 
-call plug#end()
+" Mappings {{{
 
-" Set Colorscheme
-colorscheme solarized
+	" Set the leader {{{
+		" needs to be done early,
+		" because any mappings that use <Leader> will
+		" use the value of <Leader> that was defined when
+		" they’re defined.
+		let mapleader="\<Space>"
+	" }}}
 
-" }}}1
+	Plug 'tpope/vim-repeat' " Plugin mappings can be repeated with .
 
-" Mappings {{{1
+	" Make it easier to work with buffers {{{
+		" Open empty buffer
+		nnoremap <Leader>T :enew<Cr>
+		" Move to next buffer
+		nnoremap <Leader>l :bnext<Cr>
+		" Move to previous buffer
+		nnoremap <Leader>h :bprevious<Cr>
+		" Close buffer and show previous
+		nnoremap <Leader>bq :bprevious <Bar> :bdelete #<Cr>
+		" Show open buffers
+		nnoremap <Leader>bl :buffers<Cr>
+	" }}}
 
-" Open empty buffer
-nnoremap <Leader>T :enew<Cr>
-" Move to next buffer
-nnoremap <Leader>l :bnext<Cr>
-" Move to previous buffer
-nnoremap <Leader>h :bprevious<Cr>
-" Close buffer and show previous
-nnoremap <Leader>bq :bprevious <Bar> :bdelete #<Cr>
-" Show open buffers
-nnoremap <Leader>bl :buffers<Cr>
+	" Emacs-style keybindings when in insert or command mode {{{
+		Plug 'tpope/vim-rsi' " Readline style insertion
+		" recall newer command-line using current characters as search pattern
+		cnoremap <C-N> <Down>
+		" recall previous (older) command-line using current characters as search pattern
+		cnoremap <C-P> <Up>
+	" }}}
 
-" recall newer command-line using current characters as search pattern
-cnoremap <C-N> <Down>
-" recall previous (older) command-line using current characters as search pattern
-cnoremap <C-P> <Up>
+	" Let brace movement work even when braces aren’t at col 0
+	map [[ ?{<CR>w99[{
+	map ][ /}<CR>b99]}
+	map ]] j0[[%/{<CR>
+	map [] k$][%?}<CR>
 
-" Let brace movement work even when braces aren't at col 0
-map [[ ?{<CR>w99[{
-map ][ /}<CR>b99]}
-map ]] j0[[%/{<CR>
-map [] k$][%?}<CR>
+	" Don't use Ex mode, use Q for formatting
+	map Q gq
 
-" Don't use Ex mode, use Q for formatting
-map Q gq
+	" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+	" so that you can undo CTRL-U after inserting a line break.
+	inoremap <C-U> <C-G>u<C-U>
+	nnoremap <Leader><Space> :nohlsearch<Cr>
 
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
-nnoremap <Leader><Space> :nohlsearch<Cr>
+	" Convenient command to see the difference between the current buffer and the
+	" file it was loaded from, thus the changes you made.
+	" Only define it when not defined already.
+	if !exists(":DiffOrig")
+		command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+			\ | wincmd p | diffthis
+	endif
 
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-if !exists(":DiffOrig")
-	command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-		\ | wincmd p | diffthis
-endif
+	" edit and source the vimrc file quickly
+	nnoremap <Leader>ev :vsplit $MYVIMRC<cr>
+	nnoremap <Leader>sv :source $MYVIMRC<cr>
+	" edit the zshrc file quickly
+	nnoremap <Leader>ez :vsplit ~/.zshrc<cr>
 
-" edit and source the vimrc file quickly
-nnoremap <Leader>ev :vsplit $MYVIMRC<cr>
-nnoremap <Leader>sv :source $MYVIMRC<cr>
-" edit the zshrc file quickly
-nnoremap <Leader>ez :vsplit ~/.zshrc<cr>
+	" change ESC to jk
+	inoremap jk <esc>
 
-" change ESC to jk
-inoremap jk <esc>
+	" easy semicolon at end of line in insert mode
+	inoremap <Leader>; <C-o>m`<C-o>A;<C-o>``
+	" easy comma at end of line in insert mode
+	inoremap <Leader>, <C-o>m`<C-o>A,<C-o>``
 
-" easy semicolon at end of line in insert mode
-inoremap <Leader>; <C-o>m`<C-o>A;<C-o>``
-" easy comma at end of line in insert mode
-inoremap <Leader>, <C-o>m`<C-o>A,<C-o>``
+	" save a vim session
+	nnoremap <Leader>s :mksession<Cr>
 
-" save a vim session
-nnoremap <Leader>s :mksession<Cr>
+	" Easier system clipboard usage
+	vnoremap <Leader>y "+y
+	vnoremap <Leader>d "+d
+	nnoremap <Leader>p "+p
+	nnoremap <Leader>P "+P
+	vnoremap <Leader>p "+p
+	vnoremap <Leader>P "+P
 
-" Easier system clipboard usage
-vnoremap <Leader>y "+y
-vnoremap <Leader>d "+d
-nnoremap <Leader>p "+p
-nnoremap <Leader>P "+P
-vnoremap <Leader>p "+p
-vnoremap <Leader>P "+P
+	" Automatically go to end of paste
+	vnoremap <silent> p p`]
+	nnoremap <silent> p p`]
+	" vnoremap <silent> y y`] |" same for selection
 
-" Automatically go to end of paste
-vnoremap <silent> p p`]
-nnoremap <silent> p p`]
-" vnoremap <silent> y y`] |" same for selection
+	" unmap keys I shouldn't be using
+	inoremap <esc> <nop>
+	inoremap <up> <nop>
+	inoremap <down> <nop>
+	inoremap <left> <nop>
+	inoremap <right> <nop>
+	nnoremap <up> <nop>
+	nnoremap <down> <nop>
+	nnoremap <left> <nop>
+	nnoremap <right> <nop>
 
-" unmap keys I shouldn't be using
-inoremap <esc> <nop>
-inoremap <up> <nop>
-inoremap <down> <nop>
-inoremap <left> <nop>
-inoremap <right> <nop>
-nnoremap <up> <nop>
-nnoremap <down> <nop>
-nnoremap <left> <nop>
-nnoremap <right> <nop>
+" }}}
 
-" Local settings {{{1
+" Load plugins {{{
 
-if filereadable(expand("~/.vimrc.local"))
-	source ~/.vimrc.local
-endif
+	call plug#end()
 
-" }}}1
+" }}}
+
+" Set Colorscheme {{{
+
+	colorscheme solarized
+
+" }}}
+
+" Load local ‘after’ settings {{{
+
+	if filereadable(expand("~/.vimrc.after"))
+		source ~/.vimrc.after
+	endif
+
+" }}}
 
 " vim: set foldmethod=marker foldlevel=0:
