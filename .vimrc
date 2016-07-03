@@ -363,14 +363,14 @@ nnoremap <Leader>u :GundoToggle<CR>
 nnoremap <F8> :NERDTreeToggle<CR>
 let g:NTPNamesDirs = ['.git']
 
-" HardMode {{{4
-nnoremap <Leader>hm :call ToggleHardMode()<CR>
-
 " MediumMode {{{4
 let g:mediummode_enabled = 0
 nnoremap <Leader>mm :MediumModeToggle<CR>
 
 " Searching, finding, tagging {{{3
+
+" Gitgutter
+let g:gitgutter_map_keys = 0
 
 " Easytags {{{4
 let g:easytags_languages = {
