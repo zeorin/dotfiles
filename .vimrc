@@ -308,7 +308,7 @@ Plug '2072/php-indenting-for-vim', { 'for': 'php' } " Updated official PHP inden
 
 " Text-like {{{4
 " Define text-like file types
-let markdownft = ['markdown', 'mkd']
+let markdownft = ['markdown']
 let vcsft = ['git', 'gitsendemail', '*commit*', '*COMMIT*']
 let textlikeft = markdownft + vcsft + ['text', 'mail']
 
@@ -630,8 +630,7 @@ augroup textlike
 			\ | call plug#load('vim-textobj-sentence')
 		\ | endif
 		\ | call pencil#init()
-		\ | call textobj#quote#init()
-		\ | call textobj#sentence#init({'educate': 1})
+		\ | call textobj#quote#init({'educate': 1})
 	\ | endif
 	" Init for non-text-like file types
 	autocmd FileType * if index(textlikeft, &filetype) < 0 |
