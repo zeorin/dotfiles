@@ -101,6 +101,8 @@ bindkey "^?" backward-delete-char
 # completion
 zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+setopt auto_list
+setopt no_list_beep
 
 # no autocorrect, thank you
 unsetopt correct_all
