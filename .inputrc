@@ -9,12 +9,16 @@ set completion-ignore-case on
 # on menu-complete, first display the common prefix, then cycle through the options when hitting tab
 set menu-complete-display-prefix on
 
-##################################3333
-# Keymaps for when we're in command mode
-set keymap vi-command
+$if mode=vi
+	# Keymaps for when we're in command mode
+	set keymap vi-command
+		"gg": beginning-of-history
+		"G": end-of-history
 
-
-##################################3333
-# Keymaps for when we're in insert mode
-set keymap vi-insert
-	"jk": vi-movement-mode	# remap ESC to jk
+	# Keymaps for when we're in insert mode
+	set keymap vi-insert
+		"jk": vi-movement-mode	# remap ESC to jk
+		"\C-w": backward-kill-word
+		"\C-p": history-search-backward
+		"\C-n": history-search-forward
+$endif
