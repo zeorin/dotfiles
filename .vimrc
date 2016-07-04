@@ -288,6 +288,16 @@
 	" Use CTRL-A/CTRL-X to increment dates, times, and more
 	Plug 'tpope/vim-speeddating'
 
+	" Send buffer contents to other tmux panes
+	Plug 'jpalardy/vim-slime'
+	let g:slime_target = 'tmux'
+	let mySlimeFile = expand(vimDir . 'tmp/') . '.slime_paste'
+	let g:slime_paste_file = mySlimeFile
+	augroup slime
+		autocmd!
+		autocmd VimLeave * call system('rm ' . mySlimeFile)
+	augroup END
+
 " }}}
 
 " Plugin list {{{2
