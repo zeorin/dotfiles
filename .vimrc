@@ -81,14 +81,6 @@
 	syntax on " Turn on syntax highlighting
 " }}}
 
-" Load local ‘before’ settings {{{
-
-	if filereadable(expand("~/.vimrc.before"))
-		source ~/.vimrc.before
-	endif
-
-" }}}
-
 " Platform detection {{{
 	silent function! OSX()
 		return has('macunix')
@@ -116,7 +108,17 @@
 	endif
 " }}}
 
+" Load local ‘before’ settings {{{
+
+	if filereadable(expand(vimRc . '.before'))
+		source expand(vimRc . '.before')
+	endif
+
+" }}}
+
 " Start plugin manager {{{
+
+	" TODO: make this platform-independent
 
 	" Install vim-plug if necessary
 	if empty(glob('~/.vim/autoload/plug.vim'))
@@ -136,7 +138,6 @@
 
 	" line numbers
 	set relativenumber
-	" Show current line number in number column
 	set number
 
 	" Don't break words when wrapping lines
@@ -156,6 +157,9 @@
 	" Highlight the line I'm on
 	set cursorline
 
+	" Show the textwidth visually
+	set colorcolumn=+1,+2
+
 	" Highlight matching paired delimiter
 	set showmatch
 
@@ -169,9 +173,6 @@
 		autocmd ColorScheme * highlight Comment gui=italic cterm=italic
 	augroup END
 
-	" Show the textwidth visually
-	set colorcolumn=+1,+2
-
 	" Git diff in the gutter (sign column) and stage/undo hunks
 	Plug 'airblade/vim-gitgutter'
 	let g:gitgutter_map_keys = 0
@@ -179,7 +180,7 @@
 	" Solarized color scheme {{{
 		" Precision colors for machines and people
 		Plug 'altercation/vim-colors-solarized'
-		" Create a dictionary for other settings
+		" Create a dictionary of the colors for later use
 		let g:sol = {
 			\"gui": {
 				\"base03": "#002b36",
@@ -255,7 +256,7 @@
 		let &background = g:background_style
 		augroup backgroundswitch
 			autocmd!
-			autocmd ColorScheme solarized let g:background_style = &background
+			autocmd ColorScheme * let g:background_style = &background
 		augroup END
 	" }}}
 
@@ -366,11 +367,12 @@
 	" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 	" so that you can undo CTRL-U after inserting a line break.
 	inoremap <C-U> <C-G>u<C-U>
+
+	" Quickly clear search highlight
 	nnoremap <Leader><Space> :nohlsearch<Cr>
 
 	" Convenient command to see the difference between the current buffer and the
 	" file it was loaded from, thus the changes you made.
-	" Only define it when not defined already.
 	if !exists(":DiffOrig")
 		command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
 			\ | wincmd p | diffthis
@@ -422,13 +424,12 @@
 " General functionality {{{
 
 	" Match paired characters
-	Plug 'matchit.zip' " (Possibly) updated matchit
+	Plug 'matchit.zip' " Updated matchit
 	Plug 'tpope/vim-unimpaired' " Pairs of handy bracket mappings
 
-	" Sensible default settings we can all agree on
-	" See ~/.vim/plugged/vim-sensible/plugin/sensible.vim for the actual
-	" settings. Although the plugin is defined here, it’s only loaded near
-	" the end of the script.
+	" Sensible default settings we can all agree on See
+	" vim-sensible/plugin/sensible.vim for the actual settings. Although the
+	" plugin is defined here, it’s only loaded near the end of the script.
 	Plug 'tpope/vim-sensible'
 
 	" set tabs to display as 4 spaces wide (might be overwritten by
@@ -508,9 +509,6 @@
 		augroup END
 	" }}}
 
-	" Where to look for tags files
-	let &tags= '.git/tags;' + &tags
-
 	" Persistent undo {{{
 		if has('persistent_undo')
 			let myUndoDir = expand(vimDir . 'tmp/undo//')
@@ -548,7 +546,8 @@
 	" Quoting/parenthesizing made simple
 	Plug 'tpope/vim-surround'
 
-	" Easily search for, substitute, and abbreviate multiple variants of a word
+	" Easily search for, substitute, and abbreviate multiple variants of a
+	" word
 	Plug 'tpope/vim-abolish'
 
 	" Better indentation when pasting
@@ -564,10 +563,10 @@
 		let g:syntastic_check_on_wq = 0
 		let g:syntastic_quiet_messages = { "type": "style" }
 		let g:syntastic_html_tidy_exec = '/usr/local/bin/tidy'
-		let g:syntastic_error_symbol = "\u2717"
-		let g:syntastic_style_error_symbol = "S\u2717"
-		let g:syntastic_warning_symbol = "\u26A0"
-		let g:syntastic_style_warning_symbol = "S\u26A0"
+		let g:syntastic_error_symbol = "\u2717" " ✗
+		let g:syntastic_style_error_symbol = "S\u2717" " S✗
+		let g:syntastic_warning_symbol = "\u26A0" " ⚠
+		let g:syntastic_style_warning_symbol = "S\u26A0" " S⚠
 		augroup syntastic_checkers
 			autocmd!
 			" Use only jshint if there’s a .jshintrc in the project root
@@ -582,24 +581,29 @@
 		Plug 'janlay/NERD-tree-project' " Try to find project dir
 		Plug 'Xuyuanp/nerdtree-git-plugin' " NERDTree showing git status
 		nnoremap <F8> :NERDTreeToggle<CR>
+		let g:NTPNames = ['.git*', 'package.json', 'Gemfile', 'Gulpfile.js', 'Gruntfile.js']
 		let g:NTPNamesDirs = ['.git']
 	" }}}
 
-	" Working directory is always project root
-	Plug 'airblade/vim-rooter'
-	let g:rooter_patterns = ['.git/']
+	" Working directory is always project root {{{
+		Plug 'airblade/vim-rooter'
+		let g:rooter_patterns = ['.git', '.git/', 'package.json', 'Gemfile', 'Gulpfile.js', 'Gruntfile.js', 'config.rb']
+		let g:rooter_silent_chdir = 1
+	" }}}
 
-	" Better clipboard functionality
-	Plug 'svermeulen/vim-easyclip'
-	" Easyclip remaps the mark mapping, remap mark to gm
-	nnoremap gm m
-	let g:EasyClipUseSubstituteDefaults = 1 " s is the substitution mapping
+	" Better clipboard functionality {{{
+		Plug 'svermeulen/vim-easyclip'
+		" Easyclip remaps the mark mapping, remap mark to gm
+		nnoremap gm m
+		let g:EasyClipUseSubstituteDefaults = 1 " s is the substitution mapping
+	" }}}
 
-	" Learn Vim’s movement commands better
-	Plug 'wikitopian/hardmode' " Hard mode
-	Plug 'kbarrette/mediummode' " Less… hard
-	let g:mediummode_enabled = 0
-	nnoremap <Leader>mm :MediumModeToggle<CR>
+	" Learn Vim’s movement commands better {{{
+		Plug 'wikitopian/hardmode' " Hard mode
+		Plug 'kbarrette/mediummode' " Less… hard
+		let g:mediummode_enabled = 0
+		nnoremap <Leader>mm :MediumModeToggle<CR>
+	" }}}
 
 	" Fuzzy file, buffer, mru, tag, etc finder {{{
 		Plug 'ctrlpvim/ctrlp.vim'
@@ -633,6 +637,10 @@
 	" }}}
 
 	" Automated tag file generation and syntax highlighting of tags {{{
+
+		" Where to look for tags files
+		set tags=.git/tags,tags,./tags
+
 		Plug 'xolox/vim-misc' " Needed for Easytags
 		Plug 'xolox/vim-easytags'
 		let g:easytags_languages = {
@@ -644,6 +652,8 @@
 				\'recurse_flag': '-R'
 			\}
 		\}
+		let g:easytags_auto_highlight = 0
+		set cpoptions+=d
 		let g:easytags_dynamic_files = 2
 		let g:easytags_async = 1
 	" }}}
@@ -654,22 +664,33 @@
 	" Wisely add 'end' in ruby, endfunction/endif/more in vim script, etc
 	Plug 'tpope/vim-endwise'
 
-	" Insert mode auto-completion for quotes, parens, brackets, etc.
-	Plug 'Raimondi/delimitMate'
+	" Insert mode auto-completion for quotes, parens, brackets, etc. {{{
+		Plug 'Raimondi/delimitMate'
+		let delimitMate_expand_space = 1
+		let delimitMate_expand_cr = 2
+		let delimitMate_jump_expansion = 1
+	" }}}
 
-	" A code-completion engine for Vim
-	Plug 'Valloric/YouCompleteMe'
-	let g:ycm_key_list_select_completion = ['<C-n>']
-	let g:ycm_key_list_previous_completion = ['<C-p>']
+	" A code-completion engine for Vim {{{
+		Plug 'Valloric/YouCompleteMe'
+		let g:ycm_key_list_select_completion = ['<C-n>']
+		let g:ycm_key_list_previous_completion = ['<C-p>']
+		let g:ycm_collect_identifiers_from_tags_files = 1
+		let g:ycm_add_preview_to_completeopt = 1
+		let g:ycm_autoclose_preview_window_after_completion = 1
+		let g:ycm_autoclose_preview_window_after_insertion = 1
+		let g:ycm_cache_omnifunc = 0
+	" }}}
 
-	" The ultimate snippet solution for Vim
-	Plug 'sirver/ultisnips'
-	Plug 'honza/vim-snippets' " Community-maintained default snippets
-	let g:UltiSnipsExpandTrigger="<Tab>"
-	let g:UltiSnipsListSnippets="<C-a>"
-	let g:UltiSnipsJumpForwardTrigger="<C-b>"
-	let g:UltiSnipsJumpBackwardTrigger="<C-x>"
-	let g:UltiSnipsEditSplit="vertical"
+	" The ultimate snippet solution for Vim {{{
+		Plug 'sirver/ultisnips'
+		Plug 'honza/vim-snippets' " Community-maintained default snippets
+		let g:UltiSnipsExpandTrigger="<Tab>"
+		let g:UltiSnipsListSnippets="<C-a>"
+		let g:UltiSnipsJumpForwardTrigger="<Tab>"
+		let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
+		let g:UltiSnipsEditSplit="vertical"
+	" }}}
 
 	" Emmet support
 	Plug 'mattn/emmet-vim'
@@ -691,64 +712,68 @@
 	let vcsft = ['git', 'gitsendemail', '*commit*', '*COMMIT*']
 	let textlikeft = markdownft + vcsft + ['text', 'mail']
 
-	" Rethinking Vim as a tool for writers
-	Plug 'reedes/vim-pencil', { 'on': [] }
+	" Text & text-like filetype plugins {{{
 
-	" Distraction-free writing
-	Plug 'junegunn/goyo.vim', { 'on': [] }
+		" Rethinking Vim as a tool for writers
+		Plug 'reedes/vim-pencil', { 'on': [] }
 
-	" Hyper-focus writing
-	Plug 'junegunn/limelight.vim', { 'on': [] }
+		" Distraction-free writing
+		Plug 'junegunn/goyo.vim', { 'on': [] }
 
-	" Build on Vim’s spell/thes/dict completion
-	" Plug 'reedes/vim-lexical', { 'for': textlikeft }
+		" Hyper-focus writing
+		Plug 'junegunn/limelight.vim', { 'on': [] }
 
-	" Light-weight auto-correction
-	Plug 'reedes/vim-litecorrect'
+		" Build on Vim’s spell/thes/dict completion
+		" Plug 'reedes/vim-lexical', { 'for': textlikeft }
 
-	" Create your own text objects
-	Plug 'kana/vim-textobj-user'
+		" Light-weight auto-correction
+		Plug 'reedes/vim-litecorrect'
 
-	" Use ‘curly’ quote characters
-	Plug 'reedes/vim-textobj-quote'
+		" Create your own text objects
+		Plug 'kana/vim-textobj-user'
 
-	" Improved native sentence text object and motion
-	Plug 'reedes/vim-textobj-sentence', { 'on': [] }
+		" Use ‘curly’ quote characters
+		Plug 'reedes/vim-textobj-quote'
 
-	" Uncover usage problems in your writing
-	Plug 'reedes/vim-wordy', { 'for': textlikeft }
+		" Improved native sentence text object and motion
+		Plug 'reedes/vim-textobj-sentence', { 'on': [] }
 
-	" Support for MultiMarkdown, CriticMark, etc.
-	Plug 'mattly/vim-markdown-enhancements', { 'for': markdownft }
+		" Uncover usage problems in your writing
+		Plug 'reedes/vim-wordy', { 'for': textlikeft }
 
-	" For all text files set 'textwidth' to 78 characters.
-	autocmd! FileType text,markdown setlocal textwidth=78
+		" Support for MultiMarkdown, CriticMark, etc.
+		Plug 'mattly/vim-markdown-enhancements', { 'for': markdownft }
 
-	" Text-like plugins lazy-loading {{{
-		let s:textlikeft_plugins_loaded = 0
-		augroup textlike
-			autocmd!
-			" Init for all file types
-			autocmd FileType *
-				\   call litecorrect#init()
-			" Init for text-like file types
-			autocmd FileType * if index(textlikeft, &filetype) >= 0 |
-				\   if !s:textlikeft_plugins_loaded
-					\ | let s:textlikeft_plugins_loaded = 1
-					\ | call plug#load('vim-pencil')
-					\ | call plug#load('goyo.vim')
-					\ | call plug#load('limelight.vim')
-					\ | call plug#load('vim-textobj-sentence')
+		" For all text files set 'textwidth' to 78 characters.
+		autocmd! FileType text,markdown setlocal textwidth=78
+
+		" Text-like plugins lazy-loading {{{
+			let s:textlikeft_plugins_loaded = 0
+			augroup textlike
+				autocmd!
+				" Init for all file types
+				autocmd FileType *
+					\   call litecorrect#init()
+				" Init for text-like file types
+				autocmd FileType * if index(textlikeft, &filetype) >= 0 |
+					\   if !s:textlikeft_plugins_loaded
+						\ | let s:textlikeft_plugins_loaded = 1
+						\ | call plug#load('vim-pencil')
+						\ | call plug#load('goyo.vim')
+						\ | call plug#load('limelight.vim')
+						\ | call plug#load('vim-textobj-sentence')
+					\ | endif
+					\ | call pencil#init()
+					\ | call textobj#quote#init({'educate': 1})
 				\ | endif
-				\ | call pencil#init()
-				\ | call textobj#quote#init({'educate': 1})
-			\ | endif
-			" Init for non-text-like file types
-			autocmd FileType * if index(textlikeft, &filetype) < 0 |
-				\   call textobj#quote#init({'educate': 0})
-				\ | silent let g:textobj#quote#educate = 1 " For smart quotes in comments & for toggling
-			\ | endif
-		augroup END
+				" Init for non-text-like file types
+				autocmd FileType * if index(textlikeft, &filetype) < 0 |
+					\   call textobj#quote#init({'educate': 0})
+					\ | silent let g:textobj#quote#educate = 1 " For smart quotes in comments & for toggling
+				\ | endif
+			augroup END
+		" }}}
+
 	" }}}
 
 	" Typographic smart quotes {{{
@@ -820,6 +845,8 @@
 " Plugins that have to be last because of loading order {{{
 
 	" Pretty font icons like Seti-UI {{{
+		" Needs to be near the end because it changes the way some of the
+		" other plugins like ctrl-p, startify, NERDTree, etc. work.
 		Plug 'ryanoasis/vim-devicons'
 		let g:WebDevIconsUnicodeDecorateFolderNodes = 1
 		let g:DevIconsEnableFoldersOpenClose = 1
@@ -889,8 +916,8 @@
 
 " Load local ‘after’ settings {{{
 
-	if filereadable(expand("~/.vimrc.after"))
-		source ~/.vimrc.after
+	if filereadable(expand(vimRc . '.after'))
+		source expand(vimRc . '.after')
 	endif
 
 " }}}
