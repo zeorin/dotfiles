@@ -2,5 +2,5 @@
 /plugged
 /autoload/plug.vim
 /autoload/plug.vim.old
-/undo/
+/tmp/
 /spell/

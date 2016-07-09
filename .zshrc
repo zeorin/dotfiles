@@ -73,9 +73,6 @@ bindkey -M vicmd 'j' history-substring-search-down
 # Source promptline
 source ~/.shell_prompt.sh
 
-# Ignore vim backup files in autocompletion
-zstyle ':completion:*:*:*:*:*files' ignored-patterns '*~'
-
 # Set Neovim or Vim or Vi to default CLI editor if one is installed
 if (( $+commands[nvim] ))
 then
@@ -104,6 +101,8 @@ bindkey "^?" backward-delete-char
 # completion
 zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+setopt auto_list
+setopt no_list_beep
 
 # no autocorrect, thank you
 unsetopt correct_all
