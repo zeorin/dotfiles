@@ -4,6 +4,7 @@
 *.swo
 .DS_Store
 tags
+.tern-project
 
 ### /home/xandor/.gitignore-boilerplates/CodeIgniter.gitignore
 
