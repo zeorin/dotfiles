@@ -470,6 +470,7 @@
 	set foldlevelstart=10
 	set foldnestmax=10
 	set foldmethod=indent
+	Plug 'Konfekt/FastFold' " Make folding faster
 
 	" Switch buffers even if modified
 	set hidden
