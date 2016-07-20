@@ -275,7 +275,9 @@
 	Plug 'edkolev/promptline.vim'
 
 	" Set tmux theme to airline theme
-	Plug 'zeorin/tmuxline.vim', { 'branch': 'utf8-suppress-error' }
+	if !has('gui')
+		Plug 'zeorin/tmuxline.vim', { 'branch': 'utf8-suppress-error' }
+	endif
 
 	" Fancy start screen {{{
 		Plug 'mhinz/vim-startify'
