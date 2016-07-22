@@ -26,6 +26,3 @@
 [submodule "git-flow-completion"]
 	path = git-flow-completion
 	url = git@github.com:bobthecow/git-flow-completion.git
-[submodule "tty-solarized"]
-	path = tty-solarized
-	url = ssh://git@github.com/joepvd/tty-solarized.git
