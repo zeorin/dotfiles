@@ -100,6 +100,7 @@ zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 setopt auto_list
 setopt no_list_beep
+bindkey '^[[Z' reverse-menu-complete # SHIFT-TAB to go back
 
 # no autocorrect, thank you
 unsetopt correct_all

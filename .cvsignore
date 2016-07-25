@@ -5,6 +5,7 @@
 .DS_Store
 tags
 .tern-project
+Session.vim
 
 ### /home/xandor/.gitignore-boilerplates/CodeIgniter.gitignore
 
