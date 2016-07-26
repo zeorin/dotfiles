@@ -1,8 +1,82 @@
-# If not running interactively, do not do anything
-[[ $- != *i* ]] && return
-
 #  Start shell in tmux
-[[ -z "$TMUX" ]] && exec tmux
+if command -v tmux >/dev/null && [[ -z "$TMUX" ]]; then
+
+	# Check for unattached sessions
+	TMUX_UNATTACHED_SESSIONS=`tmux list-sessions | grep -v '(\(attached\))$'`
+
+	# if we found no unattached sessions
+	if [[ -z "$TMUX_UNATTACHED_SESSIONS" ]]; then
+
+		exec tmux
+
+	else
+
+		# ask which session we’d like to attach to
+		TMUX_SESSION=false
+		ERROR_MSG=""
+		SHOW_ATTACHED_SESSIONS=false
+		while [[ "$TMUX_SESSION" == false ]]; do
+			TMUX_UNATTACHED_SESSIONS=`tmux list-sessions | grep -v '(\(attached\))$'`
+			TMUX_ALL_SESSIONS=`tmux list-sessions`
+			clear
+			if [[ "$SHOW_ATTACHED_SESSIONS" == false ]]; then
+				echo "Would you like to attach to any of the following"
+				echo "unattached tmux sessions?"
+				echo ""
+				echo "$TMUX_UNATTACHED_SESSIONS"
+			else
+				echo "Would you like to attach to any of the following"
+				echo "tmux sessions?"
+				echo ""
+				echo "$TMUX_ALL_SESSIONS"
+			fi
+			echo ""
+			echo "Type the name/number of the session to attach to it."
+			if [[ "$SHOW_ATTACHED_SESSIONS" == false ]]; then
+				echo "Type \"all\" to see all sessions."
+			fi
+			echo "Or type \"e\" for a new tmux session."
+			echo ""
+			if [[ ! -z "$ERROR_MSG" ]]; then
+				echo "$ERROR_MSG"
+				echo ""
+			fi
+
+			read INPUT
+
+			case "$INPUT" in
+				"E" | "e" )
+					clear
+					echo "What would you like to name this session?"
+					echo ""
+					read TMUX_SESSION_NAME
+					if [[ ! -z "$TMUX_SESSION_NAME" ]]; then
+						exec tmux new-session -s "$TMUX_SESSION_NAME"
+					else
+						exec tmux
+					fi
+					TMUX_SESSION=true
+				;;
+
+				"All" | "ALL" | "all" )
+					SHOW_ATTACHED_SESSIONS=true
+					TMUX_SESSION=false
+				;;
+
+				* )
+					tmux has-session -t "$INPUT" 2&>1 >/dev/null
+					if [[ "$?" == 0 ]]; then
+						exec tmux attach-session -t "$INPUT"
+						TMUX_SESSION=true
+					else
+						ERROR_MSG="Session '$INPUT' does not exist!"
+						TMUX_SESSION=false
+					fi
+				;;
+			esac
+		done
+	fi
+fi
 
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
