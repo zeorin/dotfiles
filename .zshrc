@@ -2,7 +2,7 @@
 if command -v tmux >/dev/null && [[ -z "$TMUX" ]]; then
 
 	# Check for unattached sessions
-	TMUX_UNATTACHED_SESSIONS=`tmux list-sessions | grep -v '(\(attached\))$'`
+	TMUX_UNATTACHED_SESSIONS=`tmux list-sessions 2&>/dev/null | grep -v '(\(attached\))$'`
 
 	# if we found no unattached sessions
 	if [[ -z "$TMUX_UNATTACHED_SESSIONS" ]]; then
