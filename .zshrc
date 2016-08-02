@@ -45,85 +45,80 @@
 
 # }}}
 
-#  Start shell in tmux
-if command -v tmux >/dev/null && [[ -z "$TMUX" ]]; then
+#  Start shell in tmux, choose a session if there’re unattached sessions {{{
+	if command -v tmux >/dev/null && [[ -z "$TMUX" ]]; then
 
-	# Check for unattached sessions
-	TMUX_UNATTACHED_SESSIONS=`tmux list-sessions 2&>/dev/null | grep -v '(\(attached\))$'`
+		# Check for unattached sessions
+		TMUX_UNATTACHED_SESSIONS=`tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//'`
 
-	# if we found no unattached sessions
-	if [[ -z "$TMUX_UNATTACHED_SESSIONS" ]]; then
+		# if we found no unattached sessions
+		if [[ -z "$TMUX_UNATTACHED_SESSIONS" ]]; then
 
-		exec tmux
+			exec tmux
 
-	else
+		else
 
-		# ask which session we’d like to attach to
-		TMUX_SESSION=false
-		ERROR_MSG=""
-		SHOW_ATTACHED_SESSIONS=false
-		while [[ "$TMUX_SESSION" == false ]]; do
-			TMUX_UNATTACHED_SESSIONS=`tmux list-sessions | grep -v '(\(attached\))$'`
-			TMUX_ALL_SESSIONS=`tmux list-sessions`
-			clear
-			if [[ "$SHOW_ATTACHED_SESSIONS" == false ]]; then
-				echo "Would you like to attach to any of the following"
-				echo "unattached tmux sessions?"
-				echo ""
-				echo "$TMUX_UNATTACHED_SESSIONS"
-			else
-				echo "Would you like to attach to any of the following"
-				echo "tmux sessions?"
-				echo ""
-				echo "$TMUX_ALL_SESSIONS"
-			fi
-			echo ""
-			echo "Type the name/number of the session to attach to it."
-			if [[ "$SHOW_ATTACHED_SESSIONS" == false ]]; then
-				echo "Type \"all\" to see all sessions."
-			fi
-			echo "Or type \"e\" for a new tmux session."
-			echo ""
-			if [[ ! -z "$ERROR_MSG" ]]; then
-				echo "$ERROR_MSG"
-				echo ""
-			fi
+			# ask which session we’d like to attach to
+			TMUX_SESSION=false
+			SHOW_ATTACHED_SESSIONS=false
+			while [[ "$TMUX_SESSION" == false ]]; do
 
-			read INPUT
+				# Build up the menu options
+				TMUX_MENU_OPTIONS=("New session" "")
+				if [[ "$SHOW_ATTACHED_SESSIONS" == false ]]; then
+					TMUX_MENU_PROMPT="Which unattached tmux session do you want to attach to?"
+					# This is some heinous code, basically it makes unattached
+					# session names into array items.
+					TMUX_MENU_OPTIONS+=("${(f)$(tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//')}")
+					TMUX_MENU_OPTIONS+=("" "Show all sessions")
+				else
+					TMUX_MENU_PROMPT="Which tmux session do you want to attach to?"
+					# Same heinousness as earlier, except for all sessions
+					TMUX_MENU_OPTIONS+=("${(f)$(tmux list-sessions -F '#S' 2>/dev/null)}")
+				fi
 
-			case "$INPUT" in
-				"E" | "e" )
-					clear
-					echo "What would you like to name this session?"
-					echo ""
-					read TMUX_SESSION_NAME
-					if [[ ! -z "$TMUX_SESSION_NAME" ]]; then
-						exec tmux new-session -s "$TMUX_SESSION_NAME"
-					else
-						exec tmux
-					fi
-					TMUX_SESSION=true
-				;;
+				# Because whiptail expects arguments in a [tag item]... format
+				TMUX_MENU_TAG_ITEMS=()
+				for key in "${TMUX_MENU_OPTIONS[@]}"; do
+					TMUX_MENU_TAG_ITEMS+=("$key" "")
+				done
 
-				"All" | "ALL" | "all" )
-					SHOW_ATTACHED_SESSIONS=true
-					TMUX_SESSION=false
-				;;
+				INPUT=$(whiptail --title "Choose tmux session" --nocancel --menu "$TMUX_MENU_PROMPT" 0 0 0 -- "${TMUX_MENU_TAG_ITEMS[@]}" 3>&1 1>&2 2>&3)
 
-				* )
-					tmux has-session -t "$INPUT" 2&>1 >/dev/null
-					if [[ "$?" == 0 ]]; then
-						exec tmux attach-session -t "$INPUT"
+				case "$INPUT" in
+					"New session" )
+						echo "What would you like to name this session?"
+						TMUX_SESSION_NAME=$(whiptail --title "Choose tmux session" --nocancel --inputbox "What would you like to name this session?" 0 0 3>&1 1>&2 2>&3)
+						if [[ ! -z "$TMUX_SESSION_NAME" ]]; then
+							exec tmux new-session -s "$TMUX_SESSION_NAME"
+						else
+							exec tmux
+						fi
 						TMUX_SESSION=true
-					else
-						ERROR_MSG="Session '$INPUT' does not exist!"
-						TMUX_SESSION=false
-					fi
-				;;
-			esac
-		done
+					;;
+
+					"Show all sessions" )
+						SHOW_ATTACHED_SESSIONS=true
+					;;
+
+					"" )
+						# If the user choose a blank spacer line (dumbass)
+						# just redraw the menu
+						continue 2
+					;;
+
+					* )
+						tmux has-session -t "$INPUT" 2&>1 >/dev/null
+						if [[ "$?" == 0 ]]; then
+							exec tmux attach-session -t "$INPUT"
+							TMUX_SESSION=true
+						fi
+					;;
+				esac
+			done
+		fi
 	fi
-fi
+# }}}
 
 # Path to your oh-my-zsh configuration.
 ZSH=$HOME/.oh-my-zsh
