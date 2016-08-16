@@ -562,6 +562,7 @@
 
 	" Syntax checking hacks {{{
 		Plug 'scrooloose/syntastic'
+		Plug 'mtscout6/syntastic-local-eslint.vim' " Prefer a local installation of eslint
 		let g:syntastic_check_on_open = 1
 		let g:syntastic_check_on_wq = 0
 		let g:syntastic_quiet_messages = { "type": "style" }
@@ -572,9 +573,16 @@
 		let g:syntastic_style_warning_symbol = "S\u26A0" " S⚠
 		augroup syntastic_checkers
 			autocmd!
+			" Use eslint if it’s installed or if there’s a .eslintrc in
+			" the project root
+			autocmd FileType javascript if filereadable(expand('.eslintrc.*')) && executable(expand('./node_modules/.bin/eslint')) |
+				\   let b:syntastic_checkers = ['eslint']
+				\ | elseif filereadable(expand('$HOME/'.'.eslintrc.*')) && executable('eslint') |
+				\   let b:syntastic_checkers = ['eslint']
+				\ | endif
 			" Use only jshint if there’s a .jshintrc in the project root
-			autocmd FileType javascript if filereadable(".jshintrc") && executable("jshint") |
-				\   let b:syntastic_checkers = ["jshint"]
+			autocmd FileType javascript if filereadable('.jshintrc') && executable('jshint') |
+				\   let b:syntastic_checkers = ['jshint']
 				\ | endif
 		augroup END
 	" }}}
@@ -703,6 +711,8 @@
 
 	" A solid language pack (HTML5, CSS3, SASS, PHP, & about 74 others)
 	Plug 'sheerun/vim-polyglot'
+	" Enable JSX syntax in JS files
+	let g:jsx_ext_required = 0
 
 	" Improved PHP omnicompletion
 	Plug 'shawncplus/phpcomplete.vim', { 'for': 'php' }
