@@ -302,4 +302,10 @@ bindkey '^Z' fancy-ctrl-z
 export NVM_DIR="/home/xandor/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
+
+if (( $+commands[direnv] ))
+then
+	eval "$(direnv hook zsh)"
+fi
+
 # vim: set foldmethod=marker foldlevel=0:
