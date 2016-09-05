@@ -149,10 +149,10 @@
 
 	" Make tabs, non-breaking spaces and trailing white space visible
 	set list
-	" Use a Musical Symbol Single Barline (0x1d100) to show a Tab, a Middle
-	" Dot (0x00B7) for trailing spaces, and the negation symbol (0x00AC) for
-	" non-breaking spaces
-	set listchars=tab:𝄀\ ,trail:·,extends:→,precedes:←,nbsp:¬
+	" Use a Box Drawings Light Quaduple Dash Vertical (0x250A) + Space to show
+	" a Tab, a Middle Dot (0x00B7) for trailing spaces, and the negation
+	" symbol (0x00AC) for non-breaking spaces
+	set listchars=tab:┊\ ,trail:·,extends:→,precedes:←,nbsp:¬
 
 	" Highlight the line I'm on
 	set cursorline
