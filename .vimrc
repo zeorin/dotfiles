@@ -149,8 +149,8 @@
 
 	" Make tabs, non-breaking spaces and trailing white space visible
 	set list
-	" Use a Box Drawings Light Quaduple Dash Vertical (0x250A) + Space to show
-	" a Tab, a Middle Dot (0x00B7) for trailing spaces, and the negation
+	" Use a Box Drawings Light Quadruple Dash Vertical (0x250A) + Space to
+	" show a Tab, a Middle Dot (0x00B7) for trailing spaces, and the negation
 	" symbol (0x00AC) for non-breaking spaces
 	set listchars=tab:┊\ ,trail:·,extends:→,precedes:←,nbsp:¬
 
@@ -898,7 +898,7 @@
 					else
 						exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[color].' ctermfg='.g:sol.cterm[color]
 					endif
-					exec 'autocmd FileType nerdtree,startify syntax match devicons_'.color.' /\v'.join(a:config[color], '|').'/ containedin=ALL'
+					exec 'autocmd FileType nerdtree,startify syntax match devicons_'.color.' /\v'.join(a:config[color], '.|').'./ containedin=ALL'
 				endfor
 			augroup END
 		endfunction
