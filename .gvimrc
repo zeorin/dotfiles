@@ -11,4 +11,4 @@ set guioptions-=r
 set guioptions-=L
 
 " Set font
-set guifont=Knack\ 9
+set guifont=Knack\ Nerd\ Font\ 9
