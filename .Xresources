@@ -12,18 +12,22 @@ URxvt.lineSpace:            0
 
 ! Fonts
 URxvt.intensityStyles:      true
-URxvt.font: xft:Knack Nerd Font:pixelsize=11
-URxvt.boldFont: xft:Knack Nerd Font:style=Bold:pixelsize=11
-URxvt.italicFont: xft:Knack Nerd Font:style=Italic:pixelsize=11
-URxvt.boldItalicFont: xft:Knack Nerd Font:style=Bold Italic:pixelsize=11
+URxvt.font: xft:Knack Nerd Font:style=Regular:pixelsize=12,xft:Unifont
+URxvt.boldFont: xft:Knack Nerd Font:style=Bold:pixelsize=12,xft:Unifont
+URxvt.italicFont: xft:Knack Nerd Font:style=Italic:pixelsize=12,xft:Unifont
+URxvt.boldItalicFont: xft:Knack Nerd Font:style=Bold Italic:pixelsize=12,xft:Unifont
 
 ! Fix font space
-URxvt.letterSpace: -1
+URxvt.letterSpace: -2
 URxvt.skipBuiltinGlyphs: true
 
 ! Scrollbar
 URxvt.scrollStyle:          rxvt
 URxvt.scrollBar:            false
+
+! CTRL+SHIFT should not be bound by URxvt
+URxvt.iso14755: false
+URxvt.iso14755_52: false
 
 ! Solarized color scheme for the X Window System
 !
