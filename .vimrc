@@ -157,6 +157,16 @@
 	" Highlight the line I'm on
 	set cursorline
 
+	" Set cursor depending on mode
+	if !has('gui')
+		if has('nvim')
+			let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+		else
+			let &t_SI = "\<Esc>[5 q"	# DECSCUSR Blink Bar
+			let &t_EI = "\<Esc>[2 q"	# DECSCUSR Steady Block
+		endif
+	endif
+
 	" Show the textwidth visually
 	set colorcolumn=+1,+2
 

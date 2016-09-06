@@ -10,5 +10,8 @@ set guioptions-=r
 " Hide left scroll
 set guioptions-=L
 
+" Configure cursor appearance
+set guicursor+=n-v-c:blinkon0
+
 " Set font
 set guifont=Knack\ Nerd\ Font\ 9

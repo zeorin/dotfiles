@@ -211,6 +211,22 @@ bindkey -M viins 'jk' vi-cmd-mode
 # VIm-style backspace
 bindkey "^?" backward-delete-char
 
+# Change cursor shape depending on mode
+function zle-keymap-select zle-line-init {
+	case $KEYMAP in
+		viins|main) print -n -- "\E[5 q";;	# DECSCUSR Blink Bar
+		vicmd)      print -n -- "\E[2 q";;	# DECSCUSR Steady Block
+	esac
+	zle reset-prompt
+	zle -R
+}
+function zle-line-finish {
+	print -n -- "\E[2 q"	# DECSCUSR Steady Block
+}
+zle -N zle-line-init
+zle -N zle-line-finish
+zle -N zle-keymap-select
+
 # completion
 zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
