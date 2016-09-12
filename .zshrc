@@ -45,8 +45,8 @@
 
 # }}}
 
-#  Start shell in tmux, choose a session if there’re unattached sessions {{{
-	if command -v tmux >/dev/null && [[ -z "$TMUX" ]]; then
+# Tmux session chooser {{{
+	if which tmux >/dev/null 2>&1 && [[ -z "$TMUX" ]]; then
 
 		# Check for unattached sessions
 		TMUX_UNATTACHED_SESSIONS=`tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//'`
@@ -120,208 +120,280 @@
 	fi
 # }}}
 
-# Path to your oh-my-zsh configuration.
-ZSH=$HOME/.oh-my-zsh
+# Load antigen {{{
+	source ~/.dotfiles/antigen/antigen.zsh
+# }}}
 
-# Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-ZSH_THEME="xandor"
+# Appearance {{{
 
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+	# Set LS_COLORS {{{
+		if [[ "$OSTYPE" == *gnu* ]]; then
+			eval `dircolors ~/.dir_colors`
+		fi
+	# }}}
 
-# Set to this to use case-sensitive completion
-# CASE_SENSITIVE="true"
+	# Cursor shape {{{
+		function zle-keymap-select zle-line-init {
+			case $KEYMAP in
+				viins|main) print -n -- "\E[5 q";;	# DECSCUSR Blink Bar
+				vicmd)      print -n -- "\E[2 q";;	# DECSCUSR Steady Block
+			esac
+			zle reset-prompt
+			zle -R
+		}
+		function zle-line-finish {
+			print -n -- "\E[2 q"	# DECSCUSR Steady Block
+		}
+		zle -N zle-line-init
+		zle -N zle-line-finish
+		zle -N zle-keymap-select
+	# }}}
 
-# Comment this out to disable weekly auto-update checks
-# DISABLE_AUTO_UPDATE="true"
+	# Syntax highlighting {{{
+		antigen bundle zsh-users/zsh-syntax-highlighting
+		ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
+		typeset -A ZSH_HIGHLIGHT_STYLES
+		ZSH_HIGHLIGHT_STYLES[alias]='fg=default,bold'
+		ZSH_HIGHLIGHT_STYLES[builtin]='fg=default,bold'
+		ZSH_HIGHLIGHT_STYLES[command]='fg=default,bold'
+		ZSH_HIGHLIGHT_STYLES[function]='fg=default,bold'
+		ZSH_HIGHLIGHT_STYLES[precommand]='fg=default,bold'
+		ZSH_HIGHLIGHT_STYLES[path]='fg=default'
+		ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=cyan'
+		ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=cyan'
+	# }}}
 
-# Uncomment following line if you want to disable colors in ls
-# DISABLE_LS_COLORS="true"
+	# Shell theme {{{
+		source ~/.shell_prompt.sh
+	# }}}
 
-# Uncomment following line if you want to disable autosetting terminal title.
-# DISABLE_AUTO_TITLE="true"
+# }}}
 
-# Uncomment following line if you want red dots to be displayed while waiting for completion
-# COMPLETION_WAITING_DOTS="true"
+# Behaviour {{{
 
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(debian gibo git git-extras git-flow github git-hubflow git-flow-completion git-remote-branch gnu-utils history node npm svn zsh-syntax-highlighting history-substring-search)
+	# vi keybindings {{{
+		bindkey -v
+		# map JK to ESC in command mode
+		bindkey -M viins 'jk' vi-cmd-mode
+		# VIm-style backspace
+		bindkey "^?" backward-delete-char
+	# }}}
 
-source $ZSH/oh-my-zsh.sh
+	# Completion {{{
 
-# Customize to your needs...
-export PATH=$PATH:$HOME/.bin:$HOME/.bin/todo.txt:$HOME/.rvm/bin
+		zmodload -i zsh/complist
 
-# Execute rvm scripts, need this to enable compass
-[[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
-[[ -e "/usr/local/rvm/scripts/rvm" ]] && source /usr/local/rvm/scripts/rvm
+		# Initialize the completion system
+		autoload -Uz compinit
+		if [[ ! -a "${HOME}/.zcompdump" || $(date +'%j') > $(date +'%j' -r "${HOME}/.zcompdump") ]]; then
+			compinit
+		else
+			compinit -C
+		fi
 
-# Turn on colors in autocompletion
-if [[ "$OSTYPE" == *gnu* ]]
-then
-	eval `dircolors ~/.dir_colors`
-fi
+		unsetopt menu_complete
+		unsetopt flowcontrol
+		setopt auto_menu
+		setopt complete_in_word
+		setopt always_to_end
 
-# Turn on syntax highlighting
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
-ZSH_HIGHLIGHT_STYLES[alias]='fg=default,bold'
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=default,bold'
-ZSH_HIGHLIGHT_STYLES[command]='fg=default,bold'
-ZSH_HIGHLIGHT_STYLES[function]='fg=default,bold'
-ZSH_HIGHLIGHT_STYLES[precommand]='fg=default,bold'
-ZSH_HIGHLIGHT_STYLES[path]='fg=default'
-ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=magenta,bold'
-ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=magenta,bold'
+		setopt auto_list
+		setopt no_list_beep
 
-# Use history-substring-search in vi mode also
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
+		# Completions are case- and hypen-insensitive, and do substring completion
+		zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
-# Source promptline
-source ~/.shell_prompt.sh
+		# Use the menu select style
+		zstyle ':completion:*:*:*:*:*' menu select
+		bindkey '^[[Z' reverse-menu-complete # SHIFT-TAB to go back
 
-# Set Neovim or Vim or Vi to default CLI editor if one is installed
-if (( $+commands[nvim] ))
-then
-	export EDITOR=nvim
-	export VISUAL=nvim
-elif (( $+commands[vim] ))
-then
-	export EDITOR=vim
-	export VISUAL=vim
-elif (( $+commands[vi] ))
-then
-	export EDITOR=vi
-	export VISUAL=vi
-fi
+		# Color completions when they’re files
+		zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-# Allow completions for git aliases when git is wrapped by hub
-compdef hub=git
+		# Colors for processes in kill
+		zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+		# List all processes owned by current user
+		zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
 
-# vi keybindings
-bindkey -v
-# map JK to ESC in command mode
-bindkey -M viins 'jk' vi-cmd-mode
-# VIm-style backspace
-bindkey "^?" backward-delete-char
+		# Disable named-directories autocompletion
+		zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
 
-# Change cursor shape depending on mode
-function zle-keymap-select zle-line-init {
-	case $KEYMAP in
-		viins|main) print -n -- "\E[5 q";;	# DECSCUSR Blink Bar
-		vicmd)      print -n -- "\E[2 q";;	# DECSCUSR Steady Block
-	esac
-	zle reset-prompt
-	zle -R
-}
-function zle-line-finish {
-	print -n -- "\E[2 q"	# DECSCUSR Steady Block
-}
-zle -N zle-line-init
-zle -N zle-line-finish
-zle -N zle-keymap-select
+		# Use caching so that commands like apt and dpkg complete are useable
+		zstyle ':completion::complete:*' use-cache 1
+		zstyle ':completion::complete:*' cache-path "$HOME/.cache/zsh"
 
-# completion
-zmodload -i zsh/complist
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-setopt auto_list
-setopt no_list_beep
-bindkey '^[[Z' reverse-menu-complete # SHIFT-TAB to go back
+		# Don't complete uninteresting users
+		zstyle ':completion:*:*:*:users' ignored-patterns \
+			adm amanda apache at avahi avahi-autoipd beaglidx bin cacti \
+			canna clamav daemon dbus distcache dnsmasq dovecot fax ftp games \
+			gdm gkrellmd gopher hacluster haldaemon halt hsqldb ident \
+			junkbust kdm ldap lp mail mailman mailnull man messagebus \
+			mldonkey mysql nagios named netdump news nfsnobody nobody nscd \
+			ntp nut nx obsrun openvpn operator pcap polkitd postfix postgres \
+			privoxy pulse pvm quagga radvd rpc rpcuser rpm rtkit scard \
+			shutdown squid sshd statd svn sync tftp usbmux uucp vcsa wwwrun \
+			xfs '_*'
+		# … unless we really want to.
+		zstyle '*' single-ignored show
 
-# no autocorrect, thank you
-unsetopt correct_all
+		expand-or-complete-with-dots() {
+			# toggle line-wrapping off and back on again
+			[[ -n "$terminfo[rmam]" && -n "$terminfo[smam]" ]] && echoti rmam
+			print -Pn "%{%F{blue}……⌛%f%}"
+			[[ -n "$terminfo[rmam]" && -n "$terminfo[smam]" ]] && echoti smam
+			zle expand-or-complete
+			zle redisplay
+		}
+		zle -N expand-or-complete-with-dots
+		bindkey "^I" expand-or-complete-with-dots
 
-# Set up aliases
-alias ..='cd ..'
-alias ~='cd ~'
+		# A whole bunch of useful completions
+		antigen bundle zsh-users/zsh-completions
 
-alias todo='~/.bin/todo.txt/todo.sh -d ~/.bin/todo.txt/todo.cfg'
+	# }}}
 
-if [[ "$OSTYPE" == *gnu* ]]
-then
-	alias ls='ls -h --color --group-directories-first'
+	# No autocorrect, thank you {{{
+		unsetopt correct_all
+	# }}}
 
-	alias grep='grep --color=auto'
-fi
-if [[ "$OSTYPE" == *darwin* ]]
-then
-	alias ls='ls -hG'
-fi
-alias l='ls -lB'
-alias ll='ls -la'
+	# Show time for long commands {{{
+		REPORTTIME=5
+		TIMEFMT="%U user %S system %P cpu %*Es total"
+	# }}}
 
-alias -g L="|less"
-alias -g ...='../..'
-alias -g ....='../../..'
-alias -g .....='../../../..'
-alias -g ......='../../../../..'
+	# History search {{{
+		antigen bundle history-substring-search
+	# }}}
 
-# ag is the silver searcher, not apt-get (oh-my-zsh debian plugin)
-unalias ag
+	# Set up custom functions
+	precmd() {
+		[[ -t 1 ]] || return
+		case $TERM in
+			(sun-cmd) print -Pn "\e]l%~\e\\"
+				;;
+			(*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
+				;;
+		esac
 
-# Use hub instead of git if it's installed
-hub --version >/dev/null 2>&1 && alias git=hub
+		# History logs
+		if [ "$(id -u)" -ne 0 ]; then
+			FULL_CMD_LOG="$HOME/.logs/zsh-history-$(date -u "+%Y-%m-%d").log"
+			echo "$USER@`hostname`:`pwd` [$(date -u)] `\history -1`" >> ${FULL_CMD_LOG}
+		fi
+	}
 
-# Show time for long commands
-REPORTTIME=5
-TIMEFMT="%U user %S system %P cpu %*Es total"
-
-# Set up custom functions
-precmd() {
-	[[ -t 1 ]] || return
-	case $TERM in
-		(sun-cmd) print -Pn "\e]l%~\e\\"
-			;;
-		(*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
-			;;
-	esac
-
-	# History logs
-	if [ "$(id -u)" -ne 0 ]; then
-		FULL_CMD_LOG="$HOME/.logs/zsh-history-$(date -u "+%Y-%m-%d").log"
-		echo "$USER@`hostname`:`pwd` [$(date -u)] `\history -1`" >> ${FULL_CMD_LOG}
+	# Better command history tracking
+	export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
+	if [[ ! -d ~/.logs ]] then
+		mkdir ~/.logs
 	fi
-}
 
-# Better command history tracking
-export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
-if [[ ! -d ~/.logs ]] then
-	mkdir ~/.logs
-fi
+# }}}
 
-# Create and enter directory
-mcd() {
-	mkdir -p "$1" && cd "$1";
-}
+# Commands, functions, aliases {{{
 
+	# EDITOR and VISUAL {{{
+		if which nvim >/dev/null 2>&1; then
+			export EDITOR=nvim
+			export VISUAL=nvim
+		elif which vim >/dev/null 2>&1; then
+			export EDITOR=vim
+			export VISUAL=vim
+		elif which vi >/dev/null 2>&1; then
+			export EDITOR=vi
+			export VISUAL=vi
+		fi
+	# }}}
 
-# Switch between running program and shell real quick
-fancy-ctrl-z () {
-	if [[ $#BUFFER -eq 0 ]]; then
-		BUFFER="fg"
-		zle accept-line
-	else
-		zle push-input
-		zle clear-screen
-	fi
-}
-zle -N fancy-ctrl-z
-bindkey '^Z' fancy-ctrl-z
+	# Add local executables to PATH {{{
+		[[ -e "$HOME/.bin" ]] && PATH="$HOME/.bin:$PATH"
+		[[ -e "$HOME/bin" ]] && PATH="$HOME/bin:$PATH"
+	# }}}
 
-# Load NVM if it exists
-export NVM_DIR="/home/xandor/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+	# Aliases {{{
+		autoload -U is-at-least	# needed for the common-aliases plugin
+		antigen bundle common-aliases
+		alias ls='ls --color=auto'
+		alias grep='grep --color=auto'
+		alias ..='cd ..'
+		alias ~='cd ~'
+		alias -g ...='../..'
+		alias -g ....='../../..'
+		alias -g .....='../../../..'
+		alias -g ......='../../../../..'
+	# }}}
 
+	# Create and enter directory {{{
+		mcd() {
+			mkdir -p "$1" && cd "$1";
+		}
+	# }}}
 
-if (( $+commands[direnv] ))
-then
-	eval "$(direnv hook zsh)"
-fi
+	# Switch between running program and shell real quick {{{
+		fancy-ctrl-z () {
+			if [[ $#BUFFER -eq 0 ]]; then
+				BUFFER="fg"
+				zle accept-line
+			else
+				zle push-input
+				zle clear-screen
+			fi
+		}
+		zle -N fancy-ctrl-z
+		bindkey '^Z' fancy-ctrl-z
+	# }}}
 
-# vim: set foldmethod=marker foldlevel=0:
+	# todo.txt {{{
+		alias todo="${HOME}/.bin/todo.txt/todo.sh -d ~/.bin/todo.txt/todo.cfg"
+	# }}}
+
+	# gibo — .gitignore boilerplates {{{
+		antigen bundle simonwhitaker/gibo
+		PATH="$HOME/.antigen/repos/https-COLON--SLASH--SLASH-github.com-SLASH-simonwhitaker-SLASH-gibo.git:$PATH"
+	# }}}
+
+	# Github’s Hub {{{
+		if which hub >/dev/null 2>&1; then
+			alias git=hub
+			# Allow completions for git aliases when git is wrapped by hub
+			compdef hub=git
+		fi
+	# }}}
+
+	# RVM {{{
+		[[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
+		[[ -e "/usr/local/rvm/scripts/rvm" ]] && source /usr/local/rvm/scripts/rvm
+		[[ -e "$HOME/.rvm/bin" ]] && PATH="$PATH:$HOME/.rvm/bin"
+	# }}}
+
+	# Load NVM {{{
+		export NVM_LAZY_LOAD=true
+		antigen bundle lukechilds/zsh-nvm
+	# }}}
+
+	# direnv {{{
+		which direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+	# }}}
+
+# }}}
+
+# Apply antigen {{{
+	antigen apply
+# }}}
+
+# Things that must come last {{{
+
+	# Use history-substring-search in vi mode also
+	# https://github.com/zsh-users/zsh-syntax-highlighting/issues/340
+	bindkey -M vicmd 'k' history-substring-search-up
+	bindkey -M vicmd 'j' history-substring-search-down
+
+# }}}
+
+# Export PATH {{{
+	# Instead of exporting it multiple times, do it once at the end for better
+	# perfomance.
+	export PATH
+# }}}
+
+# vim: set foldmethod=marker foldlevel=0 textwidth=78:

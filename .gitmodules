@@ -1,18 +1,9 @@
 [submodule ".gitignore-boilerplates"]
 	path = .gitignore-boilerplates
 	url = git@github.com:simonwhitaker/gitignore-boilerplates.git
-[submodule ".oh-my-zsh"]
-	path = .oh-my-zsh
-	url = git@github.com:robbyrussell/oh-my-zsh.git
-[submodule "gitignore-boilerplates-repo"]
-	path = gitignore-boilerplates-repo
-	url = git@github.com:simonwhitaker/gitignore-boilerplates.git
 [submodule "dircolors-solarized"]
 	path = dircolors-solarized
 	url = git@github.com:seebi/dircolors-solarized.git
-[submodule "zsh-syntax-highlighting"]
-	path = zsh-syntax-highlighting
-	url = git@github.com:zsh-users/zsh-syntax-highlighting.git
 [submodule "irssi-colors-solarized"]
 	path = irssi-colors-solarized
 	url = git@github.com:huyz/irssi-colors-solarized.git
@@ -23,6 +14,6 @@
 [submodule ".tmux/plugins/tpm"]
 	path = .tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
-[submodule "git-flow-completion"]
-	path = git-flow-completion
-	url = git@github.com:bobthecow/git-flow-completion.git
+[submodule "antigen"]
+	path = antigen
+	url = git://github.com/zsh-users/antigen.git

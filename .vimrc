@@ -464,9 +464,6 @@
 	" check final line for Vim settings
 	set modelines=1
 
-	" Only redraw when necessary
-	set lazyredraw
-
 	" ignore case sensitivity in searching
 	set ignorecase
 
