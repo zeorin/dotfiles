@@ -12,10 +12,10 @@ URxvt.lineSpace:            0
 
 ! Fonts
 URxvt.intensityStyles:      true
-URxvt.font: xft:Knack Nerd Font:style=Regular:pixelsize=12,xft:Unifont
-URxvt.boldFont: xft:Knack Nerd Font:style=Bold:pixelsize=12,xft:Unifont
-URxvt.italicFont: xft:Knack Nerd Font:style=Italic:pixelsize=12,xft:Unifont
-URxvt.boldItalicFont: xft:Knack Nerd Font:style=Bold Italic:pixelsize=12,xft:Unifont
+URxvt.font: xft:Knack Nerd Font:style=Regular:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
+URxvt.boldFont: xft:Knack Nerd Font:style=Bold:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
+URxvt.italicFont: xft:Knack Nerd Font:style=Italic:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
+URxvt.boldItalicFont: xft:Knack Nerd Font:style=Bold Italic:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
 
 ! Fix font space
 URxvt.letterSpace: -2
