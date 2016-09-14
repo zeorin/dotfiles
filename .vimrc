@@ -667,7 +667,7 @@
 		Plug 'xolox/vim-easytags'
 		let g:easytags_languages = {
 			\'javascript': {
-				\'cmd': '/usr/bin/jsctags',
+				\'cmd': 'jsctags',
 				\'args': [],
 				\'fileoutput_opt': '-f',
 				\'stdout_opt': '-f-',
