@@ -424,17 +424,6 @@
 	nnoremap <silent> p p`]
 	" vnoremap <silent> y y`] |" same for selection
 
-	" unmap keys I shouldn't be using
-	inoremap <esc> <nop>
-	inoremap <up> <nop>
-	inoremap <down> <nop>
-	inoremap <left> <nop>
-	inoremap <right> <nop>
-	nnoremap <up> <nop>
-	nnoremap <down> <nop>
-	nnoremap <left> <nop>
-	nnoremap <right> <nop>
-
 " }}}
 
 " General functionality {{{
