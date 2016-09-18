@@ -231,7 +231,7 @@
 		\}
 		" Solarized bug fixes
 		function! FixSolarized()
-			if &background == "dark"
+			if &background ==# "dark"
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				" Better Syntastic styles
@@ -243,7 +243,7 @@
 				exec 'highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				" Better fold styling
 				exec 'highlight Folded gui=NONE,underline cterm=NONE,underline guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-			elseif &background == "light"
+			elseif &background ==# "light"
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				" Better Syntastic styles
@@ -300,7 +300,7 @@
 			" No need to show spelling ‘errors’
 			autocmd FileType startify setlocal nospell
 			" Better header colour
-			exec 'autocmd FileType startify if &background == ''dark'' | '.
+			exec 'autocmd FileType startify if &background ==# ''dark'' | '.
 				\ 'highlight StartifyHeader guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
 				\ 'else | '.
 				\ 'highlight StartifyHeader guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
@@ -308,7 +308,7 @@
 			" Better section colour
 			exec 'autocmd FileType startify highlight StartifySection guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
 			" Better file colour
-			exec 'autocmd FileType startify if &background == ''dark'' | '.
+			exec 'autocmd FileType startify if &background ==# ''dark'' | '.
 				\ 'highlight StartifyFile guifg='.g:sol.gui.base0.' ctermfg='.g:sol.cterm.base0.' | '.
 				\ 'else | '.
 				\ 'highlight StartifyFile guifg='.g:sol.gui.base00.' ctermfg='.g:sol.cterm.base00.' | '.
@@ -316,7 +316,7 @@
 			" Better special colour
 			exec 'autocmd FileType startify highlight StartifySpecial gui=italic cterm=italic guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow
 			" Hide those ugly brackets
-			exec 'autocmd FileType startify if &background == ''dark'' | '.
+			exec 'autocmd FileType startify if &background ==# ''dark'' | '.
 				\ 'highlight StartifyBracket guifg='.g:sol.gui.base03.' ctermfg='.g:sol.cterm.base03.' | '.
 				\ 'else | '.
 				\ 'highlight StartifyBracket guifg='.g:sol.gui.base3.' ctermfg='.g:sol.cterm.base3.' | '.
@@ -327,7 +327,7 @@
 	" Set white space colours {{{
 		augroup whitespace
 			autocmd!
-			exec 'autocmd ColorScheme solarized if &background == ''dark'' | '.
+			exec 'autocmd ColorScheme solarized if &background ==# ''dark'' | '.
 				\ 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE | '.
 				\ 'highlight NonText gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE | '.
 				\ 'else | '.
@@ -879,14 +879,14 @@
 			augroup devicons_colors
 				autocmd!
 				for color in colors
-					if color == 'normal'
-						exec 'autocmd FileType nerdtree,startify if &background == ''dark'' | '.
+					if color ==# 'normal'
+						exec 'autocmd FileType nerdtree,startify if &background ==# ''dark'' | '.
 							\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
 							\ 'else | '.
 							\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
 							\ 'endif'
-					elseif color == 'emphasize'
-						exec 'autocmd FileType nerdtree,startify if &background == ''dark'' | '.
+					elseif color ==# 'emphasize'
+						exec 'autocmd FileType nerdtree,startify if &background ==# ''dark'' | '.
 							\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
 							\ 'else | '.
 							\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
