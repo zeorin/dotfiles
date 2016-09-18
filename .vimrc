@@ -437,6 +437,12 @@
 	" plugin is defined here, it’s only loaded near the end of the script.
 	Plug 'tpope/vim-sensible'
 
+	" Set ttymouse correctly when in Vim in Tmux, so that mouse events are
+	" correctly handled.
+	if !has('nvim') && $TERM ==# "tmux-256color"
+		set ttymouse=xterm
+	endif
+
 	" set tabs to display as 4 spaces wide (might be overwritten by
 	" .editorconfig files)
 	set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
