@@ -121,7 +121,7 @@
 # }}}
 
 # Load antigen {{{
-	source ~/.dotfiles/antigen/antigen.zsh
+	_ANTIGEN_COMP_ENABLED=false source ~/.dotfiles/antigen/antigen.zsh
 # }}}
 
 # Appearance {{{
@@ -181,10 +181,21 @@
 
 	# Completion {{{
 
+		# A whole bunch of useful completions
+		antigen bundle zsh-users/zsh-completions
+		fpath=($fpath $HOME/.antigen/repos/https-COLON--SLASH--SLASH-github.com-SLASH-zsh-users-SLASH-zsh-completions.git/src)
+
+		# Vagrant completion
+		if which vagrant >/dev/null 2>&1; then
+			antigen bundle vagrant
+			fpath=($fpath $HOME/.antigen/repos/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh.git/plugins/vagrant)
+		fi
+
 		zmodload -i zsh/complist
 
 		# Initialize the completion system
 		autoload -Uz compinit
+		compfresh=
 		if [[ ! -a "${HOME}/.zcompdump" || $(date +'%j') > $(date +'%j' -r "${HOME}/.zcompdump") ]]; then
 			compinit
 		else
@@ -246,14 +257,6 @@
 		}
 		zle -N expand-or-complete-with-dots
 		bindkey "^I" expand-or-complete-with-dots
-
-		# A whole bunch of useful completions
-		antigen bundle zsh-users/zsh-completions
-
-		# Vagrant completion
-		if which vagrant >/dev/null 2>&1; then
-			antigen bundle vagrant
-		fi
 
 	# }}}
 
