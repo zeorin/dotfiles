@@ -250,6 +250,11 @@
 		# A whole bunch of useful completions
 		antigen bundle zsh-users/zsh-completions
 
+		# Vagrant completion
+		if which vagrant >/dev/null 2>&1; then
+			antigen bundle vagrant
+		fi
+
 	# }}}
 
 	# No autocorrect, thank you {{{
