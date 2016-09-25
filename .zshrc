@@ -163,8 +163,9 @@
 		ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=cyan'
 	# }}}
 
-	# Shell theme {{{
-		source ~/.shell_prompt.sh
+	# Powerline {{{
+		PATH="$HOME/.local/bin:$PATH"
+		source "$(python -m site --user-site)/powerline/bindings/zsh/powerline.zsh"
 	# }}}
 
 # }}}
