@@ -24,6 +24,7 @@
 	stash-unapply = !git stash show -p | git apply -R
 	assume-unchanged = !git ls-files -v | grep '^[[:lower:]]'
 	edit-dirty = !git status --porcelain | sed s/^...// | xargs $EDITOR
+	tracked-ignores = !git ls-files | git check-ignore --no-index --stdin
 [push]
 	default = current
 [pager]
