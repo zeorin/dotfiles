@@ -372,7 +372,7 @@
 	# RVM {{{
 		[[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
 		[[ -e "/usr/local/rvm/scripts/rvm" ]] && source /usr/local/rvm/scripts/rvm
-		[[ -e "$HOME/.rvm/bin" ]] && PATH="$PATH:$HOME/.rvm/bin"
+		[[ -e "$HOME/.rvm/bin" ]] && PATH="$HOME/.rvm/bin:$PATH"
 	# }}}
 
 	# Load NVM {{{
@@ -382,6 +382,10 @@
 
 	# direnv {{{
 		which direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+	# }}}
+
+	# Composer {{{
+		[[ -e "$HOME/.config/composer/vendor/bin" ]] && PATH="$HOME/.config/composer/vendor/bin:$PATH"
 	# }}}
 
 # }}}
