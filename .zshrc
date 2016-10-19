@@ -274,6 +274,10 @@
 		antigen bundle history-substring-search
 	# }}}
 
+	# Change directories more easily {{{
+		setopt auto_cd
+	# }}}
+
 	# Set up custom functions
 	precmd() {
 		[[ -t 1 ]] || return
