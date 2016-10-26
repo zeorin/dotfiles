@@ -392,6 +392,10 @@
 		[[ -e "$HOME/.config/composer/vendor/bin" ]] && PATH="$HOME/.config/composer/vendor/bin:$PATH"
 	# }}}
 
+	# Yarn {{{
+		[[ -e "$HOME/.yarn/bin" ]] && PATH="$HOME/.yarn/bin:$PATH"
+	# }}}
+
 # }}}
 
 # Apply antigen {{{
