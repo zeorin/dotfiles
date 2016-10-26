@@ -7,6 +7,7 @@
 	autocrlf = input
 	eol = lf
 	safecrlf = false
+	pager = less --tabs=4 -RFX
 [diff]
 	algorithm = patience
 [merge]
@@ -31,4 +32,5 @@
 	default = current
 [pager]
 	diff = diff-so-fancy | less --tabs=4 --pattern='^(added|deleted|modified): ' -RFX
-	show = diff-so-fancy | less --tabs=4 --pattern='^(added|deleted|modified): ' -RFX
+[interactive]
+    diffFilter = diff-so-fancy --patch-mode
