@@ -8,10 +8,9 @@
 	eol = lf
 	safecrlf = false
 	pager = less --tabs=4 -RFX
-[diff]
-	algorithm = patience
 [merge]
 	tool = vimdiff
+	stat = true
 [credential]
 	helper = cache
 [color]
@@ -29,8 +28,16 @@
 	edit-dirty = !git status --porcelain | sed s/^...// | xargs $EDITOR
 	tracked-ignores = !git ls-files | git check-ignore --no-index --stdin
 [push]
-	default = current
+	default = simple
 [pager]
 	diff = diff-so-fancy | less --tabs=4 --pattern='^(added|deleted|modified): ' -RFX
 [interactive]
-    diffFilter = diff-so-fancy --patch-mode
+	diffFilter = diff-so-fancy --patch-mode
+[advice]
+	statusHints = false
+[diff]
+	algorithm = patience
+	renames = copies
+	mnemonicprefix = true
+[branch]
+	autosetupmerge = true
