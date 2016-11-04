@@ -416,6 +416,10 @@
 	nnoremap <silent> p p`]
 	" vnoremap <silent> y y`] |" same for selection
 
+	" Easier split windows
+	nnoremap <Leader>- :split<cr>
+	nnoremap <Leader>\| :vsplit<cr>
+
 " }}}
 
 " General functionality {{{
