@@ -314,6 +314,13 @@
 				\ 'highlight StartifyBracket guifg='.g:sol.gui.base3.' ctermfg='.g:sol.cterm.base3.' | '.
 				\ 'endif'
 		augroup END
+		" Open NERDTree at the same time
+		autocmd VimEnter *
+			\   if !argc()
+			\ |   Startify
+			\ |   NERDTree
+			\ |   wincmd w
+			\ | endif
 	" }}}
 
 	" Set white space colours {{{
