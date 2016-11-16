@@ -360,6 +360,10 @@
 		alias todo="${HOME}/.bin/todo.txt/todo.sh -d ~/.bin/todo.txt/todo.cfg"
 	# }}}
 
+	# git {{{
+		alias g='git'
+	# }}}
+
 	# gibo — .gitignore boilerplates {{{
 		antigen bundle simonwhitaker/gibo
 		PATH="$HOME/.antigen/repos/https-COLON--SLASH--SLASH-github.com-SLASH-simonwhitaker-SLASH-gibo.git:$PATH"
