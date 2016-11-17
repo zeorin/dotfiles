@@ -564,7 +564,6 @@
 
 	" Syntax checking hacks {{{
 		Plug 'scrooloose/syntastic'
-		Plug 'mtscout6/syntastic-local-eslint.vim' " Prefer a local installation of eslint
 		let g:syntastic_check_on_open = 1
 		let g:syntastic_check_on_wq = 0
 		let g:syntastic_quiet_messages = { "type": "style" }
@@ -573,20 +572,44 @@
 		let g:syntastic_style_error_symbol = "S\u2717" " S✗
 		let g:syntastic_warning_symbol = "\u26A0" " ⚠
 		let g:syntastic_style_warning_symbol = "S\u26A0" " S⚠
+		function! StrTrim(txt)
+			return substitute(a:txt, '^\n*\s*\(.\{-}\)\n*\s*$', '\1', '')
+		endfunction
+		function! NpmWhich(module)
+			let npm_bin = system('npm bin')
+			if executable(expand(l:npm_bin . '/', a:module))
+				return StrTrim(expand(l:npm_bin . '/', a:module))
+			elseif executable(a:module)
+				return StrTrim(system('which ' . a:module))
+			else
+				return 0
+			endif
+		endfunction
 		augroup syntastic_checkers
 			autocmd!
-			" Use eslint if it’s installed or if there’s a .eslintrc in
-			" the project root
-			autocmd FileType javascript if filereadable(expand('.eslintrc.*')) && executable(expand('./node_modules/.bin/eslint')) |
-				\   let b:syntastic_checkers = ['eslint']
-				\ | elseif filereadable(expand('$HOME/'.'.eslintrc.*')) && executable('eslint') |
-				\   let b:syntastic_checkers = ['eslint']
-				\ | endif
-			" Use only jshint if there’s a .jshintrc in the project root
-			autocmd FileType javascript if filereadable('.jshintrc') && executable('jshint') |
-				\   let b:syntastic_checkers = ['jshint']
+			" Use ESLint if there’s an ESLint configuration and it’s
+			" installed.
+			" Use JSHint if there’s a JSHint configuration and it’s installed.
+			" Default to global ESLint installation if there is one.
+			autocmd FileType javascript
+				\ if (filereadable('.eslintrc.*') ||
+						\ (filereadable('package.json') && match(readfile('package.json'), 'eslintConfig') != -1)) &&
+						\ type(NpmWhich('eslint')) == type('')
+					\ | echom 'local eslint'
+					\ | let b:syntastic_checkers = ['eslint']
+					\ | let b:syntastic_javascript_eslint_exec = NpmWhich('eslint')
+				\ | elseif (filereadable('.jshintrc') ||
+						\ (filereadable('package.json') && match(readfile('package.json'), 'jshintConfig') != -1)) &&
+						\ type(NpmWhich('jshint')) == type('')
+					\ | echom 'local jshint'
+					\ | let b:syntastic_checkers = ['jshint']
+					\ | let b:syntastic_javascript_jshint_exec = NpmWhich('jshint')
+				\ | elseif filereadable(expand('$HOME/'.'.eslintrc.*')) && executable('eslint')
+					\ | echom 'global eslint'
+					\ | let b:syntastic_checkers = ['eslint']
 				\ | endif
 		augroup END
+		nnoremap <Leader>e :Errors<CR>
 	" }}}
 
 	" File tree explorer {{{

@@ -9,6 +9,7 @@
     "installedESLint": true,
     "parserOptions": {
         "ecmaFeatures": {
+            "impliedStrict": true,
             "experimentalObjectRestSpread": true,
             "jsx": true
         },
