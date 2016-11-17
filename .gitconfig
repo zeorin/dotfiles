@@ -6,6 +6,7 @@
 	eol = lf
 	safecrlf = false
 	pager = less --tabs=4 -RFX
+	whitespace = trailing-space,space-before-tab
 [merge]
 	tool = vimdiff
 	stat = true
@@ -33,9 +34,25 @@
 	diffFilter = diff-so-fancy --patch-mode
 [advice]
 	statusHints = false
+	pushNonFastForward = false
 [diff]
 	algorithm = patience
 	renames = copies
 	mnemonicprefix = true
+	tool = nvimdiff
+[difftool]
+	prompt = false
+[difftool "nvimdiff"]
+	cmd = "$VISUAL -d \"$LOCAL\" \"$REMOTE\""
+[merge]
+	stat = true
+	tool = nvimdiff
+[mergetool]
+	prompt = false
+[mergetool "nvimdiff"]
+	cmd = "$VISUAL -d \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\""
 [branch]
 	autosetupmerge = true
+[rerere]
+	enabled = true
+	autoUpdate = true
