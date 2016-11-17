@@ -1,8 +1,6 @@
 [user]
 	name = Xandor Schiefer
-	email = me@xandor.co.za
 [core]
-	editor = vim
 	excludesfile = ~/.cvsignore
 	autocrlf = input
 	eol = lf
