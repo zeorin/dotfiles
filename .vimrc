@@ -595,17 +595,14 @@
 				\ if (filereadable('.eslintrc.*') ||
 						\ (filereadable('package.json') && match(readfile('package.json'), 'eslintConfig') != -1)) &&
 						\ type(NpmWhich('eslint')) == type('')
-					\ | echom 'local eslint'
 					\ | let b:syntastic_checkers = ['eslint']
 					\ | let b:syntastic_javascript_eslint_exec = NpmWhich('eslint')
 				\ | elseif (filereadable('.jshintrc') ||
 						\ (filereadable('package.json') && match(readfile('package.json'), 'jshintConfig') != -1)) &&
 						\ type(NpmWhich('jshint')) == type('')
-					\ | echom 'local jshint'
 					\ | let b:syntastic_checkers = ['jshint']
 					\ | let b:syntastic_javascript_jshint_exec = NpmWhich('jshint')
 				\ | elseif filereadable(expand('$HOME/'.'.eslintrc.*')) && executable('eslint')
-					\ | echom 'global eslint'
 					\ | let b:syntastic_checkers = ['eslint']
 				\ | endif
 		augroup END
