@@ -314,6 +314,13 @@
 				\ 'highlight StartifyBracket guifg='.g:sol.gui.base3.' ctermfg='.g:sol.cterm.base3.' | '.
 				\ 'endif'
 		augroup END
+		" Open NERDTree at the same time
+		autocmd VimEnter *
+			\   if !argc()
+			\ |   Startify
+			\ |   NERDTree
+			\ |   wincmd w
+			\ | endif
 	" }}}
 
 	" Set white space colours {{{
@@ -474,6 +481,7 @@
 	set foldlevelstart=10
 	set foldnestmax=10
 	set foldmethod=indent
+	" TODO: set foldcolumn
 	Plug 'Konfekt/FastFold' " Make folding faster
 
 	" Switch buffers even if modified
@@ -694,15 +702,16 @@
 	" A Git wrapper so awesome, it should be illegal
 	Plug 'tpope/vim-fugitive'
 
-	" Wisely add 'end' in ruby, endfunction/endif/more in vim script, etc
-	Plug 'tpope/vim-endwise'
-
 	" Insert mode auto-completion for quotes, parens, brackets, etc. {{{
 		Plug 'Raimondi/delimitMate'
 		let delimitMate_expand_space = 1
 		let delimitMate_expand_cr = 2
-		let delimitMate_jump_expansion = 1
+		let delimitMate_balance_matchpairs = 1
+		let delimitMate_nesting_quotes = ['`']
 	" }}}
+
+	" Wisely add 'end' in ruby, endfunction/endif/more in vim script, etc
+	Plug 'tpope/vim-endwise'
 
 	" A code-completion engine for Vim {{{
 		Plug 'Valloric/YouCompleteMe'
@@ -840,7 +849,9 @@
 		augroup smartquotes
 			autocmd!
 			autocmd InsertCharPre * if index(textlikeft, &filetype) < 0 |
-				\   call <SID>SmartQuotesInComments()
+				\   exec 'DelimitMateOff'
+				\ | call <SID>SmartQuotesInComments()
+				\ | exec 'DelimitMateOn'
 			\ | endif
 			autocmd InsertLeave * if index(textlikeft, &filetype) < 0 |
 				\   exec 'silent NoEducate'
