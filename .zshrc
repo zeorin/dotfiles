@@ -400,6 +400,10 @@
 		[[ -e "$HOME/.yarn/bin" ]] && PATH="$HOME/.yarn/bin:$PATH"
 	# }}}
 
+	# Cabal {{{
+		[[ -e "$HOME/.cabal/bin" ]] && PATH="$HOME/.cabal/bin:$PATH"
+	# }}}
+
 # }}}
 
 # Apply antigen {{{
