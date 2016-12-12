@@ -1,5 +1,6 @@
 [user]
 	name = Xandor Schiefer
+	useConfigOnly = true
 [core]
 	excludesfile = ~/.cvsignore
 	autocrlf = input
