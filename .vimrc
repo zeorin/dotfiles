@@ -626,9 +626,11 @@
 
 	" File tree explorer {{{
 		Plug 'scrooloose/nerdtree'
+		let g:NERDTreeShowHidden = 1
+		let g:NERDTreeMinimalUI = 1
+		nnoremap <F8> :NERDTreeToggle<CR>
 		Plug 'janlay/NERD-tree-project' " Try to find project dir
 		Plug 'Xuyuanp/nerdtree-git-plugin' " NERDTree showing git status
-		nnoremap <F8> :NERDTreeToggle<CR>
 		let g:NTPNames = ['.git*', 'package.json', 'Gemfile', 'Gulpfile.js', 'Gruntfile.js']
 		let g:NTPNamesDirs = ['.git']
 	" }}}
