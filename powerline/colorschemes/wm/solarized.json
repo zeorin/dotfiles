@@ -1,0 +1,8 @@
+{
+	"groups": {
+		"workspace": { "fg": "solarized:base1", "bg": "solarized:base02", "attrs": [] },
+		"w_visible": { "fg": "solarized:base1", "bg": "solarized:base02", "attrs": [] },
+		"w_focused": { "fg": "solarized:base3", "bg": "solarized:base01", "attrs": [] },
+		"w_urgent":  { "fg": "solarized:base3", "bg": "solarized:magenta", "attrs": [] }
+	}
+}
