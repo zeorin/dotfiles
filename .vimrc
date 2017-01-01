@@ -287,6 +287,13 @@
 
 	" Fancy start screen {{{
 		Plug 'mhinz/vim-startify'
+		let g:startify_list_order = [
+			\ ['   Bookmarks'],      'bookmarks',
+			\ ['   Sessions'],       'sessions',
+			\ ['   MRU '. getcwd()], 'dir',
+			\ ['   MRU'],            'files',
+			\ ['   Commands'],       'commands',
+			\ ]
 		augroup startify
 			autocmd!
 			" No need to show spelling ‘errors’
