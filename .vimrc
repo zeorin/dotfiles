@@ -591,9 +591,9 @@
 			return substitute(a:txt, '^\n*\s*\(.\{-}\)\n*\s*$', '\1', '')
 		endfunction
 		function! NpmWhich(module)
-			let npm_bin = system('npm bin')
-			if executable(expand(l:npm_bin . '/', a:module))
-				return StrTrim(expand(l:npm_bin . '/', a:module))
+			let npm_bin = StrTrim(system('npm bin'))
+			if executable(expand(l:npm_bin . '/' . a:module))
+				return StrTrim(expand(l:npm_bin . '/' . a:module))
 			elseif executable(a:module)
 				return StrTrim(system('which ' . a:module))
 			else
@@ -753,6 +753,7 @@
 	Plug 'sheerun/vim-polyglot'
 	" Enable JSX syntax in JS files
 	let g:jsx_ext_required = 0
+	let g:javascript_plugin_flow = 1
 
 	" Improved PHP omnicompletion
 	Plug 'shawncplus/phpcomplete.vim', { 'for': 'php' }
