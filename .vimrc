@@ -858,9 +858,9 @@
 		augroup smartquotes
 			autocmd!
 			autocmd InsertCharPre * if index(textlikeft, &filetype) < 0 |
-				\   exec 'DelimitMateOff'
+				\   exec 'silent DelimitMateOff'
 				\ | call <SID>SmartQuotesInComments()
-				\ | exec 'DelimitMateOn'
+				\ | exec 'silent DelimitMateOn'
 			\ | endif
 			autocmd InsertLeave * if index(textlikeft, &filetype) < 0 |
 				\   exec 'silent NoEducate'
