@@ -2,10 +2,16 @@
 	"segments": {
 		"left": [
 			{
-				"function": "powerline.segments.i3wm.workspaces",
-				"args": {
-					"strip": 2
-				}
+				"type": "segment_list",
+				"function": "powerline.listers.i3wm.workspace_lister",
+				"segments": [
+					{
+						"function": "powerline.segments.i3wm.workspace",
+						"args": {
+							"strip": 3
+						}
+					}
+				]
 			}
 		],
 		"right": [
