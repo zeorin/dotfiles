@@ -153,11 +153,11 @@
 		antigen bundle zsh-users/zsh-syntax-highlighting
 		ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
 		typeset -A ZSH_HIGHLIGHT_STYLES
-		ZSH_HIGHLIGHT_STYLES[alias]='fg=default,bold'
-		ZSH_HIGHLIGHT_STYLES[builtin]='fg=default,bold'
-		ZSH_HIGHLIGHT_STYLES[command]='fg=default,bold'
-		ZSH_HIGHLIGHT_STYLES[function]='fg=default,bold'
-		ZSH_HIGHLIGHT_STYLES[precommand]='fg=default,bold'
+		ZSH_HIGHLIGHT_STYLES[alias]='fg=white,bold'
+		ZSH_HIGHLIGHT_STYLES[builtin]='fg=white,bold'
+		ZSH_HIGHLIGHT_STYLES[command]='fg=white,bold'
+		ZSH_HIGHLIGHT_STYLES[function]='fg=white,bold'
+		ZSH_HIGHLIGHT_STYLES[precommand]='fg=white,bold'
 		ZSH_HIGHLIGHT_STYLES[path]='fg=default'
 		ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=cyan'
 		ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=cyan'
