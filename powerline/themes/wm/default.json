@@ -2,8 +2,12 @@
 	"segments": {
 		"left": [
 			{
+				"function": "powerline.segments.i3wm.mode"
+			},
+			{
 				"type": "segment_list",
 				"function": "powerline.listers.i3wm.workspace_lister",
+				"priority": 1000,
 				"segments": [
 					{
 						"function": "powerline.segments.i3wm.workspace",
@@ -16,27 +20,40 @@
 		],
 		"right": [
 			{
-				"function": "powerline.segments.common.net.network_load"
+				"function": "powerline.segments.common.net.network_load",
+				"args": {
+					"sent_format": " {value}",
+					"recv_format": " {value} ",
+					"sent_max": 1024,
+					"recv_max": 1024
+				}
 			},
 			{
 				"function": "powerline.segments.common.sys.system_load",
-				"priority": 50
+				"priority": 50,
+				"args": {
+					"short": true,
+					"format": " {avg:.1f}"
+				}
 			},
 			{
-				"function": "powerline.segments.common.bat.battery",
+				"function": "powerline.segments.common.time.date",
+				"name": "time",
+				"priority": 100,
 				"args": {
-					"gamify": true
+					"format": " %H:%M:%S",
+					"istime": true
 				}
 			},
 			{
 				"function": "powerline.segments.common.time.date"
 			},
 			{
-				"function": "powerline.segments.common.time.date",
-				"name": "time",
+				"function": "powerline.segments.common.bat.battery",
+				"priority": 100,
 				"args": {
-					"format": "%H:%M",
-					"istime": true
+					"online": "",
+					"offline": ""
 				}
 			}
 		]

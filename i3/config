@@ -128,7 +128,7 @@ bindsym $mod+r mode "resize"
 hide_edge_borders both
 
 # Start status bar
-exec $(python -m site --user-site)/powerline/bindings/lemonbar/powerline-lemonbar.py --i3 --height 16 -- -f "Knack Nerd Font-10" -B "#FF002B36"
+exec $(python -m site --user-site)/powerline/bindings/lemonbar/powerline-lemonbar.py --i3 --height 16 -- -f "Knack Nerd Font-10" -B "#FF073642"
 
 # Focus doesn't follow mouse
 focus_follows_mouse no
@@ -210,4 +210,4 @@ mode "$mode_gaps_outer" {
 client.focused #268bd2 #268bd2 #268bd2 #b58900
 client.focused_inactive #002b36 #002b36 #002b36 #002b36
 client.unfocused #002b36 #002b36 #002b36 #002b36
-client.urgent #d33682 #d33682 #d33682 #d33682
+client.urgent #b58900 #b58900 #b58900 #b58900

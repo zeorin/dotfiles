@@ -36,10 +36,10 @@ window_colors:
     text:           'base03'
     indicator:      'base03'
   urgent:
-    border:         'magenta'
-    background:     'magenta'
-    text:           'magenta'
-    indicator:      'magenta'
+    border:         'yellow'
+    background:     'yellow'
+    text:           'yellow'
+    indicator:      'yellow'
 bar_colors:
   separator:        'base01'
   background:       'base03'
@@ -59,4 +59,4 @@ bar_colors:
   urgent_workspace:
     border:         'base03'
     background:     'base03'
-    text:           'magenta'
+    text:           'yellow'
