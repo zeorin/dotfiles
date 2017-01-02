@@ -207,6 +207,6 @@ mode "$mode_gaps_outer" {
 }
 
 client.focused #268bd2 #268bd2 #268bd2 #b58900
-client.focused_inactive #002b36 #002b36 #002b36 #002b36
-client.unfocused #002b36 #002b36 #002b36 #002b36
+client.focused_inactive #657b83 #657b83 #657b83 #657b83
+client.unfocused #073642 #073642 #073642 #073642
 client.urgent #b58900 #b58900 #b58900 #b58900

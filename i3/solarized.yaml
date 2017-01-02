@@ -1,7 +1,7 @@
 # vim: filetype=yaml
 ---
 meta:
-  description: 'Solarized theme by lasers'
+  description: 'Solarized theme by Xandor'
 colors:
   base03:           '#002b36'
   base02:           '#073642'
@@ -26,37 +26,17 @@ window_colors:
     text:           'blue'
     indicator:      'yellow'
   focused_inactive:
-    border:         'base03'
-    background:     'base03'
-    text:           'base03'
-    indicator:      'base03'
+    border:         'base00'
+    background:     'base00'
+    text:           'base00'
+    indicator:      'base00'
   unfocused:
-    border:         'base03'
-    background:     'base03'
-    text:           'base03'
-    indicator:      'base03'
+    border:         'base02'
+    background:     'base02'
+    text:           'base02'
+    indicator:      'base02'
   urgent:
     border:         'yellow'
     background:     'yellow'
     text:           'yellow'
     indicator:      'yellow'
-bar_colors:
-  separator:        'base01'
-  background:       'base03'
-  statusline:       'base0'
-  focused_workspace:
-    border:         'base02'
-    background:     'base02'
-    text:           'blue'
-  active_workspace:
-    border:         'base03'
-    background:     'base03'
-    text:           'base01'
-  inactive_workspace:
-    border:         'base03'
-    background:     'base03'
-    text:           'base01'
-  urgent_workspace:
-    border:         'base03'
-    background:     'base03'
-    text:           'yellow'
