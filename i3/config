@@ -127,7 +127,7 @@ bindsym $mod+r mode "resize"
 hide_edge_borders both
 
 # Start status bar
-exec $(python -m site --user-site)/powerline/bindings/lemonbar/powerline-lemonbar.py --i3 --height 16 -- -f "Knack Nerd Font-10" -B "#FF073642"
+exec_always killall lemonbar && $(python -m site --user-site)/powerline/bindings/lemonbar/powerline-lemonbar.py --i3 --height 16 -- -f "Knack Nerd Font-10" -B "#FF073642"
 
 # Focus doesn't follow mouse
 focus_follows_mouse no
