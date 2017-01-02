@@ -14,7 +14,7 @@ bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-bindsym $mod+d exec rofi -show run -width 100 -padding 325 -eh 2 -lines 5 -opacity 90 -bw 1 -font "Knack Nerd Font 10"
+bindsym $mod+d exec rofi -show DRun
 
 # change focus (Vi keybindings)
 bindsym $mod+h focus left

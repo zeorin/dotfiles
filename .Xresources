@@ -1,38 +1,7 @@
-URxvt.termName:             rxvt-unicode-256color
-URxvt.depth:                32
-URxvt.geometry:             80x25
-URxvt.transparent:          false
-URxvt.fading:               0
-URxvt.urgentOnBell:         true
-URxvt.visualBell:           true
-URxvt.loginShell:           true
-URxvt.saveLines:            50
-URxvt.internalBorder:       0
-URxvt.lineSpace:            0
-
-! Fonts
-URxvt.intensityStyles:      true
-URxvt.font: xft:Knack Nerd Font:style=Regular:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
-URxvt.boldFont: xft:Knack Nerd Font:style=Bold:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
-URxvt.italicFont: xft:Knack Nerd Font:style=Italic:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
-URxvt.boldItalicFont: xft:Knack Nerd Font:style=Bold Italic:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
-
-! Fix font space
-URxvt.letterSpace: -2
-URxvt.skipBuiltinGlyphs: true
-
-! Scrollbar
-URxvt.scrollStyle:          rxvt
-URxvt.scrollBar:            false
-
-! CTRL+SHIFT should not be bound by URxvt
-URxvt.iso14755: false
-URxvt.iso14755_52: false
-
+!
 ! Solarized color scheme for the X Window System
 !
 ! http://ethanschoonover.com/solarized
-
 
 ! Solarized colours
 
@@ -89,3 +58,77 @@ URxvt.iso14755_52: false
 ! *pointerColorBackground:  S_base1
 ! *pointerColorForeground:  S_base01
 ! *colorBD:                 S_base03
+
+
+
+!
+! Rofi
+!
+
+rofi.width: 100
+rofi.padding: 450
+rofi.eh: 2
+rofi.lines: 5
+rofi.opacity: 90
+rofi.bw: 1
+rofi.font: Knack Nerd Font 10
+
+rofi.fg: S_base0
+rofi.bg: S_base02
+rofi.fg-active: S_blue
+rofi.fg-urgent: S_red
+rofi.hlfg-active: S_base3
+rofi.hlfg-urgent: S_base3
+rofi.bg-active: S_base3
+rofi.bg-urgent: S_base3
+rofi.hlbg-active: S_blue
+rofi.hlbg-urgent: S_red
+rofi.bgalt: S_base03
+rofi.hlfg: S_base2
+rofi.hlbg: S_base01
+rofi.bc: S_base03
+
+rofi.color-normal: S_base02, S_base0, S_base03, S_base01, S_base2
+rofi.color-urgent: S_base02, S_red, S_base03, S_red, S_base3
+rofi.color-active: S_base02, S_blue, S_base03, S_blue, S_base3
+rofi.color-window: S_base02, S_base03
+
+
+
+!
+! URxvt
+!
+
+URxvt.termName:             rxvt-unicode-256color
+URxvt.depth:                32
+URxvt.geometry:             80x25
+URxvt.transparent:          false
+URxvt.fading:               0
+URxvt.urgentOnBell:         true
+URxvt.visualBell:           true
+URxvt.loginShell:           true
+URxvt.saveLines:            50
+URxvt.internalBorder:       0
+URxvt.lineSpace:            0
+
+! Fonts
+URxvt.intensityStyles:      true
+URxvt.font: xft:Knack Nerd Font:style=Regular:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
+URxvt.boldFont: xft:Knack Nerd Font:style=Bold:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
+URxvt.italicFont: xft:Knack Nerd Font:style=Italic:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
+URxvt.boldItalicFont: xft:Knack Nerd Font:style=Bold Italic:pixelsize=12,xft:EmojiOne Color,xft:Symbola,xft:Unifont
+
+! Fix font space
+URxvt.letterSpace: -2
+URxvt.skipBuiltinGlyphs: true
+
+! Scrollbar
+URxvt.scrollStyle:          rxvt
+URxvt.scrollBar:            false
+
+! CTRL+SHIFT should not be bound by URxvt
+URxvt.iso14755: false
+URxvt.iso14755_52: false
+
+
+
