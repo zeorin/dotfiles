@@ -210,7 +210,7 @@ mode "$mode_gaps_outer" {
         bindsym Escape mode "default"
 }
 
-client.focused #268bd2 #268bd2 #268bd2 #b58900
+client.focused #93a1a1 #93a1a1 #93a1a1 #b58900
 client.focused_inactive #657b83 #657b83 #657b83 #657b83
 client.unfocused #073642 #073642 #073642 #073642
 client.urgent #b58900 #b58900 #b58900 #b58900

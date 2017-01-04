@@ -21,9 +21,9 @@ colors:
   green:            '#859900'
 window_colors:
   focused:
-    border:         'blue'
-    background:     'blue'
-    text:           'blue'
+    border:         'base1'
+    background:     'base1'
+    text:           'base1'
     indicator:      'yellow'
   focused_inactive:
     border:         'base00'
