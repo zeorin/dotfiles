@@ -148,7 +148,7 @@ bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
 bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
 
 # Set wallpaper
-exec_always feh --no-fehbg --bg-fill ~/Pictures/Wallpapers/Material_Design_Wallpaper_WALLPAPERDNA\ \(19\).png
+exec_always feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
 
 
 # Start programs on login
