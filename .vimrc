@@ -243,6 +243,7 @@
 				exec 'highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				" Better fold styling
 				exec 'highlight Folded gui=NONE,underline cterm=NONE,underline guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
+				exec 'highlight FoldColumn gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 			elseif &background ==# "light"
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
@@ -255,6 +256,7 @@
 				exec 'highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				" Better fold styling
 				exec 'highlight Folded gui=NONE,underline cterm=NONE,underline guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
+				exec 'highlight FoldColumn gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 			endif
 		endfunction
 		augroup margincolor
@@ -488,7 +490,7 @@
 	set foldlevelstart=10
 	set foldnestmax=10
 	set foldmethod=indent
-	" TODO: set foldcolumn
+	set foldcolumn=2
 	Plug 'Konfekt/FastFold' " Make folding faster
 
 	" Switch buffers even if modified
@@ -978,4 +980,4 @@
 
 " }}}
 
-" vim: set foldmethod=marker foldlevel=0:
+" vim: set foldmethod=marker foldlevel=0 foldcolumn=4 textwidth=78:

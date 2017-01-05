@@ -425,4 +425,4 @@
 	export PATH
 # }}}
 
-# vim: set foldmethod=marker foldlevel=0 textwidth=78:
+# vim: set foldmethod=marker foldlevel=0 foldcolumn=3 textwidth=78:
