@@ -14,7 +14,7 @@ bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-bindsym $mod+d exec rofi -show DRun
+bindsym $mod+d exec rofi -modi drun -show drun
 
 # change focus (Vi keybindings)
 bindsym $mod+h focus left
