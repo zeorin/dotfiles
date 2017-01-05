@@ -126,10 +126,9 @@
 
 # Appearance {{{
 
-	# Set LS_COLORS {{{
-		if [[ "$OSTYPE" == *gnu* ]]; then
-			eval `dircolors ~/.dir_colors`
-		fi
+	# Powerline {{{
+		PATH="$HOME/.local/bin:$PATH"
+		source "$(python -m site --user-site)/powerline/bindings/zsh/powerline.zsh"
 	# }}}
 
 	# Cursor shape {{{
@@ -149,6 +148,12 @@
 		zle -N zle-keymap-select
 	# }}}
 
+	# Set LS_COLORS {{{
+		if [[ "$OSTYPE" == *gnu* ]]; then
+			eval `dircolors ~/.dir_colors`
+		fi
+	# }}}
+
 	# Syntax highlighting {{{
 		antigen bundle zsh-users/zsh-syntax-highlighting
 		ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
@@ -163,10 +168,42 @@
 		ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=cyan'
 	# }}}
 
-	# Powerline {{{
-		PATH="$HOME/.local/bin:$PATH"
-		source "$(python -m site --user-site)/powerline/bindings/zsh/powerline.zsh"
+	# man colors {{{
+		# https://wiki.archlinux.org/index.php/Color_output_in_console#man
+		# https://wiki.archlinux.org/index.php/Color_output_in_console#less
+		# LESS_TERMCAP_mb begin bold
+		# LESS_TERMCAP_md begin blink
+		# LESS_TERMCAP_me reset bold/blink
+		# LESS_TERMCAP_so begin reverse video
+		# LESS_TERMCAP_se reset reverse video
+		# LESS_TERMCAP_us begin underline
+		# LESS_TERMCAP_ue reset underline
+		man() {
+			LESS=-R \
+			LESS_TERMCAP_mb=$'\e[1m\e[38;5;7m' \
+			LESS_TERMCAP_md=$'\e[1m\e[38;5;7m' \
+			LESS_TERMCAP_me=$'\e[0m' \
+			LESS_TERMCAP_so=$'\e[1;43m\e[38;5;0m' \
+			LESS_TERMCAP_se=$'\e[0m' \
+			LESS_TERMCAP_us=$'\e[1;36m' \
+			LESS_TERMCAP_ue=$'\e[0m' \
+			command man "$@"
+		}
 	# }}}
+
+	# diff, grep, ls colors {{{
+		alias diff='diff --color=auto'
+		alias grep='grep --color=auto'
+		alias ls='ls --color=auto'
+	# }}}
+
+	# grep colors {{{
+	# }}}
+
+	# ls colors {{{
+		alias grep='grep --color=auto'
+	# }}}
+
 
 # }}}
 
@@ -326,8 +363,6 @@
 	# Aliases {{{
 		autoload -U is-at-least	# needed for the common-aliases plugin
 		antigen bundle common-aliases
-		alias ls='ls --color=auto'
-		alias grep='grep --color=auto'
 		alias ..='cd ..'
 		alias ~='cd ~'
 		alias -g ...='../..'
@@ -425,4 +460,4 @@
 	export PATH
 # }}}
 
-# vim: set foldmethod=marker foldlevel=0 textwidth=78:
+# vim: set foldmethod=marker foldlevel=0 foldcolumn=3 textwidth=78:
