@@ -141,6 +141,7 @@ workspace_auto_back_and_forth yes
 
 # Lock screen command
 bindsym $mod+Shift+x exec lock --pixelate --font Knack-Regular-Nerd-Font-Complete --text 'Type password' -- scrot -z
+exec /usr/bin/xautolock -time 5 -locker "/usr/local/bin/lock --pixelate --font Knack-Regular-Nerd-Font-Complete --text 'Type password' -- scrot -z" -detectsleep
 
 # Pulse Audio controls
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 1 +5% #increase sound volume
