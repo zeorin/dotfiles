@@ -158,12 +158,8 @@ exec_always feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
 
 # Start programs on login
 exec compton -f -D 5
-#exec nm-applet
-#exec ~/bin/Telegram/Telegram
-#exec pidgin
-#exec redshift-gtk
-#exec thunderbird
-#exec owncloud
+exec thunderbird
+exec dex -a -e i3
 
 #
 # i3-gaps settings
