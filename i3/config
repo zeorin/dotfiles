@@ -8,7 +8,7 @@ font pango:DejaVu Sans Mono 0
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -106,7 +106,7 @@ bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+Shift+e exec --no-startup-id "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -131,7 +131,7 @@ bindsym $mod+r mode "resize"
 hide_edge_borders both
 
 # Start status bar
-exec_always killall lemonbar; $(python -m site --user-site)/powerline/bindings/lemonbar/powerline-lemonbar.py --i3 --height 16 -- -f "Knack Nerd Font-10" -B "#FF073642"
+exec_always --no-startup-id killall lemonbar; $(python -m site --user-site)/powerline/bindings/lemonbar/powerline-lemonbar.py --i3 --height 16 -- -f "Knack Nerd Font-10" -B "#FF073642"
 
 # Focus doesn't follow mouse
 focus_follows_mouse no
@@ -140,8 +140,8 @@ focus_follows_mouse no
 workspace_auto_back_and_forth yes
 
 # Lock screen command
-bindsym $mod+Shift+x exec lock --pixelate --font Knack-Regular-Nerd-Font-Complete --text 'Type password' -- scrot -z
-exec /usr/bin/xautolock -time 5 -locker "/usr/local/bin/lock --pixelate --font Knack-Regular-Nerd-Font-Complete --text 'Type password' -- scrot -z" -detectsleep
+bindsym $mod+Shift+x exec --no-startup-id lock --pixelate --font Knack-Regular-Nerd-Font-Complete --text 'Type password' -- scrot -z
+exec --no-startup-id /usr/bin/xautolock -time 5 -locker "/usr/local/bin/lock --pixelate --font Knack-Regular-Nerd-Font-Complete --text 'Type password' -- scrot -z" -detectsleep
 
 # Pulse Audio controls
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 1 +5% #increase sound volume
@@ -149,17 +149,17 @@ bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 1 -5% #d
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 1 toggle # mute sound
 
 # Sreen brightness controls
-bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
-bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
+bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
 
 # Set wallpaper
-exec_always feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
+exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
 
 
 # Start programs on login
-exec compton -f -D 5
+exec --no-startup-id compton -f -D 5
 exec thunderbird
-exec dex -a -e i3
+exec --no-startup-id dex -a -e i3
 
 #
 # i3-gaps settings
