@@ -152,6 +152,20 @@ bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 1 toggle # mute s
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 20 # increase screen brightness
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease screen brightness
 
+# Input configuration
+# Map keycodes to keysymbols
+exec --no-startup-id xmodmap ~/.Xmodmap
+# Natural scroll
+exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Scrolling Distance" -45, -45
+# No edge scrolling
+exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Edge Scrolling" 0, 0, 0
+# Enable horizontal scroll
+exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Two-Finger Scrolling" 1, 1
+# Enable palm detection
+exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Palm Detection" 1
+# Toggle touchpad
+bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggletouchpad.sh
+
 # Set wallpaper
 exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
 
