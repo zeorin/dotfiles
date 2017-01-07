@@ -4,7 +4,7 @@ verbose =        false
 default_action = shutdown
 composite =      true
 theme =          foom
-buttons =        cancel logout shutdown restart
+buttons =        cancel lock logout shutdown restart
 
 [actions]
 logout =         i3-msg exit
@@ -24,4 +24,3 @@ logout =         LOGOUT
 restart =        RESTART
 shutdown =       SHUTDOWN
 lock =           LOCK
-switch =         SWITCH USER
