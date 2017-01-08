@@ -158,8 +158,8 @@ bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease
 exec --no-startup-id setxkbmap -option
 # Add Programmer Dvorak to keyboard layout variants
 exec --no-startup-id setxkbmap -layout us,us -variant ,dvp
-# Super+Space to toggle keyboard layout
-exec --no-startup-id setxkbmap -option grp:win_space_toggle
+# Shift+Caps Lock to toggle keyboard layout
+exec --no-startup-id setxkbmap -option grp:shift_caps_toggle
 # Scroll-lock led shows alt layout active
 exec --no-startup-id setxkbmap -option grp_led:scroll
 # Right alt is compose key
