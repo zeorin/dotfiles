@@ -155,25 +155,25 @@ bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 20 # decrease
 
 # Input configuration
 # Clear options
-exec --no-startup-id setxkbmap -option
+exec_always --no-startup-id setxkbmap -option
 # Add Programmer Dvorak to keyboard layout variants
-exec --no-startup-id setxkbmap -layout us,us -variant ,dvp
+exec_always --no-startup-id setxkbmap -layout us,us -variant ,dvp
 # Shift+Caps Lock to toggle keyboard layout
-exec --no-startup-id setxkbmap -option grp:shift_caps_toggle
+exec_always --no-startup-id setxkbmap -option grp:shift_caps_toggle
 # Scroll-lock led shows alt layout active
-exec --no-startup-id setxkbmap -option grp_led:scroll
+exec_always --no-startup-id setxkbmap -option grp_led:scroll
 # Right alt is compose key
-exec --no-startup-id setxkbmap -option compose:ralt
+exec_always --no-startup-id setxkbmap -option compose:ralt
 # Map keycodes to keysymbols
-exec --no-startup-id xmodmap ~/.Xmodmap
+exec_always --no-startup-id xmodmap ~/.Xmodmap
 # Natural scroll
-exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Scrolling Distance" -45, -45
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Scrolling Distance" -45, -45
 # No edge scrolling
-exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Edge Scrolling" 0, 0, 0
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Edge Scrolling" 0, 0, 0
 # Enable horizontal scroll
-exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Two-Finger Scrolling" 1, 1
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Two-Finger Scrolling" 1, 1
 # Enable palm detection
-exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Palm Detection" 1
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Palm Detection" 1
 # Toggle touchpad
 bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggletouchpad.sh
 
