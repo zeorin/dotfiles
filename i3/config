@@ -168,12 +168,16 @@ exec --no-startup-id setxkbmap -option compose:ralt
 exec --no-startup-id xmodmap ~/.Xmodmap
 # Natural scroll
 exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Scrolling Distance" -45, -45
+exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Scrolling Distance" -53, -53
 # No edge scrolling
 exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Edge Scrolling" 0, 0, 0
+exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Edge Scrolling" 0, 0, 0
 # Enable horizontal scroll
 exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Two-Finger Scrolling" 1, 1
+exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Two-Finger Scrolling" 1, 1
 # Enable palm detection
 exec --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Palm Detection" 1
+exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Palm Detection" 1
 # Toggle touchpad
 bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggletouchpad.sh
 
