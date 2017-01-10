@@ -1,0 +1,27 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+/* Increase padding for better readability */
+
+#folderTree treechildren:-moz-tree-row {
+	height: 2em;
+}
+#threadTree treechildren:-moz-tree-row {
+	height: 2.5em;
+}
+
+/* Alternate background-color for better readability */
+
+#threadTree treechildren:-moz-tree-row {
+	background-color: -moz-default-background-color;
+	color: -moz-default-color;
+}
+#threadTree treechildren:-moz-tree-row(odd) {
+	background-color: -moz-dialog;
+}
+#threadTree treechildren:-moz-tree-row(selected) {
+	background-color: -moz-cellhighlight;
+	color: -moz-cellhighlighttext;
+}
+#threadTree treechildren:-moz-tree-row(selected, focus) {
+	background-color: highlight;
+}
