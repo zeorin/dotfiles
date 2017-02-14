@@ -57,3 +57,5 @@
 [rerere]
 	enabled = true
 	autoUpdate = true
+[log]
+	abbrevCommit = true
