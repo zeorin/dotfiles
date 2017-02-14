@@ -67,7 +67,6 @@
 		set langnoremap " 'langmap' doesn’t mess with mappings
 		set laststatus=2 " Status line is always shown
 		set listchars=tab:>\ ,trail:-,nbsp:+ " Default white space characters
-		set mouse=a " Enable mouse
 		set nrformats=hex " Recognize hexadecimal numbers
 		" For sessions, save & restore the following:
 		set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize
@@ -448,6 +447,10 @@
 	" vim-sensible/plugin/sensible.vim for the actual settings. Although the
 	" plugin is defined here, it’s only loaded near the end of the script.
 	Plug 'tpope/vim-sensible'
+
+
+	" Enable mouse
+	set mouse=a
 
 	" Set ttymouse correctly when in Vim in Tmux, so that mouse events are
 	" correctly handled.
