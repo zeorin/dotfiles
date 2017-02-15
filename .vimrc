@@ -586,12 +586,12 @@
 		Plug 'scrooloose/syntastic'
 		let g:syntastic_check_on_open = 1
 		let g:syntastic_check_on_wq = 0
-		let g:syntastic_quiet_messages = { "type": "style" }
 		let g:syntastic_html_tidy_exec = '/usr/local/bin/tidy'
 		let g:syntastic_error_symbol = "\u2717" " ✗
 		let g:syntastic_style_error_symbol = "S\u2717" " S✗
 		let g:syntastic_warning_symbol = "\u26A0" " ⚠
 		let g:syntastic_style_warning_symbol = "S\u26A0" " S⚠
+		let g:syntastic_aggregate_errors = 1
 		function! StrTrim(txt)
 			return substitute(a:txt, '^\n*\s*\(.\{-}\)\n*\s*$', '\1', '')
 		endfunction
@@ -613,17 +613,29 @@
 			" Default to global ESLint installation if there is one.
 			autocmd FileType javascript
 				\ if (filereadable('.eslintrc.*') ||
-						\ (filereadable('package.json') && match(readfile('package.json'), 'eslintConfig') != -1)) &&
+						\ (filereadable('package.json') && match(readfile('package.json'), '"eslintConfig":') != -1)) &&
 						\ type(NpmWhich('eslint')) == type('')
 					\ | let b:syntastic_checkers = ['eslint']
 					\ | let b:syntastic_javascript_eslint_exec = NpmWhich('eslint')
 				\ | elseif (filereadable('.jshintrc') ||
-						\ (filereadable('package.json') && match(readfile('package.json'), 'jshintConfig') != -1)) &&
+						\ (filereadable('package.json') && match(readfile('package.json'), '"jshintConfig":') != -1)) &&
 						\ type(NpmWhich('jshint')) == type('')
 					\ | let b:syntastic_checkers = ['jshint']
 					\ | let b:syntastic_javascript_jshint_exec = NpmWhich('jshint')
 				\ | elseif filereadable(expand('$HOME/'.'.eslintrc.*')) && executable('eslint')
 					\ | let b:syntastic_checkers = ['eslint']
+				\ | endif
+			" Use StyleLint if there’s an StyleLint configuration and it’s
+			" installed.
+			autocmd FileType sass,scss
+				\ if (filereadable('.stylelintrc') || filereadable('stylelint.config.js') ||
+						\ (filereadable('package.json') && match(readfile('package.json'), '"stylelint":') != -1)) &&
+						\ type(NpmWhich('stylelint')) == type('')
+					\ | let b:syntastic_checkers = ['sass', 'stylelint']
+					\ | let b:syntastic_scss_stylelint_exec = NpmWhich('stylelint')
+					\ | let b:syntastic_sass_stylelint_exec = NpmWhich('stylelint')
+				\ | elseif filereadable(expand('$HOME/'.'.stylelintrc')) && executable('eslint')
+					\ | let b:syntastic_checkers = ['sass', 'stylelint']
 				\ | endif
 		augroup END
 		nnoremap <Leader>e :Errors<CR>
