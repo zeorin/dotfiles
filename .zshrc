@@ -197,14 +197,6 @@
 		alias ls='ls --color=auto'
 	# }}}
 
-	# grep colors {{{
-	# }}}
-
-	# ls colors {{{
-		alias grep='grep --color=auto'
-	# }}}
-
-
 # }}}
 
 # Behaviour {{{
