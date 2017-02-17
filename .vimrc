@@ -578,6 +578,7 @@
 
 	" Better indentation when pasting
 	Plug 'sickill/vim-pasta'
+	let g:pasta_disabled_filetypes = ['pug', 'yaml']
 
 	" Visualize Vim's undo tree
 	Plug 'sjl/gundo.vim'
