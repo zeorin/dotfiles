@@ -627,15 +627,15 @@
 				\ | endif
 			" Use StyleLint if there’s an StyleLint configuration and it’s
 			" installed.
-			autocmd FileType sass,scss
+			autocmd FileType css,scss
 				\ if (filereadable('.stylelintrc') || filereadable('stylelint.config.js') ||
 						\ (filereadable('package.json') && match(readfile('package.json'), '"stylelint":') != -1)) &&
 						\ type(NpmWhich('stylelint')) == type('')
-					\ | let b:syntastic_checkers = ['sass', 'stylelint']
+					\ | let b:syntastic_checkers = ['stylelint']
+					\ | let b:syntastic_css_stylelint_exec = NpmWhich('stylelint')
 					\ | let b:syntastic_scss_stylelint_exec = NpmWhich('stylelint')
-					\ | let b:syntastic_sass_stylelint_exec = NpmWhich('stylelint')
 				\ | elseif filereadable(expand('$HOME/'.'.stylelintrc')) && executable('eslint')
-					\ | let b:syntastic_checkers = ['sass', 'stylelint']
+					\ | let b:syntastic_checkers = ['stylelint']
 				\ | endif
 		augroup END
 		nnoremap <Leader>e :Errors<CR>
