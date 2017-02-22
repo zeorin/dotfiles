@@ -284,6 +284,7 @@
 		let g:airline#extensions#tabline#enabled = 1 " Use tabline
 		let g:airline#extensions#tabline#show_tabs = 1 " Always show tabline
 		let g:airline#extensions#tabline#show_buffers = 1 " Show buffers when no tabs
+		let g:airline#extensions#whitespace#mixed_indent_algo = 2 " Allow spaces after tabs for alignment
 	" }}}
 
 	" Fancy start screen {{{
@@ -577,6 +578,7 @@
 
 	" Better indentation when pasting
 	Plug 'sickill/vim-pasta'
+	let g:pasta_disabled_filetypes = ['pug', 'yaml']
 
 	" Visualize Vim's undo tree
 	Plug 'sjl/gundo.vim'
