@@ -167,6 +167,7 @@ exec_always --no-startup-id setxkbmap -option compose:ralt
 # Map keycodes to keysymbols
 exec_always --no-startup-id xmodmap ~/.Xmodmap
 # Natural scroll
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "libinput Natural Scrolling Enabled" 1
 exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Scrolling Distance" -45, -45
 exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Scrolling Distance" -53, -53
 # No edge scrolling
