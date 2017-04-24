@@ -178,6 +178,11 @@ exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptic
 # Enable palm detection
 exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Palm Detection" 1
 exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Palm Detection" 1
+# Tapping enabled
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "libinput Tapping Enabled" 1
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "libinput Tapping Drag Lock Enabled" 1
+exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "libinput Tapping Enabled" 1
+exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "libinput Tapping Drag Lock Enabled" 1
 # Toggle touchpad
 bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggletouchpad.sh
 
