@@ -192,7 +192,7 @@ exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/
 
 
 # Start programs on login
-exec --no-startup-id compton -f -D 5
+exec --no-startup-id compton -f -D 5 -c
 exec --no-startup-id dex -a -e i3
 
 #
