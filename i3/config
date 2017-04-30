@@ -167,6 +167,7 @@ exec_always --no-startup-id setxkbmap -option compose:ralt
 # Map keycodes to keysymbols
 exec_always --no-startup-id xmodmap ~/.Xmodmap
 # Natural scroll
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "libinput Natural Scrolling Enabled" 1
 exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Scrolling Distance" -45, -45
 exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Scrolling Distance" -53, -53
 # No edge scrolling
@@ -178,6 +179,11 @@ exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptic
 # Enable palm detection
 exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "Synaptics Palm Detection" 1
 exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Palm Detection" 1
+# Tapping enabled
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "libinput Tapping Enabled" 1
+exec_always --no-startup-id xinput set-prop "Asus T100 MultiTouch Trackpad" "libinput Tapping Drag Lock Enabled" 1
+exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "libinput Tapping Enabled" 1
+exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "libinput Tapping Drag Lock Enabled" 1
 # Toggle touchpad
 bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggletouchpad.sh
 
@@ -186,7 +192,7 @@ exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/
 
 
 # Start programs on login
-exec --no-startup-id compton -f -D 5
+exec --no-startup-id compton -f -D 5 -c
 exec --no-startup-id dex -a -e i3
 
 #
