@@ -200,7 +200,7 @@ exec --no-startup-id dex -a -e i3
 #
 
 # Disable window titles
-for_window [class="^.*"] border pixel 1
+for_window [class="^.*"] border pixel 2
 gaps inner 20
 gaps outer 0
 
