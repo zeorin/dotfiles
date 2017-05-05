@@ -512,6 +512,8 @@
 	let &backupdir = myBackupDir . ',' . &backupdir
 	" Keep backup files
 	set backup
+	" Do it in a way that is compatible with file-watchers
+	set backupcopy=yes
 
 	" Stop swap files from littering all over the system
 	let mySwapDir = expand(vimDir . 'tmp/swap//')
