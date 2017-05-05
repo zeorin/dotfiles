@@ -436,6 +436,9 @@
 	nnoremap <Leader>- :split<cr>
 	nnoremap <Leader>\| :vsplit<cr>
 
+	" Write with root permissions
+	cmap w!! w !sudo tee > /dev/null %
+
 " }}}
 
 " General functionality {{{
@@ -448,7 +451,6 @@
 	" vim-sensible/plugin/sensible.vim for the actual settings. Although the
 	" plugin is defined here, it’s only loaded near the end of the script.
 	Plug 'tpope/vim-sensible'
-
 
 	" Enable mouse
 	set mouse=a
@@ -510,6 +512,8 @@
 	let &backupdir = myBackupDir . ',' . &backupdir
 	" Keep backup files
 	set backup
+	" Do it in a way that is compatible with file-watchers
+	set backupcopy=yes
 
 	" Stop swap files from littering all over the system
 	let mySwapDir = expand(vimDir . 'tmp/swap//')
@@ -779,6 +783,10 @@
 
 	" Updated official PHP indent
 	Plug '2072/php-indenting-for-vim', { 'for': 'php' }
+
+	" Browse documentation {{{
+		nnoremap gK :!zeal "<cword>"&<CR><CR>
+	" }}}
 
 	" Define text-like file types
 	let markdownft = ['markdown', 'mkd']
