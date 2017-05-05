@@ -407,7 +407,7 @@
 	# RVM {{{
 		[[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
 		[[ -e "/usr/local/rvm/scripts/rvm" ]] && source /usr/local/rvm/scripts/rvm
-		[[ -e "$HOME/.rvm/bin" ]] && PATH="$HOME/.rvm/bin:$PATH"
+		[[ -e "$HOME/.rvm/bin" ]] && PATH="$PATH:$HOME/.rvm/bin"
 	# }}}
 
 	# Load NVM {{{
