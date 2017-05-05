@@ -51,7 +51,7 @@
 [mergetool]
 	prompt = false
 [mergetool "nvimdiff"]
-	cmd = "$VISUAL -d \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\""
+	cmd = "$VISUAL -d -c '4wincmd w | wincmd J'  \"$LOCAL\" \"$BASE\" \"$REMOTE\" \"$MERGED\""
 [branch]
 	autosetupmerge = true
 [rerere]
