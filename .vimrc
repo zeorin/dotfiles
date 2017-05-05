@@ -436,6 +436,9 @@
 	nnoremap <Leader>- :split<cr>
 	nnoremap <Leader>\| :vsplit<cr>
 
+	" Write with root permissions
+	cmap w!! w !sudo tee > /dev/null %
+
 " }}}
 
 " General functionality {{{
@@ -448,7 +451,6 @@
 	" vim-sensible/plugin/sensible.vim for the actual settings. Although the
 	" plugin is defined here, it’s only loaded near the end of the script.
 	Plug 'tpope/vim-sensible'
-
 
 	" Enable mouse
 	set mouse=a
