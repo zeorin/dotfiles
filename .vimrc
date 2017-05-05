@@ -784,6 +784,10 @@
 	" Updated official PHP indent
 	Plug '2072/php-indenting-for-vim', { 'for': 'php' }
 
+	" Browse documentation {{{
+		nnoremap gK :!zeal "<cword>"&<CR><CR>
+	" }}}
+
 	" Define text-like file types
 	let markdownft = ['markdown', 'mkd']
 	let vcsft = ['git', 'gitsendemail', '*commit*', '*COMMIT*']
