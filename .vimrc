@@ -660,7 +660,7 @@
 
 	" Working directory is always project root {{{
 		Plug 'airblade/vim-rooter'
-		let g:rooter_patterns = ['.git', '.git/', 'package.json', 'Gemfile', 'Gulpfile.js', 'Gruntfile.js', 'config.rb']
+		let g:rooter_patterns = ['package.json', 'Gemfile', 'Gulpfile.js', 'Gruntfile.js', 'config.rb', '.git', '.git/']
 		let g:rooter_silent_chdir = 1
 	" }}}
 
