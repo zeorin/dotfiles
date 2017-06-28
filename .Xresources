@@ -65,8 +65,8 @@
 ! Rofi
 !
 
-rofi.width: 100
-rofi.padding: 450
+rofi.fullscreen: true
+rofi.padding: 400
 rofi.eh: 2
 rofi.lines: 5
 rofi.opacity: 90
@@ -91,7 +91,7 @@ rofi.bc: S_base03
 rofi.color-normal: S_base02, S_base0, S_base03, S_base01, S_base2
 rofi.color-urgent: S_base02, S_red, S_base03, S_red, S_base3
 rofi.color-active: S_base02, S_blue, S_base03, S_blue, S_base3
-rofi.color-window: S_base02, S_base03
+rofi.color-window: argb:ee073642, S_base03
 
 
 
