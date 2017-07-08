@@ -66,7 +66,7 @@
 !
 
 rofi.fullscreen: true
-rofi.padding: 400
+rofi.padding: 250
 rofi.eh: 2
 rofi.lines: 5
 rofi.opacity: 90
