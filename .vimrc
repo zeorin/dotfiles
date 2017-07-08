@@ -444,7 +444,7 @@
 " General functionality {{{
 
 	" Match paired characters
-	Plug 'matchit.zip' " Updated matchit
+	Plug 'vim-scripts/matchit.zip' " Updated matchit
 	Plug 'tpope/vim-unimpaired' " Pairs of handy bracket mappings
 
 	" Sensible default settings we can all agree on See
