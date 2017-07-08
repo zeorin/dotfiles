@@ -154,16 +154,6 @@ bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 10 # increase s
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 10 # decrease screen brightness
 
 # Input configuration
-# Clear options
-exec_always --no-startup-id setxkbmap -option
-# Add Programmer Dvorak to keyboard layout variants
-exec_always --no-startup-id setxkbmap -layout us,us -variant ,dvp
-# Shift+Caps Lock to toggle keyboard layout
-exec_always --no-startup-id setxkbmap -option grp:shift_caps_toggle
-# Scroll-lock led shows alt layout active
-exec_always --no-startup-id setxkbmap -option grp_led:scroll
-# Right alt is compose key
-exec_always --no-startup-id setxkbmap -option compose:ralt
 # Map keycodes to keysymbols
 exec_always --no-startup-id xmodmap ~/.Xmodmap
 # Natural scroll
