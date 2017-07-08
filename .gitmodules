@@ -1,19 +1,15 @@
 [submodule ".gitignore-boilerplates"]
 	path = .gitignore-boilerplates
-	url = git@github.com:simonwhitaker/gitignore-boilerplates.git
+	url = https://github.com/simonwhitaker/gitignore-boilerplates.git
 [submodule "dircolors-solarized"]
 	path = dircolors-solarized
-	url = git@github.com:seebi/dircolors-solarized.git
+	url = https://github.com/seebi/dircolors-solarized.git
 [submodule "irssi-colors-solarized"]
 	path = irssi-colors-solarized
-	url = git@github.com:huyz/irssi-colors-solarized.git
-	ignore = dirty
-[submodule ".tmux/plugins/tmp"]
-	path = .tmux/plugins/tmp
-	url = https://github.com/tmux-plugins/tpm
+	url = https://github.com/huyz/irssi-colors-solarized.git
 [submodule ".tmux/plugins/tpm"]
 	path = .tmux/plugins/tpm
-	url = https://github.com/tmux-plugins/tpm
+	url = https://github.com/tmux-plugins/tpm.git
 [submodule "antigen"]
 	path = antigen
-	url = git://github.com/zsh-users/antigen.git
+	url = https://github.com/zsh-users/antigen.git
