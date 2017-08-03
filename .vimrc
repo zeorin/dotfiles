@@ -159,7 +159,7 @@
 	" Set cursor depending on mode
 	if !has('gui')
 		if has('nvim')
-			let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+			set guicursor=n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor
 		else
 			let &t_SI = "\<Esc>[5 q"	" DECSCUSR Blink Bar
 			let &t_EI = "\<Esc>[2 q"	" DECSCUSR Steady Block
