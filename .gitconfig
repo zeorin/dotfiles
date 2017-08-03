@@ -14,7 +14,7 @@
 [credential]
 	helper = cache
 [color]
-	ui = auto
+	ui = true
 [alias]
 	co = checkout
 	br = branch
@@ -23,6 +23,7 @@
 	unstage = reset HEAD --
 	last = log -1 HEAD
 	visual = !ungit
+	patch = !git --no-pager diff --no-color
 	stash-unapply = !git stash show -p | git apply -R
 	assume-unchanged = !git ls-files -v | grep '^[[:lower:]]'
 	edit-dirty = !git status --porcelain | sed s/^...// | xargs $EDITOR
@@ -38,7 +39,9 @@
 [push]
 	default = simple
 [pager]
-	diff = diff-so-fancy | less --tabs=4 --pattern='^(added|deleted|modified): ' -RFX
+	diff = diff-so-fancy | less --tabs=4 -RFX --pattern='^(Date|added|deleted|modified): '
+	log = diff-so-fancy | less --tabs=4 -RFX
+	show = diff-so-fancy | less --tabs=4 -RFX
 [interactive]
 	diffFilter = diff-so-fancy --patch-mode
 [advice]
