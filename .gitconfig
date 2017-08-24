@@ -8,9 +8,6 @@
 	safecrlf = false
 	pager = less --tabs=4 -RFX
 	whitespace = trailing-space,space-before-tab
-[merge]
-	tool = vimdiff
-	stat = true
 [credential]
 	helper = cache
 [color]
