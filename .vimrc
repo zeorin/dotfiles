@@ -618,7 +618,7 @@
 			" Use JSHint if there’s a JSHint configuration and it’s installed.
 			" Default to global ESLint installation if there is one.
 			autocmd FileType javascript
-				\ if (filereadable('.eslintrc.*') ||
+				\ if (filereadable(expand('.eslintrc*')) ||
 						\ (filereadable('package.json') && match(readfile('package.json'), '"eslintConfig":') != -1)) &&
 						\ type(NpmWhich('eslint')) == type('')
 					\ | let b:syntastic_checkers = ['eslint']
