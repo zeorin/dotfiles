@@ -209,87 +209,6 @@
 		bindkey "^?" backward-delete-char
 	# }}}
 
-	# Completion {{{
-
-		# A whole bunch of useful completions
-		antigen bundle zsh-users/zsh-completions
-		fpath=($fpath $HOME/.antigen/repos/https-COLON--SLASH--SLASH-github.com-SLASH-zsh-users-SLASH-zsh-completions.git/src)
-
-		# Vagrant completion
-		if which vagrant >/dev/null 2>&1; then
-			antigen bundle vagrant
-			fpath=($fpath $HOME/.antigen/repos/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh.git/plugins/vagrant)
-		fi
-
-		zmodload -i zsh/complist
-
-		# Initialize the completion system
-		autoload -Uz compinit
-		compfresh=
-		if [[ ! -a "${HOME}/.zcompdump" || $(date +'%j') > $(date +'%j' -r "${HOME}/.zcompdump") ]]; then
-			compinit
-		else
-			compinit -C
-		fi
-
-		unsetopt menu_complete
-		unsetopt flowcontrol
-		setopt auto_menu
-		setopt complete_in_word
-		setopt always_to_end
-
-		setopt auto_list
-		setopt no_list_beep
-
-		# Completions are case- and hypen-insensitive, and do substring completion
-		zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
-
-		# Use the menu select style
-		zstyle ':completion:*:*:*:*:*' menu select
-		bindkey '^[[Z' reverse-menu-complete # SHIFT-TAB to go back
-
-		# Color completions when they’re files
-		zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-
-		# Colors for processes in kill
-		zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
-		# List all processes owned by current user
-		zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
-
-		# Disable named-directories autocompletion
-		zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
-
-		# Use caching so that commands like apt and dpkg complete are useable
-		zstyle ':completion::complete:*' use-cache 1
-		zstyle ':completion::complete:*' cache-path "$HOME/.cache/zsh"
-
-		# Don't complete uninteresting users
-		zstyle ':completion:*:*:*:users' ignored-patterns \
-			adm amanda apache at avahi avahi-autoipd beaglidx bin cacti \
-			canna clamav daemon dbus distcache dnsmasq dovecot fax ftp games \
-			gdm gkrellmd gopher hacluster haldaemon halt hsqldb ident \
-			junkbust kdm ldap lp mail mailman mailnull man messagebus \
-			mldonkey mysql nagios named netdump news nfsnobody nobody nscd \
-			ntp nut nx obsrun openvpn operator pcap polkitd postfix postgres \
-			privoxy pulse pvm quagga radvd rpc rpcuser rpm rtkit scard \
-			shutdown squid sshd statd svn sync tftp usbmux uucp vcsa wwwrun \
-			xfs '_*'
-		# … unless we really want to.
-		zstyle '*' single-ignored show
-
-		expand-or-complete-with-dots() {
-			# toggle line-wrapping off and back on again
-			[[ -n "$terminfo[rmam]" && -n "$terminfo[smam]" ]] && echoti rmam
-			print -Pn "%{%F{blue}……⌛%f%}"
-			[[ -n "$terminfo[rmam]" && -n "$terminfo[smam]" ]] && echoti smam
-			zle expand-or-complete
-			zle redisplay
-		}
-		zle -N expand-or-complete-with-dots
-		bindkey "^I" expand-or-complete-with-dots
-
-	# }}}
-
 	# No autocorrect, thank you {{{
 		unsetopt correct_all
 	# }}}
@@ -393,7 +312,7 @@
 
 	# gibo — .gitignore boilerplates {{{
 		antigen bundle simonwhitaker/gibo
-		PATH="$HOME/.antigen/repos/https-COLON--SLASH--SLASH-github.com-SLASH-simonwhitaker-SLASH-gibo.git:$PATH"
+		PATH="$HOME/.antigen/bundles/simonwhitaker/gibo:$PATH"
 	# }}}
 
 	# Github’s Hub {{{
@@ -430,6 +349,85 @@
 	# Cabal {{{
 		[[ -e "$HOME/.cabal/bin" ]] && PATH="$HOME/.cabal/bin:$PATH"
 	# }}}
+
+# }}}
+
+# Completion {{{
+
+	# A whole bunch of useful completions
+	antigen bundle zsh-users/zsh-completions
+
+	# Vagrant completion
+	if which vagrant >/dev/null 2>&1; then
+		antigen bundle vagrant
+	fi
+
+	zmodload -i zsh/complist
+
+	# Initialize the completion system
+	autoload -Uz compinit
+	compfresh=
+	if [[ ! -a "${HOME}/.zcompdump" || $(date +'%j') > $(date +'%j' -r "${HOME}/.zcompdump") ]]; then
+		compinit
+	else
+		compinit -C
+	fi
+
+	unsetopt menu_complete
+	unsetopt flowcontrol
+	setopt auto_menu
+	setopt complete_in_word
+	setopt always_to_end
+
+	setopt auto_list
+	setopt no_list_beep
+
+	# Completions are case- and hypen-insensitive, and do substring completion
+	zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+	# Use the menu select style
+	zstyle ':completion:*:*:*:*:*' menu select
+	bindkey '^[[Z' reverse-menu-complete # SHIFT-TAB to go back
+
+	# Color completions when they’re files
+	zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+
+	# Colors for processes in kill
+	zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+	# List all processes owned by current user
+	zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
+
+	# Disable named-directories autocompletion
+	zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
+
+	# Use caching so that commands like apt and dpkg complete are useable
+	zstyle ':completion::complete:*' use-cache 1
+	zstyle ':completion::complete:*' cache-path "$HOME/.cache/zsh"
+
+	# Don't complete uninteresting users
+	zstyle ':completion:*:*:*:users' ignored-patterns \
+		adm amanda apache at avahi avahi-autoipd beaglidx bin cacti \
+		canna clamav daemon dbus distcache dnsmasq dovecot fax ftp games \
+		gdm gkrellmd gopher hacluster haldaemon halt hsqldb ident \
+		junkbust kdm ldap lp mail mailman mailnull man messagebus \
+		mldonkey mysql nagios named netdump news nfsnobody nobody nscd \
+		ntp nut nx obsrun openvpn operator pcap polkitd postfix postgres \
+		privoxy pulse pvm quagga radvd rpc rpcuser rpm rtkit scard \
+		shutdown squid sshd statd svn sync tftp usbmux uucp vcsa wwwrun \
+		xfs '_*'
+	# … unless we really want to.
+	zstyle '*' single-ignored show
+
+	expand-or-complete-with-dots() {
+		# toggle line-wrapping off and back on again
+		[[ -n "$terminfo[rmam]" && -n "$terminfo[smam]" ]] && echoti rmam
+		print -Pn "%{%F{blue}……⌛%f%}"
+		[[ -n "$terminfo[rmam]" && -n "$terminfo[smam]" ]] && echoti smam
+		zle expand-or-complete
+		zle redisplay
+	}
+	zle -N expand-or-complete-with-dots
+	bindkey "^I" expand-or-complete-with-dots
 
 # }}}
 
