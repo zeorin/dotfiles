@@ -1,0 +1,42 @@
+diff --git a/st.c b/st.c
+index 2594c65..89bffdd 100644
+--- a/st.c
++++ b/st.c
+@@ -532,6 +532,7 @@ static char *opt_line  = NULL;
+ static char *opt_name  = NULL;
+ static char *opt_title = NULL;
+ static int oldbutton   = 3; /* button event on startup: 3 = release */
++static int bellon      = 0; /* visual bell status */
+ 
+ static char *usedfont = NULL;
+ static double usedfontsize = 0;
+@@ -2766,6 +2767,15 @@ tcontrolcode(uchar ascii)
+ 				xseturgency(1);
+ 			if (bellvolume)
+ 				XkbBell(xw.dpy, xw.win, bellvolume, (Atom)NULL);
++
++                        /* visual bell*/
++                        if (!bellon) {
++                                bellon = 1;
++                                MODBIT(term.mode, !IS_SET(MODE_REVERSE), MODE_REVERSE);
++                                redraw();
++                                XFlush(xw.dpy);
++                                MODBIT(term.mode, !IS_SET(MODE_REVERSE), MODE_REVERSE);
++                        }
+ 		}
+ 		break;
+ 	case '\033': /* ESC */
+@@ -4292,7 +4302,12 @@ run(void)
+ 					(handler[ev.type])(&ev);
+ 			}
+ 
+-			draw();
++			if (bellon) {
++				bellon = 0;
++				redraw();
++			}
++			else draw();
++
+ 			XFlush(xw.dpy);
+ 
+ 			if (xev && !FD_ISSET(xfd, &rfd))
