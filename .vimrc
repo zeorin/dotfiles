@@ -233,9 +233,9 @@
 			if &background ==# "dark"
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				" Better Syntastic styles
-				exec 'highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.violet.' ctermfg='.g:sol.cterm.violet.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				exec 'highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
+				" Better ALE styles
+				exec 'highlight ALEWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.violet.' ctermfg='.g:sol.cterm.violet.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
+				exec 'highlight ALEErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				" Better git-gutter styles
 				exec 'highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.green.' ctermfg='.g:sol.cterm.green.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight lineModified gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
@@ -247,8 +247,8 @@
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				" Better Syntastic styles
-				exec 'highlight SyntasticWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.violet.' ctermfg='.g:sol.cterm.violet.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
-				exec 'highlight SyntasticErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base1.' ctermbg='.g:sol.cterm.base2
+				exec 'highlight ALEWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.violet.' ctermfg='.g:sol.cterm.violet.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
+				exec 'highlight ALEErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base1.' ctermbg='.g:sol.cterm.base2
 				" Better git-gutter styles
 				exec 'highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.green.' ctermfg='.g:sol.cterm.green.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				exec 'highlight lineModified gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base1.' ctermbg='.g:sol.cterm.base2
@@ -589,63 +589,21 @@
 	Plug 'sjl/gundo.vim'
 	nnoremap <Leader>u :GundoToggle<CR>
 
-	" Syntax checking hacks {{{
-		Plug 'scrooloose/syntastic'
-		let g:syntastic_check_on_open = 1
-		let g:syntastic_check_on_wq = 0
-		let g:syntastic_html_tidy_exec = '/usr/local/bin/tidy'
-		let g:syntastic_error_symbol = "\u2717" " ✗
-		let g:syntastic_style_error_symbol = "S\u2717" " S✗
-		let g:syntastic_warning_symbol = "\u26A0" " ⚠
-		let g:syntastic_style_warning_symbol = "S\u26A0" " S⚠
-		let g:syntastic_aggregate_errors = 1
-		function! StrTrim(txt)
-			return substitute(a:txt, '^\n*\s*\(.\{-}\)\n*\s*$', '\1', '')
-		endfunction
-		function! NpmWhich(module)
-			let npm_bin = StrTrim(system('npm bin'))
-			if executable(expand(l:npm_bin . '/' . a:module))
-				return StrTrim(expand(l:npm_bin . '/' . a:module))
-			elseif executable(a:module)
-				return StrTrim(system('which ' . a:module))
-			else
-				return 0
-			endif
-		endfunction
-		augroup syntastic_checkers
-			autocmd!
-			" Use ESLint if there’s an ESLint configuration and it’s
-			" installed.
-			" Use JSHint if there’s a JSHint configuration and it’s installed.
-			" Default to global ESLint installation if there is one.
-			autocmd FileType javascript
-				\ if (filereadable(expand('.eslintrc*')) ||
-						\ (filereadable('package.json') && match(readfile('package.json'), '"eslintConfig":') != -1)) &&
-						\ type(NpmWhich('eslint')) == type('')
-					\ | let b:syntastic_checkers = ['eslint']
-					\ | let b:syntastic_javascript_eslint_exec = NpmWhich('eslint')
-				\ | elseif (filereadable('.jshintrc') ||
-						\ (filereadable('package.json') && match(readfile('package.json'), '"jshintConfig":') != -1)) &&
-						\ type(NpmWhich('jshint')) == type('')
-					\ | let b:syntastic_checkers = ['jshint']
-					\ | let b:syntastic_javascript_jshint_exec = NpmWhich('jshint')
-				\ | elseif filereadable(expand('$HOME/'.'.eslintrc.*')) && executable('eslint')
-					\ | let b:syntastic_checkers = ['eslint']
-				\ | endif
-			" Use StyleLint if there’s an StyleLint configuration and it’s
-			" installed.
-			autocmd FileType css,scss
-				\ if (filereadable('.stylelintrc') || filereadable('stylelint.config.js') ||
-						\ (filereadable('package.json') && match(readfile('package.json'), '"stylelint":') != -1)) &&
-						\ type(NpmWhich('stylelint')) == type('')
-					\ | let b:syntastic_checkers = ['stylelint']
-					\ | let b:syntastic_css_stylelint_exec = NpmWhich('stylelint')
-					\ | let b:syntastic_scss_stylelint_exec = NpmWhich('stylelint')
-				\ | elseif filereadable(expand('$HOME/'.'.stylelintrc')) && executable('eslint')
-					\ | let b:syntastic_checkers = ['stylelint']
-				\ | endif
-		augroup END
-		nnoremap <Leader>e :Errors<CR>
+	" Linting {{{
+		Plug 'w0rp/ale'
+		let g:airline#extensions#ale#enabled = 1
+		let g:ale_open_list = 'on_save'
+		let g:ale_sign_warning = "\u26A0" " ⚠
+		let g:ale_sign_error = "\u2717" " ✗
+		let g:ale_sign_warning = "\u26A0" " ⚠
+		let g:ale_sign_error = "\u2717" " ✗
+		let g:ale_echo_msg_error_str = "\u26A0" " ⚠
+		let g:ale_echo_msg_warning_str = "\u2717" " ✗
+		let g:ale_echo_msg_format = '%severity%  [%linter%] %s'
+		let g:ale_fix_on_save = 1
+		let g:ale_fixers = {}
+		let g:ale_fixers['javascript'] = ['prettier']
+		let g:ale_javascript_prettier_use_local_config = 1
 	" }}}
 
 	" File tree explorer {{{
@@ -906,7 +864,6 @@
 			set scrolloff=999
 			Limelight
 			GitGutterDisable
-			silent SyntasticToggleMode
 		endfunction
 		function! s:goyo_leave()
 			silent !tmux set status on
@@ -914,7 +871,6 @@
 			set scrolloff=1
 			Limelight!
 			GitGutterEnable
-			silent SyntasticToggleMode
 		endfunction
 		augroup goyo_limelight
 			autocmd!
