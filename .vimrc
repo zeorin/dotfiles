@@ -285,6 +285,7 @@
 		let g:airline#extensions#tabline#show_tabs = 1 " Always show tabline
 		let g:airline#extensions#tabline#show_buffers = 1 " Show buffers when no tabs
 		let g:airline#extensions#whitespace#mixed_indent_algo = 2 " Allow spaces after tabs for alignment
+		let g:airline#extensions#c_like_langs = ['c', 'cpp', 'cuda', 'go', 'javascript', 'javascript.jsx', 'ld', 'php']
 	" }}}
 
 	" Fancy start screen {{{
