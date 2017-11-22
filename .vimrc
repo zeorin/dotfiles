@@ -590,6 +590,12 @@
 	Plug 'sjl/gundo.vim'
 	nnoremap <Leader>u :GundoToggle<CR>
 
+	" Don’t include quickfix list in buffer list
+	augroup qf
+		autocmd!
+		autocmd FileType qf set nobuflisted
+	augroup END
+
 	" Linting {{{
 		Plug 'w0rp/ale'
 		let g:airline#extensions#ale#enabled = 1
@@ -661,9 +667,9 @@
 		Plug 'mileszs/ack.vim'
 		if executable('ag')
 			let g:ackprg = "ag --nogroup --nocolor --column"
-			nnoremap <Leader>a :Ack |
+			nnoremap <Leader>a :Ack! |
 		elseif executable('ack') || executable ('ack-grep')
-			nnoremap <Leader>a :Ack |
+			nnoremap <Leader>a :Ack! |
 		else
 			nnoremap <Leader>a :grep |
 		endif
