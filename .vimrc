@@ -722,6 +722,14 @@
 		let g:ycm_autoclose_preview_window_after_completion = 1
 		let g:ycm_autoclose_preview_window_after_insertion = 1
 		let g:ycm_cache_omnifunc = 0
+		imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR><Plug>delimitMateBS
+
+		function! YcmOnDeleteChar()
+			if pumvisible()
+				return "\<C-y>"
+			endif
+			return ""
+		endfunction
 	" }}}
 
 	" The ultimate snippet solution for Vim {{{
