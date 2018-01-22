@@ -362,8 +362,6 @@
 		antigen bundle vagrant
 	fi
 
-	zmodload -i zsh/complist
-
 	# Initialize the completion system
 	autoload -Uz compinit
 	compfresh=
@@ -372,6 +370,8 @@
 	else
 		compinit -C
 	fi
+
+	zmodload -i zsh/complist
 
 	unsetopt menu_complete
 	unsetopt flowcontrol
