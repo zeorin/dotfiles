@@ -755,6 +755,10 @@
 	let g:javascript_plugin_jsdoc = 1
 	let g:javascript_plugin_flow = 1
 
+	" Flow omnicompletion
+	Plug 'flowtype/vim-flow', { 'for': 'javascript' }
+	let g:flow#enable = 0
+
 	" Improved PHP omnicompletion
 	Plug 'shawncplus/phpcomplete.vim', { 'for': 'php' }
 
