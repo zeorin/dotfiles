@@ -1,3 +1,16 @@
+From adc6b217669b30f4396e8a89f2a15b679d0e313e Mon Sep 17 00:00:00 2001
+From: fanboimsft <fanboimsft@icloud.com>
+Date: Thu, 21 Dec 2017 23:21:53 +0700
+Subject: [PATCH] alpha patch to latest git version
+
+---
+ config.def.h |  6 ++++-
+ config.mk    |  4 ++--
+ st.h         |  1 +
+ win.h        |  4 ++++
+ x.c          | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 5 files changed, 75 insertions(+), 11 deletions(-)
+
 diff --git a/config.def.h b/config.def.h
 index 877afab..0e423b1 100644
 --- a/config.def.h
@@ -30,16 +43,20 @@ index 877afab..0e423b1 100644
  unsigned int defaultrcs = 257;
  
 diff --git a/config.mk b/config.mk
-index c84c5ee..2854f6c 100644
+index 0aceec4..d2421f8 100644
 --- a/config.mk
 +++ b/config.mk
-@@ -14,7 +14,7 @@ X11LIB = /usr/X11R6/lib
- INCS = -I. -I/usr/include -I${X11INC} \
+@@ -11,10 +11,10 @@ X11INC = /usr/X11R6/include
+ X11LIB = /usr/X11R6/lib
+ 
+ # includes and libs
+-INCS = -I$(X11INC) \
++INCS = -I. -I/usr/include -I${X11INC} \
         `pkg-config --cflags fontconfig` \
         `pkg-config --cflags freetype2`
--LIBS = -L/usr/lib -lc -L${X11LIB} -lm -lrt -lX11 -lutil -lXft \
+-LIBS = -L$(X11LIB) -lm -lrt -lX11 -lutil -lXft \
 +LIBS = -L/usr/lib -lc -L${X11LIB} -lm -lrt -lX11 -lutil -lXft -lXrender\
-        `pkg-config --libs fontconfig`  \
+        `pkg-config --libs fontconfig` \
         `pkg-config --libs freetype2`
  
 diff --git a/st.h b/st.h
@@ -70,7 +87,7 @@ index 428111c..05e8482 100644
  
  void draw(void);
 diff --git a/x.c b/x.c
-index fbfd350..5d111da 100644
+index 191e5dc..0e12ab9 100644
 --- a/x.c
 +++ b/x.c
 @@ -49,6 +49,7 @@ typedef struct {
@@ -198,3 +215,6 @@ index fbfd350..5d111da 100644
  	XSetForeground(xw.dpy, dc.gc, dc.col[defaultbg].pixel);
  	XFillRectangle(xw.dpy, xw.buf, dc.gc, 0, 0, win.w, win.h);
  
+-- 
+2.15.0
+
