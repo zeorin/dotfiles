@@ -55,16 +55,16 @@ bindsym $mod+a focus parent
 bindsym $mod+x focus child
 
 # Define workspace names
-set $workspace1 1: 
-set $workspace2 2: 
-set $workspace3 3: 3
-set $workspace4 4: 4
-set $workspace5 5: 5
-set $workspace6 6: 6
-set $workspace7 7: 7
-set $workspace8 8: 8
-set $workspace9 9: 
-set $workspace10 10:
+set $workspace1 1:
+set $workspace2 2:
+set $workspace3 3:3
+set $workspace4 4:
+set $workspace5 5:5
+set $workspace6 6:6
+set $workspace7 7:7
+set $workspace8 8:
+set $workspace9 9:
+set $workspace10 10:
 
 # switch to workspace
 bindsym $mod+1 workspace $workspace1
@@ -94,12 +94,10 @@ bindsym $mod+Shift+0 move container to workspace $workspace10; workspace $worksp
 bindsym $mod+Shift+bracketleft move workspace to output left
 bindsym $mod+Shift+bracketright move workspace to output right
 
-# Bind certain windows to workspaces
-assign [class="Firefox*"] $workspace2
-assign [class="Thunderbird"] $workspace9
-assign [class="Telegram"] $workspace10
-assign [class="Pidgin"] $workspace10
-assign [class="Slack"] $workspace10
+# Toggle scratchpad
+bindsym $mod+plus scratchpad show
+# Move window to scratchpad
+bindsym $mod+Shift+plus move scratchpad
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -131,52 +129,20 @@ bindsym $mod+r mode "resize"
 
 hide_edge_borders both
 
-# Start status bar
-exec_always --no-startup-id killall lemonbar; $(python -m site --user-site)/powerline/bindings/lemonbar/powerline-lemonbar.py --i3 --height 16 -- -f "Knack Nerd Font-10" -B "#FF073642"
-
 # Focus doesn't follow mouse
 focus_follows_mouse no
 
 # Allow switching back to previous workspace by pressing the same workspace number
 workspace_auto_back_and_forth yes
 
-# Lock screen command
-bindsym $mod+Shift+x exec --no-startup-id lock --pixelate --font Knack-Regular-Nerd-Font-Complete --text 'Type password' -- scrot -z
-exec --no-startup-id /usr/bin/xautolock -time 5 -locker "/usr/local/bin/lock --pixelate --font Knack-Regular-Nerd-Font-Complete --text 'Type password' -- scrot -z" -detectsleep
-
 # Pulse Audio controls
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 1 +5% #increase sound volume
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 1 -5% #decrease sound volume
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 1 toggle # mute sound
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
 
 # Sreen brightness controls
-bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -inc 10 # increase screen brightness
-bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -dec 10 # decrease screen brightness
-
-# Input configuration
-# Map keycodes to keysymbols
-exec_always --no-startup-id xmodmap ~/.Xmodmap
-# Natural scroll
-exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Scrolling Distance" -53, -53
-# No edge scrolling
-exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Edge Scrolling" 0, 0, 0
-# Enable horizontal scroll
-exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Two-Finger Scrolling" 1, 1
-# Enable palm detection
-exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "Synaptics Palm Detection" 1
-# Tapping enabled
-exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "libinput Tapping Enabled" 1
-exec_always --no-startup-id xinput set-prop "ETPS/2 Elantech Touchpad" "libinput Tapping Drag Lock Enabled" 1
-# Toggle touchpad
-bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggletouchpad.sh
-
-# Set wallpaper
-exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
-
-
-# Start programs on login
-exec --no-startup-id compton -f -D 5 -cz
-exec --no-startup-id dex -a -e i3
+bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -fps 60 -inc 10 # increase screen brightness
+bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -fps 60 -dec 10 # decrease screen brightness
 
 #
 # i3-gaps settings
@@ -184,7 +150,7 @@ exec --no-startup-id dex -a -e i3
 
 # Disable window titles
 for_window [class="^.*"] border pixel 2
-gaps inner 20
+gaps inner 24
 gaps outer 0
 
 set $mode_gaps Gaps: (o) outer, (i) inner
@@ -228,3 +194,36 @@ client.focused #93a1a1 #93a1a1 #93a1a1 #b58900
 client.focused_inactive #657b83 #657b83 #657b83 #657b83
 client.unfocused #073642 #073642 #073642 #073642
 client.urgent #b58900 #b58900 #b58900 #b58900
+
+#
+# Programs
+#
+
+# Set DPI
+exec_always --no-startup-id xrandr --dpi 192
+
+# Set up .Xresources
+exec_always --no-startup-id xrdb -merge ~/.Xresources
+
+# Start compositor
+exec_always --no-startup-id $HOME/.config/i3/compton.sh
+
+# Start status bar
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+# Set wallpaper
+exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
+
+# Start programs on login
+exec --no-startup-id dex -a -e i3
+
+# Bind certain windows to workspaces
+assign [class="(?i)^firefox.*$" window_role="^(?i)(?!.*(dialog)).*$"] $workspace2
+assign [class="(?i)^google-chrome.*$" window_role="^(?i)(?!.*(dialog)).*$"] $workspace2
+assign [class="(?i)^spotify$"] $workspace4
+assign [class="(?i)^keepass2$"] $workspace8
+assign [class="(?i)^keepass2$"] $workspace8
+assign [class="(?i)^thunderbird$"] $workspace9
+assign [class="(?i)^telegram$"] $workspace10
+assign [class="(?i)^pidgin$"] $workspace10
+assign [class="(?i)^slack$"] $workspace10
