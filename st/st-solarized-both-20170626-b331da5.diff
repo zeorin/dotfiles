@@ -1,7 +1,7 @@
-diff --git a/config.def.h b/config.def.h
+diff --git a/config.h b/config.h
 index 877afab..7305ec9 100644
---- a/config.def.h
-+++ b/config.def.h
+--- a/config.h
++++ b/config.h
 @@ -84,42 +84,54 @@ static unsigned int tabspaces = 8;
  
  /* Terminal colors (16 first used in escape sequence) */

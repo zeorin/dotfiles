@@ -4,17 +4,17 @@ Date: Thu, 21 Dec 2017 23:21:53 +0700
 Subject: [PATCH] alpha patch to latest git version
 
 ---
- config.def.h |  6 ++++-
+ config.h     |  6 ++++-
  config.mk    |  4 ++--
  st.h         |  1 +
  win.h        |  4 ++++
  x.c          | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++-------
  5 files changed, 75 insertions(+), 11 deletions(-)
 
-diff --git a/config.def.h b/config.def.h
+diff --git a/config.h b/config.h
 index 877afab..0e423b1 100644
---- a/config.def.h
-+++ b/config.def.h
+--- a/config.h
++++ b/config.h
 @@ -82,6 +82,9 @@ char termname[] = "st-256color";
   */
  static unsigned int tabspaces = 8;
