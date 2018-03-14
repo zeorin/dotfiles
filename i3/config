@@ -234,6 +234,5 @@ assign [class="(?i)^spotify$"] $workspace4
 assign [class="(?i)^keepass2$"] $workspace8
 assign [class="(?i)^keepass2$"] $workspace8
 assign [class="(?i)^thunderbird$"] $workspace9
-assign [class="(?i)^telegram$"] $workspace10
-assign [class="(?i)^pidgin$"] $workspace10
+assign [class="(?i)^telegram.*$"] $workspace10
 assign [class="(?i)^slack$"] $workspace10
