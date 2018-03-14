@@ -95,9 +95,9 @@ bindsym $mod+Shift+bracketleft move workspace to output left
 bindsym $mod+Shift+bracketright move workspace to output right
 
 # Toggle scratchpad
-bindsym $mod+plus scratchpad show
+bindsym $mod+numbersign scratchpad show
 # Move window to scratchpad
-bindsym $mod+Shift+plus move scratchpad
+bindsym $mod+Shift+numbersign move scratchpad
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
