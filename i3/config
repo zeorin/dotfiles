@@ -103,9 +103,6 @@ bindsym $mod+Shift+numbersign move scratchpad
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec --no-startup-id obshutdown
-for_window [class="Obshutdown"] fullscreen
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -139,12 +136,12 @@ workspace_auto_back_and_forth yes
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
-bindsym XF86AudioPlay exec playerctl play-pause
-bindsym XF86AudioPause exec playerctl pause
-bindsym XF86AudioNext exec playerctl next
-bindsym XF86AudioPrev exec playerctl previous
-bindsym XF86AudioForward exec playerctl position 5+
-bindsym XF86AudioRewind exec playerctl position 5-
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPause exec --no-startup-id playerctl pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+bindsym XF86AudioForward exec --no-startup-id playerctl position 5+
+bindsym XF86AudioRewind exec --no-startup-id playerctl position 5-
 
 # Sreen brightness controls
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -fps 60 -inc 10 # increase screen brightness
@@ -162,6 +159,7 @@ bindsym $mod+BackSpace exec ~/.config/i3/toggletouchpad.sh
 for_window [class="^.*"] border pixel 2
 gaps inner 24
 gaps outer 0
+smart_gaps on
 
 set $mode_gaps Gaps: (o) outer, (i) inner
 set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
@@ -176,24 +174,24 @@ mode "$mode_gaps" {
 }
 
 mode "$mode_gaps_inner" {
-        bindsym plus  gaps inner current plus 5
-        bindsym minus gaps inner current minus 5
+        bindsym plus  gaps inner current plus 6
+        bindsym minus gaps inner current minus 6
         bindsym 0     gaps inner current set 0
 
-        bindsym Shift+plus  gaps inner all plus 5
-        bindsym Shift+minus gaps inner all minus 5
+        bindsym Shift+plus  gaps inner all plus 6
+        bindsym Shift+minus gaps inner all minus 6
         bindsym Shift+0     gaps inner all set 0
 
         bindsym Return mode "default"
         bindsym Escape mode "default"
 }
 mode "$mode_gaps_outer" {
-        bindsym plus  gaps outer current plus 5
-        bindsym minus gaps outer current minus 5
+        bindsym plus  gaps outer current plus 6
+        bindsym minus gaps outer current minus 6
         bindsym 0     gaps outer current set 0
 
-        bindsym Shift+plus  gaps outer all plus 5
-        bindsym Shift+minus gaps outer all minus 5
+        bindsym Shift+plus  gaps outer all plus 6
+        bindsym Shift+minus gaps outer all minus 6
         bindsym Shift+0     gaps outer all set 0
 
         bindsym Return mode "default"
