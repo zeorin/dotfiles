@@ -1,5 +1,5 @@
 [global]
-    font = FiraCode Nerd Font 24
+    font = FuraCode Nerd Font 24
 
     # Allow a small subset of html markup:
     #   <b>bold</b>
