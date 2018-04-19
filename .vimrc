@@ -684,7 +684,7 @@
 		set tags=.git/tags,tags,./tags
 
 		Plug 'xolox/vim-misc' " Needed for Easytags
-		Plug 'xolox/vim-easytags'
+		Plug 'Wraul/vim-easytags', { 'commit': 'f5746bdfd9942b00c349e53f3f4917ae73bb6797' }
 		let g:easytags_languages = {
 			\'javascript': {
 				\'cmd': 'jsctags',
