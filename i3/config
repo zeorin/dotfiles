@@ -208,7 +208,7 @@ client.urgent #b58900 #b58900 #b58900 #b58900
 #
 
 # Set DPI
-exec_always --no-startup-id xrandr --dpi 192
+exec_always --no-startup-id xrandr --dpi 96
 
 # Set up .Xresources
 exec_always --no-startup-id xrdb -merge ~/.Xresources
@@ -227,7 +227,7 @@ exec --no-startup-id dex -a -e i3
 
 # Start dvorak layout in scratchpad
 for_window [class="feh"] floating enable, move scratchpad
-exec feh --auto-zoom --geometry 1800x600 ~/.config/i3/KB_Programmer_Dvorak.png
+exec feh --auto-zoom --geometry 900x300 ~/.config/i3/KB_Programmer_Dvorak.png
 
 # Bind certain windows to workspaces
 assign [class="(?i)^firefox.*$" window_role="^(?i)(?!.*(dialog)).*$"] $workspace2
