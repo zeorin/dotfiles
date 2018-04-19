@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if synclient -l | grep "TouchpadOff .*=.*0" &>/dev/null; then
-	synclient TouchpadOff=1
+if xinput list-props "SynPS/2 Synaptics TouchPad" | grep -q "Device Enabled [^:]*:[^10]*1"; then
+     xinput disable "SynPS/2 Synaptics TouchPad"
 else
-	synclient TouchpadOff=0
+     xinput enable "SynPS/2 Synaptics TouchPad"
 fi

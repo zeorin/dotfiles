@@ -151,7 +151,7 @@
 	" Use a Box Drawings Light Quadruple Dash Vertical (0x250A) + Space to
 	" show a Tab, a Middle Dot (0x00B7) for trailing spaces, and the negation
 	" symbol (0x00AC) for non-breaking spaces
-	set listchars=tab:┊\ ,trail:·,extends:→,precedes:←,nbsp:¬
+	set listchars=tab:│\ ,trail:·,extends:→,precedes:←,nbsp:¬
 
 	" Highlight the line I'm on
 	set cursorline
@@ -230,6 +230,7 @@
 		\}
 		" Solarized bug fixes
 		function! FixSolarized()
+			exec 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
 			if &background ==# "dark"
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
@@ -337,11 +338,11 @@
 		augroup whitespace
 			autocmd!
 			exec 'autocmd ColorScheme solarized if &background ==# ''dark'' | '.
-				\ 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE | '.
-				\ 'highlight NonText gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE | '.
-				\ 'else | '.
-				\ 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg=NONE ctermbg=NONE | '.
+				\ 'highlight Whitespace gui=NONE cterm=NONE guifg='.g:sol.gui.base02.' ctermfg='.g:sol.cterm.base02.' guibg=NONE ctermbg=NONE | '.
 				\ 'highlight NonText gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg=NONE ctermbg=NONE | '.
+				\ 'else | '.
+				\ 'highlight Whitespace gui=NONE cterm=NONE guifg='.g:sol.gui.base2.' ctermfg='.g:sol.cterm.base2.' guibg=NONE ctermbg=NONE | '.
+				\ 'highlight NonText gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE | '.
 				\ 'endif'
 			" Highlight trailing white space
 			exec 'autocmd ColorScheme solarized highlight ExtraWhitespace gui=NONE cterm=NONE guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg=NONE ctermbg=NONE'

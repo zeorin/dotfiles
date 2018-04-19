@@ -95,17 +95,14 @@ bindsym $mod+Shift+at move workspace to output left
 bindsym $mod+Shift+slash move workspace to output right
 
 # Toggle scratchpad
-bindsym $mod+plus scratchpad show
+bindsym $mod+numbersign scratchpad show
 # Move window to scratchpad
-bindsym $mod+Shift+plus move scratchpad
+bindsym $mod+Shift+numbersign move scratchpad
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec --no-startup-id obshutdown
-for_window [class="Obshutdown"] fullscreen
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -135,14 +132,24 @@ focus_follows_mouse no
 # Allow switching back to previous workspace by pressing the same workspace number
 workspace_auto_back_and_forth yes
 
-# Pulse Audio controls
+# Audio controls
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPause exec --no-startup-id playerctl pause
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+bindsym XF86AudioForward exec --no-startup-id playerctl position 5+
+bindsym XF86AudioRewind exec --no-startup-id playerctl position 5-
 
 # Sreen brightness controls
 bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -fps 60 -inc 10 # increase screen brightness
 bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -fps 60 -dec 10 # decrease screen brightness
+
+# Toggle touchpad
+bindsym XF86TouchpadToggle exec ~/.config/i3/toggletouchpad.sh
+bindsym $mod+BackSpace exec ~/.config/i3/toggletouchpad.sh
 
 #
 # i3-gaps settings
@@ -152,6 +159,7 @@ bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -fps 60 -dec 10 # 
 for_window [class="^.*"] border pixel 2
 gaps inner 24
 gaps outer 0
+smart_gaps on
 
 set $mode_gaps Gaps: (o) outer, (i) inner
 set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
@@ -166,24 +174,24 @@ mode "$mode_gaps" {
 }
 
 mode "$mode_gaps_inner" {
-        bindsym plus  gaps inner current plus 5
-        bindsym minus gaps inner current minus 5
+        bindsym plus  gaps inner current plus 6
+        bindsym minus gaps inner current minus 6
         bindsym 0     gaps inner current set 0
 
-        bindsym Shift+plus  gaps inner all plus 5
-        bindsym Shift+minus gaps inner all minus 5
+        bindsym Shift+plus  gaps inner all plus 6
+        bindsym Shift+minus gaps inner all minus 6
         bindsym Shift+0     gaps inner all set 0
 
         bindsym Return mode "default"
         bindsym Escape mode "default"
 }
 mode "$mode_gaps_outer" {
-        bindsym plus  gaps outer current plus 5
-        bindsym minus gaps outer current minus 5
+        bindsym plus  gaps outer current plus 6
+        bindsym minus gaps outer current minus 6
         bindsym 0     gaps outer current set 0
 
-        bindsym Shift+plus  gaps outer all plus 5
-        bindsym Shift+minus gaps outer all minus 5
+        bindsym Shift+plus  gaps outer all plus 6
+        bindsym Shift+minus gaps outer all minus 6
         bindsym Shift+0     gaps outer all set 0
 
         bindsym Return mode "default"
@@ -217,6 +225,10 @@ exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/
 # Start programs on login
 exec --no-startup-id dex -a -e i3
 
+# Start dvorak layout in scratchpad
+for_window [class="feh"] floating enable, move scratchpad
+exec feh --auto-zoom --geometry 1800x600 ~/.config/i3/KB_Programmer_Dvorak.png
+
 # Bind certain windows to workspaces
 assign [class="(?i)^firefox.*$" window_role="^(?i)(?!.*(dialog)).*$"] $workspace2
 assign [class="(?i)^google-chrome.*$" window_role="^(?i)(?!.*(dialog)).*$"] $workspace2
@@ -224,6 +236,5 @@ assign [class="(?i)^spotify$"] $workspace4
 assign [class="(?i)^keepass2$"] $workspace8
 assign [class="(?i)^keepass2$"] $workspace8
 assign [class="(?i)^thunderbird$"] $workspace9
-assign [class="(?i)^telegram$"] $workspace10
-assign [class="(?i)^pidgin$"] $workspace10
+assign [class="(?i)^telegram.*$"] $workspace10
 assign [class="(?i)^slack$"] $workspace10
