@@ -316,11 +316,9 @@
 	# }}}
 
 	# Github’s Hub {{{
-		if which hub >/dev/null 2>&1; then
-			alias git=hub
-			# Allow completions for git aliases when git is wrapped by hub
-			compdef hub=git
-		fi
+		# if which hub >/dev/null 2>&1; then
+		# 	alias git='hub'
+		# fi
 	# }}}
 
 	# RVM {{{
