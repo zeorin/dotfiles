@@ -27,6 +27,7 @@ secondary = ${self.cyan}
 alert = ${self.orange}
 
 [bar/top]
+monitor = ${env:MONITOR:}
 dpi = 192
 width = 3760
 height = 48

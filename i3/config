@@ -91,8 +91,8 @@ bindsym $mod+Shift+9 move container to workspace $workspace9; workspace $workspa
 bindsym $mod+Shift+0 move container to workspace $workspace10; workspace $workspace10
 
 # Move workspace to different monitor
-bindsym $mod+Shift+bracketleft move workspace to output left
-bindsym $mod+Shift+bracketright move workspace to output right
+bindsym $mod+Shift+at move workspace to output left
+bindsym $mod+Shift+slash move workspace to output right
 
 # Toggle scratchpad
 bindsym $mod+plus scratchpad show
