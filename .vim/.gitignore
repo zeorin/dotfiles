@@ -1,6 +1,6 @@
 .netrwhist
-/plugged
-/autoload/plug.vim
-/autoload/plug.vim.old
-/tmp/
-/spell/
+plugged
+autoload/plug.vim
+autoload/plug.vim.old
+tmp/
+spell/
