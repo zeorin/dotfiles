@@ -16,11 +16,7 @@ trim_trailing_whitespace = true
 ; UTF-8 ALL the things!
 charset = utf-8
 
-[*.hs]
-indent_style = space
-tab_width = 4
-
-[*.yaml]
+[*.{yaml,yml}]
 indent_style = space
 tab_width = 2
 trim_trailing_whitespace = false
