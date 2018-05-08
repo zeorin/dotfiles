@@ -157,7 +157,7 @@ bindsym $mod+BackSpace exec ~/.config/i3/toggletouchpad.sh
 
 # Disable window titles
 for_window [class="^.*"] border pixel 2
-gaps inner 24
+gaps inner 0
 gaps outer 0
 smart_gaps on
 
@@ -234,7 +234,7 @@ assign [class="(?i)^firefox.*$" window_role="^(?i)(?!.*(dialog)).*$"] $workspace
 assign [class="(?i)^google-chrome.*$" window_role="^(?i)(?!.*(dialog)).*$"] $workspace2
 assign [class="(?i)^spotify$"] $workspace4
 assign [class="(?i)^keepass2$"] $workspace8
-assign [class="(?i)^keepass2$"] $workspace8
+assign [class="(?i)^keepassxc$"] $workspace8
 assign [class="(?i)^thunderbird$"] $workspace9
 assign [class="(?i)^telegram.*$"] $workspace10
 assign [class="(?i)^slack$"] $workspace10
