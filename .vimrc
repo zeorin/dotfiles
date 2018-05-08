@@ -554,6 +554,12 @@
 	" Faster update for Git Gutter
 	set updatetime=750
 
+	" Tabulate columns
+	Plug 'godlygeek/tabular'
+
+	" Better movement targets
+	Plug 'wellle/targets.vim'
+
 	" Make it easy to comment
 	Plug 'tpope/vim-commentary' " Comment stuff out
 
