@@ -127,7 +127,8 @@
 # Appearance {{{
 
 	# Powerline {{{
-		PATH="$HOME/.local/bin:$PATH"
+		[[ -e "$HOME/.local/bin" ]] && PATH="$HOME/.local/bin:$PATH"
+		[[ -e "$HOME/Library/Python/2.7/bin" ]] && PATH="$HOME/Library/Python/2.7/bin:$PATH"
 		source "$(python -m site --user-site)/powerline/bindings/zsh/powerline.zsh"
 	# }}}
 
