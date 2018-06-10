@@ -782,6 +782,9 @@
 
 	" Text & text-like filetype plugins {{{
 
+		" Todo.txt
+		Plug 'freitass/todo.txt-vim'
+
 		" Rethinking Vim as a tool for writers
 		Plug 'reedes/vim-pencil', { 'on': [] }
 

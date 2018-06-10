@@ -265,6 +265,8 @@
 			export EDITOR=vi
 			export VISUAL=vi
 		fi
+		# ‘e’ for ‘edit’
+		alias e="$VISUAL"
 	# }}}
 
 	# Add local executables to PATH {{{
@@ -304,7 +306,8 @@
 	# }}}
 
 	# todo.txt {{{
-		alias todo="${HOME}/.bin/todo.txt/todo.sh -d ~/.bin/todo.txt/todo.cfg"
+		export TODOTXT_DEFAULT_ACTION=ls
+		alias t='todo.sh'
 	# }}}
 
 	# git {{{
