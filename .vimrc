@@ -235,7 +235,7 @@
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				" Better ALE styles
-				exec 'highlight ALEWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.violet.' ctermfg='.g:sol.cterm.violet.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
+				exec 'highlight ALEWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight ALEErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				" Better git-gutter styles
 				exec 'highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.green.' ctermfg='.g:sol.cterm.green.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
@@ -248,7 +248,7 @@
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				" Better Syntastic styles
-				exec 'highlight ALEWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.violet.' ctermfg='.g:sol.cterm.violet.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
+				exec 'highlight ALEWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				exec 'highlight ALEErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base1.' ctermbg='.g:sol.cterm.base2
 				" Better git-gutter styles
 				exec 'highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.green.' ctermfg='.g:sol.cterm.green.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
@@ -606,12 +606,12 @@
 	" Linting {{{
 		Plug 'w0rp/ale'
 		let g:airline#extensions#ale#enabled = 1
-		let g:ale_sign_warning = "⚠️"
-		let g:ale_sign_error = "🚨"
-		let g:ale_sign_warning = "⚠️"
+		" let g:ale_sign_warning = "⚠️"
+		let g:ale_sign_warning = "⚠"
 		let g:ale_sign_error = "🚨"
 		let g:ale_echo_msg_error_str = "🚨"
-		let g:ale_echo_msg_warning_str = "⚠️"
+		" let g:ale_echo_msg_warning_str = "⚠️"
+		let g:ale_echo_msg_warning_str = "⚠"
 		let g:ale_echo_msg_format = '%severity%  %s [%linter%] %code%'
 		let g:ale_fix_on_save = 1
 		let g:ale_fixers = {}
