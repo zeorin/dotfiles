@@ -15,7 +15,8 @@
 [alias]
 	co = checkout
 	br = branch
-	ci = commit
+	# Use commitizen if it’s installed, otherwise just use `git commit`
+	ci = "!f() { if command -v git-cz >/dev/null 2>&1; then git-cz \"$@\"; else git commit \"$@\"; fi; }; f"
 	st = status
 	unstage = reset HEAD --
 	last = log -1 HEAD
@@ -26,10 +27,10 @@
 	edit-dirty = !git status --porcelain | sed s/^...// | xargs $EDITOR
 	tracked-ignores = !git ls-files | git check-ignore --no-index --stdin
 	# https://stackoverflow.com/a/34467298
-	lg = !"git lg1"
-	lg1 = !"git lg1-specific --all"
-	lg2 = !"git lg2-specific --all"
-	lg3 = !"git lg3-specific --all"
+	lg = !git lg1
+	lg1 = !git lg1-specific --all
+	lg2 = !git lg2-specific --all
+	lg3 = !git lg3-specific --all
 	lg1-specific = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'
 	lg2-specific = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'
 	lg3-specific = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'

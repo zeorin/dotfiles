@@ -364,14 +364,12 @@
 		antigen bundle vagrant
 	fi
 
+	# Completion for `git ci` (complex alias defined in ~/.gitconfig)
+	_git-ci () { _git-commit }
+
 	# Initialize the completion system
 	autoload -Uz compinit
-	compfresh=
-	if [[ ! -a "${HOME}/.zcompdump" || $(date +'%j') > $(date +'%j' -r "${HOME}/.zcompdump") ]]; then
-		compinit
-	else
-		compinit -C
-	fi
+	compinit
 
 	zmodload -i zsh/complist
 
