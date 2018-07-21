@@ -759,6 +759,8 @@
 	let g:jsx_ext_required = 0
 	let g:javascript_plugin_jsdoc = 1
 	let g:javascript_plugin_flow = 1
+	" Because of https://github.com/reedes/vim-pencil/issues/31
+	let g:polyglot_disabled = ['markdown']
 
 	" Flow omnicompletion
 	Plug 'flowtype/vim-flow', { 'for': 'javascript' }
@@ -812,8 +814,12 @@
 		" Uncover usage problems in your writing
 		Plug 'reedes/vim-wordy', { 'for': textlikeft }
 
+		" Markdown
+		Plug 'tpope/vim-markdown'
+		let g:markdown_fenced_languages = ['html', 'javascript', 'bash=sh', 'css']
 		" Support for MultiMarkdown, CriticMark, etc.
 		Plug 'mattly/vim-markdown-enhancements', { 'for': markdownft }
+
 
 		" For all text files set 'textwidth' to 78 characters.
 		autocmd! FileType text,markdown setlocal textwidth=78
