@@ -305,11 +305,6 @@
 		bindkey '^Z' fancy-ctrl-z
 	# }}}
 
-	# todo.txt {{{
-		export TODOTXT_DEFAULT_ACTION=ls
-		alias t='todo.sh'
-	# }}}
-
 	# git {{{
 		alias g='git'
 	# }}}
@@ -350,6 +345,11 @@
 
 	# Cabal {{{
 		[[ -e "$HOME/.cabal/bin" ]] && PATH="$HOME/.cabal/bin:$PATH"
+	# }}}
+
+	# todo.sh {{{
+		export TODOTXT_DEFAULT_ACTION=ls
+		(( $+commands[todo.sh] )) && alias t='todo.sh'
 	# }}}
 
 # }}}
