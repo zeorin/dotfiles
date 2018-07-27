@@ -200,61 +200,9 @@
 
 # }}}
 
-# Behaviour {{{
-
-	# vi keybindings {{{
-		bindkey -v
-		# map JK to ESC in command mode
-		bindkey -M viins 'jk' vi-cmd-mode
-		# VIm-style backspace
-		bindkey "^?" backward-delete-char
-	# }}}
-
-	# No autocorrect, thank you {{{
-		unsetopt correct_all
-	# }}}
-
-	# Show time for long commands {{{
-		REPORTTIME=5
-		TIMEFMT="%U user %S system %P cpu %*Es total"
-	# }}}
-
-	# History search {{{
-		antigen bundle history-substring-search
-	# }}}
-
-	# Change directories more easily {{{
-		setopt auto_cd
-	# }}}
-
-	# Set up custom functions
-	precmd() {
-		[[ -t 1 ]] || return
-		case $TERM in
-			(sun-cmd) print -Pn "\e]l%~\e\\"
-				;;
-			(*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
-				;;
-		esac
-
-		# History logs
-		if [ "$(id -u)" -ne 0 ]; then
-			FULL_CMD_LOG="$HOME/.logs/zsh-history-$(date -u "+%Y-%m-%d").log"
-			echo "$USER@`hostname`:`pwd` [$(date -u)] `\history -1`" >> ${FULL_CMD_LOG}
-		fi
-	}
-
-	# Better command history tracking
-	export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
-	if [[ ! -d ~/.logs ]] then
-		mkdir ~/.logs
-	fi
-
-# }}}
-
 # Commands, functions, aliases {{{
 
-	# EDITOR and VISUAL {{{
+	# EDITOR, VISUAL, and PAGER {{{
 		if which nvim >/dev/null 2>&1; then
 			export EDITOR=nvim
 			export VISUAL=nvim
@@ -267,6 +215,8 @@
 		fi
 		# ‘e’ for ‘edit’
 		alias e="$VISUAL"
+
+		PAGER=less
 	# }}}
 
 	# Add local executables to PATH {{{
@@ -351,6 +301,111 @@
 		export TODOTXT_DEFAULT_ACTION=ls
 		(( $+commands[todo.sh] )) && alias t='todo.sh'
 	# }}}
+
+# }}}
+
+# Behaviour {{{
+
+	# vi keybindings {{{
+		bindkey -v
+		# map JK to ESC in command mode
+		bindkey -M viins 'jk' vi-cmd-mode
+		# VIm-style backspace
+		bindkey "^?" backward-delete-char
+	# }}}
+
+	# No autocorrect, thank you {{{
+		unsetopt correct_all
+	# }}}
+
+    # Show time for long commands {{{
+        REPORTTIME=5
+        TIMEFMT="%U user %S system %P cpu %*Es total"
+    # }}}
+
+    # Send desktop notification and ring terminal bell when long command finishes {{{
+        # Mostly copied from zbell.sh https://gist.github.com/jpouellet/5278239
+
+        # get $EPOCHSECONDS. builtins are faster than date(1)
+        zmodload zsh/datetime || return
+
+        # make sure we can register hooks
+        autoload -Uz add-zsh-hook || return
+
+        # initialize zbell_duration if not set
+        (( ${+zbell_duration} )) || zbell_duration=15
+
+        # initialize zbell_ignore if not set
+        (( ${+zbell_ignore} )) || zbell_ignore=($EDITOR $VISUAL $PAGER)
+
+        # initialize it because otherwise we compare a date and an empty string
+        # the first time we see the prompt. it's fine to have lastcmd empty on the
+        # initial run because it evaluates to an empty string, and splitting an
+        # empty string just results in an empty array.
+        zbell_timestamp=$EPOCHSECONDS
+
+        # right before we begin to execute something, store the time it started at
+        zbell_begin() {
+            zbell_timestamp=$EPOCHSECONDS
+            zbell_lastcmd=$1
+        }
+
+        # when it finishes, if it's been running longer than $zbell_duration,
+        # and we dont have an ignored command in the line, then print a bell.
+        zbell_end() {
+            ran_long=$(( $EPOCHSECONDS - $zbell_timestamp >= $zbell_duration ))
+
+            has_ignored_cmd=0
+            for cmd in ${(s:;:)zbell_lastcmd//|/;}; do
+                words=(${(z)cmd})
+                util=${words[1]}
+                if (( ${zbell_ignore[(i)$util]} <= ${#zbell_ignore} )); then
+                    has_ignored_cmd=1
+                    break
+                fi
+            done
+
+            if (( ! $has_ignored_cmd )) && (( ran_long )); then
+                print -n "\a"
+                (( $+commands[notify-send] )) && notify-send "Job \"$zbell_lastcmd\" has finished!"
+            fi
+        }
+
+        # register the functions as hooks
+        add-zsh-hook preexec zbell_begin
+        add-zsh-hook precmd zbell_end
+    # }}}
+
+	# History search {{{
+		antigen bundle history-substring-search
+	# }}}
+
+	# Change directories more easily {{{
+		setopt auto_cd
+	# }}}
+
+	# Set up custom functions
+	precmd() {
+		[[ -t 1 ]] || return
+		case $TERM in
+			(sun-cmd) print -Pn "\e]l%~\e\\"
+				;;
+			(*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
+				;;
+		esac
+
+		# History logs
+		if [ "$(id -u)" -ne 0 ]; then
+			FULL_CMD_LOG="$HOME/.logs/zsh-history-$(date -u "+%Y-%m-%d").log"
+			echo "$USER@`hostname`:`pwd` [$(date -u)] `\history -1`" >> ${FULL_CMD_LOG}
+		fi
+	}
+
+	# Better command history tracking
+	export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
+	if [[ ! -d ~/.logs ]] then
+		mkdir ~/.logs
+	fi
 
 # }}}
 
