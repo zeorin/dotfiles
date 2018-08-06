@@ -617,6 +617,8 @@
 		let g:ale_fixers = {}
 		let g:ale_fixers['javascript'] = ['eslint', 'prettier']
 		let g:ale_fixers['scss'] = ['prettier']
+		let g:ale_fixers['css'] = ['prettier']
+		let g:ale_fixers['json'] = ['prettier']
 		let g:ale_javascript_eslint_suppress_eslintignore = 1
 	" }}}
 
@@ -761,6 +763,15 @@
 	let g:javascript_plugin_flow = 1
 	" Because of https://github.com/reedes/vim-pencil/issues/31
 	let g:polyglot_disabled = ['markdown']
+
+	" Set filetypes for odd files {{{
+		augroup filetypes
+			autocmd!
+			autocmd BufNewFile,BufRead .babelrc set filetype=json
+			autocmd BufNewFile,BufRead .czrc set filetype=json
+			autocmd BufNewFile,BufRead .lintstagedrc set filetype=json
+		augroup END
+	" }}}
 
 	" Flow omnicompletion
 	Plug 'flowtype/vim-flow', { 'for': 'javascript' }
