@@ -19,13 +19,7 @@ In the future this should be compatible with various major flavours of Linux,
 OS X and Cygwin.
 
 ## Dependence on other projects
-Currently a major depenency is on oh-my-zsh. This is a great starting place,
-but adds a lot of overhead for things that aren't used, and complicates the
-git setup. Over time I should pick the things I like about oh-my-zsh and
-implement them independently.
-
-There are a lot of submodules in this repo, e.g. vim plugins. However, that is
-as it should be. This makes it easy to add, remove and update these plugins
+Remove dependency on Powerline
 
 ## Automation
 Currently updating this repo (and it's submodules) needs to be done by hand.
