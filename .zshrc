@@ -172,22 +172,22 @@
 	# man colors {{{
 		# https://wiki.archlinux.org/index.php/Color_output_in_console#man
 		# https://wiki.archlinux.org/index.php/Color_output_in_console#less
-		# LESS_TERMCAP_mb begin bold
-		# LESS_TERMCAP_md begin blink
-		# LESS_TERMCAP_me reset bold/blink
+		# LESS_TERMCAP_mb begin blink
+		# LESS_TERMCAP_md begin bold
+		# LESS_TERMCAP_me reset all modes
 		# LESS_TERMCAP_so begin reverse video
 		# LESS_TERMCAP_se reset reverse video
 		# LESS_TERMCAP_us begin underline
 		# LESS_TERMCAP_ue reset underline
 		man() {
 			LESS=-R \
-			LESS_TERMCAP_mb=$'\e[1m\e[38;5;7m' \
-			LESS_TERMCAP_md=$'\e[1m\e[38;5;7m' \
+			LESS_TERMCAP_mb=$'\e[5m' \
+			LESS_TERMCAP_md=$'\e[1;38;5;7m' \
 			LESS_TERMCAP_me=$'\e[0m' \
-			LESS_TERMCAP_so=$'\e[1;43m\e[38;5;0m' \
-			LESS_TERMCAP_se=$'\e[0m' \
-			LESS_TERMCAP_us=$'\e[1;36m' \
-			LESS_TERMCAP_ue=$'\e[0m' \
+			LESS_TERMCAP_so=$'\e[7;38;5;3m' \
+			LESS_TERMCAP_se=$'\e[27;39m' \
+			LESS_TERMCAP_us=$'\e[4;38;5;4m' \
+			LESS_TERMCAP_ue=$'\e[24;39m' \
 			command man "$@"
 		}
 	# }}}
