@@ -203,7 +203,7 @@
 # Behaviour {{{
 
 	# Make sure we can register hooks
-	autoload -Uz add-zsh-hook || return
+	autoload -Uz add-zsh-hook
 
 	# vi keybindings {{{
 		bindkey -v
@@ -284,22 +284,28 @@
 		setopt auto_cd
 	# }}}
 
-	# Set up custom functions
-	precmd() {
-		[[ -t 1 ]] || return
-		case $TERM in
-			(sun-cmd) print -Pn "\e]l%~\e\\"
-				;;
-			(*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
-				;;
-		esac
+	# Window title {{{
+		window_title() {
+			[[ -t 1 ]] || return
+			case $TERM in
+				(sun-cmd) print -Pn "\e]l%~\e\\"
+					;;
+				(*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
+					;;
+			esac
+		}
+		add-zsh-hook precmd window_title
+	# }}}
 
-		# History logs
-		if [ "$(id -u)" -ne 0 ]; then
-			FULL_CMD_LOG="$HOME/.logs/zsh-history-$(date -u "+%Y-%m-%d").log"
-			echo "$USER@`hostname`:`pwd` [$(date -u)] `\history -1`" >> ${FULL_CMD_LOG}
-		fi
-	}
+	# History logs {{{
+		history_logs() {
+			if [ "$(id -u)" -ne 0 ]; then
+				FULL_CMD_LOG="$HOME/.logs/zsh-history-$(date -u "+%Y-%m-%d").log"
+				echo "$USER@`hostname`:`pwd` [$(date -u)] `\history -1`" >> ${FULL_CMD_LOG}
+			fi
+		}
+		add-zsh-hook precmd history_logs
+	# }}}
 
 	# Better command history tracking
 	export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
