@@ -285,16 +285,16 @@
 	# }}}
 
 	# Window title {{{
-		window_title() {
-			[[ -t 1 ]] || return
-			case $TERM in
-				(sun-cmd) print -Pn "\e]l%~\e\\"
-					;;
-				(*xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%~\a"
-					;;
-			esac
+		title_precmd() {
+			print -n "\e]2;$("$HOME"/.dotfiles/scripts/short_path "$(print -P '%d')")\a"
 		}
-		add-zsh-hook precmd window_title
+		title_preexec() {
+			print -n "\e]2;$("$HOME"/.dotfiles/scripts/short_path "$(print -P '%d')") ${(q)1}\a"
+		}
+		if [[ "$TERM" == (tmux*|screen*|xterm*|rxvt*) ]]; then
+			add-zsh-hook -Uz precmd title_precmd
+			add-zsh-hook -Uz preexec title_preexec
+		fi
 	# }}}
 
 	# History logs {{{

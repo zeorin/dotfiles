@@ -459,7 +459,7 @@
 
 	" Set ttymouse correctly when in Vim in Tmux, so that mouse events are
 	" correctly handled.
-	if !has('nvim') && $TERM ==# "tmux-256color"
+	if !has('nvim') && $TERM =~# 'tmux.*'
 		set ttymouse=xterm
 	endif
 
@@ -553,6 +553,17 @@
 
 	" Faster update for Git Gutter
 	set updatetime=750
+
+	" Set window title {{{
+		autocmd BufEnter * let &titlestring = system('"$HOME"/.dotfiles/scripts/short_path "' . expand('%:p:h').'"')[:-2] . '/' . expand('%:t')
+		if $TERM =~# '\(screen\|tmux\).*'
+			set t_ts=k
+			set t_fs=\
+		endif
+		if has('nvim') && ($TERM =~# '\(screen\|tmux\).*' || $TERM =~# '.*xterm.*')
+			set title
+		endif
+	" }}}
 
 	" Tabulate columns
 	Plug 'godlygeek/tabular'
