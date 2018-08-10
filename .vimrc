@@ -418,9 +418,6 @@
 	" easy comma at end of line in insert mode
 	inoremap <Leader>, <C-o>m`<C-o>A,<C-o>``
 
-	" save a vim session
-	nnoremap <Leader>s :mksession<Cr>
-
 	" Easier system clipboard usage
 	vnoremap <Leader>y "+y
 	vnoremap <Leader>d "+d
@@ -937,6 +934,12 @@
 			autocmd User GoyoLeave nested call <SID>goyo_leave()
 		augroup END
 		nnoremap <Leader>g :Goyo<CR>
+	" }}}
+
+	" Session management {{{
+		Plug 'tpope/vim-obsession'
+		Plug 'dhruvasagar/vim-prosession'
+		let g:prosession_dir = expand(vimDir . 'tmp/session/')
 	" }}}
 
 " }}}
