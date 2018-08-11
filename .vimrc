@@ -351,6 +351,12 @@
 		augroup END
 	" }}}
 
+	" Use undercurl for spelling error highlight {{{
+		let &t_Cs = "\e[4:3m"
+		let &t_Ce = "\e[4:0m"
+		hi SpellBad gui=undercurl guisp=g:sol.cterm.red term=undercurl cterm=undercurl
+	" }}}
+
 " }}}
 
 " General Mappings {{{
