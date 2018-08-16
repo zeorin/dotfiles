@@ -370,6 +370,15 @@
 		bindkey '^Z' fancy-ctrl-z
 	# }}}
 
+	# Open ZLE buffer as filename in editor {{{
+		edit-file () {
+			BUFFER="$VISUAL $BUFFER"
+			zle accept-line "$@"
+		}
+		zle -N edit-file
+		bindkey '^P' edit-file
+	# }}}
+
 	# git {{{
 		alias g='git'
 	# }}}
