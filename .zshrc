@@ -48,21 +48,25 @@
 # Tmux session chooser {{{
 	if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ]; then
 
-		# Check for unattached sessions
-		tmux_unattached_sessions=`tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//'`
+		# If this is a remote tty, allow the MOTD, banner, etc. to be seen first
+		if [ -n "$SSH_CLIENT" -o -n "$SSH_TTY" -o -z "${$(ps -o comm= -p $PPID)##*sshd}" ]; then
+			printf $'\e[7mPress any key to continue…\e[0m';
+			saved_tty=$(stty -g </dev/tty)
+			stty raw -echo
+			dd if=/dev/tty bs=1 count=1 >/dev/null 2>&1
+			stty $saved_tty
+		fi
+
+		tmux_unattached_sessions=$(tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//')
 
 		if [ -z "$tmux_unattached_sessions" ]; then
-
 			exec tmux
-
 		else
-
 			tmux_new_session=$(tmux new-session -dPF '#S')
 			exec tmux \
 				attach -t $tmux_new_session \; \
 				choose-tree -s -f '#{?session_attached,0,1}' \
 					"switch-client -t '%%'; kill-session -t $tmux_new_session"
-
 		fi
 	fi
 # }}}
