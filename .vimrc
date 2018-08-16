@@ -773,6 +773,9 @@
 	Plug 'christoomey/vim-tmux-navigator'
 	let g:tmux_navigator_disable_when_zoomed = 1
 
+	" Extended upport for .tmux.conf
+	Plug 'tmux-plugins/vim-tmux'
+
 	" A solid language pack (HTML5, CSS3, SASS, PHP, & about 74 others)
 	Plug 'sheerun/vim-polyglot'
 	" Enable JSX syntax in JS files
