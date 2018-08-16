@@ -49,73 +49,20 @@
 	if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ]; then
 
 		# Check for unattached sessions
-		TMUX_UNATTACHED_SESSIONS=`tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//'`
+		tmux_unattached_sessions=`tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//'`
 
-		# if we found no unattached sessions
-		if [[ -z "$TMUX_UNATTACHED_SESSIONS" ]]; then
+		if [ -z "$tmux_unattached_sessions" ]; then
 
 			exec tmux
 
 		else
 
-			# ask which session we’d like to attach to
-			TMUX_SESSION=false
-			SHOW_ATTACHED_SESSIONS=false
-			while [[ "$TMUX_SESSION" == false ]]; do
+			tmux_new_session=$(tmux new-session -dPF '#S')
+			exec tmux \
+				attach -t $tmux_new_session \; \
+				choose-tree -s -f '#{?session_attached,0,1}' \
+					"switch-client -t '%%'; kill-session -t $tmux_new_session"
 
-				# Build up the menu options
-				TMUX_MENU_OPTIONS=("New session" "")
-				if [[ "$SHOW_ATTACHED_SESSIONS" == false ]]; then
-					TMUX_MENU_PROMPT="Which unattached tmux session do you want to attach to?"
-					# This is some heinous code, basically it makes unattached
-					# session names into array items.
-					TMUX_MENU_OPTIONS+=("${(f)$(tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//')}")
-					TMUX_MENU_OPTIONS+=("" "Show all sessions")
-				else
-					TMUX_MENU_PROMPT="Which tmux session do you want to attach to?"
-					# Same heinousness as earlier, except for all sessions
-					TMUX_MENU_OPTIONS+=("${(f)$(tmux list-sessions -F '#S' 2>/dev/null)}")
-				fi
-
-				# Because whiptail expects arguments in a [tag item]... format
-				TMUX_MENU_TAG_ITEMS=()
-				for key in "${TMUX_MENU_OPTIONS[@]}"; do
-					TMUX_MENU_TAG_ITEMS+=("$key" "")
-				done
-
-				INPUT=$(whiptail --title "Choose tmux session" --nocancel --menu "$TMUX_MENU_PROMPT" 0 0 0 -- "${TMUX_MENU_TAG_ITEMS[@]}" 3>&1 1>&2 2>&3)
-
-				case "$INPUT" in
-					"New session" )
-						echo "What would you like to name this session?"
-						TMUX_SESSION_NAME=$(whiptail --title "Choose tmux session" --nocancel --inputbox "What would you like to name this session?" 0 0 3>&1 1>&2 2>&3)
-						if [[ ! -z "$TMUX_SESSION_NAME" ]]; then
-							exec tmux new-session -s "$TMUX_SESSION_NAME"
-						else
-							exec tmux
-						fi
-						TMUX_SESSION=true
-					;;
-
-					"Show all sessions" )
-						SHOW_ATTACHED_SESSIONS=true
-					;;
-
-					"" )
-						# If the user choose a blank spacer line (dumbass)
-						# just redraw the menu
-						continue 2
-					;;
-
-					* )
-						tmux has-session -t "$INPUT" 2&>1 >/dev/null
-						if [[ "$?" == 0 ]]; then
-							exec tmux attach-session -t "$INPUT"
-							TMUX_SESSION=true
-						fi
-					;;
-				esac
-			done
 		fi
 	fi
 # }}}
