@@ -46,7 +46,7 @@
 # }}}
 
 # Tmux session chooser {{{
-	if which tmux >/dev/null 2>&1 && [[ -z "$TMUX" ]]; then
+	if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ]; then
 
 		# Check for unattached sessions
 		TMUX_UNATTACHED_SESSIONS=`tmux list-sessions -F '#S #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//'`
@@ -318,13 +318,13 @@
 # Commands, functions, aliases {{{
 
 	# EDITOR, VISUAL, and PAGER {{{
-		if which nvim >/dev/null 2>&1; then
+		if command -v nvim >/dev/null 2>&1; then
 			export EDITOR=nvim
 			export VISUAL=nvim
-		elif which vim >/dev/null 2>&1; then
+		elif command -v vim >/dev/null 2>&1; then
 			export EDITOR=vim
 			export VISUAL=vim
-		elif which vi >/dev/null 2>&1; then
+		elif command -v vi >/dev/null 2>&1; then
 			export EDITOR=vi
 			export VISUAL=vi
 		fi
@@ -413,7 +413,7 @@
 	# }}}
 
 	# Github’s Hub {{{
-		# if which hub >/dev/null 2>&1; then
+		# if command -v hub >/dev/null 2>&1; then
 		# 	alias git='hub'
 		# fi
 	# }}}
@@ -430,7 +430,7 @@
 	# }}}
 
 	# direnv {{{
-		which direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+		command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 	# }}}
 
 	# Composer {{{
@@ -458,7 +458,7 @@
 	antigen bundle zsh-users/zsh-completions
 
 	# Vagrant completion
-	if which vagrant >/dev/null 2>&1; then
+	if command -v vagrant >/dev/null 2>&1; then
 		antigen bundle vagrant
 	fi
 
