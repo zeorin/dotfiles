@@ -228,7 +228,9 @@
 	# }}}
 
 	# History search {{{
-		antigen bundle history-substring-search
+		antigen bundle zsh-users/zsh-history-substring-search zsh-history-substring-search.zsh
+		bindkey -M vicmd 'k' history-substring-search-up
+		bindkey -M vicmd 'j' history-substring-search-down
 	# }}}
 
 	# Change directories more easily {{{
@@ -248,21 +250,17 @@
 		fi
 	# }}}
 
-	# History logs {{{
-		history_logs() {
-			if [ "$(id -u)" -ne 0 ]; then
-				FULL_CMD_LOG="$HOME/.logs/zsh-history-$(date -u "+%Y-%m-%d").log"
-				echo "$USER@`hostname`:`pwd` [$(date -u)] `\history -1`" >> ${FULL_CMD_LOG}
-			fi
-		}
-		add-zsh-hook precmd history_logs
+	# Configure history {{{
+		export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
+		setopt share_history
+		setopt hist_expire_dups_first
+		setopt hist_find_no_dups
+		setopt hist_ignore_all_dups
+		setopt hist_ignore_space
+		setopt hist_reduce_blanks
+		setopt hist_save_no_dups
+		setopt hist_verify
 	# }}}
-
-	# Better command history tracking
-	export HISTSIZE=100000 SAVEHIST=100000 HISTFILE=~/.zhistory
-	if [[ ! -d ~/.logs ]] then
-		mkdir ~/.logs
-	fi
 
 # }}}
 
@@ -482,15 +480,6 @@
 
 # Apply antigen {{{
 	antigen apply
-# }}}
-
-# Things that must come last {{{
-
-	# Use history-substring-search in vi mode also
-	# https://github.com/zsh-users/zsh-syntax-highlighting/issues/340
-	bindkey -M vicmd 'k' history-substring-search-up
-	bindkey -M vicmd 'j' history-substring-search-down
-
 # }}}
 
 # Export PATH {{{
