@@ -379,6 +379,30 @@
 		bindkey '^P' edit-file
 	# }}}
 
+	# Alt-left to go back {{{
+		cdUndoDir() {
+			popd
+			zle reset-prompt
+			echo
+			ls -l
+			zle reset-prompt
+		}
+		zle -N cdParentDir
+		bindkey '^[[1;3A' cdParentDir
+	# }}}
+
+	# Alt-up to go to parent directory {{{
+		cdParentDir() {
+			pushd ..
+			zle reset-prompt
+			echo
+			ls -l
+			zle reset-prompt
+		}
+		zle -N cdUndoDir
+		bindkey '^[[1;3D' cdUndoDir
+	# }}}
+
 	# git {{{
 		alias g='git'
 	# }}}
