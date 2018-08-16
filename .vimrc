@@ -448,6 +448,9 @@
 
 " General functionality {{{
 
+	" Restore FocusGained and FocusLost events
+	Plug 'tmux-plugins/vim-tmux-focus-events'
+
 	" Match paired characters
 	Plug 'vim-scripts/matchit.zip' " Updated matchit
 	Plug 'tpope/vim-unimpaired' " Pairs of handy bracket mappings
