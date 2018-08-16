@@ -72,7 +72,7 @@
 # }}}
 
 # Load antigen {{{
-	_ANTIGEN_COMP_ENABLED=false source ~/.dotfiles/antigen/antigen.zsh
+	source ~/.dotfiles/antigen/antigen.zsh
 # }}}
 
 # Appearance {{{
@@ -357,8 +357,8 @@
 	# }}}
 
 	# gibo — .gitignore boilerplates {{{
-		antigen bundle simonwhitaker/gibo
 		PATH="$HOME/.antigen/bundles/simonwhitaker/gibo:$PATH"
+		antigen bundle simonwhitaker/gibo shell-completions/gibo-completion.zsh
 	# }}}
 
 	# Github’s Hub {{{
