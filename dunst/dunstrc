@@ -114,7 +114,7 @@
     # Draw a line of "separatpr_height" pixel height between two
     # notifications.
     # Set to 0 to disable.
-    separator_height = 2
+    separator_height = 0
 
     # Padding between text and separator.
     padding = 16
@@ -148,7 +148,7 @@
     icon_folders = /home/zeorin/.local/share/icons/Arc/status/32@2x/:/home/zeorin/.local/share/icons/Arc/devices/32@2x/:/usr/share/icons/Paper/32x32@2x/status/:/usr/share/icons/Paper/32x32@2x/devices/
 
 [frame]
-    width = 2
+    width = 0
     color = "#aaaaaa"
 
 [shortcuts]

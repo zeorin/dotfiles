@@ -484,7 +484,7 @@
 
 # Export PATH {{{
 	# Instead of exporting it multiple times, do it once at the end for better
-	# perfomance.
+	# performance.
 	export PATH
 # }}}
 
