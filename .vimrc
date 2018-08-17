@@ -692,7 +692,7 @@
 	" Search code using Ag or Ack {{{
 		Plug 'mileszs/ack.vim'
 		if executable('ag')
-			let g:ackprg = "ag --nogroup --nocolor --column"
+			let g:ackprg = "ag --nogroup --nocolor --column --hidden"
 			nnoremap <Leader>a :Ack! |
 		elseif executable('ack') || executable ('ack-grep')
 			nnoremap <Leader>a :Ack! |
