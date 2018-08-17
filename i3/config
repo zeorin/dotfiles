@@ -188,11 +188,11 @@ mode "$mode_gaps_inner" {
 mode "$mode_gaps_outer" {
         bindsym plus  gaps outer current plus 6
         bindsym minus gaps outer current minus 6
-        bindsym 0     gaps outer current set 0
+        bindsym equal gaps outer current set 0
 
         bindsym Shift+plus  gaps outer all plus 6
         bindsym Shift+minus gaps outer all minus 6
-        bindsym Shift+0     gaps outer all set 0
+        bindsym Shift+equal gaps outer all set 0
 
         bindsym Return mode "default"
         bindsym Escape mode "default"
