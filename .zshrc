@@ -49,8 +49,8 @@
 	if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ]; then
 
 		# If this is a remote tty, allow the MOTD, banner, etc. to be seen first
-		if [ -n "$SSH_CLIENT" -o -n "$SSH_TTY" -o -z "${$(ps -o comm= -p $PPID)##*sshd}" ]; then
-			printf $'\e[7mPress any key to continue…\e[0m';
+		if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -z "${$(ps -o comm= -p $PPID)##*sshd}" ]; then
+			print -n '\e[7mPress any key to continue…\e[0m';
 			saved_tty=$(stty -g </dev/tty)
 			stty raw -echo
 			dd if=/dev/tty bs=1 count=1 >/dev/null 2>&1
@@ -59,7 +59,7 @@
 
 		tmux_unattached_sessions=$(tmux list-sessions -F '#{session_name} #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//')
 
-		if [ -z "$tmux_unattached_sessions" -o -z "$@" ]; then
+		if [ -z "$tmux_unattached_sessions" ] || [ -n "$*" ]; then
 			exec tmux new-session "$@"
 		else
 			tmux_new_session=$(tmux new-session -dPF '#{session_name}')
