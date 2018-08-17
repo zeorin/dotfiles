@@ -229,7 +229,6 @@ exec --no-startup-id dex -a -e i3
 assign [class="(?i)^firefox.*$" window_role="^(?i)(?!.*(dialog|pop-up)).*$" title="^(?i)(?!.*(About Mozilla Firefox)).*$"] $workspace2
 assign [class="(?i)^google-chrome.*$" window_role="^(?i)(?!.*(dialog|pop-up)).*$"] $workspace2
 assign [class="(?i)^spotify$"] $workspace4
-assign [class="(?i)^keepass2$"] $workspace8
 assign [class="(?i)^keepassxc$"] $workspace8
 assign [class="(?i)^thunderbird$"] $workspace9
 assign [class="(?i)^telegram.*$"] $workspace10
