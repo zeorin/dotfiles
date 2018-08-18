@@ -56,8 +56,8 @@
 # Appearance {{{
 
 	# Powerline {{{
-		[[ -e "$HOME/.local/bin" ]] && PATH="$HOME/.local/bin:$PATH"
-		[[ -e "$HOME/Library/Python/2.7/bin" ]] && PATH="$HOME/Library/Python/2.7/bin:$PATH"
+		[[ -d "$HOME/.local/bin" ]] && PATH="$HOME/.local/bin:$PATH"
+		[[ -d "$HOME/Library/Python/2.7/bin" ]] && PATH="$HOME/Library/Python/2.7/bin:$PATH"
 		source "$(python -m site --user-site)/powerline/bindings/zsh/powerline.zsh"
 	# }}}
 
@@ -262,8 +262,8 @@
 	# }}}
 
 	# Add local executables to PATH {{{
-		[[ -e "$HOME/.bin" ]] && PATH="$HOME/.bin:$PATH"
-		[[ -e "$HOME/bin" ]] && PATH="$HOME/bin:$PATH"
+		[[ -d "$HOME/.bin" ]] && PATH="$HOME/.bin:$PATH"
+		[[ -d "$HOME/bin" ]] && PATH="$HOME/bin:$PATH"
 	# }}}
 
 	# Aliases {{{
@@ -348,7 +348,7 @@
 	# RVM {{{
 		[[ -e "$HOME/.rvm/scripts/rvm" ]] && source ~/.rvm/scripts/rvm
 		[[ -e "/usr/local/rvm/scripts/rvm" ]] && source /usr/local/rvm/scripts/rvm
-		[[ -e "$HOME/.rvm/bin" ]] && PATH="$PATH:$HOME/.rvm/bin"
+		[[ -d "$HOME/.rvm/bin" ]] && PATH="$PATH:$HOME/.rvm/bin"
 	# }}}
 
 	# Load NVM {{{
@@ -361,15 +361,15 @@
 	# }}}
 
 	# Composer {{{
-		[[ -e "$HOME/.config/composer/vendor/bin" ]] && PATH="$HOME/.config/composer/vendor/bin:$PATH"
+		[[ -d "$HOME/.config/composer/vendor/bin" ]] && PATH="$HOME/.config/composer/vendor/bin:$PATH"
 	# }}}
 
 	# Yarn {{{
-		[[ -e "$HOME/.yarn/bin" ]] && PATH="$HOME/.yarn/bin:$PATH"
+		[[ -d "$HOME/.yarn/bin" ]] && PATH="$HOME/.yarn/bin:$PATH"
 	# }}}
 
 	# Cabal {{{
-		[[ -e "$HOME/.cabal/bin" ]] && PATH="$HOME/.cabal/bin:$PATH"
+		[[ -d "$HOME/.cabal/bin" ]] && PATH="$HOME/.cabal/bin:$PATH"
 	# }}}
 
 	# todo.sh {{{
