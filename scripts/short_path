@@ -7,6 +7,10 @@ find_up() {
 	_path=$1
 	shift 1
 
+	if [ ! -d "$_path" ]; then
+		_path=$(dirname "$_path")
+	fi
+
 	while [ "$_path" != / ]; do
 		find "$_path" -maxdepth 1 -mindepth 1 "$@"
 		_path=$(readlink -f "$_path"/..)

@@ -561,7 +561,7 @@
 	set updatetime=750
 
 	" Set window title {{{
-		autocmd BufEnter * let &titlestring = system('"$HOME"/.dotfiles/scripts/short_path "' . expand('%:p:h').'"')[:-2] . '/' . expand('%:t')
+		autocmd BufEnter * let &titlestring = system('"$HOME"/.dotfiles/scripts/short_path "' . expand('%:p:.').'"')[:-2]
 		if $TERM =~# '\(screen\|tmux\).*'
 			set t_ts=k
 			set t_fs=\
