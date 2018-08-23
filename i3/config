@@ -228,16 +228,16 @@ exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/
 exec --no-startup-id dex -a -e i3
 
 # Bind certain windows to workspaces
-assign [class="(?i)^firefox.*$" window_role="^(?i)(?!.*(dialog|pop-up)).*$" title="^(?i)(?!.*(About Mozilla Firefox)).*$"] $workspace2
-assign [class="(?i)^google-chrome.*$" window_role="^(?i)(?!.*(dialog|pop-up)).*$"] $workspace2
-assign [class="(?i)^spotify$"] $workspace4
-assign [class="(?i)^keepassxc$"] $workspace8
-assign [class="(?i)^thunderbird$"] $workspace9
-assign [class="(?i)^telegram.*$"] $workspace10
-assign [class="(?i)^slack$"] $workspace10
+assign [class="^Firefox.*$" window_role="(?i)^((?!dialog).)+$"] $workspace2
+assign [class="^Google-chrome.*$" window_role="(?i)^((?!dialog).)+$"] $workspace2
+assign [class="^keepassxc$" title="^(?!KeePassXC-Browser Confirm Access).*$"] $workspace8
+assign [class="^Thunderbird$"] $workspace9
+assign [class="^TelegramDesktop$"] $workspace10
+assign [class="^Slack$"] $workspace10
 
 # Floating windows
-for_window [class="(?i)^gnome-calculator$"] floating enable
+for_window [class="^Gnome-calculator$"] floating enable
 for_window [window_role="pop-up"] floating enable
-for_window [window_role="task_dialog"] floating enable
-for_window [title="About Mozilla Firefox"] floating enable
+for_window [window_type="dialog"] floating enable
+for_window [window_role="(?i)about"] floating enable
+for_window [window_role="(?i)preferences"] floating enable
