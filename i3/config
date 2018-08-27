@@ -237,6 +237,7 @@ assign [class="^Slack$"] $workspace10
 
 # Floating windows
 for_window [class="^Gnome-calculator$"] floating enable
+for_window [instance="^textern$"] floating enable
 for_window [window_role="pop-up"] floating enable
 for_window [window_type="dialog"] floating enable
 for_window [window_role="(?i)about"] floating enable
