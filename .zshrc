@@ -121,8 +121,7 @@
 		}
 	# }}}
 
-	# diff, grep, ls colors {{{
-		alias diff='diff --color=auto'
+	# grep, ls colors {{{
 		alias grep='grep --color=auto'
 		alias ls='ls --color=auto'
 	# }}}
