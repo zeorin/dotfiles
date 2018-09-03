@@ -260,6 +260,10 @@
 		PAGER=less
 	# }}}
 
+	# Ask the shell nicely to do things as root {{{
+		alias please='sudo $(fc -ln -1)'
+	# }}}
+
 	# Add local executables to PATH {{{
 		[[ -d "$HOME/.bin" ]] && PATH="$HOME/.bin:$PATH"
 		[[ -d "$HOME/bin" ]] && PATH="$HOME/bin:$PATH"
