@@ -37,9 +37,9 @@
 [push]
 	default = simple
 [pager]
-	diff = diff-so-fancy | less --tabs=4 -RFX --pattern='^(Date|added|deleted|modified): '
-	log = diff-so-fancy | less --tabs=4 -RFX
-	show = diff-so-fancy | less --tabs=4 -RFX
+	diff = diff-so-fancy | less --tabs=4 -R -+FX --pattern='^(Date|added|deleted|modified): '
+	log = diff-so-fancy | less --tabs=4 -R -+FX
+	show = diff-so-fancy | less --tabs=4 -R -+FX
 [interactive]
 	# https://github.com/so-fancy/diff-so-fancy/issues/35
 	# diffFilter = diff-so-fancy --patch-mode
