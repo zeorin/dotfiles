@@ -785,6 +785,14 @@
 	" Because of https://github.com/reedes/vim-pencil/issues/31
 	let g:polyglot_disabled = ['markdown']
 
+	" ledger
+	Plug 'ledger/vim-ledger'
+	let g:ledger_bin = 'hledger'
+	let g:ledger_maxwidth = 80
+	let g:ledger_fillstring = '    -'
+	let g:ledger_detailed_first = 1
+	autocmd BufNewFile,BufRead *.hledger,*.journal set filetype=ledger
+
 	" Set filetypes for odd files {{{
 		augroup filetypes
 			autocmd!
