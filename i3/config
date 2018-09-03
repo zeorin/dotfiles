@@ -228,7 +228,8 @@ exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/
 exec --no-startup-id dex -a -e i3
 
 # Bind certain windows to workspaces
-assign [class="^Firefox.*$" window_role="(?i)^((?!dialog).)+$"] $workspace2
+assign [class="^Firefox$" window_role="(?i)^((?!dialog).)+$"] $workspace2
+assign [class="^FIREFOX_DEV$" window_role="(?i)^((?!dialog).)+$"] $workspace1
 assign [class="^Google-chrome.*$" window_role="(?i)^((?!dialog).)+$"] $workspace2
 assign [class="^keepassxc$" title="^(?!KeePassXC-Browser Confirm Access).*$"] $workspace8
 assign [class="^Thunderbird$"] $workspace9
