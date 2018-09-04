@@ -584,15 +584,14 @@
 	Plug 'tpope/vim-speeddating'
 
 	" Send buffer contents to other tmux panes {{{
-		Plug 'jpalardy/vim-slime'
-		let g:slime_default_config = {"socket_name": $TMUX && split($TMUX, ",")[0], "target_pane": ":.2"}
-		let g:slime_target = 'tmux'
-		let mySlimeFile = expand(vimDir . 'tmp/') . '.slime_paste'
-		let g:slime_paste_file = mySlimeFile
-		augroup slime
-			autocmd!
+		if exists('$TMUX')
+			Plug 'jpalardy/vim-slime'
+			let g:slime_target = 'tmux'
+			let g:slime_default_config = {'socket_name': split($TMUX, ',')[0], 'target_pane': ':.2'}
+			let g:slime_dont_ask_default = 1
+			let g:slime_paste_file = tempname()
 			autocmd VimLeave * call system('rm ' . mySlimeFile)
-		augroup END
+		endif
 	" }}}
 
 	" Display tags, ordered by scope
