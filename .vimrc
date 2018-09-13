@@ -123,7 +123,7 @@
 	if empty(glob('~/.vim/autoload/plug.vim'))
 		silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
 			\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-		autocmd VimEnter * PlugInstall | source $MYVIMRC
+		autocmd! VimEnter * PlugInstall | source $MYVIMRC
 	endif
 
 	call plug#begin('~/.vim/plugged')
@@ -177,10 +177,7 @@
 
 	" Set comments to be italic
 	highlight Comment gui=italic cterm=italic
-	augroup italiccomments
-		autocmd!
-		autocmd ColorScheme * highlight Comment gui=italic cterm=italic
-	augroup END
+	autocmd! ColorScheme * highlight Comment gui=italic cterm=italic
 
 	" Git diff in the gutter (sign column) and stage/undo hunks
 	Plug 'airblade/vim-gitgutter'
@@ -231,7 +228,7 @@
 		" Solarized bug fixes
 		function! FixSolarized()
 			exec 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
-			if &background ==# "dark"
+			if &background ==# 'dark'
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				" Better ALE styles
@@ -244,7 +241,7 @@
 				" Better fold styling
 				exec 'highlight Folded gui=NONE,underline cterm=NONE,underline guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight FoldColumn gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-			elseif &background ==# "light"
+			elseif &background ==# 'light'
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 				" Better Syntastic styles
@@ -259,10 +256,7 @@
 				exec 'highlight FoldColumn gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
 			endif
 		endfunction
-		augroup margincolor
-			autocmd!
-			autocmd ColorScheme solarized call FixSolarized()
-		augroup END
+		autocmd! ColorScheme solarized call FixSolarized()
 	" }}}
 
 	" Remember background style {{{
@@ -270,10 +264,7 @@
 			let g:background_style = "dark"
 		endif
 		let &background = g:background_style
-		augroup backgroundswitch
-			autocmd!
-			autocmd ColorScheme * let g:background_style = &background
-		augroup END
+		autocmd! ColorScheme * let g:background_style = &background
 	" }}}
 
 	" Powerline-style status- and tab/buffer-line {{{
@@ -298,35 +289,30 @@
 			\ ['   MRU'],            'files',
 			\ ['   Commands'],       'commands',
 			\ ]
-		augroup startify
-			autocmd!
-			" No need to show spelling ‘errors’
-			autocmd FileType startify setlocal nospell
-			" Better header colour
-			exec 'autocmd FileType startify if &background ==# ''dark'' | '.
-				\ 'highlight StartifyHeader guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
-				\ 'else | '.
-				\ 'highlight StartifyHeader guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
-				\ 'endif'
-			" Better section colour
-			exec 'autocmd FileType startify highlight StartifySection guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
-			" Better file colour
-			exec 'autocmd FileType startify if &background ==# ''dark'' | '.
-				\ 'highlight StartifyFile guifg='.g:sol.gui.base0.' ctermfg='.g:sol.cterm.base0.' | '.
-				\ 'else | '.
-				\ 'highlight StartifyFile guifg='.g:sol.gui.base00.' ctermfg='.g:sol.cterm.base00.' | '.
-				\ 'endif'
-			" Better special colour
-			exec 'autocmd FileType startify highlight StartifySpecial gui=italic cterm=italic guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow
-			" Hide those ugly brackets
-			exec 'autocmd FileType startify if &background ==# ''dark'' | '.
-				\ 'highlight StartifyBracket guifg='.g:sol.gui.base03.' ctermfg='.g:sol.cterm.base03.' | '.
-				\ 'else | '.
-				\ 'highlight StartifyBracket guifg='.g:sol.gui.base3.' ctermfg='.g:sol.cterm.base3.' | '.
-				\ 'endif'
-		augroup END
+		" Better header colour
+		if &background ==# 'dark'
+			exec 'highlight StartifyHeader guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1
+		elseif &background ==# 'light'
+			exec 'highlight StartifyHeader guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01
+		endif
+		" Better section colour
+		exec 'highlight StartifySection guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
+		" Better file colour
+		if &background ==# 'dark'
+			exec 'highlight StartifyFile guifg='.g:sol.gui.base0.' ctermfg='.g:sol.cterm.base0
+		elseif &background ==# 'light'
+			exec 'highlight StartifyFile guifg='.g:sol.gui.base00.' ctermfg='.g:sol.cterm.base00
+		endif
+		" Better special colour
+		exec 'highlight StartifySpecial gui=italic cterm=italic guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow
+		" Hide those ugly brackets
+		if &background ==# 'dark'
+			exec 'highlight StartifyBracket guifg='.g:sol.gui.base03.' ctermfg='.g:sol.cterm.base03
+		elseif &background ==# 'light'
+			exec 'highlight StartifyBracket guifg='.g:sol.gui.base3.' ctermfg='.g:sol.cterm.base3
+		endif
 		" Open NERDTree at the same time
-		autocmd VimEnter *
+		autocmd! VimEnter *
 			\   if !argc()
 			\ |   Startify
 			\ |   NERDTree
@@ -561,7 +547,7 @@
 	set updatetime=750
 
 	" Set window title {{{
-		autocmd BufEnter * let &titlestring = system('"$HOME"/.dotfiles/scripts/short_path "' . expand('%:p:.').'"')[:-2]
+		autocmd! BufEnter * let &titlestring = system('"$HOME"/.dotfiles/scripts/short_path "' . expand('%:p:.').'"')[:-2]
 		if $TERM =~# '\(screen\|tmux\).*'
 			set t_ts=k
 			set t_fs=\
@@ -590,7 +576,7 @@
 			let g:slime_default_config = {'socket_name': split($TMUX, ',')[0], 'target_pane': ':.2'}
 			let g:slime_dont_ask_default = 1
 			let g:slime_paste_file = tempname()
-			autocmd VimLeave * call system('rm ' . mySlimeFile)
+			autocmd! VimLeave * call system('rm ' . mySlimeFile)
 		endif
 	" }}}
 
@@ -614,10 +600,8 @@
 	nnoremap <Leader>u :GundoToggle<CR>
 
 	" Don’t include quickfix list in buffer list
-	augroup qf
-		autocmd!
-		autocmd FileType qf set nobuflisted
-	augroup END
+	autocmd! FileType qf set nobuflisted
+
 
 	" Linting {{{
 		Plug 'w0rp/ale'
@@ -790,7 +774,7 @@
 	let g:ledger_maxwidth = 80
 	let g:ledger_fillstring = '    -'
 	let g:ledger_detailed_first = 1
-	autocmd BufNewFile,BufRead *.hledger,*.journal set filetype=ledger
+	autocmd! BufNewFile,BufRead *.hledger,*.journal set filetype=ledger
 
 	" Set filetypes for odd files {{{
 		augroup filetypes
@@ -859,9 +843,8 @@
 		" Support for MultiMarkdown, CriticMark, etc.
 		Plug 'mattly/vim-markdown-enhancements', { 'for': markdownft }
 
-
 		" For all text files set 'textwidth' to 78 characters.
-		autocmd! FileType text,markdown setlocal textwidth=78
+		autocmd! FileType text,markdown set textwidth=78
 
 		" Text-like plugins lazy-loading {{{
 			let s:textlikeft_plugins_loaded = 0
