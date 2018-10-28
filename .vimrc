@@ -620,6 +620,9 @@
 		let g:ale_fixers['css'] = ['prettier']
 		let g:ale_fixers['json'] = ['prettier']
 		let g:ale_javascript_eslint_suppress_eslintignore = 1
+		let g:ale_linters_ignore = {
+			\'javascript': ['flow', 'tsserver'],
+		\}
 	" }}}
 
 	" File tree explorer {{{
@@ -784,11 +787,6 @@
 			autocmd BufNewFile,BufRead .lintstagedrc set filetype=json
 		augroup END
 	" }}}
-
-	" Flow omnicompletion
-	Plug 'flowtype/vim-flow', { 'for': 'javascript' }
-	let g:flow#enable = 0
-	let g:flow#showquickfix = 0
 
 	" Improved PHP omnicompletion
 	Plug 'shawncplus/phpcomplete.vim', { 'for': 'php' }
