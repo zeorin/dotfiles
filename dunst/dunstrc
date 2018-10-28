@@ -170,7 +170,7 @@
     history = ctrl+minus
 
     # Context menu.
-    context = ctrl+comma
+    context = ctrl+x
 
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
