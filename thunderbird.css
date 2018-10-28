@@ -3,10 +3,10 @@
 /* Increase padding for better readability */
 
 #folderTree treechildren:-moz-tree-row {
-	height: 2em;
+	height: 2em !important;
 }
 #threadTree treechildren:-moz-tree-row {
-	height: 2.5em;
+	height: 2.5em !important;
 }
 
 /* Alternate background-color for better readability */
