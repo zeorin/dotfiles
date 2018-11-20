@@ -206,8 +206,6 @@
 
 	# History search {{{
 		antigen bundle zsh-users/zsh-history-substring-search zsh-history-substring-search.zsh
-		bindkey -M vicmd 'k' history-substring-search-up
-		bindkey -M vicmd 'j' history-substring-search-down
 	# }}}
 
 	# Change directories more easily {{{
@@ -467,6 +465,11 @@
 	# Instead of exporting it multiple times, do it once at the end for better
 	# performance.
 	export PATH
+# }}}
+
+# Things that must come last {{{
+	bindkey -M vicmd 'k' history-substring-search-up
+	bindkey -M vicmd 'j' history-substring-search-down
 # }}}
 
 # vim: set foldmethod=marker foldlevel=0 foldcolumn=3 textwidth=78:
