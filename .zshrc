@@ -394,8 +394,8 @@
 	_git-ci () { _git-commit }
 
 	# Initialize the completion system
-	autoload -Uz compinit
-	compinit
+	autoload -U +X compinit && compinit
+	autoload -U +X bashcompinit && bashcompinit
 
 	zmodload -i zsh/complist
 
@@ -454,6 +454,16 @@
 	}
 	zle -N expand-or-complete-with-dots
 	bindkey "^I" expand-or-complete-with-dots
+
+	# Support for custom local completions
+	[[ -d "$HOME/.zsh/completions" ]] && fpath=("$HOME/.zsh/completions" $fpath)
+
+	# Support for custom local bash completions
+	if [[ -d "$HOME/.bash/completions" ]]; then
+		for file in "$HOME/.bash/completions/"*; do
+			source "$file"
+		done
+	fi
 
 # }}}
 
