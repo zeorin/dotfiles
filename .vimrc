@@ -183,6 +183,10 @@
 	Plug 'airblade/vim-gitgutter'
 	let g:gitgutter_map_keys = 0
 
+	" Concealing
+	set conceallevel=1
+	set concealcursor=nv
+
 	" Solarized color scheme {{{
 		" Precision colors for machines and people
 		Plug 'altercation/vim-colors-solarized'
@@ -399,6 +403,7 @@
 	" edit and source the vimrc file quickly
 	nnoremap <Leader>ev :vsplit $MYVIMRC<cr>
 	nnoremap <Leader>sv :source $MYVIMRC<cr>
+
 	" edit the zshrc file quickly
 	nnoremap <Leader>ez :vsplit ~/.zshrc<cr>
 
@@ -426,6 +431,9 @@
 	" Easier split windows
 	nnoremap <Leader>- :split<cr>
 	nnoremap <Leader>\| :vsplit<cr>
+
+	" Toggle conceallevel
+	map <Leader>c :exec &conceallevel ? "set conceallevel=0" : "set conceallevel=1"<cr>
 
 	" Write with root permissions
 	cmap w!! w !sudo tee > /dev/null %
@@ -762,14 +770,30 @@
 	" Extended upport for .tmux.conf
 	Plug 'tmux-plugins/vim-tmux'
 
-	" A solid language pack (HTML5, CSS3, SASS, PHP, & about 74 others)
-	Plug 'sheerun/vim-polyglot'
-	" Enable JSX syntax in JS files
-	let g:jsx_ext_required = 0
-	let g:javascript_plugin_jsdoc = 1
-	let g:javascript_plugin_flow = 1
-	" Because of https://github.com/reedes/vim-pencil/issues/31
-	let g:polyglot_disabled = ['markdown']
+	" A solid language pack (HTML5, CSS3, SASS, PHP, & about 74 others) {{{
+		Plug 'sheerun/vim-polyglot'
+		" Because of https://github.com/reedes/vim-pencil/issues/31
+		let g:polyglot_disabled = ['markdown']
+
+		" JavaScript {{{
+			let g:jsx_ext_required = 0
+			let g:javascript_plugin_jsdoc = 1
+			let g:javascript_plugin_flow = 1
+			let g:javascript_conceal_function             = "ƒ"
+			let g:javascript_conceal_null                 = "ø"
+			let g:javascript_conceal_this                 = "@"
+			let g:javascript_conceal_return               = "⇚"
+			let g:javascript_conceal_undefined            = "¿"
+			let g:javascript_conceal_NaN                  = "ℕ"
+			let g:javascript_conceal_prototype            = "¶"
+			let g:javascript_conceal_static               = "•"
+			let g:javascript_conceal_super                = "Ω"
+			" let g:javascript_conceal_arrow_function       = "⇒"
+			let g:javascript_conceal_noarg_arrow_function = "🞅"
+			let g:javascript_conceal_underscore_arrow_function = "🞅"
+		" }}}
+
+	" }}}
 
 	" ledger
 	Plug 'ledger/vim-ledger'
