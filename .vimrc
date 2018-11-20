@@ -616,6 +616,7 @@
 
 	" Linting {{{
 		Plug 'w0rp/ale'
+		let g:ale_command_wrapper = 'env NODE_ENV=development'
 		let g:airline#extensions#ale#enabled = 1
 		" let g:ale_sign_warning = "⚠️"
 		let g:ale_sign_warning = "💡"
