@@ -347,6 +347,9 @@
 		hi SpellBad gui=undercurl guisp=g:sol.cterm.red term=undercurl cterm=undercurl
 	" }}}
 
+	" Show hex, rgb, and hsl colors
+	Plug 'ap/vim-css-color'
+
 " }}}
 
 " General Mappings {{{
