@@ -51,10 +51,10 @@ tray-prefix-background = ${colors.base00}
 scroll-up = i3wm-wsnext
 scroll-down = i3wm-wsprev
 
-font-0 = "FuraCode Nerd Font:size=10;6"
-font-1 = "FuraCode Nerd Font:style=bold:size=10;6"
-font-2 = "FuraCode Nerd Font:size=8;6"
-font-3 = "PowerlineSymbols:size=16;8"
+font-0 = "Symbols Nerd Font:size=10;6"
+font-1 = "Iosevka:style=bold:size=10;6"
+font-2 = "Iosevka:size=8;6"
+font-3 = "Iosevka:size=16;8"
 font-4 = "Symbola:size=12;4"
 
 [module/i3]
