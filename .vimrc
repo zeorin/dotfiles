@@ -958,8 +958,6 @@
 
 	" Session management {{{
 		Plug 'tpope/vim-obsession'
-		Plug 'dhruvasagar/vim-prosession'
-		let g:prosession_dir = expand(vimDir . 'tmp/session/')
 	" }}}
 
 	" Add filename and line numbers to yank
