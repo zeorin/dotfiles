@@ -358,6 +358,7 @@
 	" <Leader> will use the value of <Leader> that was defined when they’re
 	" defined.
 	let mapleader="\<Space>"
+	let maplocalleader="-"
 
 	Plug 'tpope/vim-repeat' " Plugin mappings can be repeated with .
 
