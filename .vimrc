@@ -960,6 +960,9 @@
 		Plug 'tpope/vim-obsession'
 	" }}}
 
+	" GraphViz
+	Plug 'wannesm/wmgraphviz.vim'
+
 	" Add filename and line numbers to yank
 	Plug 'AaronLasseigne/yank-code'
 	map <leader>Y <plug>YankCode
