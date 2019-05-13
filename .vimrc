@@ -185,7 +185,7 @@
 
 	" Concealing
 	set conceallevel=1
-	set concealcursor=nv
+	set concealcursor=
 
 	" Solarized color scheme {{{
 		" Precision colors for machines and people
