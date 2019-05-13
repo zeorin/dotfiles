@@ -408,7 +408,7 @@
 	endif
 
 	" edit and source the vimrc file quickly
-	nnoremap <Leader>ev :vsplit $MYVIMRC<cr>
+	nnoremap <Leader>ev :edit $MYVIMRC<cr>
 	nnoremap <Leader>sv :source $MYVIMRC<cr>
 
 	" edit the zshrc file quickly
