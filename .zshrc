@@ -368,6 +368,8 @@
 		alias -g ....='../../..'
 		alias -g .....='../../../..'
 		alias -g ......='../../../../..'
+
+		alias dotfiles='cd ~/.dotfiles'
 	# }}}
 
 	# Create and enter directory {{{
