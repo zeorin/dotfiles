@@ -975,6 +975,11 @@
 		" Needs to be near the end because it changes the way some of the
 		" other plugins like ctrl-p, startify, NERDTree, etc. work.
 		Plug 'ryanoasis/vim-devicons'
+		let g:webdevicons_enable_nerdtree = 1
+		let g:webdevicons_conceal_nerdtree_brackets = 1
+		let g:WebDevIconsNerdTreeGitPluginForceVAlign = 1
+		let g:webdevicons_enable_ctrlp = 1
+		let g:webdevicons_enable_startify = 1
 		let g:WebDevIconsUnicodeDecorateFolderNodes = 1
 		let g:DevIconsEnableFoldersOpenClose = 1
 		if exists("g:loaded_webdevicons")
