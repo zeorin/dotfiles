@@ -362,6 +362,9 @@
 
 	Plug 'tpope/vim-repeat' " Plugin mappings can be repeated with .
 
+	" Copy current file path to clipboard
+	nnoremap <Leader>f :let @+ = expand("%")<cr>
+
 	" Make it easier to work with buffers
 	" Open empty buffer
 	nnoremap <Leader>T :enew<Cr>
