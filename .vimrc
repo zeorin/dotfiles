@@ -962,6 +962,10 @@
 		let g:prosession_dir = expand(vimDir . 'tmp/session/')
 	" }}}
 
+	" Add filename and line numbers to yank
+	Plug 'AaronLasseigne/yank-code'
+	map <leader>Y <plug>YankCode
+
 " }}}
 
 " Plugins that have to be last because of loading order {{{
