@@ -244,6 +244,7 @@ assign [class="^Skype$"] $workspace10
 # Floating windows
 for_window [class="^Tor Browser$"] floating enable
 for_window [class="^Gnome-calculator$"] floating enable
+for_window [class="^feh$"] floating enable
 for_window [instance="^textern$"] floating enable
 for_window [window_role="pop-up"] floating enable
 for_window [window_type="dialog"] floating enable
