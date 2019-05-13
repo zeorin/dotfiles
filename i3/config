@@ -239,6 +239,7 @@ assign [class="^keepassxc$" title="^(?!KeePassXC-Browser Confirm Access).*$"] $w
 assign [class="^Thunderbird$"] $workspace9
 assign [class="^TelegramDesktop$"] $workspace10
 assign [class="^Slack$"] $workspace10
+assign [class="^Skype$"] $workspace10
 
 # Floating windows
 for_window [class="^Tor Browser$"] floating enable
