@@ -558,8 +558,8 @@
 		endif
 	" }}}
 
-	" Faster update for Git Gutter
-	set updatetime=750
+	" Faster update for Git Gutter and CoC
+	set updatetime=300
 
 	" Set window title {{{
 		autocmd! BufEnter * let &titlestring = system('"$HOME"/.dotfiles/scripts/short_path "' . expand('%:p:.').'"')[:-2]
@@ -736,36 +736,33 @@
 		let delimitMate_nesting_quotes = ['`']
 	" }}}
 
-	" Wisely add 'end' in ruby, endfunction/endif/more in vim script, etc
-	Plug 'tpope/vim-endwise'
+	" An LSP powered code-completion engine for Vim {{{
+		Plug 'neoclide/coc.nvim', { 'tag': '*', 'do': './install.sh' }
 
-	" A code-completion engine for Vim {{{
-		Plug 'Valloric/YouCompleteMe'
-		let g:ycm_key_list_select_completion = ['<C-n>']
-		let g:ycm_key_list_previous_completion = ['<C-p>']
-		let g:ycm_collect_identifiers_from_tags_files = 1
-		let g:ycm_add_preview_to_completeopt = 1
-		let g:ycm_autoclose_preview_window_after_completion = 1
-		let g:ycm_autoclose_preview_window_after_insertion = 1
-		let g:ycm_cache_omnifunc = 0
-		imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR><Plug>delimitMateBS
-
-		function! YcmOnDeleteChar()
-			if pumvisible()
-				return "\<C-y>"
-			endif
-			return ""
-		endfunction
+		" Enter key confirms selection
+		inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+		" also use Enter key to confirm snippet expansion
+		inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() :
+			\"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+		" Close preview window when completion is done
+		autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 	" }}}
 
 	" The ultimate snippet solution for Vim {{{
 		Plug 'sirver/ultisnips'
 		Plug 'honza/vim-snippets' " Community-maintained default snippets
-		let g:UltiSnipsExpandTrigger="<Tab>"
-		let g:UltiSnipsListSnippets="<C-a>"
-		let g:UltiSnipsJumpForwardTrigger="<Tab>"
-		let g:UltiSnipsJumpBackwardTrigger="<S-Tab>"
 		let g:UltiSnipsEditSplit="vertical"
+		" Unset these since CoC handles snippet triggers
+		let g:UltiSnipsExpandTrigger="<nop>"
+		let g:UltiSnipsListSnippets="<nop>"
+		let g:UltiSnipsJumpForwardTrigger="<nop>"
+		let g:UltiSnipsJumpBackwardTrigger="<nop>"
+	" }}}
+
+	" Wisely add 'end' in ruby, endfunction/endif/more in vim script, etc {{{
+		" Temporarily disabled because of conflict with CoC
+		" https://github.com/tpope/vim-endwise/issues/22
+		" Plug 'tpope/vim-endwise
 	" }}}
 
 	" Emmet support
@@ -798,6 +795,9 @@
 			let g:javascript_conceal_noarg_arrow_function = "🞅"
 			let g:javascript_conceal_underscore_arrow_function = "🞅"
 		" }}}
+
+		" Syntax highlighting for JSONC
+		autocmd FileType json syntax match Comment +\/\/.\+$+
 
 	" }}}
 

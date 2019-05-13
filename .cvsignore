@@ -4,8 +4,8 @@
 *.swo
 .DS_Store
 tags
-.tern-project
 Session.vim
+/.vim
 
 ### /home/xandor/.gitignore-boilerplates/CodeIgniter.gitignore
 
