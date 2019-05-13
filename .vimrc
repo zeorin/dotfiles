@@ -780,8 +780,6 @@
 
 	" A solid language pack (HTML5, CSS3, SASS, PHP, & about 74 others) {{{
 		Plug 'sheerun/vim-polyglot'
-		" Because of https://github.com/reedes/vim-pencil/issues/31
-		let g:polyglot_disabled = ['markdown']
 
 		" JavaScript {{{
 			let g:jsx_ext_required = 0
@@ -831,7 +829,7 @@
 	" }}}
 
 	" Define text-like file types
-	let markdownft = ['markdown', 'mkd']
+	let markdownft = ['markdown', 'mkd', 'md']
 	let vcsft = ['git', 'gitsendemail', '*commit*', '*COMMIT*']
 	let textlikeft = markdownft + vcsft + ['text', 'mail']
 
@@ -839,9 +837,6 @@
 
 		" Todo.txt
 		Plug 'freitass/todo.txt-vim'
-
-		" Rethinking Vim as a tool for writers
-		Plug 'reedes/vim-pencil', { 'on': [] }
 
 		" Distraction-free writing
 		Plug 'junegunn/goyo.vim', { 'on': [] }
@@ -867,14 +862,8 @@
 		" Uncover usage problems in your writing
 		Plug 'reedes/vim-wordy', { 'for': textlikeft }
 
-		" Markdown
-		Plug 'tpope/vim-markdown'
-		let g:markdown_fenced_languages = ['html', 'javascript', 'bash=sh', 'css']
-		" Support for MultiMarkdown, CriticMark, etc.
-		Plug 'mattly/vim-markdown-enhancements', { 'for': markdownft }
-
 		" For all text files set 'textwidth' to 78 characters.
-		autocmd! FileType text,markdown set textwidth=78
+		autocmd! FileType text,markdownft set textwidth=78
 
 		" Text-like plugins lazy-loading {{{
 			let s:textlikeft_plugins_loaded = 0
@@ -887,12 +876,10 @@
 				autocmd FileType * if index(textlikeft, &filetype) >= 0 |
 					\   if !s:textlikeft_plugins_loaded
 						\ | let s:textlikeft_plugins_loaded = 1
-						\ | call plug#load('vim-pencil')
 						\ | call plug#load('goyo.vim')
 						\ | call plug#load('limelight.vim')
 						\ | call plug#load('vim-textobj-sentence')
 					\ | endif
-					\ | call pencil#init()
 					\ | call textobj#quote#init({'educate': 1})
 				\ | endif
 				" Init for non-text-like file types
