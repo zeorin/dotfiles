@@ -235,11 +235,13 @@ exec --no-startup-id dex -a -e i3
 assign [class="^Firefox$" window_role="(?i)^((?!dialog).)+$"] $workspace2
 assign [class="^FIREFOX_DEV$" window_role="(?i)^((?!dialog).)+$"] $workspace1
 assign [class="^Google-chrome.*$" window_role="(?i)^((?!dialog).)+$"] $workspace2
+assign [class="^ncmpcpp$"] $workspace4
 assign [class="^keepassxc$" title="^(?!KeePassXC-Browser Confirm Access).*$"] $workspace8
 assign [class="^Thunderbird$"] $workspace9
 assign [class="^TelegramDesktop$"] $workspace10
 assign [class="^Slack$"] $workspace10
 assign [class="^Skype$"] $workspace10
+assign [class="^Signal$"] $workspace10
 
 # Floating windows
 for_window [class="^Tor Browser$"] floating enable
