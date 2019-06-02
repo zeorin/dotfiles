@@ -447,7 +447,7 @@
 	# }}}
 
 	# Load NVM {{{
-		export NVM_LAZY_LOAD=true
+		export NVM_NO_USE=true
 		antigen bundle lukechilds/zsh-nvm
 	# }}}
 
