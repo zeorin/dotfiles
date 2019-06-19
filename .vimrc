@@ -152,6 +152,8 @@
 	" show a Tab, a Middle Dot (0x00B7) for trailing spaces, and the negation
 	" symbol (0x00AC) for non-breaking spaces
 	set listchars=tab:│\ ,trail:·,extends:→,precedes:←,nbsp:¬
+	" Use nicer window split separator (like tmux)
+	set fillchars+=vert:│
 
 	" Highlight the line I'm on
 	set cursorline
@@ -229,9 +231,10 @@
 				\"green": 2
 			\}
 		\}
-		" Solarized bug fixes
+		" Solarized bug fixes and tweaks
 		function! FixSolarized()
 			exec 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
+			exec 'highlight VertSplit ctermbg=NONE guibg=NONE'
 			if &background ==# 'dark'
 				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
 				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
