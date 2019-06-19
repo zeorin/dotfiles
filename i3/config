@@ -234,7 +234,6 @@ exec --no-startup-id dex -a -e i3
 # Bind certain windows to workspaces
 assign [class="^Firefox$" window_role="(?i)^((?!dialog).)+$"] $workspace2
 assign [class="^FIREFOX_DEV$" window_role="(?i)^((?!dialog).)+$"] $workspace1
-assign [class="^Google-chrome.*$" window_role="(?i)^((?!dialog).)+$"] $workspace2
 assign [class="^ncmpcpp$"] $workspace4
 assign [class="^keepassxc$" title="^(?!KeePassXC-Browser Confirm Access).*$"] $workspace8
 assign [class="^Thunderbird$"] $workspace9
