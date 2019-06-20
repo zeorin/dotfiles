@@ -1,0 +1,12 @@
+# Use the title bar for status
+set guioptions ""
+set window-title-basename true
+set window-title-page true
+
+# Better dark mode
+set recolor-darkcolor \#CCCCCC
+set recolor-keephue true
+
+# Better selection
+set selection-clipboard clipboard
+set selection-notification false
