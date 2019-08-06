@@ -37,7 +37,7 @@
 [push]
 	default = simple
 [pager]
-	diff = diff-so-fancy | less --tabs=4 -R -+FX --pattern='^(Date|added|deleted|modified): '
+	diff = diff-so-fancy | less --tabs=4 -R -+FX --pattern='^(Date|added|deleted|modified|renamed): '
 	log = diff-so-fancy | less --tabs=4 -R -+FX
 	show = diff-so-fancy | less --tabs=4 -R -+FX
 [interactive]
