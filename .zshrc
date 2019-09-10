@@ -262,11 +262,6 @@
 		alias please='sudo $(fc -ln -1)'
 	# }}}
 
-	# Add local executables to PATH {{{
-		[[ -d "$HOME/.bin" ]] && PATH="$HOME/.bin:$PATH"
-		[[ -d "$HOME/bin" ]] && PATH="$HOME/bin:$PATH"
-	# }}}
-
 	# Aliases {{{
 		autoload -U is-at-least	# needed for the common-aliases plugin
 
@@ -453,18 +448,6 @@
 
 	# direnv {{{
 		command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
-	# }}}
-
-	# Composer {{{
-		[[ -d "$HOME/.config/composer/vendor/bin" ]] && PATH="$HOME/.config/composer/vendor/bin:$PATH"
-	# }}}
-
-	# Yarn {{{
-		[[ -d "$HOME/.yarn/bin" ]] && PATH="$HOME/.yarn/bin:$PATH"
-	# }}}
-
-	# Cabal {{{
-		[[ -d "$HOME/.cabal/bin" ]] && PATH="$HOME/.cabal/bin:$PATH"
 	# }}}
 
 	# todo.sh {{{
