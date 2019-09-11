@@ -1,0 +1,29 @@
+" May require the latest beta builds.
+
+" Move this to $XDG_CONFIG_DIR/tridactyl/tridactylrc (that's
+" ~/.config/tridactyl/tridactylrc to mere mortals) or ~/.tridactylrc and
+" install the native messenger (:installnative in Tridactyl). Run :source to
+" get it in the browser, or just restart.
+
+" removing a line from here makes the setting disappear
+sanitise tridactyllocal tridactylsync
+
+"
+" Binds
+"
+
+" Don't accidentally :qall
+alias qall noop
+
+"
+" Misc settings
+"
+
+" Sane hinting mode
+set hintfiltermode vimperator-reflow
+
+" Defaults to 300ms
+set hintdelay 100
+
+" This will have to do until someone writes us a nice syntax file :)
+" vim: set filetype=vim:
