@@ -1,13 +1,4 @@
-@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
-
-/* Increase padding for better readability */
-
-#folderTree treechildren:-moz-tree-row {
-	height: 2em !important;
-}
-#threadTree treechildren:-moz-tree-row {
-	height: 2.5em !important;
-}
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 /* Alternate background-color for better readability */
 
