@@ -13,17 +13,26 @@ sanitise tridactyllocal tridactylsync
 "
 
 " Don't accidentally :qall
+" https://github.com/tridactyl/tridactyl/issues/350
 alias qall noop
 
 "
 " Misc settings
 "
 
+colorscheme shydactyl
+
+" So smooth
+set smoothscroll true
+
 " Sane hinting mode
 set hintfiltermode vimperator-reflow
 
 " Defaults to 300ms
 set hintdelay 100
+
+" Don’t show modeindicator
+set modeindicator false
 
 " This will have to do until someone writes us a nice syntax file :)
 " vim: set filetype=vim:
