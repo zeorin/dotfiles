@@ -139,8 +139,8 @@ hide_edge_borders both
 # Focus doesn't follow mouse
 focus_follows_mouse no
 
-# Allow switching back to previous workspace by pressing the same workspace number
-workspace_auto_back_and_forth yes
+# Disallow switching back to previous workspace by pressing the same workspace number
+workspace_auto_back_and_forth no
 
 # Audio controls
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
