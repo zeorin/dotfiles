@@ -28,9 +28,9 @@
 	tracked-ignores = !git ls-files | git check-ignore --no-index --stdin
 	# https://stackoverflow.com/a/34467298
 	lg = !git lg1
-	lg1 = !git lg1-specific --branches
-	lg2 = !git lg2-specific --branches
-	lg3 = !git lg3-specific --branches
+	lg1 = !git lg1-specific --branches --decorate-refs-exclude=refs/remotes/*
+	lg2 = !git lg2-specific --branches --decorate-refs-exclude=refs/remotes/*
+	lg3 = !git lg3-specific --branches --decorate-refs-exclude=refs/remotes/*
 	lg-all = !git lg1-all
 	lg1-all = !git lg1-specific --all
 	lg2-all = !git lg2-specific --all
