@@ -1,0 +1,36 @@
+statuspanel[type="overLink"],
+#statuspanel[type="overLink"] {
+	right: 0;
+	bottom: 0;
+	display: inline;
+}
+
+#TabsToolbar {
+	visibility: collapse;
+}
+
+:root:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) {
+	max-height: 1px;
+	min-height: calc(0px);
+	overflow: hidden;
+}
+
+:root:not([customizing]) #navigator-toolbox:not(:hover):not(:focus-within) #nav-bar {
+	max-height: 0;
+	min-height: 0!important;
+	--tridactyl-auto-show-zone: 10px;
+	margin-bottom: calc(-1 * var(--tridactyl-auto-show-zone));
+	opacity: 0;
+}
+
+#navigator-toolbox::after {
+	display: none !important;
+}
+
+#navigator-toolbox:not(:hover):not(:focus-within) #toolbar-menubar > * {
+	background-color: rgb(232, 232, 231);
+}
+
+#main-window[sizemode="maximized"] #content-deck {
+	padding-top: 8px;
+}
