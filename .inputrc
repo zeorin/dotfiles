@@ -17,7 +17,6 @@ $if mode=vi
 
 	# Keymaps for when we're in insert mode
 	set keymap vi-insert
-		"jk": vi-movement-mode	# remap ESC to jk
 		"\C-w": backward-kill-word
 		"\C-p": history-search-backward
 		"\C-n": history-search-forward

@@ -135,8 +135,6 @@
 
 	# vi keybindings {{{
 		bindkey -v
-		# map JK to ESC in command mode
-		bindkey -M viins 'jk' vi-cmd-mode
 		# VIm-style backspace
 		bindkey "^?" backward-delete-char
 	# }}}

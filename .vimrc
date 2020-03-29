@@ -417,9 +417,6 @@
 	" edit the zshrc file quickly
 	nnoremap <Leader>ez :vsplit ~/.zshrc<cr>
 
-	" change ESC to jk
-	inoremap jk <esc>
-
 	" easy semicolon at end of line in insert mode
 	inoremap <Leader>; <C-o>m`<C-o>A;<C-o>``
 	" easy comma at end of line in insert mode
