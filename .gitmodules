@@ -13,3 +13,6 @@
 [submodule "antigen"]
 	path = antigen
 	url = https://github.com/zsh-users/antigen.git
+[submodule "tridactyl/themes"]
+	path = tridactyl/themes
+	url = https://github.com/bezmi/base16-tridactyl
