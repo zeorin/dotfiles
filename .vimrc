@@ -561,6 +561,9 @@
 	" Faster update for Git Gutter and CoC
 	set updatetime=300
 
+	" Faster macro execution
+	set lazyredraw
+
 	" Set window title {{{
 		autocmd! BufEnter * let &titlestring = system('"$HOME"/.dotfiles/scripts/short_path "' . expand('%:p:.').'"')[:-2]
 		if $TERM =~# '\(screen\|tmux\).*'
@@ -619,26 +622,34 @@
 
 
 	" Linting {{{
-		Plug 'w0rp/ale'
+		Plug 'dense-analysis/ale'
 		let g:ale_command_wrapper = 'env NODE_ENV=development'
 		let g:airline#extensions#ale#enabled = 1
 		" let g:ale_sign_warning = "⚠️"
 		let g:ale_sign_warning = "💡"
 		let g:ale_sign_error = "🚨"
+		let g:ale_sign_priority = 11
 		let g:ale_echo_msg_error_str = "🚨"
 		" let g:ale_echo_msg_warning_str = "⚠️"
 		let g:ale_echo_msg_warning_str = "💡"
 		let g:ale_echo_msg_format = '%severity%  %s [%linter%] %code%'
 		let g:ale_fix_on_save = 1
-		let g:ale_fixers = {}
-		let g:ale_fixers['javascript'] = ['eslint', 'prettier']
-		let g:ale_fixers['scss'] = ['prettier']
-		let g:ale_fixers['css'] = ['prettier']
-		let g:ale_fixers['json'] = ['prettier']
-		let g:ale_javascript_eslint_suppress_eslintignore = 1
-		let g:ale_linters_ignore = {
-			\'javascript': ['flow', 'tsserver'],
+		let javascript_fixers = ['eslint', 'prettier', 'importjs']
+		let css_fixers = ['stylelint', 'prettier']
+		let g:ale_fixers = {
+			\ 'javascript': javascript_fixers,
+			\ 'javascript.jsx': javascript_fixers,
+			\ 'javascriptreact': javascript_fixers,
+			\ 'typescript': javascript_fixers,
+			\ 'typescript.jsx': javascript_fixers,
+			\ 'typescriptreact': javascript_fixers,
+			\ 'css': css_fixers,
+			\ 'scss': css_fixers,
+			\ 'json': ['prettier'],
+			\ 'markdown': ['prettier'],
+			\ 'yaml': ['prettier']
 		\}
+		let g:ale_javascript_eslint_suppress_eslintignore = 1
 	" }}}
 
 	" File tree explorer {{{
@@ -737,7 +748,7 @@
 	" }}}
 
 	" An LSP powered code-completion engine for Vim {{{
-		Plug 'neoclide/coc.nvim', { 'tag': '*', 'do': './install.sh' }
+		Plug 'neoclide/coc.nvim', { 'tag': '*', 'branch': 'release' }
 
 		" Enter key confirms selection
 		inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
@@ -774,6 +785,9 @@
 
 	" Extended upport for .tmux.conf
 	Plug 'tmux-plugins/vim-tmux'
+
+	" Syntax for Tridactyl config files
+	Plug 'tridactyl/vim-tridactyl'
 
 	" A solid language pack (HTML5, CSS3, SASS, PHP, & about 74 others) {{{
 		Plug 'sheerun/vim-polyglot'
@@ -1051,6 +1065,13 @@
 	if filereadable(expand(vimRc . '.after'))
 		source expand(vimRc . '.after')
 	endif
+
+" }}}
+
+" Load project-specific settings {{{
+
+	set exrc
+	set secure
 
 " }}}
 
