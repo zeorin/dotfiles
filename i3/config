@@ -60,7 +60,7 @@ bindsym Ctrl+Shift+F7 exec --no-startup-id kitty @ --to unix:/tmp/mykitty set-co
 # Define workspace names
 set $workspace1 1:
 set $workspace2 2:
-set $workspace3 3:3
+set $workspace3 3:
 set $workspace4 4:
 set $workspace5 5:5
 set $workspace6 6:6
@@ -239,7 +239,7 @@ exec --no-startup-id dex -a -e i3
 assign [class="^Firefox$" window_role="(?i)^((?!dialog).)+$"] $workspace2
 assign [class="^FIREFOX_DEV$" window_role="(?i)^((?!dialog).)+$"] $workspace1
 assign [class="^ncmpcpp$"] $workspace4
-assign [class="^keepassxc$" title="^(?!KeePassXC-Browser Confirm Access).*$"] $workspace8
+assign [class="^KeePassXC$" title="^(?!KeePassXC-Browser Confirm Access).*$"] $workspace8
 assign [class="^Thunderbird$"] $workspace9
 assign [class="^TelegramDesktop$"] $workspace10
 assign [class="^Slack$"] $workspace10
@@ -250,6 +250,9 @@ assign [class="^Signal$"] $workspace10
 for_window [class="^Tor Browser$"] floating enable
 for_window [class="^Gnome-calculator$"] floating enable
 for_window [class="^feh$"] floating enable
+for_window [class="^Sxiv$"] floating enable
+for_window [class="^zoom$"] floating enable
+for_window [class="^Blueman-manager$"] floating enable
 for_window [instance="^textern$"] floating enable
 for_window [window_role="pop-up"] floating enable
 for_window [window_type="dialog"] floating enable
