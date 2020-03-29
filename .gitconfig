@@ -6,7 +6,7 @@
 	autocrlf = input
 	eol = lf
 	safecrlf = false
-	pager = less --tabs=4 -RFX
+	pager = delta --theme \"Solarized Dark\"
 	whitespace = trailing-space,space-before-tab
 [credential]
 	helper = cache
@@ -21,7 +21,6 @@
 	unstage = reset HEAD --
 	last = log -1 HEAD
 	visual = !ungit
-	patch = !git --no-pager diff --no-color
 	stash-unapply = !git stash show -p | git apply -R
 	assume-unchanged = !git ls-files -v | grep '^[[:lower:]]'
 	edit-dirty = !git status --porcelain | sed s/^...// | xargs $EDITOR
@@ -41,10 +40,6 @@
 	lg3-specific = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'
 [push]
 	default = simple
-[pager]
-	diff = diff-so-fancy | less --tabs=4 -R -+FX --pattern='^(Date|added|deleted|modified|renamed): '
-	log = diff-so-fancy | less --tabs=4 -R -+FX
-	show = diff-so-fancy | less --tabs=4 -R -+FX
 [interactive]
 	# https://github.com/so-fancy/diff-so-fancy/issues/35
 	# diffFilter = diff-so-fancy --patch-mode
@@ -56,7 +51,7 @@
 	renames = copies
 	mnemonicprefix = true
 	tool = nvimdiff
-	noprefix = true
+	; noprefix = true
 [difftool]
 	prompt = false
 [difftool "nvimdiff"]
