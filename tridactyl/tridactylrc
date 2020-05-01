@@ -39,12 +39,9 @@ sanitize tridactyllocal tridactylsync
 	bind J tabnext
 	bind K tabprev
 
-<<<<<<< Updated upstream
-=======
 	" Don't steal my focus
 	autocmd TabEnter .* unfocus
 
->>>>>>> Stashed changes
 " }}}
 
 " Appearance {{{
@@ -75,9 +72,4 @@ sanitize tridactyllocal tridactylsync
 
 " }}}
 
-" This will have to do until someone writes us a nice syntax file :)
-<<<<<<< Updated upstream
-" vim: set filetype=vim foldmethod=marker foldlevel=0 foldcolumn=4:
-=======
 " vim: set filetype=tridactyl foldmethod=marker foldlevel=0 foldcolumn=4:
->>>>>>> Stashed changes
