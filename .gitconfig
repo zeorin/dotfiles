@@ -6,7 +6,7 @@
 	autocrlf = input
 	eol = lf
 	safecrlf = false
-	pager = delta --theme \"Solarized Dark\"
+	pager = delta --theme \"Solarized (dark)\"
 	whitespace = trailing-space,space-before-tab
 [credential]
 	helper = cache
@@ -41,8 +41,7 @@
 [push]
 	default = simple
 [interactive]
-	# https://github.com/so-fancy/diff-so-fancy/issues/35
-	# diffFilter = diff-so-fancy --patch-mode
+    diffFilter = delta --color-only
 [advice]
 	statusHints = false
 	pushNonFastForward = false

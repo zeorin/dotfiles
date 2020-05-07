@@ -109,7 +109,6 @@
 		# LESS_TERMCAP_us begin underline
 		# LESS_TERMCAP_ue reset underline
 		man() {
-			LESS=-R \
 			LESS_TERMCAP_mb=$'\e[5m' \
 			LESS_TERMCAP_md=$'\e[1;38;5;7m' \
 			LESS_TERMCAP_me=$'\e[0m' \
@@ -239,7 +238,7 @@
 
 # Commands, functions, aliases {{{
 
-	# EDITOR, VISUAL, and PAGER {{{
+	# EDITOR, VISUAL, LESS, and PAGER {{{
 		if command -v nvim >/dev/null 2>&1; then
 			export EDITOR=nvim
 			export VISUAL=nvim
@@ -253,7 +252,8 @@
 		# ‘e’ for ‘edit’
 		alias e="$VISUAL"
 
-		PAGER=less
+		export LESS="-FiRx4"
+		export PAGER="less $LESS"
 	# }}}
 
 	# Ask the shell nicely to do things as root {{{
@@ -416,6 +416,11 @@
 		}
 		zle -N cdUndoDir
 		bindkey '^[[1;3D' cdUndoDir
+	# }}}
+
+	# Pretty file print {{{
+		alias cat=bat
+		export BAT_PAGER="$PAGER"
 	# }}}
 
 	# git {{{
