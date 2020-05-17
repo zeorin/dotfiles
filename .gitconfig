@@ -41,7 +41,7 @@
 [push]
 	default = simple
 [interactive]
-    diffFilter = delta --color-only
+    diffFilter = delta --theme \"Solarized (dark)\" --color-only
 [advice]
 	statusHints = false
 	pushNonFastForward = false
