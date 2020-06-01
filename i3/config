@@ -16,6 +16,9 @@ bindsym $mod+Shift+q kill
 # start rofi (a program launcher)
 bindsym $mod+d exec rofi -modi drun -show drun
 
+# Screenshot
+bindsym $mod+Print exec --no-startup-id "maim -s | xclip -selection clipboard -t image/png"
+
 # change focus (Vi keybindings)
 bindsym $mod+h focus left
 bindsym $mod+j focus down
