@@ -427,11 +427,6 @@
 		alias g='git'
 	# }}}
 
-	# gibo — .gitignore boilerplates {{{
-		PATH="$HOME/.antigen/bundles/simonwhitaker/gibo:$PATH"
-		antigen bundle simonwhitaker/gibo shell-completions/gibo-completion.zsh
-	# }}}
-
 	# Github’s Hub {{{
 		# if command -v hub >/dev/null 2>&1; then
 		# 	alias git='hub'
