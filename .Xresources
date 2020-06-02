@@ -71,7 +71,7 @@ rofi.eh: 2
 rofi.lines: 5
 rofi.opacity: 90
 rofi.bw: 1
-rofi.font: Knack Nerd Font 10
+rofi.font: Iosevka Term 10
 
 rofi.fg: S_base0
 rofi.bg: S_base02
