@@ -1,21 +1,21 @@
 [colors]
 
-base02 = ${xrdb:color0}
-red = ${xrdb:color1}
-green = ${xrdb:color2}
-yellow = ${xrdb:color3}
-blue = ${xrdb:color4}
-magenta = ${xrdb:color5}
-cyan = ${xrdb:color6}
-base2 = ${xrdb:color7}
-base03 = ${xrdb:color8}
-orange = ${xrdb:color9}
-base01 = ${xrdb:color10}
-base00 = ${xrdb:color11}
-base0 = ${xrdb:color12}
-violet = ${xrdb:color13}
-base1 = ${xrdb:color14}
-base3 = ${xrdb:color15}
+base02 = ${xrdb:st.color0}
+red = ${xrdb:st.color1}
+green = ${xrdb:st.color2}
+yellow = ${xrdb:st.color3}
+blue = ${xrdb:st.color4}
+magenta = ${xrdb:st.color5}
+cyan = ${xrdb:st.color6}
+base2 = ${xrdb:st.color7}
+base03 = ${xrdb:st.color8}
+orange = ${xrdb:st.color9}
+base01 = ${xrdb:st.color10}
+base00 = ${xrdb:st.color11}
+base0 = ${xrdb:st.color12}
+violet = ${xrdb:st.color13}
+base1 = ${xrdb:st.color14}
+base3 = ${xrdb:st.color15}
 
 background = ${self.base03}
 background-alt = ${self.base02}
@@ -28,9 +28,9 @@ alert = ${self.orange}
 
 [bar/top]
 monitor = ${env:MONITOR:}
-dpi = 192
-width = 3760
-height = 48
+dpi = 96
+width = 1920
+height = 24
 
 background = ${colors.background}
 foreground = ${colors.foreground}
