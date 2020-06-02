@@ -14,7 +14,7 @@
 # * performance: adding lots of plugins and functionality can make Zsh slow—
 #   keep it snappy;
 # * Linux, Mac, and Windows compatibility; one .zshrc to rule them all;
-# * support for local modification with .zshrc.before and .zshrc.after;
+# * support for local modification with .zshrc.before and .zshrc.after; and
 # * making it look attractive.
 
 # This file is licensed under the MIT License. The various plugins are
@@ -55,10 +55,13 @@
 
 # Appearance {{{
 
+<<<<<<< HEAD
 	# Starship {{{
 		eval "$(starship init zsh)"
 	# }}}
 
+=======
+>>>>>>> chore: remove powerline
 	# Cursor shape {{{
 		function change-cursor {
 			case $KEYMAP in
