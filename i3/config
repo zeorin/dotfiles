@@ -8,7 +8,7 @@ font pango:DejaVu Sans Mono 0
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec --no-startup-id kitty --single-instance --listen-on unix:/tmp/mykitty
+bindsym $mod+Return exec --no-startup-id st
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -220,10 +220,10 @@ client.urgent #b58900 #b58900 #b58900 #b58900
 #
 
 # Set DPI
-exec_always --no-startup-id xrandr --dpi 192
+exec_always --no-startup-id xrandr --dpi 96
 
 # Set up .Xresources
-exec_always --no-startup-id xrdb -merge ~/.Xresources
+exec_always --no-startup-id xrdb ~/.Xresources
 
 # Start compositor
 exec_always --no-startup-id "pkill picom; DISPLAY=:0 picom -b --experimental-backends"
