@@ -66,6 +66,8 @@
     # screen width minus the width defined in within the geometry option.
     geometry = "800x10-0+24"
 
+    max_icon_size = 120
+
     # Shrink window if it's smaller than the width.  Will be ignored if
     # width is 0.
     shrink = yes
