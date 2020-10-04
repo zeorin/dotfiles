@@ -22,6 +22,7 @@ sanitize tridactyllocal tridactylsync
 	" Handy multiwindow/multitasking binds
 	bind gd tabdetach
 	bind gD composite tabduplicate | tabdetach
+	bind T composite tabduplicate
 
 	" Make yy use canonical / short links on the 5 websites that support them
 	bind yy clipboard yankshort
