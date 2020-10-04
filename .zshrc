@@ -459,6 +459,10 @@
 		(( $+commands[todo.sh] )) && alias t='todo.sh'
 	# }}}
 
+	# Yarn binaries in path {{{
+		[[ -d "$HOME/.yarn/bin" ]] && PATH="$PATH:$HOME/.yarn/bin"
+	# }}}
+
 # }}}
 
 # Completion {{{
