@@ -237,6 +237,13 @@
 
 # Commands, functions, aliases {{{
 
+	# Named directories {{{
+		# Make all Client directories bookmarks
+		for dir in ~/Documents/Pixel\ Theory/Clients/*; do
+			hash -d "$(echo $(basename $dir) | sed "s/ /_/g" | sed 's/[][]//g')"=$dir
+		done
+	# }}}
+
 	# EDITOR, VISUAL, LESS, and PAGER {{{
 		if command -v nvim >/dev/null 2>&1; then
 			export EDITOR=nvim
