@@ -13,6 +13,7 @@
 [color]
 	ui = true
 [alias]
+	d = diff
 	co = checkout
 	br = branch
 	# Use commitizen if it’s installed, otherwise just use `git commit`
