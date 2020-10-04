@@ -184,6 +184,7 @@
 	" Git diff in the gutter (sign column) and stage/undo hunks
 	Plug 'airblade/vim-gitgutter'
 	let g:gitgutter_map_keys = 0
+	let g:gitgutter_sign_priority=9
 
 	" Concealing
 	set conceallevel=1
@@ -625,10 +626,10 @@
 		Plug 'dense-analysis/ale'
 		let g:ale_command_wrapper = 'env NODE_ENV=development'
 		let g:airline#extensions#ale#enabled = 1
+		let g:ale_sign_priority=30
 		" let g:ale_sign_warning = "⚠️"
 		let g:ale_sign_warning = "💡"
 		let g:ale_sign_error = "🚨"
-		let g:ale_sign_priority = 11
 		let g:ale_echo_msg_error_str = "🚨"
 		" let g:ale_echo_msg_warning_str = "⚠️"
 		let g:ale_echo_msg_warning_str = "💡"
@@ -650,6 +651,8 @@
 			\ 'yaml': ['prettier']
 		\}
 		let g:ale_javascript_eslint_suppress_eslintignore = 1
+		" the `flow` linter uses an old API; prefer `flow-language-server`
+		let g:ale_linters_ignore = ['flow']
 	" }}}
 
 	" File tree explorer {{{
