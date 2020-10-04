@@ -15,7 +15,7 @@
 #   keep it snappy;
 # * Linux, Mac, and Windows compatibility; one .zshrc to rule them all;
 # * support for local modification with .zshrc.before and .zshrc.after;
-# * making it look attractive—powerline is pretty.
+# * making it look attractive.
 
 # This file is licensed under the MIT License. The various plugins are
 # licensed under their own licenses. Please see their documentation for more
@@ -55,27 +55,26 @@
 
 # Appearance {{{
 
-	# Powerline {{{
-		[[ -d "$HOME/.local/bin" ]] && PATH="$HOME/.local/bin:$PATH"
-		[[ -d "$HOME/Library/Python/2.7/bin" ]] && PATH="$HOME/Library/Python/2.7/bin:$PATH"
-		source "$(python -m site --user-site)/powerline/bindings/zsh/powerline.zsh"
+	# Starship {{{
+		eval "$(starship init zsh)"
 	# }}}
 
 	# Cursor shape {{{
-		function zle-keymap-select zle-line-init {
+		function change-cursor {
 			case $KEYMAP in
 				viins|main) print -n -- "\E[5 q";;	# DECSCUSR Blink Bar
 				vicmd)      print -n -- "\E[2 q";;	# DECSCUSR Steady Block
 			esac
-			zle reset-prompt
+			# Starship has already defined this
+			zle-keymap-select
 			zle -R
 		}
-		function zle-line-finish {
+		function reset-cursor {
 			print -n -- "\E[2 q"	# DECSCUSR Steady Block
 		}
-		zle -N zle-line-init
-		zle -N zle-line-finish
-		zle -N zle-keymap-select
+		zle -N zle-keymap-select change-cursor
+		zle -N zle-line-init change-cursor
+		zle -N zle-line-finish reset-cursor
 	# }}}
 
 	# Set LS_COLORS {{{
