@@ -227,7 +227,7 @@ exec_always --no-startup-id xrandr --dpi 192
 exec_always --no-startup-id xrdb -merge ~/.Xresources
 
 # Start compositor
-exec_always --no-startup-id "killall picom; DISPLAY=:0 picom -b"
+exec_always --no-startup-id "pkill picom; DISPLAY=:0 picom -b --experimental-backends"
 
 # Start status bar
 exec_always --no-startup-id "sleep 1; $HOME/.config/polybar/launch.sh"
