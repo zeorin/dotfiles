@@ -234,6 +234,9 @@ exec_always --no-startup-id "sleep 1; $HOME/.config/polybar/launch.sh"
 # Set wallpaper
 exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
 
+# Inhibit screensaver when something is fullscreen
+exec_always --no-startup-id ~/.config/i3/disable-standby-fs.py
+
 # Start programs on login
 exec --no-startup-id dex -a -e i3
 
