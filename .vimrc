@@ -14,7 +14,6 @@
 "   completion, git integration, linting, snippets, etc., that one might
 "   expect from a modern editor;
 " * some writing-focused tweaks & plugins. Text editors aren’t just for code;
-" * tmux integration: because tmux is awesome;
 " * performance: adding lots of plugins and functionality can make Vim slow—
 "   this is not Emacs—utilize lazy-loading to keep it snappy;
 " * Linux, Mac, Windows, and NeoVim compatibility; one .vimrc to rule
@@ -781,10 +780,6 @@
 
 	" Emmet support
 	Plug 'mattn/emmet-vim'
-
-	" Seamless navigation between tmux panes and vim splits
-	Plug 'christoomey/vim-tmux-navigator'
-	let g:tmux_navigator_disable_when_zoomed = 1
 
 	" Extended upport for .tmux.conf
 	Plug 'tmux-plugins/vim-tmux'
