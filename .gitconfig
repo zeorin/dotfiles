@@ -26,6 +26,8 @@
 	assume-unchanged = !git ls-files -v | grep '^[[:lower:]]'
 	edit-dirty = !git status --porcelain | sed s/^...// | xargs $EDITOR
 	tracked-ignores = !git ls-files | git check-ignore --no-index --stdin
+	# https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
+	rm-gone = ! "git for-each-ref --format '%(refname:short) %(upstream:track)' | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D"
 	# https://stackoverflow.com/a/34467298
 	lg = !git lg1
 	lg1 = !git lg1-specific --branches --decorate-refs-exclude=refs/remotes/*
