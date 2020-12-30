@@ -237,6 +237,10 @@
 
 # Commands, functions, aliases {{{
 
+	# Home Manager {{{
+		export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
+	# }}}
+
 	# Named directories {{{
 		# Make all Client directories bookmarks
 		for dir in ~/Documents/Pixel\ Theory/Clients/*; do
