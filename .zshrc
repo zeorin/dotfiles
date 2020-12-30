@@ -461,6 +461,10 @@
 		[[ -d "$HOME/.yarn/bin" ]] && PATH="$PATH:$HOME/.yarn/bin"
 	# }}}
 
+	# Local bin {{{
+		[[ -d "$HOME/.local/bin" ]] && PATH="$PATH:$HOME/.local/bin"
+	# }}}
+
 # }}}
 
 # Completion {{{
