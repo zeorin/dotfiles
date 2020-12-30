@@ -192,6 +192,7 @@
 	" Solarized color scheme {{{
 		" Precision colors for machines and people
 		Plug 'altercation/vim-colors-solarized'
+		let g:solarized_termtrans = 1
 		" Create a dictionary of the colors for later use
 		let g:sol = {
 			\"gui": {
