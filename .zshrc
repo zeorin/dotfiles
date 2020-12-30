@@ -248,20 +248,15 @@
 		done
 	# }}}
 
-	# EDITOR, VISUAL, LESS, and PAGER {{{
-		if command -v nvim >/dev/null 2>&1; then
-			export EDITOR=nvim
-			export VISUAL=nvim
-		elif command -v vim >/dev/null 2>&1; then
-			export EDITOR=vim
-			export VISUAL=vim
+	# $EDITOR, $VISUAL, $LESS, and $PAGER {{{
+		if command -v emacsclient >/dev/null 2>&1; then
+			export EDITOR="emacsclient -c"
+			alias e="emacsclient -c -n"
 		elif command -v vi >/dev/null 2>&1; then
 			export EDITOR=vi
-			export VISUAL=vi
+			alias e=vi
 		fi
-		# ‘e’ for ‘edit’
-		alias e="$VISUAL"
-
+		export VISUAL="$EDITOR"
 		export LESS="-FiRx4"
 		export PAGER="less $LESS"
 	# }}}
@@ -291,7 +286,6 @@
 			alias lrt='ls -1Fcrt'
 
 			alias zshrc='${=EDITOR} ~/.zshrc' # Quick access to the ~/.zshrc file
-			alias vimrc='${=EDITOR} ~/.vimrc' # Quick access to the ~/.vimrc file
 
 			# alias grep='grep --color'
 			alias sgrep='grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS} '
