@@ -47,8 +47,6 @@ sanitize tridactyllocal tridactylsync
 
 " Appearance {{{
 
-	colorscheme dark
-
 	" Don’t show modeindicator
 	set modeindicator false
 
