@@ -19,6 +19,9 @@ bindsym $mod+d exec rofi -modi drun -show drun
 # Screenshot
 bindsym $mod+Print exec --no-startup-id "maim -s | xclip -selection clipboard -t image/png"
 
+# Lock screen
+bindsym $mod+x exec --no-startup-id "sleep $(echo 'scale=10; 1/60'); xset s activate"
+
 # change focus (Vi keybindings)
 bindsym $mod+h focus left
 bindsym $mod+j focus down
