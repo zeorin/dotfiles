@@ -172,7 +172,7 @@
     history = mod4+ampersand
 
     # Context menu.
-    context = mod4+x
+    context = mod4+m
 
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
