@@ -471,9 +471,9 @@
 		set ttymouse=xterm
 	endif
 
-	" set tabs to display as 4 spaces wide (might be overwritten by
+	" set tabs to display as 2 spaces wide (might be overwritten by
 	" .editorconfig files)
-	set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
+	set tabstop=2 softtabstop=2 shiftwidth=2 noexpandtab
 	set shiftround
 	Plug 'tpope/vim-sleuth' " Heuristically set buffer options, like tabs/spaces
 	Plug 'editorconfig/editorconfig-vim' " EditorConfig support
