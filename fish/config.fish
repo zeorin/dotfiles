@@ -42,4 +42,11 @@ if status is-interactive
 
 	starship init fish | source
 
+	function ntfy_on_duration -e fish_prompt
+		if test $CMD_DURATION; and test $CMD_DURATION -gt (math "1000 * 10")
+			set secs (math "$CMD_DURATION / 1000")
+			ntfy -t "$history[1]" send "Returned $status, took $secs seconds"
+		end
+	end
+
 end
