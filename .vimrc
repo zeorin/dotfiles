@@ -639,7 +639,7 @@
 		let g:ale_echo_msg_format = '%severity%  %s [%linter%] %code%'
 		let g:ale_fix_on_save = 1
 		let javascript_fixers = ['prettier', 'importjs', 'eslint']
-		let css_fixers = ['stylelint', 'prettier']
+		let css_fixers = ['prettier', 'stylelint']
 		let g:ale_fixers = {
 			\ 'javascript': javascript_fixers,
 			\ 'javascript.jsx': javascript_fixers,
