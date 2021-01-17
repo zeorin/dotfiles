@@ -8,6 +8,14 @@ if status is-interactive
 
 	set EDITOR nvim
 
+	alias g "git"
+	alias e $EDITOR
+	alias m "neomutt"
+	alias o "xdg-open"
+
+	alias cat "bat"
+	alias man "MANWIDTH=([ $COLUMNS -gt "80" ] && echo "80" || echo $COLUMNS) command man"
+
 	eval (direnv hook fish)
 
 	# Use Vi keys, and Emacs keys
