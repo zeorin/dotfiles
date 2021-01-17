@@ -55,13 +55,10 @@
 
 # Appearance {{{
 
-<<<<<<< HEAD
 	# Starship {{{
 		eval "$(starship init zsh)"
 	# }}}
 
-=======
->>>>>>> chore: remove powerline
 	# Cursor shape {{{
 		function change-cursor {
 			case $KEYMAP in
