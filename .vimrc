@@ -756,7 +756,7 @@
 	set shell=/bin/sh
 
 	" An LSP powered code-completion engine for Vim {{{
-		Plug 'neoclide/coc.nvim', { 'tag': '*', 'branch': 'release' }
+		Plug 'neoclide/coc.nvim', { 'tag': '*', 'branch': 'release', 'do': 'yarn install' }
 
 		" Enter key confirms selection
 		inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
