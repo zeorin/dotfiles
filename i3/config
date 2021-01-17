@@ -160,8 +160,8 @@ bindsym XF86AudioForward exec --no-startup-id playerctl position 5+
 bindsym XF86AudioRewind exec --no-startup-id playerctl position 5-
 
 # Sreen brightness controls
-bindsym XF86MonBrightnessUp exec --no-startup-id xbacklight -fps 60 -inc 10 # increase screen brightness
-bindsym XF86MonBrightnessDown exec --no-startup-id xbacklight -fps 60 -dec 10 # decrease screen brightness
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set 5%+
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
 
 # Toggle touchpad
 bindsym XF86TouchpadToggle exec ~/.config/i3/toggletouchpad.sh
