@@ -222,12 +222,6 @@ client.urgent #b58900 #b58900 #b58900 #b58900
 # Programs
 #
 
-# Set DPI
-exec_always --no-startup-id xrandr --dpi 96
-
-# Set up .Xresources
-exec_always --no-startup-id xrdb ~/.Xresources
-
 # Start compositor
 exec_always --no-startup-id "pkill picom; DISPLAY=:0 picom -b --experimental-backends"
 
