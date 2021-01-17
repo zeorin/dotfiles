@@ -29,6 +29,7 @@ if status is-interactive
 		fish_vi_key_bindings --no-erase insert
 	end
 
+	fish_vi_cursor
 	# Emulates vim's cursor shape behavior
 	# Set the normal and visual mode cursors to a block
 	set fish_cursor_default block
