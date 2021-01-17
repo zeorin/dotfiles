@@ -450,6 +450,9 @@
 
 " General functionality {{{
 
+	" Direnv integration
+	Plug 'direnv/direnv.vim'
+
 	" Restore FocusGained and FocusLost events
 	Plug 'tmux-plugins/vim-tmux-focus-events'
 
@@ -749,6 +752,8 @@
 		let delimitMate_balance_matchpairs = 1
 		let delimitMate_nesting_quotes = ['`']
 	" }}}
+
+	set shell=/bin/sh
 
 	" An LSP powered code-completion engine for Vim {{{
 		Plug 'neoclide/coc.nvim', { 'tag': '*', 'branch': 'release' }
