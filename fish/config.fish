@@ -6,15 +6,32 @@ if status is-interactive
 		end
 	# }}}
 
-	set EDITOR nvim
+	set -Ux EDITOR nvim
+	set -Ux VISUAL nvim
+	set -Ux LESS "-FiRx4"
+	set -Ux PAGER "less $LESS"
 
 	alias g "git"
-	alias e $EDITOR
+	alias e nvim
 	alias m "neomutt"
 	alias o "xdg-open"
-
+	alias s "systemctl"
+	alias d "docker"
+	alias j "journalctl -xe"
 	alias cat "bat"
-	alias man "MANWIDTH=([ $COLUMNS -gt "80" ] && echo "80" || echo $COLUMNS) command man"
+	alias grep "grep --color=auto"
+	alias ls "ls --color=auto"
+	function man --wraps man --description 'man with more formatting'
+		set -x MANWIDTH ([ $COLUMNS -gt "80" ] && echo "80" || echo $COLUMNS)
+		set -x LESS_TERMCAP_mb (printf '\e[5m')
+		set -x LESS_TERMCAP_md (printf '\e[1;38;5;7m')
+		set -x LESS_TERMCAP_me (printf '\e[0m')
+		set -x LESS_TERMCAP_so (printf '\e[7;38;5;3m')
+		set -x LESS_TERMCAP_se (printf '\e[27;39m')
+		set -x LESS_TERMCAP_us (printf '\e[4;38;5;4m')
+		set -x LESS_TERMCAP_ue (printf '\e[24;39m')
+		command man $argv
+	end
 
 	eval (direnv hook fish)
 
