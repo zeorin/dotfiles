@@ -13,12 +13,16 @@
 [color]
 	ui = true
 [alias]
-	d = diff
-	co = checkout
-	br = branch
+	a = add
+	b = branch
 	# Use commitizen if it’s installed, otherwise just use `git commit`
-	ci = "!f() { if command -v git-cz >/dev/null 2>&1; then git-cz \"$@\"; else git commit \"$@\"; fi; }; f"
-	st = status
+	c = "!f() { if command -v git-cz >/dev/null 2>&1; then git-cz \"$@\"; else git commit \"$@\"; fi; }; f"
+	co = checkout
+	d = diff
+	p = push
+	r = rebase
+	s = status
+	u = !git unstage
 	unstage = reset HEAD --
 	last = log -1 HEAD
 	visual = !ungit
@@ -29,6 +33,7 @@
 	# https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
 	rm-gone = ! "git for-each-ref --format '%(refname:short) %(upstream:track)' | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D"
 	# https://stackoverflow.com/a/34467298
+	l = !git lg
 	lg = !git lg1
 	lg1 = !git lg1-specific --branches --decorate-refs-exclude=refs/remotes/*
 	lg2 = !git lg2-specific --branches --decorate-refs-exclude=refs/remotes/*
