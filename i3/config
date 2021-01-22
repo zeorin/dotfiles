@@ -60,9 +60,6 @@ bindsym $mod+a focus parent
 # focus the child container
 bindsym $mod+apostrophe focus child
 
-bindsym Ctrl+Shift+F6 exec --no-startup-id kitty @ --to unix:/tmp/mykitty set-colors --all --configured "$HOME/.config/kitty/light.conf"
-bindsym Ctrl+Shift+F7 exec --no-startup-id kitty @ --to unix:/tmp/mykitty set-colors --all --configured "$HOME/.config/kitty/dark.conf"
-
 # Define workspace names
 set $workspace1 1:
 set $workspace2 2:
