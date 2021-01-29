@@ -106,7 +106,7 @@ bindsym $mod+numbersign scratchpad show
 bindsym $mod+Shift+numbersign move scratchpad
 
 # reload the configuration file
-bindsym $mod+Shift+c reload
+bindsym $mod+Shift+c exec --no-startup-id i3-msg reload && notify-send --urgency=low "i3 configuration reloaded"
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 
