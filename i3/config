@@ -21,7 +21,7 @@ bindsym $mod+Shift+Print exec --no-startup-id "FOLDER=\\"$(xdg-user-dir DESKTOP)
 bindsym $mod+Print exec --no-startup-id "FOLDER=\\"$(xdg-user-dir DESKTOP)/Screenshots\\"; WINDOW=\\"$(xdotool getactivewindow)\\"; TITLE=\\"$(xdotool getwindowname $WINDOW)\\"; FILE=\\"$FOLDER/$(date +%s) ${TITLE//\//_}.png\\"; mkdir --parents \\"$FOLDER\\" && maim --hidecursor --window $WINDOW | tee \\"$FILE\\" | xclip -selection clipboard -t image/png && notify-send --urgency=low --icon=image-x-generic \\"Window screenshot taken!\\" \\"Saved to '${FILE/#$HOME/\~}' and copied to the clipboard\\""
 
 # Lock screen
-bindsym $mod+x exec --no-startup-id "sleep $(echo 'scale=10; 1/240' | bc); xset s activate"
+bindsym $mod+x exec --no-startup-id "sleep $(echo 'scale=10; 1/60' | bc); xset s activate"
 
 # change focus (Vi keybindings)
 bindsym $mod+h focus left
