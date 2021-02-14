@@ -1,0 +1,30 @@
+#!/bin/sh
+
+if [ "$1" = "activewindow" ]; then
+	# Get active window geometry
+	eval $(xdotool getactivewindow getwindowgeometry --shell)
+elif [ "$1" = "selectwindow" ]; then
+	# Let the user select a window and get its geometry
+	eval $(xdotool selectwindow getwindowgeometry --shell)
+else
+	# Get screen geometry
+	WIDTH=$(xrandr --query | awk -F '[ x,+]' '/\<connected\>/{print $3}')
+	HEIGHT=$(xrandr --query | awk -F '[ x,+]' '/\<connected\>/{print $4}')
+	X=0
+	Y=0
+fi
+
+# Get mouse position
+eval $(echo $(xdotool getmouselocation --shell) | sed "s/\(X\|Y\)/MOUSE\1/g")
+
+# Launch the screenshot gui
+flameshot gui && sleep 0.05
+
+# Move the mouse to the top left corner and drag it to to the right bottom corner
+xdotool mousemove $X $Y
+xdotool mousedown 1 # press and hold
+xdotool mousemove_relative $WIDTH $HEIGHT
+xdotool mouseup 1 # release
+
+# Restore mouse to previous location
+xdotool mousemove $MOUSEX $MOUSEY

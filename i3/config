@@ -17,8 +17,9 @@ bindsym $mod+Shift+q kill
 bindsym $mod+d exec rofi -modi drun -show drun
 
 # Screenshot
-bindsym $mod+Shift+Print exec --no-startup-id "FOLDER=\\"$(xdg-user-dir DESKTOP)/Screenshots\\"; FILE=\\"$FOLDER/$(date +%s) cropped.png\\"; mkdir --parents \\"$FOLDER\\" && maim --hidecursor --select | tee \\"$FILE\\" | xclip -selection clipboard -t image/png && notify-send --urgency=low --icon=image-x-generic \\"Cropped screenshot taken!\\" \\"Saved to '${FILE/#$HOME/\~}' and copied to the clipboard\\""
-bindsym $mod+Print exec --no-startup-id "FOLDER=\\"$(xdg-user-dir DESKTOP)/Screenshots\\"; WINDOW=\\"$(xdotool getactivewindow)\\"; TITLE=\\"$(xdotool getwindowname $WINDOW)\\"; FILE=\\"$FOLDER/$(date +%s) ${TITLE//\//_}.png\\"; mkdir --parents \\"$FOLDER\\" && maim --hidecursor --window $WINDOW | tee \\"$FILE\\" | xclip -selection clipboard -t image/png && notify-send --urgency=low --icon=image-x-generic \\"Window screenshot taken!\\" \\"Saved to '${FILE/#$HOME/\~}' and copied to the clipboard\\""
+bindsym Print exec --no-startup-id "flameshot gui"
+bindsym $mod+Print exec --no-startup-id "$HOME/.config/flameshot/shot activewindow"
+bindsym $mod+Shift+Print exec --no-startup-id "$HOME/.config/flameshot/shot"
 
 # Lock screen
 bindsym $mod+x exec --no-startup-id "sleep $(echo 'scale=10; 1/60' | bc); xset s activate"
@@ -234,6 +235,9 @@ exec_always --no-startup-id ~/.config/i3/disable-standby-fs.py
 
 # Start programs on login
 exec --no-startup-id dex -a -e i3
+
+# Start flameshot
+exec --no-startup-id flameshot
 
 # Bind certain windows to workspaces
 assign [class="^Firefox$" window_role="(?i)^((?!dialog).)+$"] $workspace2
