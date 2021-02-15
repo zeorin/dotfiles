@@ -19,6 +19,7 @@ in {
       g = "git";
       e = "$EDITOR";
       m = "neomutt";
+      h = "home-manager";
       o = "xdg-open";
       s = "systemctl";
       d = "docker";
