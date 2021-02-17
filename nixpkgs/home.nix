@@ -16,18 +16,36 @@ in {
   programs.fish = {
     enable = true;
     shellAliases = {
+      "~" = "cd ~";
+      ".." = "cd ..";
       g = "git";
       e = "$EDITOR";
       m = "neomutt";
       h = "home-manager";
       o = "xdg-open";
       s = "systemctl";
+      t = "tail -f";
       d = "docker";
       j = "journalctl -xe";
-      l = "ls -la";
+      ls = "ls --color=auto";
+      l = "ls -lFh";     #size,show type,human readable
+      la = "ls -lAFh";   #long list,show almost all,show type,human readable
+      lr = "ls -tRFh";   #sorted by date,recursive,show type,human readable
+      lt = "ls -ltFh";   #long list,sorted by date,show type,human readable
+      ll = "ls -l";      #long list
+      ldot = "ls -ld .*";
+      lS = "ls -1FSsh";
+      lart = "ls -1Fcart";
+      lrt = "ls -1Fcrt";
       cat = "${pkgs.bat}/bin/bat";
       grep = "grep --color=auto";
-      ls = "ls --color=auto";
+      sgrep = "grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS}";
+      dud = "du -d 1 -h";
+      duf = "du -sh *";
+      fd = "find . -type d -name";
+      ff = "find . -type f -name";
+      hgrep = "fc -El 0 | grep";
+      sortnr = "sort -n -r";
     };
     functions = {
       # Use Vi keys, and Emacs keys
