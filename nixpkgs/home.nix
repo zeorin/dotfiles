@@ -16,8 +16,6 @@ in {
   programs.fish = {
     enable = true;
     shellAliases = {
-      "~" = "cd ~";
-      ".." = "cd ..";
       g = "git";
       e = "$EDITOR";
       m = "neomutt";
