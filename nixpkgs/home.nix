@@ -71,6 +71,9 @@ in {
           command man $argv
         '';
       };
+      mkcd = {
+        description = "Create a directory and change into it";
+        body = "mkdir -p $argv[1] && cd $argv[1]";
       };
     };
     interactiveShellInit = ''
