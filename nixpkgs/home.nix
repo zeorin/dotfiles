@@ -71,14 +71,6 @@ in {
           command man $argv
         '';
       };
-      ntfy_on_duration = {
-        onEvent = "fish_prompt";
-        body = ''
-          if test $CMD_DURATION; and test $CMD_DURATION -gt (math "1000 * 10")
-            set secs (math "$CMD_DURATION / 1000")
-            ntfy -t "$history[1]" send "Returned $status, took $secs seconds"
-          end
-        '';
       };
     };
     interactiveShellInit = ''
@@ -93,6 +85,14 @@ in {
       set fish_cursor_default block
       set fish_cursor_insert line
       set fish_cursor_replace_one underscore
+
+      # Notify for long-running commands
+      function ntfy_on_duration --on-event fish_prompt
+        if test $CMD_DURATION; and test $CMD_DURATION -gt (math "1000 * 10")
+          set secs (math "$CMD_DURATION / 1000")
+          ${pkgs.ntfy}/bin/ntfy -t "$history[1]" send "Returned $status, took $secs seconds"
+        end
+      end
     '';
     promptInit = "${pkgs.starship}/bin/starship init fish | source";
   };
@@ -357,7 +357,6 @@ in {
     thunderbird neomutt isync
     brightnessctl
     zathura calibre-py2 spotify
-    ntfy
     gnome3.gnome-calculator
     youtube-dl
     gnucash xournalpp
