@@ -89,6 +89,120 @@ in {
     enableNixDirenvIntegration = true;
   };
 
+  programs.tmux = {
+    enable = true;
+    baseIndex = 1;
+    clock24 = true;
+    disableConfirmationPrompt = true;
+    keyMode = "vi";
+    shortcut = "Space";
+    terminal = "tmux-256color";
+
+    extraConfig = ''
+      # Vim-style selection
+      bind-key -T copy-mode-vi v send-keys -X begin-selection
+
+      # Show session selector (default to showing only unattached sessions)
+      bind-key s choose-tree -s -f '#{?session_attached,0,1}'
+
+      # Tmux window names
+      set-option -g automatic-rename on
+      set-option -g automatic-rename-format '#{pane_title}'
+
+      # Terminal window names
+      set-option -g set-titles on
+      set-option -g set-titles-string '#{window_name}'
+
+      # Clipboard integration
+      set-option -g set-clipboard on
+
+      # Mouse behaviour
+      set-option -g mouse on
+
+      set-option -g update-environment 'DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY TERM'
+    '';
+
+    plugins = with pkgs.tmuxPlugins; [
+      sensible
+      pain-control
+      sessionist
+      prefix-highlight
+      fpp
+      {
+        plugin = yank;
+        extraConfig = ''
+          set -g @override_copy_command '${pkgs.xsel}/bin/xsel'
+          set -g @yank_action 'copy-pipe'
+        '';
+      }
+      {
+        plugin = open;
+        extraConfig = ''
+          set -g @open-S 'https://www.duckduckgo.com/'
+        '';
+      }
+      {
+        plugin = tmux-colors-solarized;
+        extraConfig = ''
+          set -g @colors-solarized 'dark'
+        '';
+      }
+      {
+        plugin = mkDerivation {
+          pluginName = "fzf-url";
+          version = "unstable-2021-02-20";
+          rtpFilePath = "fzf-url.tmux";
+          src = pkgs.fetchFromGitHub {
+            owner = "wfxr";
+            repo = "tmux-fzf-url";
+            rev = "5b202610ae9dd788a4c07e18c07a2634854401cd";
+            sha256 = "1plr4sablrh6f1ljrfm6arfxking8sgfa6n1gxx5bqysadf40nxg";
+          };
+          postInstall = ''
+            sed -i -e 's|fzf-tmux|${pkgs.fzf}/bin/fzf-tmux|g' $target/fzf-url.sh
+          '';
+          dependencies = with pkgs; [ fzf ];
+        };
+      }
+      {
+        plugin = mkDerivation {
+          pluginName = "extrakto";
+          version = "unstable-2021-02-20";
+          src = pkgs.fetchFromGitHub {
+            owner = "laktak";
+            repo = "extrakto";
+            rev = "45201c7331f9c2964f278df11cf5aba8dc466155";
+            sha256 = "0as8f4l9cqlq0haw95sagv7n83r3m817prjpn4yc5bh8x75adl25";
+          };
+          dependencies = with pkgs; [ python3 fzf ];
+        };
+        extraConfig = ''
+          set-option -g @extrakto_fzf_tool '${pkgs.fzf}/bin/fzf'
+          set-option -g @extrakto_clip_tool '${pkgs.xsel}/bin/xsel --input --clipboard' # works better for nvim
+          set-option -g @extrakto_copy_key 'tab'
+          set-option -g @extrakto_insert_key 'enter'
+        '';
+      }
+      {
+        plugin = mkDerivation {
+          pluginName = "better-mouse-mode";
+          rtpFilePath = "scroll_copy_mode.tmux";
+          version = "unstable-2021-02-20";
+          src = pkgs.fetchFromGitHub {
+            owner = "NHDaly";
+            repo = "tmux-better-mouse-mode";
+            rev = "aa59077c635ab21b251bd8cb4dc24c415e64a58e";
+            sha256 = "06346ih3hzwszhkj25g4xv5av7292s6sdbrdpx39p0n3kgf5mwww";
+          };
+        };
+        extraConfig = ''
+          set-option -g @scroll-without-changing-pane 'on'
+          set-option -g @emulate-scroll-for-no-mouse-alternate-buffer 'on'
+        '';
+      }
+    ];
+  };
+
   # Allow for bluetooth devices to interface with MPRIS
   systemd.user.services.mpris-proxy = {
     Unit.Description = "Mpris proxy";
@@ -110,7 +224,7 @@ in {
     lxqt.lxqt-policykit xdg-user-dirs
     wineWowPackages.staging (winetricks.override { wine = wineWowPackages.staging; }) protontricks
     capitaine-cursors arc-theme arc-icon-theme gtk_engines gtk-engine-murrine
-    wget emacs vim nodejs neovim git tmux universal-ctags dex zip unzip numlockx ag xorg.xkill bc
+    wget emacs vim nodejs neovim git universal-ctags dex zip unzip numlockx ag xorg.xkill bc
     rofi dunst feh picom lxappearance arc-theme arc-icon-theme xorg.xcursorthemes
     (polybar.override { i3GapsSupport = true; mpdSupport = true; })
     protonvpn-gui protonvpn-cli
