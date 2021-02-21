@@ -89,6 +89,108 @@ in {
     enableNixDirenvIntegration = true;
   };
 
+  programs.git = {
+    enable = true;
+    userName = "Xandor Schiefer";
+    extraConfig = {
+      user.useConfigOnly = true;
+      core = {
+        autocrlf = "input";
+        eol = "lf";
+        safecrlf = false;
+        whitespace = "trailing-space,space-before-tab";
+      };
+      credential.helper = "cache";
+      color.ui = true;
+      push.default = "simple";
+      advice = {
+        statusHints = false;
+        pushNonFastForward = false;
+      };
+      diff = {
+        algorithm = "patience";
+        renames = "copies";
+        mnemonicprefix = true;
+        tool = "nvimdiff";
+        colormoved = "dimmed-zebra";
+        colormovedws = "allow-indentation-change";
+      };
+      difftool.prompt = false;
+      "difftool \"nvimdiff\"".cmd = "$VISUAL -d \"$LOCAL\" \"$REMOTE\"";
+      merge = {
+        stat = true;
+        tool = "nvimdiff";
+      };
+      mergetool.prompt = false;
+      "mergetool \"nvimdiff\"".cmd = "$VISUAL -d -c '4wincmd w | wincmd J'  \"$LOCAL\" \"$BASE\" \"$REMOTE\" \"$MERGED\"";
+      branch.autosetupmerge = true;
+      rerere = {
+        enabled = true;
+        autoUpdate = true;
+      };
+      log.abbrevCommit = true;
+    };
+    delta = {
+      enable = true;
+      options = {
+        features = "side-by-side line-numbers decorations";
+        white-space-error-style = "22 reverse";
+        syntax-theme = "Solarized (dark)";
+        decorations = {
+          commit-decoration-style = "bold yellow box ul";
+          file-style = "bold yellow ul";
+          file-decoration-style = "none";
+          hunk-header-decoration-style = "cyan box ul";
+        };
+      };
+    };
+    aliases = {
+      a = "add";
+      b = "branch";
+      # Use commitizen if it’s installed, otherwise just use `git commit`
+      c = "!f() { if command -v git-cz >/dev/null 2>&1; then git-cz \"$@\"; else git commit \"$@\"; fi; }; f";
+      co = "checkout";
+      d = "diff";
+      p = "push";
+      r = "rebase";
+      s = "status";
+      u = "!git unstage";
+      unstage = "reset HEAD --";
+      last = "log -1 HEAD";
+      stash-unapply = "!git stash show -p | git apply -R";
+      assume-unchanged = "!git ls-files -v | grep '^[[:lower:]]'";
+      edit-dirty = "!git status --porcelain | sed s/^...// | xargs $EDITOR";
+      tracked-ignores = "!git ls-files | git check-ignore --no-index --stdin";
+      # https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
+      rm-gone = "!git for-each-ref --format '%(refname:short) %(upstream:track)' | awk '$2 == \"[gone]\" {print $1}' | xargs -r git branch -D";
+      # https://stackoverflow.com/a/34467298
+      l = "!git lg";
+      lg = "!git lg1";
+      lg1 = "!git lg1-specific --branches --decorate-refs-exclude=refs/remotes/*";
+      lg2 = "!git lg2-specific --branches --decorate-refs-exclude=refs/remotes/*";
+      lg3 = "!git lg3-specific --branches --decorate-refs-exclude=refs/remotes/*";
+      lg-all = "!git lg1-all";
+      lg1-all = "!git lg1-specific --all";
+      lg2-all = "!git lg2-specific --all";
+      lg3-all = "!git lg3-specific --all";
+      lg-specific = "!git lg1-specific";
+      lg1-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
+      lg2-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'";
+      lg3-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'";
+      # https://docs.gitignore.io/use/command-line
+      ignore = "!gi() { curl -sL https://www.gitignore.io/api/$@ 2>/dev/null ;}; gi";
+    };
+    ignores = [
+      "*~"
+      "*.swp"
+      "*.swo"
+      ".DS_Store"
+      "tags"
+      "Session.vim"
+      "/.vim"
+    ];
+  };
+
   programs.tmux = {
     enable = true;
     baseIndex = 1;
@@ -203,6 +305,14 @@ in {
     ];
   };
 
+  xdg.configFile."bat/config".text = ''
+    --theme="Solarized (dark)"
+    --italic-text=always
+
+    # Use "gitignore" highlighting for ".ignore" files
+    --map-syntax='.ignore:Git Ignore'
+  '';
+
   # Allow for bluetooth devices to interface with MPRIS
   systemd.user.services.mpris-proxy = {
     Unit.Description = "Mpris proxy";
@@ -220,11 +330,11 @@ in {
   ];
 
   home.packages = with pkgs; [
-    libnotify file tree htop lsd gitAndTools.delta xsel xclip xdotool urlscan fpp
+    libnotify file tree htop lsd xsel xclip xdotool urlscan fpp
     lxqt.lxqt-policykit xdg-user-dirs
     wineWowPackages.staging (winetricks.override { wine = wineWowPackages.staging; }) protontricks
     capitaine-cursors arc-theme arc-icon-theme gtk_engines gtk-engine-murrine
-    wget emacs vim nodejs neovim git universal-ctags dex zip unzip numlockx ag xorg.xkill bc
+    wget emacs vim nodejs neovim universal-ctags dex zip unzip numlockx ag xorg.xkill bc
     rofi dunst feh picom lxappearance arc-theme arc-icon-theme xorg.xcursorthemes
     (polybar.override { i3GapsSupport = true; mpdSupport = true; })
     protonvpn-gui protonvpn-cli
