@@ -1,5 +1,0 @@
-# Set up .Xresources
-xrdb -merge ~/.Xresources
-
-# Polkit agent
-lxqt-policykit-agent &

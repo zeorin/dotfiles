@@ -14,15 +14,15 @@ bindsym $mod+Return exec --no-startup-id st
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-bindsym $mod+d exec rofi -modi drun -show drun
+bindsym $mod+d exec --no-startup-id "rofi -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"
 
 # Screenshot
 bindsym Print exec --no-startup-id "flameshot gui"
-bindsym $mod+Print exec --no-startup-id "$HOME/.config/flameshot/shot activewindow"
-bindsym $mod+Shift+Print exec --no-startup-id "$HOME/.config/flameshot/shot"
+bindsym $mod+Print exec --no-startup-id "$HOME/.config/flameshot/flameshot.sh activewindow"
+bindsym $mod+Shift+Print exec --no-startup-id "$HOME/.config/flameshot/flameshot.sh"
 
 # Lock screen
-bindsym $mod+x exec --no-startup-id "sleep $(echo 'scale=10; 1/60' | bc); xset s activate"
+bindsym $mod+x exec --no-startup-id "sleep 0.3; xset s activate"
 
 # change focus (Vi keybindings)
 bindsym $mod+h focus left
@@ -221,14 +221,11 @@ client.urgent #b58900 #b58900 #b58900 #b58900
 # Programs
 #
 
-# Start compositor
-exec_always --no-startup-id "pkill picom; DISPLAY=:0 picom -b --experimental-backends"
-
 # Start status bar
 exec_always --no-startup-id "sleep 1; $HOME/.config/polybar/launch.sh"
 
 # Set wallpaper
-exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/johannesburg.png
+exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/lucas-benjamin-wQLAGv4_OYs-unsplash.jpg
 
 # Inhibit screensaver when something is fullscreen
 exec_always --no-startup-id ~/.config/i3/disable-standby-fs.py
@@ -262,6 +259,10 @@ for_window [window_role="pop-up"] floating enable
 for_window [window_type="dialog"] floating enable
 for_window [window_role="(?i)about"] floating enable
 for_window [window_role="(?i)preferences"] floating enable
+for_window [title="Microsoft Teams Notification"] floating enable
+
+# Focus management
+no_focus [title="Microsoft Teams Notification"]
 
 # Show on all workspaces
 for_window [title="Picture-in-Picture"] sticky enable

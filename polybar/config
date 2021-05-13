@@ -36,7 +36,7 @@ background = ${colors.background}
 foreground = ${colors.foreground}
 
 modules-left = i3 title
-modules-center = mpd
+; modules-center = mpd
 modules-right = volume xkeyboard wlan battery date powermenu
 
 tray-position = right
@@ -52,7 +52,7 @@ scroll-up = i3wm-wsnext
 scroll-down = i3wm-wsprev
 
 font-0 = "Symbols Nerd Font:size=10;3"
-font-1 = "Iosevka Term:style=bold:size=10;3"
+font-1 = "Iosevka Term:size=10;3"
 font-2 = "Iosevka Term:size=8;3"
 font-3 = "Iosevka Term:size=16;4"
 font-4 = "Symbols Nerd Font:size=20;0"
@@ -219,7 +219,7 @@ format-disconnected =
 
 [module/date]
 type = internal/date
-interval = 5
+interval = 1
 
 date =
 date-alt = " %Y-%m-%d"
@@ -227,7 +227,7 @@ date-alt = " %Y-%m-%d"
 time = %H:%M
 time-alt = %H:%M:%S
 
-format-prefix = 
+format-prefix = |
 format-prefix-foreground = ${colors.foreground-alt}
 format-underline = #0a6cf5
 
@@ -312,7 +312,7 @@ type = custom/menu
 
 format-spacing = 1
 
-label-open = 
+label-open = |
 label-open-foreground = ${colors.secondary}
 label-close =  cancel
 label-close-foreground = ${colors.secondary}
