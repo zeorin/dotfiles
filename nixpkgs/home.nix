@@ -774,6 +774,14 @@ in {
     };
     gpg.enable = true;
     htop.enable = true;
+    mpv = {
+      enable = true;
+      config = {
+        hwdec = "auto-safe";
+        vo = "gpu";
+        profile = "gpu-hq";
+      };
+    };
     starship = {
       enable = true;
       enableBashIntegration = true;
