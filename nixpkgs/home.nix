@@ -50,10 +50,12 @@ in {
         done
 
         # Data dirs
-        for dir in bash gnupg go pass stack wineprefixes; do
+        for dir in bash go pass stack wineprefixes; do
           $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
             ${dataHome}/$dir
         done
+        $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
+          --mode=700 ${dataHome}/gnupg
       '';
     };
   };
