@@ -552,6 +552,19 @@ in {
     emacs = {
       enable = true;
       package = unstable.emacsPgtkGcc;
+      extraPackages = (epkgs: (with epkgs; [
+        vterm
+      ]) ++ (with pkgs; [
+        binutils
+        (ripgrep.override { withPCRE2 = true; })
+        gnutls
+        fd
+        imagemagick
+        zstd
+        nodePackages.javascript-typescript-langserver
+        sqlite
+        editorconfig-core-c
+      ]));
     };
     firefox = {
       enable = true;
@@ -2916,17 +2929,6 @@ in {
       rev = "1.0.0";
       sha256 = "0n5a3rnv9qnnsrl76kpi6dmaxmwj1mpdd2g0b4n1wfimqfaz6gi1";
     })) { inherit pkgs; })
-
-    # DOOM Emacs dependencies
-    binutils
-    (ripgrep.override { withPCRE2 = true; })
-    gnutls
-    fd
-    imagemagick
-    zstd
-    nodePackages.javascript-typescript-langserver
-    sqlite
-    editorconfig-core-c
 
   ] ++ [
 
