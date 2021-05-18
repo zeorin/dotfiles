@@ -3,8 +3,7 @@
 let
   unstable = import <unstable> {
     config = { allowUnfree = true; };
-    # overlays = [ (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; })) ];
-    overlays = [ (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/22f0ad4c2a5ebc49072574ecbf6096590d8858f0.tar.gz; })) ];
+    overlays = [ (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; })) ];
   };
 in {
   programs.home-manager.enable = true;
