@@ -6,6 +6,29 @@ let
     overlays = [ (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; })) ];
   };
 in {
+  # Overlays
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball { url = https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz; }))
+    # Unstable overlay
+    (final: prev: {
+      emacsPackagesFor = unstable.emacsPackagesFor;
+      barrier = unstable.barrier;
+      fish = unstable.fish;
+      flameshot = unstable.flameshot;
+      gitAndTools = prev.gitAndTools // { delta = unstable.gitAndTools.delta; };
+      screenkey = prev.screenkey.overridePythonAttrs (oldAttrs: rec {
+        version = "1.4";
+        src = final.fetchFromGitLab {
+          owner = "screenkey";
+          repo = "screenkey";
+          rev = "v${version}";
+          sha256 = "1rfngmkh01g5192pi04r1fm7vsz6hg9k3qd313sn9rl9xkjgp11l";
+        };
+        nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ final.python38Packages.Babel ];
+      });
+    })
+  ];
+
   programs.home-manager.enable = true;
   programs.man.generateCaches = true;
 
@@ -2193,28 +2216,6 @@ in {
   };
 
   fonts.fontconfig.enable = true;
-
-  # Overlays
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball { url = https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz; }))
-    # Unstable overlay
-    (final: prev: {
-      barrier = unstable.barrier;
-      fish = unstable.fish;
-      flameshot = unstable.flameshot;
-      gitAndTools = prev.gitAndTools // { delta = unstable.gitAndTools.delta; };
-      screenkey = prev.screenkey.overridePythonAttrs (oldAttrs: rec {
-        version = "1.4";
-        src = final.fetchFromGitLab {
-          owner = "screenkey";
-          repo = "screenkey";
-          rev = "v${version}";
-          sha256 = "1rfngmkh01g5192pi04r1fm7vsz6hg9k3qd313sn9rl9xkjgp11l";
-        };
-        nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ final.python38Packages.Babel ];
-      });
-    })
-  ];
 
   nixpkgs.config = {
     allowUnfree = true;
