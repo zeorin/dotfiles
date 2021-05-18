@@ -551,8 +551,28 @@ in {
     };
     emacs = {
       enable = true;
-      package = unstable.emacsPgtkGcc;
-      extraPackages = epkgs: [ epkgs.vterm ];
+      package = with pkgs; (symlinkJoin {
+        name = "emacs";
+        paths = [ unstable.emacsPgtkGcc ];
+        buildInputs = [ makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/emacs \
+            --prefix PATH : "${binutils}/bin" \
+            --prefix PATH : "${ripgrep.override { withPCRE2 = true; }}/bin" \
+            --prefix PATH : "${gnutls}/bin" \
+            --prefix PATH : "${fd}/bin" \
+            --prefix PATH : "${imagemagick}/bin" \
+            --prefix PATH : "${zstd}/bin" \
+            --prefix PATH : "${nodePackages.javascript-typescript-langserver}/bin" \
+            --prefix PATH : "${sqlite}/bin" \
+            --prefix PATH : "${editorconfig-core-c}/bin"
+        '';
+      }) // (with unstable.emacsPgtkGcc; {
+        inherit meta src;
+      });
+      extraPackages = epkgs: (with epkgs; [
+        vterm
+      ]);
     };
     firefox = {
       enable = true;
@@ -2917,22 +2937,6 @@ in {
       rev = "1.0.0";
       sha256 = "0n5a3rnv9qnnsrl76kpi6dmaxmwj1mpdd2g0b4n1wfimqfaz6gi1";
     })) { inherit pkgs; })
-
-  ] ++ [
-
-    ###########################
-    # DOOM Emacs dependencies #
-    ###########################
-
-    binutils
-    (ripgrep.override { withPCRE2 = true; })
-    gnutls
-    fd
-    imagemagick
-    zstd
-    nodePackages.javascript-typescript-langserver
-    sqlite
-    editorconfig-core-c
 
   ] ++ [
 
