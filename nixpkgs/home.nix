@@ -38,8 +38,8 @@ in {
       PASSWORD_STORE_DIR = "${dataHome}/pass";
       STACK_ROOT = "${dataHome}/stack";
       WINEPREFIX = "${dataHome}/wineprefixes/default";
-      DOOMDIR = "${configHome}/doom-config";
-      DOOMLOCALDIR = "${configHome}/doom-local";
+      DOOMDIR = "${configHome}/doom";
+      DOOMLOCALDIR = "${dataHome}/doom";
     };
     activation = with config.xdg; {
       createXdgCacheAndDataDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -1219,7 +1219,7 @@ in {
           fi
         ''}";
       };
-      "doom-config/config.el".text = ''
+      "doom/config.el".text = ''
         ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
         ;; Place your private configuration here! Remember, you do not need to run 'doom
@@ -1292,7 +1292,7 @@ in {
               :desc "Reset font size"
               "0" #'text-scale-adjust)
       '';
-      "doom-config/init.el" = {
+      "doom/init.el" = {
         text = ''
           ;;; init.el -*- lexical-binding: t; -*-
 
@@ -1489,7 +1489,7 @@ in {
           ${configHome}/doom-emacs/bin/doom -y sync
         ''}";
       };
-      "doom-config/packages.el" = {
+      "doom/packages.el" = {
         text = ''
           ;; -*- no-byte-compile: t; -*-
           ;;; $DOOMDIR/packages.el
