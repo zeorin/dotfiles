@@ -924,15 +924,6 @@ in {
         }
       ];
     };
-    vscode = {
-      enable = true;
-      package = pkgs.vscodium;
-      extensions = with unstable.vscode-extensions; [
-        bbenoist.Nix
-        vscodevim.vim
-        ms-vsliveshare.vsliveshare
-      ];
-    };
     zathura = {
       enable = true;
       options = {
