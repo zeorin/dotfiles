@@ -3,7 +3,10 @@
 let
   unstable = import <unstable> {
     config = { allowUnfree = true; };
-    overlays = [ (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; })) ];
+    overlays = [
+      # (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; }))
+      # (import (builtins.fetchTarball { url = https://github.com/nix-community/emacs-overlay/archive/master.tar.gz; }))
+    ];
   };
 in {
   # Overlays
@@ -573,9 +576,12 @@ in {
     };
     emacs = {
       enable = true;
-      package = with pkgs; (symlinkJoin {
+      package = let
+        # emacsPkg = unstable.emacsPgtkGcc;
+        emacsPkg = unstable.emacs;
+      in with pkgs; (symlinkJoin {
         name = "emacs";
-        paths = [ unstable.emacsPgtkGcc ];
+        paths = [ emacsPkg ];
         buildInputs = [ makeWrapper ];
         postBuild = ''
           wrapProgram $out/bin/emacs \
@@ -589,7 +595,7 @@ in {
             --prefix PATH : "${sqlite}/bin" \
             --prefix PATH : "${editorconfig-core-c}/bin"
         '';
-      }) // (with unstable.emacsPgtkGcc; {
+      }) // (with emacsPkg; {
         inherit meta src;
       });
       extraPackages = epkgs: (with epkgs; [
