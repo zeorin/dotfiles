@@ -1,5 +1,10 @@
 #!/usr/bin/env fish
-if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ]
+if command -v tmux >/dev/null 2>&1 && \
+	[ -z "$TMUX" ] && \
+	[ -z "$EMACS" ] && \
+	[ -z "$VIM" ] && \
+	[ -z "$INSIDE_EMACS" ] && \
+	[ "$TERM_PROGRAM" != "vscode" ]
 
 	# If this is a remote tty, allow the MOTD, banner, etc. to be seen first
 	set parent_process (ps -o comm= -p (ps -o ppid= -p $fish_pid | string trim))
