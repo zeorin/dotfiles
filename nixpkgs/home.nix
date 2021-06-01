@@ -652,6 +652,20 @@ in {
           description = "Create a directory and change into it";
           body = "mkdir -p $argv[1] && cd $argv[1]";
         };
+        vterm_printf = {
+          description = "Send information to vterm via properly escaped sequences";
+          body = ''
+            if begin; [ -n "$TMUX" ]; and string match -q -r "screen|tmux" "$TERM"; end
+                # tell tmux to pass the escape sequences through
+                printf "\ePtmux;\e\e]%s\007\e\\" "$argv"
+            else if string match -q -- "screen*" "$TERM"
+                # GNU screen (screen, screen-256color, screen-256color-bce)
+                printf "\eP\e]%s\007\e\\" "$argv"
+            else
+                printf "\e]%s\e\\" "$argv"
+            end
+          '';
+        };
       };
       interactiveShellInit = ''
         # Clear greeting message
