@@ -2935,6 +2935,11 @@ in {
       sha256 = "0n5a3rnv9qnnsrl76kpi6dmaxmwj1mpdd2g0b4n1wfimqfaz6gi1";
     })) { inherit pkgs; })
 
+    # TODO: Remove this once the i3 & polybar configs are managed by
+    # home-manager, as we’re only installing it so that we can use `pactl`
+    # https://nixos.wiki/wiki/PipeWire#pactl_not_found
+    pulseaudio
+
   ] ++ [
 
     #########

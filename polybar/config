@@ -37,7 +37,7 @@ foreground = ${colors.foreground}
 
 modules-left = i3 title
 ; modules-center = mpd
-modules-right = volume xkeyboard wlan battery date powermenu
+modules-right = pipewire xkeyboard wlan battery date powermenu
 
 tray-position = right
 tray-padding = 2
@@ -233,33 +233,16 @@ format-underline = #0a6cf5
 
 label = %date% %time%
 
-[module/volume]
-type = internal/volume
-
-format-volume = <label-volume> <bar-volume>
-label-volume = VOL
-label-volume-foreground = ${root.foreground}
-
-format-muted-prefix = " "
-format-muted-foreground = ${colors.foreground-alt}
-label-muted = sound muted
-
-bar-volume-width = 10
-bar-volume-foreground-0 = #55aa55
-bar-volume-foreground-1 = #55aa55
-bar-volume-foreground-2 = #55aa55
-bar-volume-foreground-3 = #55aa55
-bar-volume-foreground-4 = #55aa55
-bar-volume-foreground-5 = #f5a70a
-bar-volume-foreground-6 = #ff5555
-bar-volume-gradient = false
-bar-volume-indicator = |
-bar-volume-indicator-font = 2
-bar-volume-fill = ─
-bar-volume-fill-font = 2
-bar-volume-empty = ─
-bar-volume-empty-font = 2
-bar-volume-empty-foreground = ${colors.foreground-alt}
+[module/pipewire]
+type = custom/script
+label = "%output%"
+label-font = 2
+interval = 0.01666
+exec = ~/.config/polybar/pipewire.sh
+click-right = exec pavucontrol &
+click-left = ~/.config/polybar/pipewire.sh mute &
+scroll-up = ~/.config/polybar/pipewire.sh up &
+scroll-down = ~/.config/polybar/pipewire.sh down &
 
 [module/battery]
 type = internal/battery
