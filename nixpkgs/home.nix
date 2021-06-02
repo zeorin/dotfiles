@@ -2961,7 +2961,6 @@ in {
     libertine
     libertinus
     montserrat
-    public-sans
     f5_6
     route159
     aileron
