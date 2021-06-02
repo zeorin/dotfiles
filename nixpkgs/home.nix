@@ -2956,7 +2956,6 @@ in {
     comic-relief
     fira
     fira-mono
-    roboto-mono
     inter
     lato
     libertine
