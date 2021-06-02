@@ -1,7 +1,7 @@
 { pkgs, config, lib, ... }:
 
 let
-  unstable = import <unstable> {
+  unstable = import <nixos-unstable> {
     config = { allowUnfree = true; };
     overlays = [
       # (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; }))
@@ -9,27 +9,8 @@ let
     ];
   };
 in {
-  # Overlays
   nixpkgs.overlays = [
     (import (builtins.fetchTarball { url = https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz; }))
-    # Unstable overlay
-    (final: prev: {
-      emacsPackagesFor = unstable.emacsPackagesFor;
-      barrier = unstable.barrier;
-      fish = unstable.fish;
-      flameshot = unstable.flameshot;
-      gitAndTools = prev.gitAndTools // { delta = unstable.gitAndTools.delta; };
-      screenkey = prev.screenkey.overridePythonAttrs (oldAttrs: rec {
-        version = "1.4";
-        src = final.fetchFromGitLab {
-          owner = "screenkey";
-          repo = "screenkey";
-          rev = "v${version}";
-          sha256 = "1rfngmkh01g5192pi04r1fm7vsz6hg9k3qd313sn9rl9xkjgp11l";
-        };
-        nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ final.python38Packages.Babel ];
-      });
-    })
   ];
 
   programs.home-manager.enable = true;
@@ -898,7 +879,7 @@ in {
           '';
         }
         {
-          plugin = mkDerivation {
+          plugin = mkTmuxPlugin {
             pluginName = "fzf-url";
             version = "unstable-2021-02-20";
             rtpFilePath = "fzf-url.tmux";
@@ -911,21 +892,10 @@ in {
             postInstall = ''
               sed -i -e 's|fzf-tmux|${pkgs.fzf}/bin/fzf-tmux|g' $target/fzf-url.sh
             '';
-            dependencies = with pkgs; [ fzf ];
           };
         }
         {
-          plugin = mkDerivation {
-            pluginName = "extrakto";
-            version = "unstable-2021-02-20";
-            src = pkgs.fetchFromGitHub {
-              owner = "laktak";
-              repo = "extrakto";
-              rev = "de8ac3e8a9fa887382649784ed8cae81f5757f77";
-              sha256 = "0mkp9r6mipdm7408w7ls1vfn6i3hj19nmir2bvfcp12b69zlzc47";
-            };
-            dependencies = with pkgs; [ python3 fzf ];
-          };
+          plugin = extrakto;
           extraConfig = ''
             set-option -g @extrakto_fzf_tool '${pkgs.fzf}/bin/fzf'
             set-option -g @extrakto_clip_tool '${pkgs.xsel}/bin/xsel --input --clipboard' # works better for nvim
@@ -934,7 +904,7 @@ in {
           '';
         }
         {
-          plugin = mkDerivation {
+          plugin = mkTmuxPlugin {
             pluginName = "better-mouse-mode";
             rtpFilePath = "scroll_copy_mode.tmux";
             version = "unstable-2021-02-20";
@@ -1095,7 +1065,7 @@ in {
       provider = "manual";
       latitude = "-26.20";
       longitude = "28.02";
-      extraOptions = [ "-v" "-m randr" ];
+      settings.redshift.adjustment-method = "randr";
     };
     unclutter = {
       enable = true;
@@ -2225,6 +2195,7 @@ in {
 
   nixpkgs.config = {
     allowUnfree = true;
+    joypixels.acceptLicense = true;
     firefox.enableTridactylNative = true;
   };
 
@@ -2815,8 +2786,8 @@ in {
     brightnessctl
     zathura
     sigil
-    (unstable.calibre.overrideAttrs (oldAttrs: {
-      buildInputs = oldAttrs.buildInputs ++ (with unstable.python3Packages; [
+    (calibre.overrideAttrs (oldAttrs: {
+      buildInputs = oldAttrs.buildInputs ++ (with python3Packages; [
         pycryptodome
       ]);
     }))
@@ -2841,7 +2812,7 @@ in {
     inkscape
     krita
     libreoffice
-    unstable.onlyoffice-bin
+    onlyoffice-bin
     arandr
     barrier
     flameshot
@@ -2884,7 +2855,7 @@ in {
     signal-desktop
     spotify
     zoom-us
-    unstable.manix
+    manix
     cachix
     nix-index
     nix-prefetch-git
@@ -3047,6 +3018,6 @@ in {
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "20.03";
+  home.stateVersion = "21.05";
 }
 # vim: set foldmethod=indent foldcolumn=4 shiftwidth=2 tabstop=2 expandtab:
