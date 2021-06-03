@@ -4,7 +4,7 @@ let
   unstable = import <nixos-unstable> {
     config = { allowUnfree = true; };
     overlays = [
-      # (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; }))
+      (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; }))
       # (import (builtins.fetchTarball { url = https://github.com/nix-community/emacs-overlay/archive/master.tar.gz; }))
     ];
   };
@@ -558,8 +558,8 @@ in {
     emacs = {
       enable = true;
       package = let
-        # emacsPkg = unstable.emacsPgtkGcc;
-        emacsPkg = unstable.emacs;
+        emacsPkg = unstable.emacsPgtkGcc;
+        # emacsPkg = unstable.emacs;
       in with pkgs; (symlinkJoin {
         name = "emacs";
         paths = [ emacsPkg ];
@@ -585,7 +585,238 @@ in {
     };
     firefox = {
       enable = true;
-      package = pkgs.latest.firefox-bin;
+      # package = pkgs.latest.firefox-bin;
+      package = pkgs.firefox-bin.override {
+        cfg.enableTridactylNative = true;
+      };
+      extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+        clearurls
+        (buildFirefoxXpiAddon rec {
+          pname = "containerise";
+          version = "3.9.0";
+          addonId = "containerise@kinte.sh";
+          url = "https://addons.mozilla.org/firefox/downloads/file/3724805/containerise-${version}-fx.xpi";
+          sha256 = "1rfi22m844sn13kj1014k9hf34ixjxvjjiqx8b75wb2ic2hilldz";
+          meta = with lib; {
+            homepage = "https://github.com/kintesh/containerise";
+            description = "Automatically open websites in a dedicated container. Simply add rules to map domain or subdomain to your container.";
+            licence = licences.mit;
+            platforms = platforms.all;
+          };
+        })
+        (buildFirefoxXpiAddon rec {
+          pname = "cookies.txt";
+          version = "0.2";
+          addonId = "{12cf650b-1822-40aa-bff0-996df6948878}";
+          url = "https://addons.mozilla.org/firefox/downloads/file/3588248/cookiestxt-${version}-fx.xpi";
+          sha256 = "1byr53zlyjp54p9h8bkhmln1a9yf7zsk0jz8hsb035j01bijghp2";
+          meta = with lib; {
+            homepage = "https://github.com/lennonhill/cookies-txt";
+            description = "Exports all cookies to a Netscape HTTP Cookie File, as used by curl, wget, and youtube-dl, among others.";
+            licence = licences.gpl3;
+            platforms = platforms.all;
+          };
+        })
+        darkreader
+        (buildFirefoxXpiAddon rec {
+          pname = "enhancer-for-youtube";
+          version = "2.0.104.12";
+          addonId = "enhancerforyoutube@maximerf.addons.mozilla.org";
+          url = "https://addons.mozilla.org/firefox/downloads/file/3780706/enhancer_for_youtubetm-${version}-fx.xpi";
+          sha256 = "0zjs4jgvg0shjhj38jb17wp3v28fp51bbr10wnqy3fq9fj2pn88p";
+          meta = with lib; {
+            homepage = "https://www.mrfdev.com/enhancer-for-youtube";
+            description = "Take control of YouTube and boost your user experience!";
+            licence = licences.gpl3;
+            platforms = platforms.all;
+          };
+        })
+        https-everywhere
+        keepassxc-browser
+        privacy-badger
+        react-devtools
+        reddit-enhancement-suite
+        (buildFirefoxXpiAddon rec {
+          pname = "redirect-amp-to-html";
+          version = "2.1.0";
+          addonId = "{569456be-2850-4f7e-b669-71e55140ee0a}";
+          url = "https://addons.mozilla.org/firefox/downloads/file/3546077/redirect_amp_to_html-${version}-an+fx.xpi";
+          sha256 = "142plr60v7w4niwm5kpmaymmaqn319rwfwakh3ad6c1cg0r40bkn";
+          meta = with lib; {
+            homepage = "https://www.daniel.priv.no/web-extensions/amp2html.html";
+            description = "Automatically redirects AMP pages to the regular web page variant.";
+            licence = with licences; [ mit x11 ];
+            platforms = platforms.all;
+          };
+        })
+        reduxdevtools
+        refined-github
+        (buildFirefoxXpiAddon rec {
+          pname = "share-on-twitter";
+          version = "0.80.2";
+          addonId = "jid1-SmvuJ9Cq3Cx13w@jetpack";
+          url = "https://addons.mozilla.org/firefox/downloads/file/3524067/share_on_twitter-${version}-fx.xpi";
+          sha256 = "14pvjqdffxy40mmf6208xmdkk3d1qmgbyw5p8srw5vzvvwkss8bn";
+          meta = with lib; {
+            homepage = "https://browsernative.com/twitter-share-firefox/";
+            description = "Simplest add-on for Twitter. Share web pages, links and selected text on Twitter right from the context menu (right click menu) and the toolbar button.";
+            licence = licences.mpl2;
+            platforms = platforms.all;
+          };
+        })
+        tridactyl
+        ublock-origin
+        (buildFirefoxXpiAddon rec {
+          pname = "wallabagger";
+          version = "1.13.0";
+          addonId = "{7a7b1d36-d7a4-481b-92c6-9f5427cb9eb1}";
+          url = "https://addons.mozilla.org/firefox/downloads/file/3782259/wallabagger-${version}-an+fx.xpi";
+          sha256 = "1w0jygwz486r7xli5fcm6agibyjrfdr89dxyir5371if9khixr37";
+          meta = with lib; {
+            homepage = "";
+            description = "This wallabag v2 extension has the ability to edit title and tags and set starred, archived, or delete states. You can add a page from the icon or through the right click menu on a link or on a blank page spot.";
+            licence = with licences; [ mit x11 ];
+            platforms = platforms.all;
+          };
+        })
+      ];
+      profiles =
+        let
+          commonSettings = {
+            "browser.startup.page" = 3; # resume previous session
+            "browser.startup.homepage" = "about:blank";
+            "browser.newtabpage.enabled" = false;
+            "browser.newtab.preload" = false;
+            "browser.newtab.url" = "about:blank";
+            "browser.startup.homepage_override.mstone" = "ignore"; # hide welcome & what's new notices
+            "browser.messaging-system.whatsNewPanel.enabled" = false; # hide what's new
+            "browser.menu.showViewImageInfo" = true; # restore "view image info"
+            "browser.ctrlTab.recentlyUsedOrder" = false; # use chronological order
+            "browser.display.show_image_placeholders" = false;
+            "browser.tabs.loadBookmarksInTabs" = true; # open bookmarks in a new tab
+            "browser.urlbar.decodeURLsOnCopy" = true;
+            "editor.truncate_user_pastes" = false; # don't truncate pasted passwords
+            "media.videocontrols.picture-in-picture.video-toggle.has-used" = true; # smaller picture-in-picture icon
+            "accessibility.typeaheadfind" = true; # enable "Find As You Type"
+            "layout.spellcheckDefault" = 2; # multi-line & single-line
+            # we use an external password manager
+            "signon.rememberSignons" = false;
+            "privacy.clearOnShutdown.passwords" = true;
+            # dropdown options in the URL bar
+            "browser.urlbar.suggest.bookmarks" = true;
+            "browser.urlbar.suggest.engines" = false;
+            "browser.urlbar.suggest.history" = true;
+            "browser.urlbar.suggest.openpage" = true;
+            "browser.urlbar.suggest.searches" = true;
+            "browser.urlbar.suggest.topsites" = false; # disable dropdown suggestions with empty query
+            # Smooth scroll
+            "general.smoothScroll" = true;
+            "general.smoothScroll.currentVelocityWeighting" = "0.1";
+            "general.smoothScroll.mouseWheel.durationMaxMS" = 250;
+            "general.smoothScroll.mouseWheel.durationMinMS" = 125;
+            "general.smoothScroll.stopDecelerationWeighting" = "0.7";
+            "mousewheel.min_line_scroll_amount" = 25;
+            "apz.overscroll.enabled" = true; /*elastic overscroll*/
+            # Disable annoying warnings
+            "browser.tabs.warnOnClose" = false;
+            "browser.tabs.warnOnCloseOtherTabs" = false;
+            "browser.tabs.warnOnOpen" = false;
+            "browser.aboutConfig.showWarning" = false;
+            # Hide bookmarks toolbar
+            "browser.toolbars.bookmarks.visibility" = "never";
+          };
+          performanceSettings = {
+            "gfx.webrender.all" = true; # Use webrender everywhere
+            # "gfx.webrender.software" = true; # If the hardware doesn't support it, use software webrendering
+            "dom.image-lazy-loading.enabled" = true;
+            # Restore tabs only on demand
+            "browser.sessionstore.restore_on_demand" = true;
+            "browser.sessionstore.restore_pinned_tabs_on_demand" = true;
+            "browser.sessionstore.restore_tabs_lazily" = true;
+            # Disable preSkeletonUI on startup
+            "browser.startup.preXulSkeletonUI" = false;
+            # Process count (more is faster, but uses more memory)
+            # "dom.ipc.processCount" = 8; # default
+            # "dom.ipc.processCount" = 16;
+            "dom.ipc.processCount" = -1; # as many as FF wants
+            "network.http.max-persistent-connections-per-server" = 10; # default 6
+          };
+          enableUserChrome = {
+            "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+          };
+          saneNewTab = {
+            # Don't open links in new tabs, except when it makes sense
+            "browser.link.open_newwindow" = 1; # force new window into same tab
+            "browser.link.open_newwindow.restriction" = 2; # except for script windows with features
+            "browser.link.open_newwindow.override.external" = 3; # open external links in a new tab in last active window
+            # "browser.link.open_newwindow.override.external" = 2; # open external links in a new window
+          };
+        in
+          {
+            personal = {
+              id = 0;
+              isDefault = true;
+              settings =
+                commonSettings //
+                performanceSettings //
+                enableUserChrome //
+                saneNewTab;
+              extraConfig =
+                let
+                  user-js = pkgs.fetchFromGitHub {
+                    owner = "pyllyukko";
+                    repo = "user.js";
+                    rev = "84134e2b5a53ecdc9f525d5a2c9971c64f9d2057"; # `relaxed` branch
+                    sha256 = "0snnqr51db6x2zs3k7hibrvndv2rb1mjbpl026f566mgc659m7y3";
+                  };
+                in
+                  ''
+                    ${builtins.readFile "${user-js}/user.js"}
+
+                    // Given that we're managing updates declaratively, we don't want to auto-update
+                    user_pref("extensions.update.enabled", false);
+                    user_pref("app.update.enabled", false);
+
+                    // Re-enable some of the more annoying changes
+                    user_pref("browser.display.use_document_fonts", 1); // Allow websites to load fonts
+                    user_pref("keyword.enabled", true); // submit invalid URLs in address bar to the default search engine
+                    user_pref("browser.urlbar.suggest.searches", true);
+                    user_pref("browser.urlbar.suggest.history", true);
+                    user_pref("privacy.sanitize.sanitizeOnShutdown", false);
+                    user_pref("privacy.clearOnShutdown.cache", false);
+                    user_pref("privacy.clearOnShutdown.formdata", false);
+                    user_pref("privacy.clearOnShutdown.offlineApps", false);
+                    user_pref("privacy.clearOnShutdown.history", false);
+                    user_pref("privacy.clearOnShutdown.sessions", false);
+                    user_pref("privacy.clearOnShutdown.openWindows", false);
+                    user_pref("places.history.enabled", true);
+                    user_pref("browser.cache.disk.enable", true);
+                    user_pref("browser.cache.disk_cache_ssl", true);
+                    user_pref("browser.download.manager.retention", 30);
+                    user_pref("browser.formfill.enable", true);
+                    user_pref("browser.formfill.expire_days", 30);
+                    user_pref("browser.download.folderList", 1);
+                    user_pref("browser.download.useDownloadDir", true);
+                  '';
+              userChrome =
+                let
+                  firefox-csshacks = pkgs.fetchFromGitHub {
+                    owner = "MrOtherGuy";
+                    repo = "firefox-csshacks";
+                    rev = "753c37d010836fc53dbab9d005663d52fe4f7930";
+                    sha256 = "02wzb6l4vi04va41h76wiji3xq7ma6bs2ybbc5sp5lhsnqizis16";
+                  };
+                in
+                  ''
+                    @import url('${firefox-csshacks}/chrome/hide_tabs_toolbar.css');
+                    @import url('${firefox-csshacks}/chrome/window_control_placeholder_support.css');
+                    @import url('${firefox-csshacks}/chrome/autohide_toolbox.css');
+
+                    /* autohide_toolbox.css: If tabs toolbar is hidden with hide_tabs_toolbar.css */
+                    #titlebar { margin-bottom: -9px; }
+                  '';
+            };
+          };
     };
     fish = {
       enable = true;
@@ -2068,6 +2299,9 @@ in {
         " Misc settings
         """"""""""""""""""
 
+        " Plain new tab
+        set newtab about:blank
+
         " I’m a smooth operator
         set smoothscroll true
 
@@ -2210,7 +2444,11 @@ in {
   nixpkgs.config = {
     allowUnfree = true;
     joypixels.acceptLicense = true;
-    firefox.enableTridactylNative = true;
+    packageOverrides = pkgs: {
+      nur = import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/master.tar.gz") {
+        inherit pkgs;
+      };
+    };
   };
 
   home.packages = with pkgs; [
