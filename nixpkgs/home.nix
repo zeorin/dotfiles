@@ -2301,8 +2301,10 @@ in {
         " Plain new tab
         set newtab about:blank
 
+        " FIXME currently disabled because it uses performance.now() and this
+        " conflicts with the user.js settings
         " I’m a smooth operator
-        set smoothscroll true
+        " set smoothscroll true
 
         " Sane hinting mode
         set hintfiltermode vimperator-reflow
