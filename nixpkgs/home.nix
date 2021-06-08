@@ -1269,8 +1269,7 @@ in {
       backend = "xrender";
       fade = true;
       fadeDelta = 3;
-      inactiveOpacity = "0.9";
-      inactiveDim = "0.1";
+      inactiveDim = "0.2";
       shadow = true;
       shadowOffsets = [ (-7) (-7) ];
       shadowExclude = [
