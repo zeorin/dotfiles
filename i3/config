@@ -174,7 +174,7 @@ bindsym $mod+BackSpace exec ~/.config/i3/toggletouchpad.sh
 
 # Disable window titles
 for_window [class="^.*"] border pixel 0
-gaps inner 20
+gaps inner 0
 gaps outer 0
 
 set $mode_gaps Gaps: (o) outer, (i) inner
