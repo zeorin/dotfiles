@@ -4,7 +4,7 @@ set $mod Mod4
 # Font for window titles. Will also be used by the bar unless a different font
 font pango:DejaVu Sans Mono 0
 
-# Use Mouse+$mod to drag floating windows to their wanted position
+# Use Mouse+$mod to drag floating windows to their desired position
 floating_modifier $mod
 
 # start a terminal
@@ -98,9 +98,13 @@ bindsym $mod+Shift+8 move container to workspace $workspace8; workspace $workspa
 bindsym $mod+Shift+9 move container to workspace $workspace9; workspace $workspace9
 bindsym $mod+Shift+0 move container to workspace $workspace10; workspace $workspace10
 
-# Move workspace to different monitor
+# Move focus/workspace/window to different monitor
+bindsym $mod+at focus output left
 bindsym $mod+Shift+at move workspace to output left
+bindsym $mod+Shift+Ctrl+at move container to output left; focus output left
+bindsym $mod+slash focus output right
 bindsym $mod+Shift+slash move workspace to output right
+bindsym $mod+Shift+Ctrl+slash move container to output right; focus output right
 
 # Toggle scratchpad
 bindsym $mod+numbersign scratchpad show
@@ -115,11 +119,6 @@ bindsym $mod+Shift+r restart
 # resize window (you can also use the mouse for that)
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
-
-        # Pressing left will shrink the window’s width.
-        # Pressing right will grow the window’s width.
-        # Pressing up will shrink the window’s height.
-        # Pressing down will grow the window’s height.
         bindsym h resize shrink width 20 px or 10 ppt
         bindsym j resize grow height 20 px or 10 ppt
         bindsym k resize shrink height 20 px or 10 ppt
@@ -143,6 +142,9 @@ hide_edge_borders both
 
 # Focus doesn't follow mouse
 focus_follows_mouse no
+
+# Don’t focus wrap out of workspace
+focus_wrapping workspace
 
 # Disallow switching back to previous workspace by pressing the same workspace number
 workspace_auto_back_and_forth no
@@ -235,6 +237,9 @@ exec --no-startup-id dex -a -e i3
 
 # Start flameshot
 exec --no-startup-id flameshot
+
+# Don’t focus a window when it gets focus
+focus_on_window_activation urgent
 
 # Bind certain windows to workspaces
 assign [class="^Firefox$" window_role="(?i)^((?!dialog).)+$"] $workspace2
