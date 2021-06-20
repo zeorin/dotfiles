@@ -585,8 +585,7 @@ in {
     };
     firefox = {
       enable = true;
-      # package = pkgs.latest.firefox-bin;
-      package = pkgs.firefox-bin.override {
+      package = pkgs.latest.firefox-bin.override {
         cfg.enableTridactylNative = true;
       };
       extensions = with pkgs.nur.repos.rycee.firefox-addons; [
@@ -763,7 +762,7 @@ in {
                 saneNewTab;
               extraConfig =
                 let
-                  user-js = pkgs.fetchFromGitHub {
+                  pyllyukko-user-js = pkgs.fetchFromGitHub {
                     owner = "pyllyukko";
                     repo = "user.js";
                     rev = "84134e2b5a53ecdc9f525d5a2c9971c64f9d2057"; # `relaxed` branch
@@ -771,7 +770,7 @@ in {
                   };
                 in
                   ''
-                    ${builtins.readFile "${user-js}/user.js"}
+                    ${builtins.readFile "${pyllyukko-user-js}/user.js"}
 
                     // Given that we're managing updates declaratively, we don't want to auto-update
                     user_pref("extensions.update.enabled", false);
@@ -797,6 +796,10 @@ in {
                     user_pref("browser.formfill.expire_days", 30);
                     user_pref("browser.download.folderList", 1);
                     user_pref("browser.download.useDownloadDir", true);
+
+                    # Work around https://bugzil.la/1664151
+                    # https://github.com/NixOS/nixpkgs/issues/126602
+                    user_pref("gfx.e10s.font-list.shared", false);
                   '';
               userChrome =
                 let
