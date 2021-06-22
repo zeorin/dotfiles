@@ -553,7 +553,7 @@ in {
       enableBashIntegration = true;
       enableZshIntegration = true;
       enableFishIntegration = true;
-      enableNixDirenvIntegration = true;
+      nix-direnv.enable = true;
     };
     emacs = {
       enable = true;
