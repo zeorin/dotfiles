@@ -100,11 +100,11 @@ bindsym $mod+Shift+0 move container to workspace $workspace10; workspace $worksp
 
 # Move focus/workspace/window to different monitor
 bindsym $mod+at focus output left
-bindsym $mod+Shift+at move workspace to output left
-bindsym $mod+Shift+Ctrl+at move container to output left; focus output left
+bindsym $mod+Shift+at move container to output left; focus output left
+bindsym $mod+Shift+Ctrl+at move workspace to output left
 bindsym $mod+slash focus output right
-bindsym $mod+Shift+slash move workspace to output right
-bindsym $mod+Shift+Ctrl+slash move container to output right; focus output right
+bindsym $mod+Shift+slash move container to output right; focus output right
+bindsym $mod+Shift+Ctrl+slash move workspace to output right
 
 # Toggle scratchpad
 bindsym $mod+numbersign scratchpad show
