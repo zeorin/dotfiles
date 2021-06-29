@@ -2,10 +2,9 @@
 
 let
   unstable = import <nixos-unstable> {
-    config = { allowUnfree = true; };
+    config = config.nixpkgs.config;
     overlays = [
       (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; }))
-      # (import (builtins.fetchTarball { url = https://github.com/nix-community/emacs-overlay/archive/master.tar.gz; }))
     ];
   };
 in {
@@ -559,8 +558,7 @@ in {
       enable = true;
       package = let
         emacsPkg = unstable.emacsPgtkGcc;
-        # emacsPkg = unstable.emacs;
-      in with pkgs; (symlinkJoin {
+      in with pkgs; symlinkJoin {
         name = "emacs";
         paths = [ emacsPkg ];
         buildInputs = [ makeWrapper ];
@@ -576,7 +574,7 @@ in {
             --prefix PATH : "${sqlite}/bin" \
             --prefix PATH : "${editorconfig-core-c}/bin"
         '';
-      }) // (with emacsPkg; {
+      } // (with emacsPkg; {
         inherit meta src;
       });
       extraPackages = epkgs: (with epkgs; [
@@ -856,6 +854,8 @@ in {
         ff = "find . -type f -name";
         sortnr = "sort -n -r";
       };
+      # Functions defined here are lazy-loaded, so any functions that react to
+      # signals shouldn’t be defined here.
       functions = {
         # Use Vi keys, and Emacs keys
         fish_user_key_bindings.body = ''
@@ -885,20 +885,6 @@ in {
         mkcd = {
           description = "Create a directory and change into it";
           body = "mkdir -p $argv[1] && cd $argv[1]";
-        };
-        vterm_printf = {
-          description = "Send information to vterm via properly escaped sequences";
-          body = ''
-            if begin; [ -n "$TMUX" ]; and string match -q -r "screen|tmux" "$TERM"; end
-                # tell tmux to pass the escape sequences through
-                printf "\ePtmux;\e\e]%s\007\e\\" "$argv"
-            else if string match -q -- "screen*" "$TERM"
-                # GNU screen (screen, screen-256color, screen-256color-bce)
-                printf "\eP\e]%s\007\e\\" "$argv"
-            else
-                printf "\e]%s\e\\" "$argv"
-            end
-          '';
         };
       };
       interactiveShellInit = ''
@@ -933,13 +919,18 @@ in {
         end
         delta_sidebyside
 
+        #  Use nix-locate to suggest packages that contain missing commands
         function __fish_command_not_found_handler --on-event fish_command_not_found
           ${pkgs.writeShellScript "nix-command-not-found" ''
             source ${pkgs.nix-index}/etc/profile.d/command-not-found.sh
             command_not_found_handle "$@"
           ''} $argv
         end
+
+        # https://github.com/akermu/emacs-libvterm
+        source ${unstable.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${unstable.emacsPackages.vterm.version}/etc/emacs-vterm.fish
       '';
+      # source ${config.programs.emacs.package.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${config.programs.emacs.package.pkgs.vterm.version}/etc/emacs-vterm.fish
     };
     git = {
       enable = true;
