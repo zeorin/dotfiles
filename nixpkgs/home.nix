@@ -928,7 +928,9 @@ in {
         end
 
         # https://github.com/akermu/emacs-libvterm
-        source ${unstable.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${unstable.emacsPackages.vterm.version}/etc/emacs-vterm.fish
+        if test -n "$INSIDE_EMACS"
+          source ${unstable.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${unstable.emacsPackages.vterm.version}/etc/emacs-vterm.fish
+        end
       '';
       # source ${config.programs.emacs.package.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${config.programs.emacs.package.pkgs.vterm.version}/etc/emacs-vterm.fish
     };
