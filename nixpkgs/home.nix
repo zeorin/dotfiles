@@ -1421,14 +1421,26 @@ in {
   #   };
   # };
 
-  # Allow for bluetooth devices to interface with MPRIS
-  systemd.user.services.mpris-proxy = {
-    Unit = {
-      Description = "Forward bluetooth media controls to MPRIS";
-      After = [ "network.target" "sound.target" ];
+  systemd.user = {
+    services = {
+      # Allow for bluetooth devices to interface with MPRIS
+      mpris-proxy = {
+        Unit = {
+          Description = "Forward bluetooth media controls to MPRIS";
+          After = [ "network.target" "sound.target" ];
+        };
+        Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
+        Install.WantedBy = [ "default.target" ];
+      };
     };
-    Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
-    Install.WantedBy = [ "default.target" ];
+    targets = {
+      tray = {
+        Unit = {
+          Description = "Home Manager System Tray";
+          Requires = [ "graphical-session-pre.target" ];
+        };
+      };
+    };
   };
 
   xdg = {
@@ -1813,19 +1825,63 @@ in {
           default: ${userDirs.documents}/Journal/journal.txt
         tagsymbols: @
       '';
-      "flameshot/flameshot.ini".text = ''
-        [General]
-        contrastOpacity=127
-        contrastUiColor=#4476ff
-        copyAndCloseAfterUpload=true
-        disabledTrayIcon=true
-        drawColor=#1e6cc5
-        drawThickness=2
-        saveAfterCopyPath=/home/zeorin/Screenshots
-        savePath=/home/zeorin/Screenshots/
-        showHelp=false
-        uiColor=#003396
-      '';
+      "flameshot/flameshot.ini" = {
+        text = ''
+          [General]
+          checkForUpdates=false
+          contrastOpacity=127
+          contrastUiColor=#4476ff
+          copyAndCloseAfterUpload=true
+          copyPathAfterSave=true
+          disabledTrayIcon=true
+          drawColor=#1e6cc5
+          drawThickness=2
+          saveAfterCopy=true
+          saveAfterCopyPath=/home/zeorin/Screenshots
+          savePath=/home/zeorin/Screenshots/
+          savePathFixed=false
+          showHelp=false
+          showStartupLaunchMessage=true
+          startupLaunch=false
+          uiColor=#003396
+
+          [Shortcuts]
+          TYPE_ARROW=A
+          TYPE_CIRCLE=C
+          TYPE_CIRCLECOUNT=
+          TYPE_COMMIT_CURRENT_TOOL=Ctrl+Return
+          TYPE_COPY=Ctrl+C
+          TYPE_DRAWER=D
+          TYPE_EXIT=Ctrl+Q
+          TYPE_IMAGEUPLOADER=Return
+          TYPE_MARKER=M
+          TYPE_MOVESELECTION=Ctrl+M
+          TYPE_MOVE_DOWN=Down
+          TYPE_MOVE_LEFT=Left
+          TYPE_MOVE_RIGHT=Right
+          TYPE_MOVE_UP=Up
+          TYPE_OPEN_APP=Ctrl+O
+          TYPE_PENCIL=P
+          TYPE_PIN=
+          TYPE_PIXELATE=B
+          TYPE_RECTANGLE=R
+          TYPE_REDO=Ctrl+Shift+Z
+          TYPE_RESIZE_DOWN=Shift+Down
+          TYPE_RESIZE_LEFT=Shift+Left
+          TYPE_RESIZE_RIGHT=Shift+Right
+          TYPE_RESIZE_UP=Shift+Up
+          TYPE_SAVE=Ctrl+S
+          TYPE_SELECTION=S
+          TYPE_SELECTIONINDICATOR=
+          TYPE_SELECT_ALL=Ctrl+A
+          TYPE_TEXT=T
+          TYPE_TOGGLE_PANEL=Space
+          TYPE_UNDO=Ctrl+Z
+        '';
+        onChange = "${pkgs.writeShellScript "restart flameshot.service" ''
+          ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
+        ''}";
+      };
       "flameshot/flameshot.sh".source = pkgs.writeShellScript "flameshot.sh" ''
         if [ "$1" = "activewindow" ]; then
           # Get active window geometry
@@ -3073,7 +3129,6 @@ in {
     onlyoffice-bin
     arandr
     barrier
-    flameshot
     # TODO this is for the i3-fullscreen screensaver inhibition script, move to its own config later
     (python3.withPackages (python-packages: [ python-packages.i3ipc ]))
     ethtool
