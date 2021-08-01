@@ -572,7 +572,8 @@ in {
             --prefix PATH : "${zstd}/bin" \
             --prefix PATH : "${nodePackages.javascript-typescript-langserver}/bin" \
             --prefix PATH : "${sqlite}/bin" \
-            --prefix PATH : "${editorconfig-core-c}/bin"
+            --prefix PATH : "${editorconfig-core-c}/bin" \
+            --prefix PATH : "${gcc}/bin"
         '';
       } // (with emacsPkg; {
         inherit meta src;
