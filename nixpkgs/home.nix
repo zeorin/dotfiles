@@ -946,6 +946,7 @@ in {
           safecrlf = false;
           whitespace = "trailing-space,space-before-tab";
         };
+        init.defaultBranch = "main";
         credential.helper = "cache";
         color.ui = true;
         push.default = "simple";
