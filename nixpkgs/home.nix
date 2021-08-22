@@ -1531,11 +1531,7 @@ in {
         ;; numbers are disabled. For relative line numbers, set this to `relative'.
         (setq display-line-numbers-type 'relative)
 
-        (setq projectile-project-search-path '("~/Code/"
-                                              "~/Code/Stone Three/"
-                                              "~/Code/Pixel Theory/"
-                                              "~/Code/John Lewis/"
-                                              "~/Code/TransferGo/"))
+        (setq projectile-project-search-path '(("~/Code/" . 1)))
 
         ;; Here are some additional functions/macros that could help you configure Doom:
         ;;
