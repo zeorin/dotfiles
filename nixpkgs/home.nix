@@ -1446,6 +1446,76 @@ in {
         Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
         Install.WantedBy = [ "default.target" ];
       };
+      # Noise suppression
+      pipewire-input-filter = {
+        Unit = {
+          Description = "PipeWire Input Filter Chain";
+          After = [ "pipewire.service" ];
+          BindsTo = [ "pipewire.service" ];
+        };
+        Service = pkgs.lib.mkIf pkgs.hostPlatform.isLinux {
+          ExecStart = "${pkgs.pipewire}/bin/pipewire -c ${pkgs.writeText "pipewire-input-filter.conf" ''
+            #
+            # Noise canceling source
+            # https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Filter-Chain#rnnoise-example
+            #
+
+            context.properties = {
+                log.level        = 0
+            }
+
+            context.spa-libs = {
+                audio.convert.* = audioconvert/libspa-audioconvert
+                support.*       = support/libspa-support
+            }
+
+            context.modules = [
+                {   name = libpipewire-module-rtkit
+                    args = {
+                        #nice.level   = -11
+                        #rt.prio      = 88
+                        #rt.time.soft = 200000
+                        #rt.time.hard = 200000
+                    }
+                    flags = [ ifexists nofail ]
+                }
+                {   name = libpipewire-module-protocol-native }
+                {   name = libpipewire-module-client-node }
+                {   name = libpipewire-module-adapter }
+
+                {   name = libpipewire-module-filter-chain
+                    args = {
+                        node.name =  "rnnoise_source"
+                        node.description =  "Noise Canceling source"
+                        media.name =  "Noise Canceling source"
+                        filter.graph = {
+                            nodes = [
+                                {
+                                    type = ladspa
+                                    name = rnnoise
+                                    plugin = ${pkgs.rnnoise-plugin}/lib/ladspa/librnnoise_ladspa.so
+                                    label = noise_suppressor_stereo
+                                    control = {
+                                        "VAD Threshold (%)" 95.0
+                                    }
+                                }
+                            ]
+                        }
+                        capture.props = {
+                            node.passive = true
+                        }
+                        playback.props = {
+                            media.class = Audio/Source
+                        }
+                    }
+                }
+            ]
+          ''}";
+          Type = "simple";
+          Restart = "on-failure";
+        };
+        Install.WantedBy = [ "pipewire.service" ];
+      };
     };
     targets = {
       tray = {
@@ -1699,7 +1769,7 @@ in {
                  ;;idris             ; a language you can depend on
                  json              ; At least it ain't XML
                  ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
-                 javascript        ; all(hope(abandon(ye(who(enter(here))))))
+                 (javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
                  ;;julia             ; a better, faster MATLAB
                  ;;kotlin            ; a better, slicker Java(Script)
                  latex             ; writing papers in Emacs has never been so fun
