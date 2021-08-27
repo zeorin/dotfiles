@@ -9,9 +9,9 @@ function main() {
 
     action=$1
     if [ "${action}" == "up" ]; then
-        pactl set-sink-volume @DEFAULT_SINK@ +10%
+        pactl set-sink-volume @DEFAULT_SINK@ +5%
     elif [ "${action}" == "down" ]; then
-        pactl set-sink-volume @DEFAULT_SINK@ -10%
+        pactl set-sink-volume @DEFAULT_SINK@ -5%
     elif [ "${action}" == "mute" ]; then
         pactl set-sink-mute @DEFAULT_SINK@ toggle
     else
