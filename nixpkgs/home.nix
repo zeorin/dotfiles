@@ -589,6 +589,17 @@ in {
       };
       extensions = with pkgs.nur.repos.rycee.firefox-addons; [
         clearurls
+        darkreader
+        https-everywhere
+        keepassxc-browser
+        privacy-badger
+        react-devtools
+        reddit-enhancement-suite
+        reduxdevtools
+        refined-github
+        tridactyl
+        ublock-origin
+      ] ++ [
         (buildFirefoxXpiAddon rec {
           pname = "containerise";
           version = "3.9.0";
@@ -615,7 +626,19 @@ in {
             platforms = platforms.all;
           };
         })
-        darkreader
+        (buildFirefoxXpiAddon rec {
+          pname = "cors-everywhere";
+          version = "18.11.13.2043";
+          addonId = "cors-everywhere@spenibus";
+          url = "https://addons.mozilla.org/firefox/downloads/file/1148493/cors_everywhere-${version}-fx.xpi";
+          sha256 = "0kw89yjsw0dggdk8h238h7fzjpi7wm58gnnad8vpnax63xp90chj";
+          meta = with lib; {
+            homepage = "https://github.com/spenibus/cors-everywhere-firefox-addon";
+            description = "Bypass CORS restrictions by altering http responses.";
+            licence = licences.mit;
+            platforms = platforms.all;
+          };
+        })
         (buildFirefoxXpiAddon rec {
           pname = "enhancer-for-youtube";
           version = "2.0.104.12";
@@ -629,11 +652,6 @@ in {
             platforms = platforms.all;
           };
         })
-        https-everywhere
-        keepassxc-browser
-        privacy-badger
-        react-devtools
-        reddit-enhancement-suite
         (buildFirefoxXpiAddon rec {
           pname = "redirect-amp-to-html";
           version = "2.1.0";
@@ -647,8 +665,6 @@ in {
             platforms = platforms.all;
           };
         })
-        reduxdevtools
-        refined-github
         (buildFirefoxXpiAddon rec {
           pname = "share-on-twitter";
           version = "0.80.2";
@@ -662,8 +678,6 @@ in {
             platforms = platforms.all;
           };
         })
-        tridactyl
-        ublock-origin
         (buildFirefoxXpiAddon rec {
           pname = "wallabagger";
           version = "1.13.0";
@@ -723,6 +737,12 @@ in {
             # Hide bookmarks toolbar
             "browser.toolbars.bookmarks.visibility" = "never";
           };
+          noNoiseSuppression = {
+            "media.getusermedia.aec_enabled" = false;
+            "media.getusermedia.agc_enabled" = false;
+            "media.getusermedia.noise_enabled" = false;
+            "media.getusermedia.hpf_enabled" = false;
+          };
           performanceSettings = {
             "gfx.webrender.all" = true; # Use webrender everywhere
             # "gfx.webrender.software" = true; # If the hardware doesn't support it, use software webrendering
@@ -756,6 +776,7 @@ in {
               isDefault = true;
               settings =
                 commonSettings //
+                noNoiseSuppression //
                 performanceSettings //
                 enableUserChrome //
                 saneNewTab;
@@ -817,6 +838,9 @@ in {
                     /* autohide_toolbox.css: If tabs toolbar is hidden with hide_tabs_toolbar.css */
                     #titlebar { margin-bottom: -9px; }
                   '';
+            };
+            blank = {
+              id = 1;
             };
           };
     };
@@ -1177,6 +1201,14 @@ in {
         }
       ];
     };
+    vscode = {
+      enable = true;
+      package = pkgs.vscodium;
+      extensions = with unstable.vscode-extensions; [
+        bbenoist.nix
+        vscodevim.vim
+      ];
+    };
     zathura = {
       enable = true;
       options = {
@@ -1446,77 +1478,8 @@ in {
         Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
         Install.WantedBy = [ "default.target" ];
       };
-      # Noise suppression
-      pipewire-input-filter = {
-        Unit = {
-          Description = "PipeWire Input Filter Chain";
-          After = [ "pipewire.service" ];
-          BindsTo = [ "pipewire.service" ];
-        };
-        Service = pkgs.lib.mkIf pkgs.hostPlatform.isLinux {
-          ExecStart = "${pkgs.pipewire}/bin/pipewire -c ${pkgs.writeText "pipewire-input-filter.conf" ''
-            #
-            # Noise canceling source
-            # https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Filter-Chain#rnnoise-example
-            #
-
-            context.properties = {
-                log.level        = 0
-            }
-
-            context.spa-libs = {
-                audio.convert.* = audioconvert/libspa-audioconvert
-                support.*       = support/libspa-support
-            }
-
-            context.modules = [
-                {   name = libpipewire-module-rtkit
-                    args = {
-                        #nice.level   = -11
-                        #rt.prio      = 88
-                        #rt.time.soft = 200000
-                        #rt.time.hard = 200000
-                    }
-                    flags = [ ifexists nofail ]
-                }
-                {   name = libpipewire-module-protocol-native }
-                {   name = libpipewire-module-client-node }
-                {   name = libpipewire-module-adapter }
-
-                {   name = libpipewire-module-filter-chain
-                    args = {
-                        node.name =  "rnnoise_source"
-                        node.description =  "Noise Canceling source"
-                        media.name =  "Noise Canceling source"
-                        filter.graph = {
-                            nodes = [
-                                {
-                                    type = ladspa
-                                    name = rnnoise
-                                    plugin = ${pkgs.rnnoise-plugin}/lib/ladspa/librnnoise_ladspa.so
-                                    label = noise_suppressor_stereo
-                                    control = {
-                                        "VAD Threshold (%)" 95.0
-                                    }
-                                }
-                            ]
-                        }
-                        capture.props = {
-                            node.passive = true
-                        }
-                        playback.props = {
-                            media.class = Audio/Source
-                        }
-                    }
-                }
-            ]
-          ''}";
-          Type = "simple";
-          Restart = "on-failure";
-        };
-        Install.WantedBy = [ "pipewire.service" ];
-      };
     };
+    # REVIEW https://github.com/nix-community/home-manager/issues/2064#issuecomment-887300055
     targets = {
       tray = {
         Unit = {
