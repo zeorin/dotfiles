@@ -3266,7 +3266,7 @@ in {
       }))
       gnome3.gnome-calculator
       gnome3.file-roller
-      youtube-dl
+      unstable.yt-dlp
       screenkey
       slop
       system-config-printer
