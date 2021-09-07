@@ -575,9 +575,9 @@ in {
             --prefix PATH : "${editorconfig-core-c}/bin" \
             --prefix PATH : "${gcc}/bin"
         '';
-      } // (with emacsPkg; {
-        inherit meta src;
-      });
+      } // {
+        inherit (emacsPkg) meta src;
+      };
       extraPackages = epkgs: (with epkgs; [
         vterm
       ]);
@@ -1203,7 +1203,20 @@ in {
     };
     vscode = {
       enable = true;
-      package = pkgs.vscodium;
+      package = let
+          vscodePkg = pkgs.vscode;
+        in with pkgs; symlinkJoin {
+          name = "vscode";
+          paths = [ vscodePkg ];
+          buildInputs = [ makeWrapper ];
+          postBuild = ''
+            wrapProgram $out/bin/code \
+              --prefix PATH : "${docker}/bin" \
+              --prefix PATH : "${docker-compose}/bin"
+          '';
+        } // {
+          inherit (vscodePkg) meta src pname;
+        };
       extensions = with unstable.vscode-extensions; [
         bbenoist.nix
         vscodevim.vim
@@ -3255,12 +3268,8 @@ in {
       }
     )
 
-    ((import (fetchFromGitHub {
-      owner = "Shopify";
-      repo = "comma";
-      rev = "1.0.0";
-      sha256 = "0n5a3rnv9qnnsrl76kpi6dmaxmwj1mpdd2g0b4n1wfimqfaz6gi1";
-    })) { inherit pkgs; })
+    # https://github.com/Shopify/comma/issues/2#issuecomment-636572039
+    nur.repos.xe.comma
 
     # TODO: Remove this once the i3 & polybar configs are managed by
     # home-manager, as we’re only installing it so that we can use `pactl`
@@ -3355,6 +3364,7 @@ in {
     junicode
 
     # Fallback fonts
+    cm_unicode
     xorg.fontcursormisc
     symbola
     freefont_ttf
