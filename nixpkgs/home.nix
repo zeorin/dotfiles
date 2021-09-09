@@ -575,7 +575,11 @@ in {
             --prefix PATH : "${fd}/bin" \
             --prefix PATH : "${imagemagick}/bin" \
             --prefix PATH : "${zstd}/bin" \
-            --prefix PATH : "${nodePackages.javascript-typescript-langserver}/bin" \
+            --prefix PATH : "${nodePackages.typescript-language-server}/bin" \
+            --prefix PATH : "${nodePackages.vscode-css-languageserver-bin}/bin" \
+            --prefix PATH : "${nodePackages.vscode-html-languageserver-bin}/bin" \
+            --prefix PATH : "${nodePackages.prettier}/bin" \
+            --prefix PATH : "${nixfmt}/bin" \
             --prefix PATH : "${sqlite}/bin" \
             --prefix PATH : "${editorconfig-core-c}/bin" \
             --prefix PATH : "${gcc}/bin"
@@ -1790,7 +1794,7 @@ in {
                  ;;solidity          ; do you need a blockchain? No.
                  ;;swift             ; who asked for emoji variables?
                  ;;terra             ; Earth and Moon in alignment for performance.
-                 web               ; the tubes
+                 (web +lsp)              ; the tubes
                  yaml              ; JSON, but readable
 
                  :email
