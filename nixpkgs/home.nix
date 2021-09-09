@@ -4,12 +4,17 @@ let
   unstable = import <nixos-unstable> {
     config = config.nixpkgs.config;
     overlays = [
-      (import (builtins.fetchTarball { url = https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz; }))
+      (import (builtins.fetchTarball {
+        url =
+          "https://github.com/mjlbach/emacs-overlay/archive/feature/flakes.tar.gz";
+      }))
     ];
   };
 in {
   nixpkgs.overlays = [
-    (import (builtins.fetchTarball { url = https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz; }))
+    (import (builtins.fetchTarball {
+      url = "https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz";
+    }))
   ];
 
   programs.home-manager.enable = true;
@@ -556,9 +561,9 @@ in {
     };
     emacs = {
       enable = true;
-      package = let
-        emacsPkg = unstable.emacsPgtkGcc;
-      in with pkgs; symlinkJoin {
+      package = let emacsPkg = unstable.emacsPgtkGcc;
+      in with pkgs;
+      symlinkJoin {
         name = "emacs";
         paths = [ emacsPkg ];
         buildInputs = [ makeWrapper ];
@@ -578,271 +583,278 @@ in {
       } // {
         inherit (emacsPkg) meta src;
       };
-      extraPackages = epkgs: (with epkgs; [
-        vterm
-      ]);
+      extraPackages = epkgs: (with epkgs; [ vterm ]);
     };
     firefox = {
       enable = true;
-      package = pkgs.latest.firefox-bin.override {
-        cfg.enableTridactylNative = true;
+      package =
+        pkgs.latest.firefox-bin.override { cfg.enableTridactylNative = true; };
+      extensions = with pkgs.nur.repos.rycee.firefox-addons;
+        [
+          clearurls
+          darkreader
+          https-everywhere
+          keepassxc-browser
+          privacy-badger
+          react-devtools
+          reddit-enhancement-suite
+          reduxdevtools
+          refined-github
+          tridactyl
+          ublock-origin
+        ] ++ [
+          (buildFirefoxXpiAddon rec {
+            pname = "containerise";
+            version = "3.9.0";
+            addonId = "containerise@kinte.sh";
+            url =
+              "https://addons.mozilla.org/firefox/downloads/file/3724805/containerise-${version}-fx.xpi";
+            sha256 = "1rfi22m844sn13kj1014k9hf34ixjxvjjiqx8b75wb2ic2hilldz";
+            meta = with lib; {
+              homepage = "https://github.com/kintesh/containerise";
+              description =
+                "Automatically open websites in a dedicated container. Simply add rules to map domain or subdomain to your container.";
+              licence = licences.mit;
+              platforms = platforms.all;
+            };
+          })
+          (buildFirefoxXpiAddon rec {
+            pname = "cookies.txt";
+            version = "0.2";
+            addonId = "{12cf650b-1822-40aa-bff0-996df6948878}";
+            url =
+              "https://addons.mozilla.org/firefox/downloads/file/3588248/cookiestxt-${version}-fx.xpi";
+            sha256 = "1byr53zlyjp54p9h8bkhmln1a9yf7zsk0jz8hsb035j01bijghp2";
+            meta = with lib; {
+              homepage = "https://github.com/lennonhill/cookies-txt";
+              description =
+                "Exports all cookies to a Netscape HTTP Cookie File, as used by curl, wget, and youtube-dl, among others.";
+              licence = licences.gpl3;
+              platforms = platforms.all;
+            };
+          })
+          (buildFirefoxXpiAddon rec {
+            pname = "cors-everywhere";
+            version = "18.11.13.2043";
+            addonId = "cors-everywhere@spenibus";
+            url =
+              "https://addons.mozilla.org/firefox/downloads/file/1148493/cors_everywhere-${version}-fx.xpi";
+            sha256 = "0kw89yjsw0dggdk8h238h7fzjpi7wm58gnnad8vpnax63xp90chj";
+            meta = with lib; {
+              homepage =
+                "https://github.com/spenibus/cors-everywhere-firefox-addon";
+              description =
+                "Bypass CORS restrictions by altering http responses.";
+              licence = licences.mit;
+              platforms = platforms.all;
+            };
+          })
+          (buildFirefoxXpiAddon rec {
+            pname = "enhancer-for-youtube";
+            version = "2.0.104.12";
+            addonId = "enhancerforyoutube@maximerf.addons.mozilla.org";
+            url =
+              "https://addons.mozilla.org/firefox/downloads/file/3780706/enhancer_for_youtubetm-${version}-fx.xpi";
+            sha256 = "0zjs4jgvg0shjhj38jb17wp3v28fp51bbr10wnqy3fq9fj2pn88p";
+            meta = with lib; {
+              homepage = "https://www.mrfdev.com/enhancer-for-youtube";
+              description =
+                "Take control of YouTube and boost your user experience!";
+              licence = licences.gpl3;
+              platforms = platforms.all;
+            };
+          })
+          (buildFirefoxXpiAddon rec {
+            pname = "redirect-amp-to-html";
+            version = "2.1.0";
+            addonId = "{569456be-2850-4f7e-b669-71e55140ee0a}";
+            url =
+              "https://addons.mozilla.org/firefox/downloads/file/3546077/redirect_amp_to_html-${version}-an+fx.xpi";
+            sha256 = "142plr60v7w4niwm5kpmaymmaqn319rwfwakh3ad6c1cg0r40bkn";
+            meta = with lib; {
+              homepage =
+                "https://www.daniel.priv.no/web-extensions/amp2html.html";
+              description =
+                "Automatically redirects AMP pages to the regular web page variant.";
+              licence = with licences; [ mit x11 ];
+              platforms = platforms.all;
+            };
+          })
+          (buildFirefoxXpiAddon rec {
+            pname = "share-on-twitter";
+            version = "0.80.2";
+            addonId = "jid1-SmvuJ9Cq3Cx13w@jetpack";
+            url =
+              "https://addons.mozilla.org/firefox/downloads/file/3524067/share_on_twitter-${version}-fx.xpi";
+            sha256 = "14pvjqdffxy40mmf6208xmdkk3d1qmgbyw5p8srw5vzvvwkss8bn";
+            meta = with lib; {
+              homepage = "https://browsernative.com/twitter-share-firefox/";
+              description =
+                "Simplest add-on for Twitter. Share web pages, links and selected text on Twitter right from the context menu (right click menu) and the toolbar button.";
+              licence = licences.mpl2;
+              platforms = platforms.all;
+            };
+          })
+          (buildFirefoxXpiAddon rec {
+            pname = "wallabagger";
+            version = "1.13.0";
+            addonId = "{7a7b1d36-d7a4-481b-92c6-9f5427cb9eb1}";
+            url =
+              "https://addons.mozilla.org/firefox/downloads/file/3782259/wallabagger-${version}-an+fx.xpi";
+            sha256 = "1w0jygwz486r7xli5fcm6agibyjrfdr89dxyir5371if9khixr37";
+            meta = with lib; {
+              homepage = "";
+              description =
+                "This wallabag v2 extension has the ability to edit title and tags and set starred, archived, or delete states. You can add a page from the icon or through the right click menu on a link or on a blank page spot.";
+              licence = with licences; [ mit x11 ];
+              platforms = platforms.all;
+            };
+          })
+        ];
+      profiles = let
+        commonSettings = {
+          "browser.startup.page" = 3; # resume previous session
+          "browser.startup.homepage" = "about:blank";
+          "browser.newtabpage.enabled" = false;
+          "browser.newtab.preload" = false;
+          "browser.newtab.url" = "about:blank";
+          "browser.startup.homepage_override.mstone" =
+            "ignore"; # hide welcome & what's new notices
+          "browser.messaging-system.whatsNewPanel.enabled" =
+            false; # hide what's new
+          "browser.menu.showViewImageInfo" = true; # restore "view image info"
+          "browser.ctrlTab.recentlyUsedOrder" = false; # use chronological order
+          "browser.display.show_image_placeholders" = false;
+          "browser.tabs.loadBookmarksInTabs" =
+            true; # open bookmarks in a new tab
+          "browser.urlbar.decodeURLsOnCopy" = true;
+          "editor.truncate_user_pastes" =
+            false; # don't truncate pasted passwords
+          "media.videocontrols.picture-in-picture.video-toggle.has-used" =
+            true; # smaller picture-in-picture icon
+          "accessibility.typeaheadfind" = true; # enable "Find As You Type"
+          "layout.spellcheckDefault" = 2; # multi-line & single-line
+          # we use an external password manager
+          "signon.rememberSignons" = false;
+          "privacy.clearOnShutdown.passwords" = true;
+          # dropdown options in the URL bar
+          "browser.urlbar.suggest.bookmarks" = true;
+          "browser.urlbar.suggest.engines" = false;
+          "browser.urlbar.suggest.history" = true;
+          "browser.urlbar.suggest.openpage" = true;
+          "browser.urlbar.suggest.searches" = true;
+          "browser.urlbar.suggest.topsites" =
+            false; # disable dropdown suggestions with empty query
+          # Smooth scroll
+          "general.smoothScroll" = true;
+          "general.smoothScroll.currentVelocityWeighting" = "0.1";
+          "general.smoothScroll.mouseWheel.durationMaxMS" = 250;
+          "general.smoothScroll.mouseWheel.durationMinMS" = 125;
+          "general.smoothScroll.stopDecelerationWeighting" = "0.7";
+          "mousewheel.min_line_scroll_amount" = 25;
+          "apz.overscroll.enabled" = true; # elastic overscroll
+          # Disable annoying warnings
+          "browser.tabs.warnOnClose" = false;
+          "browser.tabs.warnOnCloseOtherTabs" = false;
+          "browser.tabs.warnOnOpen" = false;
+          "browser.aboutConfig.showWarning" = false;
+          # Hide bookmarks toolbar
+          "browser.toolbars.bookmarks.visibility" = "never";
+        };
+        noNoiseSuppression = {
+          "media.getusermedia.aec_enabled" = false;
+          "media.getusermedia.agc_enabled" = false;
+          "media.getusermedia.noise_enabled" = false;
+          "media.getusermedia.hpf_enabled" = false;
+        };
+        performanceSettings = {
+          "gfx.webrender.all" = true; # Use webrender everywhere
+          # "gfx.webrender.software" = true; # If the hardware doesn't support it, use software webrendering
+          "dom.image-lazy-loading.enabled" = true;
+          # Restore tabs only on demand
+          "browser.sessionstore.restore_on_demand" = true;
+          "browser.sessionstore.restore_pinned_tabs_on_demand" = true;
+          "browser.sessionstore.restore_tabs_lazily" = true;
+          # Disable preSkeletonUI on startup
+          "browser.startup.preXulSkeletonUI" = false;
+          # Process count (more is faster, but uses more memory)
+          # "dom.ipc.processCount" = 8; # default
+          # "dom.ipc.processCount" = 16;
+          "dom.ipc.processCount" = -1; # as many as FF wants
+          "network.http.max-persistent-connections-per-server" = 10; # default 6
+        };
+        enableUserChrome = {
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+        };
+        saneNewTab = {
+          # Don't open links in new tabs, except when it makes sense
+          "browser.link.open_newwindow" = 1; # force new window into same tab
+          "browser.link.open_newwindow.restriction" =
+            2; # except for script windows with features
+          "browser.link.open_newwindow.override.external" =
+            3; # open external links in a new tab in last active window
+          # "browser.link.open_newwindow.override.external" = 2; # open external links in a new window
+        };
+      in {
+        personal = {
+          id = 0;
+          isDefault = true;
+          settings = commonSettings // noNoiseSuppression // performanceSettings
+            // enableUserChrome // saneNewTab;
+          extraConfig = let
+            pyllyukko-user-js = pkgs.fetchFromGitHub {
+              owner = "pyllyukko";
+              repo = "user.js";
+              rev =
+                "84134e2b5a53ecdc9f525d5a2c9971c64f9d2057"; # `relaxed` branch
+              sha256 = "0snnqr51db6x2zs3k7hibrvndv2rb1mjbpl026f566mgc659m7y3";
+            };
+          in ''
+            ${builtins.readFile "${pyllyukko-user-js}/user.js"}
+
+            // Given that we're managing updates declaratively, we don't want to auto-update
+            user_pref("extensions.update.enabled", false);
+            user_pref("app.update.enabled", false);
+
+            // Re-enable some of the more annoying changes
+            user_pref("browser.display.use_document_fonts", 1); // Allow websites to load fonts
+            user_pref("keyword.enabled", true); // submit invalid URLs in address bar to the default search engine
+            user_pref("browser.urlbar.suggest.searches", true);
+            user_pref("browser.urlbar.suggest.history", true);
+            user_pref("privacy.sanitize.sanitizeOnShutdown", false);
+            user_pref("privacy.clearOnShutdown.cache", false);
+            user_pref("privacy.clearOnShutdown.formdata", false);
+            user_pref("privacy.clearOnShutdown.offlineApps", false);
+            user_pref("privacy.clearOnShutdown.history", false);
+            user_pref("privacy.clearOnShutdown.sessions", false);
+            user_pref("privacy.clearOnShutdown.openWindows", false);
+            user_pref("places.history.enabled", true);
+            user_pref("browser.cache.disk.enable", true);
+            user_pref("browser.cache.disk_cache_ssl", true);
+            user_pref("browser.download.manager.retention", 30);
+            user_pref("browser.formfill.enable", true);
+            user_pref("browser.formfill.expire_days", 30);
+            user_pref("browser.download.folderList", 1);
+            user_pref("browser.download.useDownloadDir", true);
+          '';
+          userChrome = let
+            firefox-csshacks = pkgs.fetchFromGitHub {
+              owner = "MrOtherGuy";
+              repo = "firefox-csshacks";
+              rev = "753c37d010836fc53dbab9d005663d52fe4f7930";
+              sha256 = "02wzb6l4vi04va41h76wiji3xq7ma6bs2ybbc5sp5lhsnqizis16";
+            };
+          in ''
+            @import url('${firefox-csshacks}/chrome/hide_tabs_toolbar.css');
+            @import url('${firefox-csshacks}/chrome/window_control_placeholder_support.css');
+            @import url('${firefox-csshacks}/chrome/autohide_toolbox.css');
+
+            /* autohide_toolbox.css: If tabs toolbar is hidden with hide_tabs_toolbar.css */
+            #titlebar { margin-bottom: -9px; }
+          '';
+        };
+        blank = { id = 1; };
       };
-      extensions = with pkgs.nur.repos.rycee.firefox-addons; [
-        clearurls
-        darkreader
-        https-everywhere
-        keepassxc-browser
-        privacy-badger
-        react-devtools
-        reddit-enhancement-suite
-        reduxdevtools
-        refined-github
-        tridactyl
-        ublock-origin
-      ] ++ [
-        (buildFirefoxXpiAddon rec {
-          pname = "containerise";
-          version = "3.9.0";
-          addonId = "containerise@kinte.sh";
-          url = "https://addons.mozilla.org/firefox/downloads/file/3724805/containerise-${version}-fx.xpi";
-          sha256 = "1rfi22m844sn13kj1014k9hf34ixjxvjjiqx8b75wb2ic2hilldz";
-          meta = with lib; {
-            homepage = "https://github.com/kintesh/containerise";
-            description = "Automatically open websites in a dedicated container. Simply add rules to map domain or subdomain to your container.";
-            licence = licences.mit;
-            platforms = platforms.all;
-          };
-        })
-        (buildFirefoxXpiAddon rec {
-          pname = "cookies.txt";
-          version = "0.2";
-          addonId = "{12cf650b-1822-40aa-bff0-996df6948878}";
-          url = "https://addons.mozilla.org/firefox/downloads/file/3588248/cookiestxt-${version}-fx.xpi";
-          sha256 = "1byr53zlyjp54p9h8bkhmln1a9yf7zsk0jz8hsb035j01bijghp2";
-          meta = with lib; {
-            homepage = "https://github.com/lennonhill/cookies-txt";
-            description = "Exports all cookies to a Netscape HTTP Cookie File, as used by curl, wget, and youtube-dl, among others.";
-            licence = licences.gpl3;
-            platforms = platforms.all;
-          };
-        })
-        (buildFirefoxXpiAddon rec {
-          pname = "cors-everywhere";
-          version = "18.11.13.2043";
-          addonId = "cors-everywhere@spenibus";
-          url = "https://addons.mozilla.org/firefox/downloads/file/1148493/cors_everywhere-${version}-fx.xpi";
-          sha256 = "0kw89yjsw0dggdk8h238h7fzjpi7wm58gnnad8vpnax63xp90chj";
-          meta = with lib; {
-            homepage = "https://github.com/spenibus/cors-everywhere-firefox-addon";
-            description = "Bypass CORS restrictions by altering http responses.";
-            licence = licences.mit;
-            platforms = platforms.all;
-          };
-        })
-        (buildFirefoxXpiAddon rec {
-          pname = "enhancer-for-youtube";
-          version = "2.0.104.12";
-          addonId = "enhancerforyoutube@maximerf.addons.mozilla.org";
-          url = "https://addons.mozilla.org/firefox/downloads/file/3780706/enhancer_for_youtubetm-${version}-fx.xpi";
-          sha256 = "0zjs4jgvg0shjhj38jb17wp3v28fp51bbr10wnqy3fq9fj2pn88p";
-          meta = with lib; {
-            homepage = "https://www.mrfdev.com/enhancer-for-youtube";
-            description = "Take control of YouTube and boost your user experience!";
-            licence = licences.gpl3;
-            platforms = platforms.all;
-          };
-        })
-        (buildFirefoxXpiAddon rec {
-          pname = "redirect-amp-to-html";
-          version = "2.1.0";
-          addonId = "{569456be-2850-4f7e-b669-71e55140ee0a}";
-          url = "https://addons.mozilla.org/firefox/downloads/file/3546077/redirect_amp_to_html-${version}-an+fx.xpi";
-          sha256 = "142plr60v7w4niwm5kpmaymmaqn319rwfwakh3ad6c1cg0r40bkn";
-          meta = with lib; {
-            homepage = "https://www.daniel.priv.no/web-extensions/amp2html.html";
-            description = "Automatically redirects AMP pages to the regular web page variant.";
-            licence = with licences; [ mit x11 ];
-            platforms = platforms.all;
-          };
-        })
-        (buildFirefoxXpiAddon rec {
-          pname = "share-on-twitter";
-          version = "0.80.2";
-          addonId = "jid1-SmvuJ9Cq3Cx13w@jetpack";
-          url = "https://addons.mozilla.org/firefox/downloads/file/3524067/share_on_twitter-${version}-fx.xpi";
-          sha256 = "14pvjqdffxy40mmf6208xmdkk3d1qmgbyw5p8srw5vzvvwkss8bn";
-          meta = with lib; {
-            homepage = "https://browsernative.com/twitter-share-firefox/";
-            description = "Simplest add-on for Twitter. Share web pages, links and selected text on Twitter right from the context menu (right click menu) and the toolbar button.";
-            licence = licences.mpl2;
-            platforms = platforms.all;
-          };
-        })
-        (buildFirefoxXpiAddon rec {
-          pname = "wallabagger";
-          version = "1.13.0";
-          addonId = "{7a7b1d36-d7a4-481b-92c6-9f5427cb9eb1}";
-          url = "https://addons.mozilla.org/firefox/downloads/file/3782259/wallabagger-${version}-an+fx.xpi";
-          sha256 = "1w0jygwz486r7xli5fcm6agibyjrfdr89dxyir5371if9khixr37";
-          meta = with lib; {
-            homepage = "";
-            description = "This wallabag v2 extension has the ability to edit title and tags and set starred, archived, or delete states. You can add a page from the icon or through the right click menu on a link or on a blank page spot.";
-            licence = with licences; [ mit x11 ];
-            platforms = platforms.all;
-          };
-        })
-      ];
-      profiles =
-        let
-          commonSettings = {
-            "browser.startup.page" = 3; # resume previous session
-            "browser.startup.homepage" = "about:blank";
-            "browser.newtabpage.enabled" = false;
-            "browser.newtab.preload" = false;
-            "browser.newtab.url" = "about:blank";
-            "browser.startup.homepage_override.mstone" = "ignore"; # hide welcome & what's new notices
-            "browser.messaging-system.whatsNewPanel.enabled" = false; # hide what's new
-            "browser.menu.showViewImageInfo" = true; # restore "view image info"
-            "browser.ctrlTab.recentlyUsedOrder" = false; # use chronological order
-            "browser.display.show_image_placeholders" = false;
-            "browser.tabs.loadBookmarksInTabs" = true; # open bookmarks in a new tab
-            "browser.urlbar.decodeURLsOnCopy" = true;
-            "editor.truncate_user_pastes" = false; # don't truncate pasted passwords
-            "media.videocontrols.picture-in-picture.video-toggle.has-used" = true; # smaller picture-in-picture icon
-            "accessibility.typeaheadfind" = true; # enable "Find As You Type"
-            "layout.spellcheckDefault" = 2; # multi-line & single-line
-            # we use an external password manager
-            "signon.rememberSignons" = false;
-            "privacy.clearOnShutdown.passwords" = true;
-            # dropdown options in the URL bar
-            "browser.urlbar.suggest.bookmarks" = true;
-            "browser.urlbar.suggest.engines" = false;
-            "browser.urlbar.suggest.history" = true;
-            "browser.urlbar.suggest.openpage" = true;
-            "browser.urlbar.suggest.searches" = true;
-            "browser.urlbar.suggest.topsites" = false; # disable dropdown suggestions with empty query
-            # Smooth scroll
-            "general.smoothScroll" = true;
-            "general.smoothScroll.currentVelocityWeighting" = "0.1";
-            "general.smoothScroll.mouseWheel.durationMaxMS" = 250;
-            "general.smoothScroll.mouseWheel.durationMinMS" = 125;
-            "general.smoothScroll.stopDecelerationWeighting" = "0.7";
-            "mousewheel.min_line_scroll_amount" = 25;
-            "apz.overscroll.enabled" = true; /*elastic overscroll*/
-            # Disable annoying warnings
-            "browser.tabs.warnOnClose" = false;
-            "browser.tabs.warnOnCloseOtherTabs" = false;
-            "browser.tabs.warnOnOpen" = false;
-            "browser.aboutConfig.showWarning" = false;
-            # Hide bookmarks toolbar
-            "browser.toolbars.bookmarks.visibility" = "never";
-          };
-          noNoiseSuppression = {
-            "media.getusermedia.aec_enabled" = false;
-            "media.getusermedia.agc_enabled" = false;
-            "media.getusermedia.noise_enabled" = false;
-            "media.getusermedia.hpf_enabled" = false;
-          };
-          performanceSettings = {
-            "gfx.webrender.all" = true; # Use webrender everywhere
-            # "gfx.webrender.software" = true; # If the hardware doesn't support it, use software webrendering
-            "dom.image-lazy-loading.enabled" = true;
-            # Restore tabs only on demand
-            "browser.sessionstore.restore_on_demand" = true;
-            "browser.sessionstore.restore_pinned_tabs_on_demand" = true;
-            "browser.sessionstore.restore_tabs_lazily" = true;
-            # Disable preSkeletonUI on startup
-            "browser.startup.preXulSkeletonUI" = false;
-            # Process count (more is faster, but uses more memory)
-            # "dom.ipc.processCount" = 8; # default
-            # "dom.ipc.processCount" = 16;
-            "dom.ipc.processCount" = -1; # as many as FF wants
-            "network.http.max-persistent-connections-per-server" = 10; # default 6
-          };
-          enableUserChrome = {
-            "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-          };
-          saneNewTab = {
-            # Don't open links in new tabs, except when it makes sense
-            "browser.link.open_newwindow" = 1; # force new window into same tab
-            "browser.link.open_newwindow.restriction" = 2; # except for script windows with features
-            "browser.link.open_newwindow.override.external" = 3; # open external links in a new tab in last active window
-            # "browser.link.open_newwindow.override.external" = 2; # open external links in a new window
-          };
-        in
-          {
-            personal = {
-              id = 0;
-              isDefault = true;
-              settings =
-                commonSettings //
-                noNoiseSuppression //
-                performanceSettings //
-                enableUserChrome //
-                saneNewTab;
-              extraConfig =
-                let
-                  pyllyukko-user-js = pkgs.fetchFromGitHub {
-                    owner = "pyllyukko";
-                    repo = "user.js";
-                    rev = "84134e2b5a53ecdc9f525d5a2c9971c64f9d2057"; # `relaxed` branch
-                    sha256 = "0snnqr51db6x2zs3k7hibrvndv2rb1mjbpl026f566mgc659m7y3";
-                  };
-                in
-                  ''
-                    ${builtins.readFile "${pyllyukko-user-js}/user.js"}
-
-                    // Given that we're managing updates declaratively, we don't want to auto-update
-                    user_pref("extensions.update.enabled", false);
-                    user_pref("app.update.enabled", false);
-
-                    // Re-enable some of the more annoying changes
-                    user_pref("browser.display.use_document_fonts", 1); // Allow websites to load fonts
-                    user_pref("keyword.enabled", true); // submit invalid URLs in address bar to the default search engine
-                    user_pref("browser.urlbar.suggest.searches", true);
-                    user_pref("browser.urlbar.suggest.history", true);
-                    user_pref("privacy.sanitize.sanitizeOnShutdown", false);
-                    user_pref("privacy.clearOnShutdown.cache", false);
-                    user_pref("privacy.clearOnShutdown.formdata", false);
-                    user_pref("privacy.clearOnShutdown.offlineApps", false);
-                    user_pref("privacy.clearOnShutdown.history", false);
-                    user_pref("privacy.clearOnShutdown.sessions", false);
-                    user_pref("privacy.clearOnShutdown.openWindows", false);
-                    user_pref("places.history.enabled", true);
-                    user_pref("browser.cache.disk.enable", true);
-                    user_pref("browser.cache.disk_cache_ssl", true);
-                    user_pref("browser.download.manager.retention", 30);
-                    user_pref("browser.formfill.enable", true);
-                    user_pref("browser.formfill.expire_days", 30);
-                    user_pref("browser.download.folderList", 1);
-                    user_pref("browser.download.useDownloadDir", true);
-
-                    # Work around https://bugzil.la/1664151
-                    # https://github.com/NixOS/nixpkgs/issues/126602
-                    user_pref("gfx.e10s.font-list.shared", false);
-                  '';
-              userChrome =
-                let
-                  firefox-csshacks = pkgs.fetchFromGitHub {
-                    owner = "MrOtherGuy";
-                    repo = "firefox-csshacks";
-                    rev = "753c37d010836fc53dbab9d005663d52fe4f7930";
-                    sha256 = "02wzb6l4vi04va41h76wiji3xq7ma6bs2ybbc5sp5lhsnqizis16";
-                  };
-                in
-                  ''
-                    @import url('${firefox-csshacks}/chrome/hide_tabs_toolbar.css');
-                    @import url('${firefox-csshacks}/chrome/window_control_placeholder_support.css');
-                    @import url('${firefox-csshacks}/chrome/autohide_toolbox.css');
-
-                    /* autohide_toolbox.css: If tabs toolbar is hidden with hide_tabs_toolbar.css */
-                    #titlebar { margin-bottom: -9px; }
-                  '';
-            };
-            blank = {
-              id = 1;
-            };
-          };
     };
     fish = {
       enable = true;
@@ -857,11 +869,11 @@ in {
         d = "docker";
         j = "journalctl -xe";
         ls = "${pkgs.lsd}/bin/lsd";
-        l = "ls -lFh";     #size,show type,human readable
-        la = "ls -lAFh";   #long list,show almost all,show type,human readable
-        lr = "ls -tRFh";   #sorted by date,recursive,show type,human readable
-        lt = "ls -ltFh";   #long list,sorted by date,show type,human readable
-        ll = "ls -l";      #long list
+        l = "ls -lFh"; # size,show type,human readable
+        la = "ls -lAFh"; # long list,show almost all,show type,human readable
+        lr = "ls -tRFh"; # sorted by date,recursive,show type,human readable
+        lt = "ls -ltFh"; # long list,sorted by date,show type,human readable
+        ll = "ls -l"; # long list
         ldot = "ls -ld .*";
         lS = "ls -1FSsh";
         lart = "ls -1Fcart";
@@ -946,10 +958,12 @@ in {
 
         #  Use nix-locate to suggest packages that contain missing commands
         function __fish_command_not_found_handler --on-event fish_command_not_found
-          ${pkgs.writeShellScript "nix-command-not-found" ''
-            source ${pkgs.nix-index}/etc/profile.d/command-not-found.sh
-            command_not_found_handle "$@"
-          ''} $argv
+          ${
+            pkgs.writeShellScript "nix-command-not-found" ''
+              source ${pkgs.nix-index}/etc/profile.d/command-not-found.sh
+              command_not_found_handle "$@"
+            ''
+          } $argv
         end
 
         # https://github.com/akermu/emacs-libvterm
@@ -1002,12 +1016,10 @@ in {
         };
         log.abbrevCommit = true;
       };
-      includes = [
-        {
-          path = "~/Code/John Lewis/.gitconfig";
-          condition = "gitdir:~/Code/John Lewis/";
-        }
-      ];
+      includes = [{
+        path = "~/Code/John Lewis/.gitconfig";
+        condition = "gitdir:~/Code/John Lewis/";
+      }];
       delta = {
         enable = true;
         options = {
@@ -1203,20 +1215,20 @@ in {
     };
     vscode = {
       enable = true;
-      package = let
-          vscodePkg = pkgs.vscode;
-        in with pkgs; symlinkJoin {
-          name = "vscode";
-          paths = [ vscodePkg ];
-          buildInputs = [ makeWrapper ];
-          postBuild = ''
-            wrapProgram $out/bin/code \
-              --prefix PATH : "${docker}/bin" \
-              --prefix PATH : "${docker-compose}/bin"
-          '';
-        } // {
-          inherit (vscodePkg) meta src pname;
-        };
+      package = let vscodePkg = pkgs.vscode;
+      in with pkgs;
+      symlinkJoin {
+        name = "vscode";
+        paths = [ vscodePkg ];
+        buildInputs = [ makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/code \
+            --prefix PATH : "${docker}/bin" \
+            --prefix PATH : "${docker-compose}/bin"
+        '';
+      } // {
+        inherit (vscodePkg) meta src pname;
+      };
       extensions = with unstable.vscode-extensions; [
         bbenoist.nix
         vscodevim.vim
@@ -1228,10 +1240,10 @@ in {
         # Use the title bar for status
         guioptions = "";
         window-title-basename = true;
-        window-title-page  = true;
+        window-title-page = true;
 
         # Better dark mode
-        recolor-darkcolor = "\#CCCCCC";
+        recolor-darkcolor = "#CCCCCC";
         recolor-keephue = true;
 
         # Better selection
@@ -1325,7 +1337,7 @@ in {
         url = "https://github.com/NixOS/nixpkgs/";
         ref = "refs/heads/nixos-20.09";
         rev = "05b1f3f0c9db8327acaa20f8d660440f8adb1031";
-      }) {}).nextcloud-client;
+      }) { }).nextcloud-client;
     };
     picom = {
       enable = true;
@@ -1666,7 +1678,7 @@ in {
                  (evil +everywhere); come to the dark side, we have cookies
                  file-templates    ; auto-snippets for empty files
                  fold              ; (nigh) universal code folding
-                 ;;(format +onsave)  ; automated prettiness
+                 (format +onsave)  ; automated prettiness
                  ;;god               ; run Emacs commands without modifier keys
                  ;;lispy             ; vim for lisp, for people who don't like vim
                  multiple-cursors  ; editing in many places at once
@@ -2535,7 +2547,8 @@ in {
     ".haskeline".text = ''
       editMode: Vi
     '';
-    ".mozilla/native-messaging-hosts/tridactyl.json".source = "${pkgs.tridactyl-native}/lib/mozilla/native-messaging-hosts/tridactyl.json";
+    ".mozilla/native-messaging-hosts/tridactyl.json".source =
+      "${pkgs.tridactyl-native}/lib/mozilla/native-messaging-hosts/tridactyl.json";
     ".my.cnf".text = ''
       [client]
       user = root
@@ -2563,15 +2576,16 @@ in {
     allowUnfree = true;
     joypixels.acceptLicense = true;
     packageOverrides = pkgs: {
-      nur = import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/master.tar.gz") {
-        inherit pkgs;
-      };
+      nur = import (builtins.fetchTarball
+        "https://github.com/nix-community/NUR/archive/master.tar.gz") {
+          inherit pkgs;
+        };
     };
   };
 
-  home.packages = with pkgs; [
-    (
-      let
+  home.packages = with pkgs;
+    [
+      (let
         configFile = writeText "config.h" ''
           /* See LICENSE file for copyright and license details. */
 
@@ -3093,7 +3107,7 @@ in {
           patches = [
             (fetchurl {
               url =
-                https://gitlab.freedesktop.org/xorg/lib/libxft/-/commit/7808631e7a9a605d5fe7a1077129c658d9ec47fc.diff;
+                "https://gitlab.freedesktop.org/xorg/lib/libxft/-/commit/7808631e7a9a605d5fe7a1077129c658d9ec47fc.diff";
               sha256 = "1fkw7ghjfz2svhpc2msz8lyjafzmabgm95xc6dycmb0gb3fq58ik";
             })
           ];
@@ -3103,276 +3117,274 @@ in {
       }).overrideAttrs (oldAttrs: {
         preBuild = "cp ${configFile} config.h";
         src = builtins.fetchGit {
-          url = git://git.suckless.org/st;
+          url = "git://git.suckless.org/st";
           ref = "master";
           rev = "5703aa0390484dd7da4bd9c388c85708d8fcd339";
         };
+      })))
+      webcamoid
+      libnotify
+      file
+      tree
+      xsel
+      xclip
+      xdotool
+      curl
+      lxqt.lxqt-policykit
+      xdg-user-dirs
+      wineWowPackages.staging
+      (winetricks.override { wine = wineWowPackages.staging; })
+      protontricks
+      jrnl
+      capitaine-cursors
+      arc-theme
+      arc-icon-theme
+      gtk_engines
+      gtk-engine-murrine
+      wget
+      vim
+      nodejs
+      neovim
+      universal-ctags
+      dex
+      zip
+      unzip
+      numlockx
+      ag
+      xorg.xkill
+      bc
+      rofi
+      feh
+      lxappearance
+      xorg.xcursorthemes
+      (polybar.override {
+        i3GapsSupport = true;
+        mpdSupport = true;
+      })
+      protonvpn-gui
+      protonvpn-cli
+      thunderbird
+      neomutt
+      isync
+      brightnessctl
+      zathura
+      sigil
+      (calibre.overrideAttrs (oldAttrs: {
+        buildInputs = oldAttrs.buildInputs
+          ++ (with python3Packages; [ pycryptodome ]);
       }))
-    )
-    webcamoid
-    libnotify
-    file
-    tree
-    xsel
-    xclip
-    xdotool
-    curl
-    lxqt.lxqt-policykit
-    xdg-user-dirs
-    wineWowPackages.staging
-    (winetricks.override { wine = wineWowPackages.staging; })
-    protontricks
-    jrnl
-    capitaine-cursors
-    arc-theme
-    arc-icon-theme
-    gtk_engines
-    gtk-engine-murrine
-    wget
-    vim
-    nodejs
-    neovim
-    universal-ctags
-    dex
-    zip
-    unzip
-    numlockx
-    ag
-    xorg.xkill
-    bc
-    rofi
-    feh
-    lxappearance
-    xorg.xcursorthemes
-    (polybar.override {
-      i3GapsSupport = true;
-      mpdSupport = true;
-    })
-    protonvpn-gui
-    protonvpn-cli
-    thunderbird
-    neomutt
-    isync
-    brightnessctl
-    zathura
-    sigil
-    (calibre.overrideAttrs (oldAttrs: {
-      buildInputs = oldAttrs.buildInputs ++ (with python3Packages; [
-        pycryptodome
-      ]);
-    }))
-    gnome3.gnome-calculator
-    gnome3.file-roller
-    youtube-dl
-    screenkey
-    slop
-    system-config-printer
-    gnucash
-    xournalpp
-    transmission-gtk
-    mpv
-    weechat
-    keepassxc
-    pcmanfm
-    lxmenu-data
-    shared_mime_info
-    lutris
-    vulkan-tools
-    gimp
-    inkscape
-    krita
-    libreoffice
-    onlyoffice-bin
-    arandr
-    barrier
-    # TODO this is for the i3-fullscreen screensaver inhibition script, move to its own config later
-    (python3.withPackages (python-packages: [ python-packages.i3ipc ]))
-    ethtool
-    pavucontrol
-    ncdu
-    playerctl
-    qutebrowser
-    luakit
-    surf
-    # (latest.firefox-nightly-bin.override {
-    #   browserName = "firefox-nightly";
-    #   pname = "firefox-nightly-bin";
-    #   desktopName = "Firefox Nightly";
-    # })
-    # (latest.firefox-beta-bin.override {
-    #   browserName = "firefox-beta";
-    #   pname = "firefox-beta-bin";
-    #   desktopName = "Firefox Beta";
-    # })
-    # (latest.firefox-esr-bin.override {
-    #   browserName = "firefox-esr";
-    #   pname = "firefox-esr-bin";
-    #   desktopName = "Firefox ESR";
-    # })
-    ungoogled-chromium
-    google-chrome
-    google-chrome-beta
-    google-chrome-dev
-    unstable.tor-browser-bundle-bin
-    virt-manager
-    qemu
-    slack
-    discord
-    tdesktop
-    teams
-    skype
-    signal-desktop
-    spotify
-    zoom-us
-    manix
-    cachix
-    nix-index
-    nix-prefetch-git
+      gnome3.gnome-calculator
+      gnome3.file-roller
+      youtube-dl
+      screenkey
+      slop
+      system-config-printer
+      gnucash
+      xournalpp
+      transmission-gtk
+      mpv
+      weechat
+      keepassxc
+      pcmanfm
+      lxmenu-data
+      shared_mime_info
+      lutris
+      vulkan-tools
+      gimp
+      inkscape
+      krita
+      libreoffice
+      onlyoffice-bin
+      arandr
+      barrier
+      # TODO this is for the i3-fullscreen screensaver inhibition script, move to its own config later
+      (python3.withPackages (python-packages: [ python-packages.i3ipc ]))
+      ethtool
+      pavucontrol
+      ncdu
+      playerctl
+      qutebrowser
+      luakit
+      surf
+      # (latest.firefox-nightly-bin.override {
+      #   browserName = "firefox-nightly";
+      #   pname = "firefox-nightly-bin";
+      #   desktopName = "Firefox Nightly";
+      # })
+      # (latest.firefox-beta-bin.override {
+      #   browserName = "firefox-beta";
+      #   pname = "firefox-beta-bin";
+      #   desktopName = "Firefox Beta";
+      # })
+      # (latest.firefox-esr-bin.override {
+      #   browserName = "firefox-esr";
+      #   pname = "firefox-esr-bin";
+      #   desktopName = "Firefox ESR";
+      # })
+      ungoogled-chromium
+      google-chrome
+      google-chrome-beta
+      google-chrome-dev
+      unstable.tor-browser-bundle-bin
+      virt-manager
+      qemu
+      slack
+      discord
+      tdesktop
+      teams
+      skype
+      signal-desktop
+      spotify
+      zoom-us
+      manix
+      cachix
+      nix-index
+      nix-prefetch-git
 
-    # Amphetype
-    (with python38Packages; with qt5;
-      let
-        translitcodec = buildPythonPackage rec {
-          pname = "translitcodec";
-          version = "0.6.0";
+      # Amphetype
+      (with python38Packages;
+        with qt5;
+        let
+          translitcodec = buildPythonPackage rec {
+            pname = "translitcodec";
+            version = "0.6.0";
+            src = fetchPypi {
+              inherit pname version;
+              sha256 = "1xh2mqfh3ckl18jqx7sc4bzx8hmg9sxrzhs6vk2x21678xa45j6w";
+            };
+          };
+          editdistance = buildPythonPackage rec {
+            pname = "editdistance";
+            version = "0.5.3";
+            src = fetchPypi {
+              inherit pname version;
+              sha256 = "07qc2a3igcqaspnj0139zlmn2yssflvl7cqjkv2b4ja6l3fidl49";
+            };
+          };
+        in mkDerivationWith buildPythonPackage rec {
+          pname = "amphetype";
+          version = "1.0.1";
+
           src = fetchPypi {
             inherit pname version;
-            sha256 = "1xh2mqfh3ckl18jqx7sc4bzx8hmg9sxrzhs6vk2x21678xa45j6w";
+            sha256 = "1sdn0l36r5sxmlkjlly8h6irzhp52krsxpg6m3izqabwpzwc5gp4";
           };
-        };
-        editdistance = buildPythonPackage rec {
-          pname = "editdistance";
-          version = "0.5.3";
-          src = fetchPypi {
-            inherit pname version;
-            sha256 = "07qc2a3igcqaspnj0139zlmn2yssflvl7cqjkv2b4ja6l3fidl49";
-          };
-        };
-      in mkDerivationWith buildPythonPackage rec {
-        pname = "amphetype";
-        version = "1.0.1";
 
-        src = fetchPypi {
-          inherit pname version;
-          sha256 = "1sdn0l36r5sxmlkjlly8h6irzhp52krsxpg6m3izqabwpzwc5gp4";
-        };
+          propagatedBuildInputs = [ pyqt5 qtbase translitcodec editdistance ];
 
-        propagatedBuildInputs = [ pyqt5 qtbase translitcodec editdistance ];
+          doCheck = false;
 
-        doCheck = false;
+          dontWrapQtApps = true;
+          preFixup = ''
+            wrapQtApp "$out/bin/amphetype" --prefix PATH : /path/to/bin
+          '';
+        })
 
-        dontWrapQtApps = true;
-        preFixup = ''
-          wrapQtApp "$out/bin/amphetype" --prefix PATH : /path/to/bin
-        '';
-      }
-    )
+      # https://github.com/Shopify/comma/issues/2#issuecomment-636572039
+      nur.repos.xe.comma
 
-    # https://github.com/Shopify/comma/issues/2#issuecomment-636572039
-    nur.repos.xe.comma
+      # TODO: Remove this once the i3 & polybar configs are managed by
+      # home-manager, as we’re only installing it so that we can use `pactl`
+      # https://nixos.wiki/wiki/PipeWire#pactl_not_found
+      pulseaudio
 
-    # TODO: Remove this once the i3 & polybar configs are managed by
-    # home-manager, as we’re only installing it so that we can use `pactl`
-    # https://nixos.wiki/wiki/PipeWire#pactl_not_found
-    pulseaudio
+    ] ++ [
 
-  ] ++ [
+      #########
+      # FONTS #
+      #########
 
-    #########
-    # FONTS #
-    #########
+      # Icon fonts
+      emacs-all-the-icons-fonts
 
-    # Icon fonts
-    emacs-all-the-icons-fonts
+      # Emoji
+      # emojione
+      # twitter-color-emoji
+      # twemoji-color-font
+      # noto-fonts-emoji
+      # noto-fonts-emoji-blob-bin
+      joypixels
 
-    # Emoji
-    # emojione
-    # twitter-color-emoji
-    # twemoji-color-font
-    # noto-fonts-emoji
-    # noto-fonts-emoji-blob-bin
-    joypixels
+      # Classic fonts
+      eb-garamond
+      # helvetica-neue-lt-std
+      libre-bodoni
+      libre-caslon
+      libre-franklin
+      etBook
 
-    # Classic fonts
-    eb-garamond
-    # helvetica-neue-lt-std
-    libre-bodoni
-    libre-caslon
-    libre-franklin
-    etBook
+      # Microsoft fonts
+      corefonts
+      vistafonts
 
-    # Microsoft fonts
-    corefonts
-    vistafonts
+      # Metrically-compatible font replacements
+      liberation_ttf
+      liberation-sans-narrow
+      meslo-lg
 
-    # Metrically-compatible font replacements
-    liberation_ttf
-    liberation-sans-narrow
-    meslo-lg
+      # Libre fonts
+      gentium
+      gentium-book-basic
+      crimson
+      dejavu_fonts
+      overpass
+      raleway
+      comic-neue
+      comic-relief
+      fira
+      fira-mono
+      inter
+      lato
+      libertine
+      libertinus
+      montserrat
+      f5_6
+      route159
+      aileron
+      eunomia
+      seshat
+      penna
+      ferrum
+      medio
+      tenderness
+      vegur
+      source-code-pro
+      xkcd-font
+      gyre-fonts
 
-    # Libre fonts
-    gentium
-    gentium-book-basic
-    crimson
-    dejavu_fonts
-    overpass
-    raleway
-    comic-neue
-    comic-relief
-    fira
-    fira-mono
-    inter
-    lato
-    libertine
-    libertinus
-    montserrat
-    f5_6
-    route159
-    aileron
-    eunomia
-    seshat
-    penna
-    ferrum
-    medio
-    tenderness
-    vegur
-    source-code-pro
-    xkcd-font
-    gyre-fonts
+      # Font collections
+      google-fonts
+      league-of-moveable-type
 
-    # Font collections
-    google-fonts
-    league-of-moveable-type
+      (nerdfonts.override { fonts = [ "Iosevka" ]; })
 
-    nerdfonts
+      # Coding fonts
+      # iosevka
+      # hack-font
+      # go-font
+      # hasklig
+      # fira-code
+      # inconsolata
+      # mononoki
+      # fantasque-sans-mono
 
-    # Coding fonts
-    # iosevka
-    # hack-font
-    # go-font
-    # hasklig
-    # fira-code
-    # inconsolata
-    # mononoki
-    # fantasque-sans-mono
+      # Icon fonts
+      font-awesome
+      material-icons
 
-    # Icon fonts
-    font-awesome
-    material-icons
+      # Non-latin character sets
+      junicode
 
-    # Non-latin character sets
-    junicode
-
-    # Fallback fonts
-    cm_unicode
-    xorg.fontcursormisc
-    symbola
-    freefont_ttf
-    unifont
-    noto-fonts
-    noto-fonts-extra
-    noto-fonts-cjk
-  ];
+      # Fallback fonts
+      cm_unicode
+      xorg.fontcursormisc
+      symbola
+      freefont_ttf
+      unifont
+      noto-fonts
+      noto-fonts-extra
+      noto-fonts-cjk
+    ];
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
