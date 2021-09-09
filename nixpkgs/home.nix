@@ -1734,7 +1734,7 @@ in {
                  ;;ansible
                  ;;debugger          ; FIXME stepping through code, to help you add bugs
                  direnv
-                 docker
+                 ;;docker
                  editorconfig      ; let someone else argue about tabs vs spaces
                  ;;ein               ; tame Jupyter notebooks with emacs
                  (eval +overlay)     ; run code, run (also, repls)
@@ -1743,13 +1743,13 @@ in {
                  lsp
                  magit             ; a git porcelain for Emacs
                  ;;make              ; run make tasks from Emacs
-                 pass              ; password manager for nerds
+                 ;;pass              ; password manager for nerds
                  ;;pdf               ; pdf enhancements
                  ;;prodigy           ; FIXME managing external services & code builders
                  rgb               ; creating color strings
                  ;;taskrunner        ; taskrunner for all your projects
                  ;;terraform         ; infrastructure as code
-                 tmux              ; an API for interacting with tmux
+                 ;;tmux              ; an API for interacting with tmux
                  ;;upload            ; map local to remote projects via ssh/ftp
 
                  :os
@@ -1758,24 +1758,24 @@ in {
 
                  :lang
                  ;;agda              ; types of types of types of types...
-                 cc                ; C/C++/Obj-C madness
-                 clojure           ; java with a lisp
-                 common-lisp       ; if you've seen one lisp, you've seen them all
+                 ;;cc                ; C/C++/Obj-C madness
+                 ;;clojure           ; java with a lisp
+                 ;;common-lisp       ; if you've seen one lisp, you've seen them all
                  ;;coq               ; proofs-as-programs
                  ;;crystal           ; ruby at the speed of c
                  ;;csharp            ; unity, .NET, and mono shenanigans
                  ;;data              ; config/data formats
                  (dart +flutter)   ; paint ui and not much else
-                 elixir            ; erlang done right
-                 elm               ; care for a cup of TEA?
+                 ;;elixir            ; erlang done right
+                 ;;elm               ; care for a cup of TEA?
                  emacs-lisp        ; drown in parentheses
                  ;;erlang            ; an elegant language for a more civilized age
                  ;;ess               ; emacs speaks statistics
                  ;;faust             ; dsp, but you get to keep your soul
-                 fsharp            ; ML stands for Microsoft's Language
+                 ;;fsharp            ; ML stands for Microsoft's Language
                  ;;fstar             ; (dependent) types and (monadic) effects and Z3
                  ;;gdscript          ; the language you waited for
-                 (go +lsp)         ; the hipster dialect
+                 ;;(go +lsp)         ; the hipster dialect
                  (haskell +dante)  ; a language that's lazier than I am
                  ;;hy                ; readability of scheme w/ speed of python
                  ;;idris             ; a language you can depend on
@@ -1784,7 +1784,7 @@ in {
                  (javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
                  ;;julia             ; a better, faster MATLAB
                  ;;kotlin            ; a better, slicker Java(Script)
-                 latex             ; writing papers in Emacs has never been so fun
+                 ;;latex             ; writing papers in Emacs has never been so fun
                  ;;lean
                  ;;factor
                  ledger            ; an accounting system in Emacs
@@ -1792,23 +1792,23 @@ in {
                  markdown          ; writing docs for people to ignore
                  ;;nim               ; python + lisp at the speed of c
                  nix               ; I hereby declare "nix geht mehr!"
-                 ocaml             ; an objective camel
+                 ;;ocaml             ; an objective camel
                  (org               ; organize your plain life in plain text
                   +pretty
                   +roam2)
-                 php               ; perl's insecure younger brother
+                 ;;php               ; perl's insecure younger brother
                  ;;plantuml          ; diagrams for confusing people more
                  ;;purescript        ; javascript, but functional
-                 python            ; beautiful is better than ugly
+                 ;;python            ; beautiful is better than ugly
                  ;;qt                ; the 'cutest' gui framework ever
                  ;;racket            ; a DSL for DSLs
                  ;;raku              ; the artist formerly known as perl6
                  ;;rest              ; Emacs as a REST client
                  ;;rst               ; ReST in peace
-                 (ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-                 rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
-                 scala             ; java, but good
-                 scheme            ; a fully conniving family of lisps
+                 ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+                 ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+                 ;;scala             ; java, but good
+                 ;;scheme            ; a fully conniving family of lisps
                  sh                ; she sells {ba,z,fi}sh shells on the C xor
                  ;;sml
                  ;;solidity          ; do you need a blockchain? No.
