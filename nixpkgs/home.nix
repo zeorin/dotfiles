@@ -1622,6 +1622,26 @@ in {
         (map! :leader
               :desc "Reset font size"
               "0" #'text-scale-adjust)
+
+        (use-package! tree-sitter
+          :config
+          (cl-pushnew "${
+            pkgs.runCommandLocal "tree-sitter-grammars-bundle" { } ''
+              mkdir -p $out/bin
+              ${
+                lib.concatStringsSep "\n" (lib.mapAttrsToList (name: src:
+                  "ln -s ${src}/parser $out/bin/${
+                    (builtins.replaceStrings [ "tree-sitter-" ] [ "" ] name)
+                  }.so") pkgs.tree-sitter.builtGrammars)
+              };
+            ''
+          }/bin" tree-sitter-load-path)
+          (require 'tree-sitter-langs)
+          (global-tree-sitter-mode)
+          (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+          ;; Don't use LSP formatters
+          (setq +format-with-lsp nil)
       '';
       "doom/init.el" = {
         text = ''
@@ -1872,6 +1892,9 @@ in {
           ;(unpin! pinned-package another-pinned-package)
           ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
           ;(unpin! t)
+
+          (package! tree-sitter)
+          (package! tree-sitter-langs)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
