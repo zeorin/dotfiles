@@ -2399,26 +2399,44 @@ in {
         " Key bindings
         """"""""""""""""""
 
-        " Don't accidentally :qall
-        " https://github.com/tridactyl/tridactyl/issues/350
-        alias qall noop
+        " Don't lose windows on :qall https://github.com/tridactyl/tridactyl/issues/350
+        alias qall !s pkill firefox
+
+        " Comment toggler for Reddit, Hacker News and Lobste.rs
+        bind ;c hint -Jc [class*="expand"],[class="togg"],[class="comment_folder"]
+
+        " GitHub pull request checkout command to clipboard (only works if you're a collaborator or above)
+        bind yp composite js document.getElementById("clone-help-step-1").textContent.replace("git checkout -b", "git checkout -B").replace("git pull ", "git fetch ") + "git reset --hard " + document.getElementById("clone-help-step-1").textContent.split(" ")[3].replace("-","/") | yank
 
         " Git{Hub,Lab} git clone via SSH yank
         bind yg composite js "git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
+
+        " As above but execute it and open terminal in folder
+        bind ,g js let uri = document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git"); tri.native.run("cd ~/projects; git clone " + uri + "; cd \"$(basename \"" + uri + "\" .git)\"; st")
 
         " Handy multiwindow/multitasking binds
         bind gd tabdetach
         bind gD composite tabduplicate | tabdetach
         bind T composite tabduplicate
 
+        " Override some FF defaults to equivalent Tridactyl command line
+        bind <C-t> fillcmdline tabopen
+        bind <C-l> fillcmdline open
+        bind <C-n> fillcmdline winopen
+        bind <CS-p> fillcmdline winopen -private
+
+        " make d take you to the left (I find it much less confusing)
+        bind d composite tabprev; tabclose #
+        bind D tabclose
+
         " Stupid workaround to let hint -; be used with composite which steals semi-colons
-        command hint_focus hint -;
+        alias hint_focus hint -;
 
         " Open right click menu on links
         bind ;C composite hint_focus; !s xdotool key Menu
 
-        " Comment toggler for Reddit and Hacker News
-        bind ;c hint -c [class*="expand"],[class="togg"]
+        " Comment toggler for Reddit, Hacker News and Lobste.rs
+        bind ;c hint -Jc [class*="expand"],[class="togg"],[class="comment_folder"]
 
         " The default is unintuitive
         bind J tabnext
@@ -2426,6 +2444,20 @@ in {
 
         " Don't steal my focus
         autocmd TabEnter .* unfocus
+        autocmd DocLoad .* unfocus
+
+        " Emulate arrow keys in insert mode!
+        bind --mode=insert <C-h> !s xdotool key Left
+        bind --mode=insert <C-j> !s xdotool key Down
+        bind --mode=insert <C-k> !s xdotool key Up
+        bind --mode=insert <C-l> !s xdotool key Right
+
+        " Like DOOM Emacs
+        bind --mode=ex <C-j> ex.next_completion
+        bind --mode=ex <C-k> ex.prev_completion
+        bind --mode=ex <C-p> ex.prev_history
+        bind --mode=ex <C-n> ex.next_history
+
 
         """"""""""""""""""
         " Appearance
@@ -2440,6 +2472,10 @@ in {
         " Misc settings
         """"""""""""""""""
 
+        " Use Wikiwand as Wikipedia viewer
+        autocmd DocStart ^http(s?)://[a-z]{2}.wikipedia.org js tri.excmds.urlmodify("-r", /([a-z]{2})\.wikipedia.org\/wiki/, "www.wikiwand.com/$1")
+        bindurl wikiwand.com yy composite js document.location.href.replace(/www\.wikiwand\.com\/([a-z]{2})/, "$1.wikipedia.org/wiki") | clipboard yank
+
         " Plain new tab
         set newtab about:blank
 
@@ -2450,9 +2486,22 @@ in {
 
         " Sane hinting mode
         set hintfiltermode vimperator-reflow
+        " I use Programmer Dvorak
+        set hintchars dhtnaoeuifgcrl',.pybm;qjkx
 
         " Defaults to 300ms
         set hintdelay 100
+
+        " Don't autofocus!
+        autocmd TabEnter .* unfocus
+        autocmd DocLoad .* unfocus
+
+        "
+        " URL redirects
+        "
+
+        " New reddit is bad
+        autocmd DocStart ^http(s?)://www.reddit.com js tri.excmds.urlmodify("-t", "www", "old")
       '';
       "tridactyl/themes/zeorin.css".text = ''
         @media (prefers-color-scheme: dark) {
