@@ -3306,7 +3306,7 @@ in {
       skype
       signal-desktop
       spotify
-      zoom-us
+      unstable.zoom-us
       manix
       cachix
       nix-index
