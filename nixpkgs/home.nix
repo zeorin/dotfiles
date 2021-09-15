@@ -805,41 +805,12 @@ in {
           isDefault = true;
           settings = commonSettings // noNoiseSuppression // performanceSettings
             // enableUserChrome // saneNewTab;
-          extraConfig = let
-            pyllyukko-user-js = pkgs.fetchFromGitHub {
-              owner = "pyllyukko";
-              repo = "user.js";
-              rev =
-                "84134e2b5a53ecdc9f525d5a2c9971c64f9d2057"; # `relaxed` branch
-              sha256 = "0snnqr51db6x2zs3k7hibrvndv2rb1mjbpl026f566mgc659m7y3";
-            };
-          in ''
-            ${builtins.readFile "${pyllyukko-user-js}/user.js"}
+          extraConfig = ''
+            // http://kb.mozillazine.org/About:config_entries
 
             // Given that we're managing updates declaratively, we don't want to auto-update
             user_pref("extensions.update.enabled", false);
             user_pref("app.update.enabled", false);
-
-            // Re-enable some of the more annoying changes
-            user_pref("browser.display.use_document_fonts", 1); // Allow websites to load fonts
-            user_pref("keyword.enabled", true); // submit invalid URLs in address bar to the default search engine
-            user_pref("browser.urlbar.suggest.searches", true);
-            user_pref("browser.urlbar.suggest.history", true);
-            user_pref("privacy.sanitize.sanitizeOnShutdown", false);
-            user_pref("privacy.clearOnShutdown.cache", false);
-            user_pref("privacy.clearOnShutdown.formdata", false);
-            user_pref("privacy.clearOnShutdown.offlineApps", false);
-            user_pref("privacy.clearOnShutdown.history", false);
-            user_pref("privacy.clearOnShutdown.sessions", false);
-            user_pref("privacy.clearOnShutdown.openWindows", false);
-            user_pref("places.history.enabled", true);
-            user_pref("browser.cache.disk.enable", true);
-            user_pref("browser.cache.disk_cache_ssl", true);
-            user_pref("browser.download.manager.retention", 30);
-            user_pref("browser.formfill.enable", true);
-            user_pref("browser.formfill.expire_days", 30);
-            user_pref("browser.download.folderList", 1);
-            user_pref("browser.download.useDownloadDir", true);
           '';
           userChrome = let
             firefox-csshacks = pkgs.fetchFromGitHub {
@@ -1345,7 +1316,7 @@ in {
     };
     picom = {
       enable = true;
-      backend = "xrender";
+      backend = "glx";
       fade = true;
       fadeDelta = 3;
       inactiveDim = "0.2";
@@ -1506,6 +1477,21 @@ in {
         };
         Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
         Install.WantedBy = [ "default.target" ];
+      };
+      xsettingsd = {
+        Unit = {
+          Description = "xsettingsd";
+          After = [ "graphical-session-pre.target" ];
+          PartOf = [ "graphical-session.target" ];
+        };
+
+        Install.WantedBy = [ "graphical-session.target" ];
+
+        Service = {
+          Environment = "PATH=${config.home.profileDirectory}/bin";
+          ExecStart = "${pkgs.xsettingsd}/bin/xsettingsd";
+          Restart = "on-abort";
+        };
       };
     };
     # REVIEW https://github.com/nix-community/home-manager/issues/2064#issuecomment-887300055
@@ -2469,6 +2455,12 @@ in {
         set hintdelay 100
       '';
       "tridactyl/themes/zeorin.css".text = ''
+        @media (prefers-color-scheme: dark) {
+          .TridactylOwnNamespace body {
+            filter: invert(1) hue-rotate(180deg);
+          }
+        }
+
         .TridactylOwnNamespace body {
             top: 0;
         }
@@ -2559,6 +2551,9 @@ in {
         ! *pointerColorBackground:  S_base1
         ! *pointerColorForeground:  S_base01
         ! *colorBD:                 S_base03
+      '';
+      "xsettingsd/xsettingsd.conf".text = ''
+        Net/ThemeName "Arc-Dark"
       '';
     };
   };
