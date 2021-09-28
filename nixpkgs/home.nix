@@ -669,6 +669,21 @@ in {
             };
           })
           (buildFirefoxXpiAddon rec {
+            pname = "netflix-1080p";
+            version = "1.16.0";
+            addonId = "{f18f0257-10ad-4ff7-b51e-6895edeccfc8}";
+            url =
+              "https://addons.mozilla.org/firefox/downloads/file/3781739/netflix_1080p-${version}-fx.xpi";
+            sha256 = "07cfqj20n44pjynkv48arsva3fbzfn5xxcmhff3haw1yswf88zw9";
+            meta = with lib; {
+              homepage = "https://github.com/TheGoddessInari/netflix-1080p-firefox";
+              description =
+                "Force 1080p Netflix playback in Firefox";
+              licence = licences.mit;
+              platforms = platforms.all;
+            };
+          })
+          (buildFirefoxXpiAddon rec {
             pname = "redirect-amp-to-html";
             version = "2.1.0";
             addonId = "{569456be-2850-4f7e-b669-71e55140ee0a}";
