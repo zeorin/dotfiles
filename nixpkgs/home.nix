@@ -779,6 +779,10 @@ in {
           "browser.aboutConfig.showWarning" = false;
           # Hide bookmarks toolbar
           "browser.toolbars.bookmarks.visibility" = "never";
+          # Allow all fontconfig substitutions
+          "gfx.font_rendering.fontconfig.max_generic_substitutions" = 127;
+          # Use system emoji
+          "font.name-list.emoji" = "emoji";
         };
         noNoiseSuppression = {
           "media.getusermedia.aec_enabled" = false;
@@ -812,7 +816,7 @@ in {
             2; # except for script windows with features
           "browser.link.open_newwindow.override.external" =
             3; # open external links in a new tab in last active window
-          # "browser.link.open_newwindow.override.external" = 2; # open external links in a new window
+          "browser.newtab.url" = "about:blank";
         };
       in {
         personal = {
@@ -2440,9 +2444,8 @@ in {
         bind <C-n> fillcmdline winopen
         bind <CS-p> fillcmdline winopen -private
 
-        " make d take you to the left (I find it much less confusing)
-        bind d composite tabprev; tabclose #
-        bind D tabclose
+        " make D take you to the left after closing a tab
+        bind D composite tabprev; tabclose #
 
         " Stupid workaround to let hint -; be used with composite which steals semi-colons
         alias hint_focus hint -;
@@ -2490,9 +2493,6 @@ in {
         " Use Wikiwand as Wikipedia viewer
         autocmd DocStart ^http(s?)://[a-z]{2}.wikipedia.org js tri.excmds.urlmodify("-r", /([a-z]{2})\.wikipedia.org\/wiki/, "www.wikiwand.com/$1")
         bindurl wikiwand.com yy composite js document.location.href.replace(/www\.wikiwand\.com\/([a-z]{2})/, "$1.wikipedia.org/wiki") | clipboard yank
-
-        " Plain new tab
-        set newtab about:blank
 
         " FIXME currently disabled because it uses performance.now() and this
         " conflicts with the user.js settings
