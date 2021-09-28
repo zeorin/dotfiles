@@ -1318,7 +1318,6 @@ in {
       enable = true;
       pinentryFlavor = "gnome3";
     };
-    lorri.enable = true;
     network-manager-applet.enable = true;
     nextcloud-client = {
       enable = true;
