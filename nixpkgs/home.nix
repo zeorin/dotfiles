@@ -1330,7 +1330,7 @@ in {
     };
     picom = {
       enable = true;
-      backend = "glx";
+      experimentalBackends = true;
       fade = true;
       fadeDelta = 3;
       inactiveDim = "0.2";
@@ -1362,6 +1362,7 @@ in {
         use-damage = true;
         shadow-radius = 7;
         xinerama-shadow-crop = true;
+        xrender-sync-fence = true;
         focus-exclude = [
           "name = 'Picture-in-Picture'"
         ];
