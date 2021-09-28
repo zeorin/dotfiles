@@ -2641,6 +2641,11 @@ in {
     '';
   };
 
+  qt = {
+    enable = true;
+    platformTheme = "gtk";
+  };
+
   fonts.fontconfig.enable = true;
 
   nixpkgs.config = {
