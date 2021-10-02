@@ -676,9 +676,9 @@ in {
               "https://addons.mozilla.org/firefox/downloads/file/3781739/netflix_1080p-${version}-fx.xpi";
             sha256 = "07cfqj20n44pjynkv48arsva3fbzfn5xxcmhff3haw1yswf88zw9";
             meta = with lib; {
-              homepage = "https://github.com/TheGoddessInari/netflix-1080p-firefox";
-              description =
-                "Force 1080p Netflix playback in Firefox";
+              homepage =
+                "https://github.com/TheGoddessInari/netflix-1080p-firefox";
+              description = "Force 1080p Netflix playback in Firefox";
               licence = licences.mit;
               platforms = platforms.all;
             };
@@ -1598,7 +1598,7 @@ in {
         ;; numbers are disabled. For relative line numbers, set this to `relative'.
         (setq display-line-numbers-type 'relative)
 
-        (setq projectile-project-search-path '(("~/Code/" . 1)))
+        (setq projectile-project-search-path '(("~/Code/" . 2)))
 
         ;; Here are some additional functions/macros that could help you configure Doom:
         ;;
