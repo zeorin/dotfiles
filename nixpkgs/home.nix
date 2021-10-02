@@ -1497,9 +1497,9 @@ in {
         Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
         Install.WantedBy = [ "default.target" ];
       };
-      xsettingsd = {
+      xfsettingsd = {
         Unit = {
-          Description = "xsettingsd";
+          Description = "xfsettingsd";
           After = [ "graphical-session-pre.target" ];
           PartOf = [ "graphical-session.target" ];
         };
@@ -1508,7 +1508,7 @@ in {
 
         Service = {
           Environment = "PATH=${config.home.profileDirectory}/bin";
-          ExecStart = "${pkgs.xsettingsd}/bin/xsettingsd";
+          ExecStart = "${pkgs.xfce.xfce4-settings}/bin/xfsettingsd";
           Restart = "on-abort";
         };
       };
@@ -3378,6 +3378,9 @@ in {
       # home-manager, as we’re only installing it so that we can use `pactl`
       # https://nixos.wiki/wiki/PipeWire#pactl_not_found
       pulseaudio
+
+      # For dark mode toggling
+      xfce.xfconf
 
     ] ++ [
 
