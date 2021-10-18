@@ -1368,7 +1368,8 @@ in {
         xinerama-shadow-crop = true;
         xrender-sync-fence = true;
         focus-exclude = [
-          "name = 'Picture-in-Picture'"
+          "name = 'Picture-in-Picture'",
+          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_FULLSCREEN'"
         ];
       '';
     };
