@@ -1011,8 +1011,8 @@ in {
         log.abbrevCommit = true;
       };
       includes = [{
-        path = "~/Code/John Lewis/.gitconfig";
-        condition = "gitdir:~/Code/John Lewis/";
+        path = "~/Code/WyzeTalk/.gitconfig";
+        condition = "gitdir:~/Code/WyzeTalk/";
       }];
       delta = {
         enable = true;
