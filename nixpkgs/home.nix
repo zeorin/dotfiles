@@ -1530,6 +1530,7 @@ in {
     enable = true;
     userDirs.enable = true;
     configFile = with config.xdg; {
+      "mimeapps.list".force = true; # Force overwrite, don't prompt
       "bat/config".text = ''
         --theme="Solarized (dark)"
         --italic-text=always
@@ -2420,6 +2421,9 @@ in {
         " Key bindings
         """"""""""""""""""
 
+        " Take a note in org-roamm
+        bind n js document.location.href = 'org-protocol://roam-ref?template=r&ref=' + encodeURIComponent(location.href) + '&title=' + encodeURIComponent(document.title) + '&body=' + encodeURIComponent(window.getSelection())
+
         " Don't lose windows on :qall https://github.com/tridactyl/tridactyl/issues/350
         alias qall !s pkill firefox
 
@@ -2621,6 +2625,27 @@ in {
       "xsettingsd/xsettingsd.conf".text = ''
         Net/ThemeName "Arc-Dark"
       '';
+    };
+    dataFile."applications/mimeapps.list".force =
+      true; # Force overwrite, don't prompt
+    # TODO: Enable this on next home-manager stable release channel (current:
+    # 21.05), and remove the manually created desktop entry from `home.packages`
+    # desktopEntries = {
+    #   org-protocol = {
+    #     name = "org-protocol";
+    #     exec = "emacsclient %u";
+    #     icon = "emacs-icon";
+    #     type = "Application";
+    #     terminal = false;
+    #     categories = [ "System" ];
+    #     mimeType = [ "x-scheme-handler/org-protocol" ];
+    #   };
+    # };
+    mimeApps = {
+      enable = true;
+      defaultApplications = {
+        "x-scheme-handler/org-protocol" = [ "org-protocol.desktop" ];
+      };
     };
   };
 
@@ -3480,6 +3505,23 @@ in {
       noto-fonts
       noto-fonts-extra
       noto-fonts-cjk
+
+    ] ++ [
+
+      ###################
+      # DESKTOP ENTRIES #
+      ###################
+
+      (makeDesktopItem {
+        name = "org-protocol";
+        desktopName = "org-protocol";
+        exec = "emacsclient %u";
+        icon = "emacs-icon";
+        type = "Application";
+        terminal = false;
+        categories = "System;";
+        mimeType = "x-scheme-handler/org-protocol;";
+      })
     ];
 
   # This value determines the Home Manager release that your
