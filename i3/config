@@ -233,7 +233,7 @@ client.urgent #b58900 #b58900 #b58900 #b58900
 exec_always --no-startup-id "sleep 1; $HOME/.config/polybar/launch.sh"
 
 # Set wallpaper
-exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/lucas-benjamin-wQLAGv4_OYs-unsplash.jpg
+exec_always --no-startup-id feh --no-fehbg --no-xinerama --bg-fill ~/.config/i3/hidden-valley-3840x1080.jpg
 
 # Inhibit screensaver when something is fullscreen
 exec_always --no-startup-id ~/.config/i3/disable-standby-fs.py
