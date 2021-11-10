@@ -3333,7 +3333,7 @@ in {
       pcmanfm
       lxmenu-data
       shared_mime_info
-      lutris
+      unstable.lutris
       vulkan-tools
       gimp
       inkscape
