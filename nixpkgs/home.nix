@@ -2664,6 +2664,13 @@ in {
     mimeApps = {
       enable = true;
       defaultApplications = {
+        "application/pdf" = [ "org.pwmt.zathura-pdf-mupdf.desktop" ];
+        "application/xhtml+xml" = [ "firefox.desktop" ];
+        "inode/directory" = [ "pcmanfm.desktop" ];
+        "text/html" = [ "firefox.desktop" ];
+        "text/xml" = [ "firefox.desktop" ];
+        "x-scheme-handler/http" = [ "firefox.desktop" ];
+        "x-scheme-handler/https" = [ "firefox.desktop" ];
         "x-scheme-handler/org-protocol" = [ "org-protocol.desktop" ];
       };
     };
