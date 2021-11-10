@@ -1651,6 +1651,23 @@ in {
 
           ;; Don't use LSP formatters
           (setq +format-with-lsp nil)
+
+          (use-package! org-super-agenda
+            :after org-agenda
+            :init
+            (setq org-super-agenda-groups '((:name "Today"
+                                                   :time-grid t
+                                                   :scheduled today)
+                                            (:name "Due today"
+                                                   :deadline today)
+                                            (:name "Important"
+                                                   :priority "A")
+                                            (:name "Overdue"
+                                                   :deadline past)
+                                            (:name "Due soon"
+                                                   :deadline future)))
+            :config
+            (org-super-agenda-mode))
       '';
       "doom/init.el" = {
         text = ''
@@ -1904,6 +1921,8 @@ in {
 
           (package! tree-sitter)
           (package! tree-sitter-langs)
+
+          (package! org-super-agenda)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
