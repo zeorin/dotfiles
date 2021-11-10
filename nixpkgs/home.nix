@@ -3287,6 +3287,8 @@ in {
       gtk_engines
       gtk-engine-murrine
       wget
+      wireshark
+      websocat
       vim
       nodejs
       neovim
