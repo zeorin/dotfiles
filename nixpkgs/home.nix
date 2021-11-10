@@ -592,7 +592,8 @@ in {
     firefox = {
       enable = true;
       package =
-        pkgs.latest.firefox-bin.override { cfg.enableTridactylNative = true; };
+        # pkgs.latest.firefox-bin.override { cfg.enableTridactylNative = true; };
+        pkgs.firefox-bin.override { cfg.enableTridactylNative = true; };
       extensions = with pkgs.nur.repos.rycee.firefox-addons;
         [
           clearurls
