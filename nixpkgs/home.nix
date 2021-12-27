@@ -1593,9 +1593,9 @@ in {
 
         ;; If you use `org' and don't want your org files in the default location below,
         ;; change `org-directory'. It must be set before org loads!
-        (setq org-directory "~/Documents/notes")
-        (setq org-roam-directory "~/Documents/notes")
-        (setq org-agenda-files '("~/Documents/notes" "~/Documents/notes/daily"))
+        (setq org-directory "~/Documents/notes"
+              org-roam-directory "~/Documents/notes"
+              org-agenda-files '("~/Documents/notes" "~/Documents/notes/daily"))
 
         ;; This determines the style of line numbers in effect. If set to `nil', line
         ;; numbers are disabled. For relative line numbers, set this to `relative'.
