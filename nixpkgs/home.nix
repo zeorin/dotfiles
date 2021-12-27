@@ -1208,7 +1208,7 @@ in {
     };
     vscode = {
       enable = true;
-      package = let vscodePkg = pkgs.vscode;
+      package = let vscodePkg = unstable.vscode;
       in with pkgs;
       symlinkJoin {
         name = "vscode";
@@ -1225,6 +1225,7 @@ in {
       extensions = with unstable.vscode-extensions; [
         bbenoist.nix
         vscodevim.vim
+        ms-vsliveshare.vsliveshare
       ];
     };
     zathura = {
