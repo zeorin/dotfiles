@@ -3277,7 +3277,7 @@ in {
       lxqt.lxqt-policykit
       xdg-user-dirs
       unstable.wineWowPackages.stable
-      (unstable.winetricks.override { wine = unstable.wineWowPackages.stable; })
+      unstable.winetricks
       protontricks
       jrnl
       capitaine-cursors
