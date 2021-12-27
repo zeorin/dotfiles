@@ -1084,11 +1084,9 @@ in {
       settings = {
         enable_mouse = true;
         cpu_count_from_zero = true;
-        delay = 1;
         hide_threads = true;
         hide_userland_threads = true;
         highlight_basename = true;
-        tree_view = true;
         vim_mode = true;
       };
     };
