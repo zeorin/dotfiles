@@ -3376,7 +3376,7 @@ in {
       qemu
       slack
       discord
-      tdesktop
+      unstable.tdesktop
       teams
       skype
       signal-desktop
