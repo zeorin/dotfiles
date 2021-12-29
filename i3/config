@@ -22,7 +22,7 @@ bindsym $mod+Print exec --no-startup-id "$HOME/.config/flameshot/flameshot.sh ac
 bindsym $mod+Shift+Print exec --no-startup-id "$HOME/.config/flameshot/flameshot.sh"
 
 # Toggle grayscale
-bindsym $mod+g exec "nvidia-settings -a DigitalVibrance=$([ $(nvidia-settings -t -q DigitalVibrance | head -n 1) = 0 ] && echo -1024 || echo 0)"
+bindsym $mod+g exec "$([ -f ~/.local/share/picom/env ] && rm ~/.local/share/picom/env || ln -s ~/.config/picom/env-grayscale ~/.local/share/picom/env); systemctl --user restart picom.service"
 
 # Toggle dark mode
 bindsym $mod+Shift+d exec "$HOME/.config/i3/dark_mode_toggle.sh"

@@ -60,7 +60,7 @@ in {
         done
 
         # Data dirs
-        for dir in bash go pass stack wineprefixes; do
+        for dir in bash go pass stack wineprefixes picom; do
           $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
             ${dataHome}/$dir
         done
@@ -1334,7 +1334,20 @@ in {
     };
     picom = {
       enable = true;
-      experimentalBackends = true;
+      package = let picomPkg = pkgs.picom;
+      in with pkgs;
+      symlinkJoin {
+        name = "picom";
+        paths = [ picomPkg ];
+        buildInputs = [ makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/picom \
+            --add-flags \''${ARG_0:+\"\$ARG_0\"} \
+            --add-flags \''${ARG_1:+\"\$ARG_1\"}
+        '';
+      } // {
+        inherit (picomPkg) meta src;
+      };
       fade = true;
       fadeDelta = 3;
       inactiveDim = "0.2";
@@ -1498,6 +1511,7 @@ in {
         Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
         Install.WantedBy = [ "default.target" ];
       };
+      picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
       xfsettingsd = {
         Unit = {
           Description = "xfsettingsd";
@@ -2050,6 +2064,19 @@ in {
         prefix=${dataHome}/npm
         cache=${cacheHome}/npm
         tmp=$XDG_RUNTIME_DIR/npm
+      '';
+      "picom/env-grayscale".text = ''
+        ARG_0="--glx-fshader-win"
+        ARG_1="
+          uniform sampler2D tex;
+          uniform float opacity;
+          void main() {
+              vec4 color = texture2D(tex, gl_TexCoord[0].xy);
+              gl_FragColor = vec4(
+                  vec3(0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) * opacity,
+                  color.a * opacity);
+          }
+        "
       '';
       "readline/inputrc".text = ''
         $include /etc/inputrc
