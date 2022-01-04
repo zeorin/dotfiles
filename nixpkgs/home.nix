@@ -1211,25 +1211,37 @@ in {
     };
     vscode = {
       enable = true;
-      package = let vscodePkg = unstable.vscode;
-      in with pkgs;
-      symlinkJoin {
-        name = "vscode";
-        paths = [ vscodePkg ];
-        buildInputs = [ makeWrapper ];
-        postBuild = ''
-          wrapProgram $out/bin/code \
-            --prefix PATH : "${docker}/bin" \
-            --prefix PATH : "${docker-compose}/bin"
-        '';
-      } // {
-        inherit (vscodePkg) meta src pname;
-      };
-      extensions = with unstable.vscode-extensions; [
-        bbenoist.nix
-        vscodevim.vim
-        ms-vsliveshare.vsliveshare
-      ];
+      # https://github.com/nix-community/home-manager/issues/1667
+      # package = let vscodePkg = unstable.vscode;
+      # in with pkgs;
+      # symlinkJoin {
+      #   name = "vscode";
+      #   paths = [ vscodePkg ];
+      #   buildInputs = [ makeWrapper ];
+      #   postBuild = ''
+      #     wrapProgram $out/bin/code \
+      #       --prefix PATH : "${docker}/bin" \
+      #       --prefix PATH : "${docker-compose}/bin"
+      #   '';
+      # } // {
+      #   inherit (vscodePkg) meta src pname;
+      # };
+      # extensions = with unstable.vscode-extensions; [
+      #   bbenoist.nix
+      #   vscodevim.vim
+      #   ms-vsliveshare.vsliveshare
+      # ];
+      package = (unstable.vscode-with-extensions.override {
+        vscode = unstable.vscode;
+        vscodeExtensions = with unstable.vscode-extensions; [
+          bbenoist.nix
+          vscodevim.vim
+          ms-vsliveshare.vsliveshare
+        ];
+      }).overrideAttrs (old: {
+        inherit (unstable.vscode) meta src pname version;
+      });
+      extensions = [  ];
     };
     zathura = {
       enable = true;
