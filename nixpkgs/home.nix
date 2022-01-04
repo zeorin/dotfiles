@@ -40,7 +40,6 @@ in {
       LESSHISTFILE = "${cacheHome}/less/history";
       PSQL_HISTORY = "${cacheHome}/pg/psql_history";
       XCOMPOSECACHE = "${cacheHome}/X11/xcompose";
-      GNUPGHOME = "${dataHome}/gnupg";
       GOPATH = "${dataHome}/go";
       LEDGER_FILE = "${dataHome}/hledger.journal";
       MYSQL_HISTFILE = "${dataHome}/mysql_history";
@@ -1078,7 +1077,11 @@ in {
       ignores =
         [ "*~" "*.swp" "*.swo" ".DS_Store" "tags" "Session.vim" "/.vim" ];
     };
-    gpg.enable = true;
+    gpg = {
+      enable = true;
+      homedir = "${config.xdg.dataHome}/gnupg";
+      settings = {};
+    };
     htop = {
       enable = true;
       settings = {
@@ -1320,7 +1323,8 @@ in {
     flameshot.enable = true;
     gpg-agent = {
       enable = true;
-      pinentryFlavor = "gnome3";
+      extraConfig = ''
+      '';
     };
     network-manager-applet.enable = true;
     nextcloud-client = {
