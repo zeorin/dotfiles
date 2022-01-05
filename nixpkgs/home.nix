@@ -3290,15 +3290,6 @@ in {
             "`abcdefghijklmnopqrstuvwxyz{|}~";
         '';
       in ((st.override {
-        libXft = xorg.libXft.overrideAttrs (oldAttrs: {
-          patches = [
-            (fetchurl {
-              url =
-                "https://gitlab.freedesktop.org/xorg/lib/libxft/-/commit/7808631e7a9a605d5fe7a1077129c658d9ec47fc.diff";
-              sha256 = "1fkw7ghjfz2svhpc2msz8lyjafzmabgm95xc6dycmb0gb3fq58ik";
-            })
-          ];
-        });
         patches = [ /etc/nixos/st-patches.diff ];
         extraLibs = [ harfbuzz xorg.libXcursor ];
       }).overrideAttrs (oldAttrs: {
@@ -3351,7 +3342,7 @@ in {
         mpdSupport = true;
       })
       protonvpn-gui
-      protonvpn-cli
+      # protonvpn-cli
       thunderbird
       neomutt
       isync
@@ -3362,8 +3353,8 @@ in {
         buildInputs = oldAttrs.buildInputs
           ++ (with python3Packages; [ pycryptodome ]);
       }))
-      gnome3.gnome-calculator
-      gnome3.file-roller
+      gnome.gnome-calculator
+      gnome.file-roller
       unstable.yt-dlp
       screenkey
       slop
