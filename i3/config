@@ -278,3 +278,4 @@ no_focus [title="Microsoft Teams Notification"]
 
 # Show on all workspaces
 for_window [title="Picture-in-Picture"] sticky enable
+for_window [window_role="AlarmWindow"] sticky enable
