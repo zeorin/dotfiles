@@ -1677,6 +1677,8 @@ in {
         "_GTK_FRAME_EXTENTS@:c"
         # notifications
         "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_NOTIFICATION'"
+        # Mozilla fixes
+        "(class_g = 'Firefox' || class_g = 'Thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
       ];
       vSync = true;
       extraOptions = ''
