@@ -35,6 +35,18 @@ in {
   home = {
     username = "zeorin";
     homeDirectory = "/home/${config.home.username}";
+    keyboard = {
+      layout = "us,us";
+      variant = "dvp,";
+      options = [
+        "grp:alt_space_toggle"
+        "grp_led:scroll"
+        "shift:both_capslock"
+        "shift:breaks_caps"
+        "compose:menu"
+        "terminate:ctrl_alt_bksp"
+      ];
+    };
     sessionPath = [ "${config.xdg.configHome}/doom-emacs/bin" ];
     sessionVariables = with config.xdg; rec {
       EDITOR = "nvim";
@@ -1705,6 +1717,8 @@ in {
     };
   };
 
+  xsession.enable = true;
+
   # # Email
   # programs.mbsync.enable = true;
   # programs.msmtp.enable = true;
@@ -1829,15 +1843,6 @@ in {
           Environment = "PATH=${config.home.profileDirectory}/bin";
           ExecStart = "${pkgs.xfce.xfce4-settings}/bin/xfsettingsd";
           Restart = "on-abort";
-        };
-      };
-    };
-    # REVIEW https://github.com/nix-community/home-manager/issues/2064#issuecomment-887300055
-    targets = {
-      tray = {
-        Unit = {
-          Description = "Home Manager System Tray";
-          Requires = [ "graphical-session-pre.target" ];
         };
       };
     };
