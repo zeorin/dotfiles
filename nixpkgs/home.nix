@@ -2531,10 +2531,8 @@ in {
         autocmd DocStart ^http(s?)://[a-z]{2}.wikipedia.org js tri.excmds.urlmodify("-r", /([a-z]{2})\.wikipedia.org\/wiki/, "www.wikiwand.com/$1")
         bindurl wikiwand.com yy composite js document.location.href.replace(/www\.wikiwand\.com\/([a-z]{2})/, "$1.wikipedia.org/wiki") | clipboard yank
 
-        " FIXME currently disabled because it uses performance.now() and this
-        " conflicts with the user.js settings
         " I’m a smooth operator
-        " set smoothscroll true
+        set smoothscroll true
 
         " Sane hinting mode
         set hintfiltermode vimperator-reflow
