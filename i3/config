@@ -21,6 +21,13 @@ bindsym Print exec --no-startup-id "flameshot gui"
 bindsym $mod+Print exec --no-startup-id "$HOME/.config/flameshot/flameshot.sh activewindow"
 bindsym $mod+Shift+Print exec --no-startup-id "$HOME/.config/flameshot/flameshot.sh"
 
+# Notifications
+bindsym $mod+dollar exec --no-startup-id "dunstctl close"
+bindsym $mod+Shift+dollar exec --no-startup-id "dunstctl close-all"
+bindsym $mod+ampersand exec --no-startup-id "dunstctl history-pop"
+bindsym $mod+m exec --no-startup-id "dunstctl action 0"
+bindsym $mod+Shift+m exec --no-startup-id "dunstctl context"
+
 # Toggle grayscale
 bindsym $mod+g exec "$([ -f ~/.local/share/picom/env ] && rm ~/.local/share/picom/env || ln -s ~/.config/picom/env-grayscale ~/.local/share/picom/env); systemctl --user restart picom.service"
 

@@ -1279,63 +1279,44 @@ in {
       enable = true;
       settings = {
         global = {
-          font = "Iosevka Term 12";
-          allow_markup = true;
+          follow = "keyboard";
+          width = 600;
+          height = 100;
+          offset = "0x24";
+          separator_height = 4;
+          frame_width = 0;
+          separator_color = "#00000000";
+          font = "Iosevka 10";
           format = ''
             <b>%s</b>
             %b'';
-          sort = true;
-          indicate_hidden = true;
-          alignment = true;
-          bounce_freq = 0;
-          show_age_threshold = 60;
-          word_wrap = true;
-          ignore_newline = false;
-          geometry = "800x10-0+48";
-          max_icon_size = 60;
-          shrink = true;
-          transparency = 15;
-          idle_threshold = 0;
-          monitor = 0;
-          follow = "keyboard";
-          sticky_history = true;
-          history_length = 20;
-          show_indicators = true;
-          line_height = 0;
-          separator_height = 0;
-          padding = 12;
-          horizontal_padding = 12;
-          separator_color = "frame";
-          startup_notification = false;
-          dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst";
-          browser = "${config.programs.firefox.package}/bin/firefox -new-tab";
+          vertical_alignment = "top";
+          show_age_threshold = "5m";
           icon_position = "left";
-          icon_folders =
-            "${pkgs.arc-icon-theme}/share/icons/Arc/status/32@2x/:${pkgs.arc-icon-theme}/share/icons/Arc/devices/32@2x/:${pkgs.arc-icon-theme}/share/icons/Arc/legacy/32@2x/";
-        };
-        frame = {
-          width = 0;
-          color = "#aaaaaa";
-        };
-        shortcuts = {
-          close = "mod4+dollar";
-          close_all = "mod4+shift+dollar";
-          history = "mod4+ampersand";
-          context = "mod4+m";
+          max_icon_size = 60;
+          icon_path = "${pkgs.arc-icon-theme}/share/icons/Arc";
+          enable_recursive_icon_lookup = "true";
+          dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst";
+          mouse_left_click = "close_current";
+          mouse_middle_click = "context";
+          mouse_right_click = "do_action";
+          fullscreen = "pushback";
+          timeout = "30s";
+          startup_notification = false;
+          markup = "full";
         };
         urgency_low = {
-          background = "#002b36";
+          background = "#002b36cc";
           foreground = "#586e75";
-          timeout = 10;
         };
         urgency_normal = {
-          background = "#268bd2";
+          background = "#268bd2cc";
           foreground = "#eee8d5";
-          timeout = 10;
         };
         urgency_critical = {
-          background = "#dc322f";
+          background = "#dc322fcc";
           foreground = "#fdf6e3";
+          fullscreen = "show";
           timeout = 0;
         };
       };
@@ -1394,6 +1375,8 @@ in {
         "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
         "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
         "_GTK_FRAME_EXTENTS@:c"
+        # notifications
+        "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_NOTIFICATION'"
       ];
       vSync = true;
       extraOptions = ''
