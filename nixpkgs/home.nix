@@ -1070,7 +1070,7 @@ in {
     gpg = {
       enable = true;
       homedir = "${config.xdg.dataHome}/gnupg";
-      settings = {};
+      settings = { };
     };
     htop = {
       enable = true;
@@ -1555,10 +1555,9 @@ in {
           vscodevim.vim
           ms-vsliveshare.vsliveshare
         ];
-      }).overrideAttrs (old: {
-        inherit (unstable.vscode) meta src pname version;
-      });
-      extensions = [  ];
+      }).overrideAttrs
+        (old: { inherit (unstable.vscode) meta src pname version; });
+      extensions = [ ];
     };
     zathura = {
       enable = true;
@@ -1631,11 +1630,7 @@ in {
       client.enable = true;
     };
     flameshot.enable = true;
-    gpg-agent = {
-      enable = true;
-      extraConfig = ''
-      '';
-    };
+    gpg-agent.enable = true;
     network-manager-applet.enable = true;
     nextcloud-client = {
       enable = true;
@@ -1676,7 +1671,7 @@ in {
         "class_g = 'i3-frame'"
         # hidden windows
         "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
-        # no shadow on stacked / tabbed windows
+        # stacked / tabbed windows
         "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
         "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
         "_GTK_FRAME_EXTENTS@:c"
