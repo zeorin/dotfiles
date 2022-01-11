@@ -1072,6 +1072,333 @@ in {
         profile = "gpu-hq";
       };
     };
+    password-store = {
+      enable = true;
+      package = pkgs.pass.withExtensions (exts:
+        with exts; [
+          pass-otp
+          pass-import
+          pass-audit
+          pass-update
+          pass-checkup
+          pass-genphrase
+          pass-tomb
+        ]);
+    };
+    rofi = {
+      enable = true;
+      pass.enable = true;
+      extraConfig = {
+        modi = "window,run,ssh";
+        width = 50;
+        lines = 15;
+        columns = 1;
+        font = "Iosevka Term 12";
+        bw = 1;
+        location = 0;
+        padding = 5;
+        yoffset = 0;
+        xoffset = 0;
+        fixed-num-lines = true;
+        show-icons = true;
+        terminal = "rofi-sensible-terminal";
+        ssh-client = "ssh";
+        ssh-command = "{terminal} -e {ssh-client} {host} [-p {port}]";
+        run-command = "{cmd}";
+        run-list-command = "";
+        run-shell-command = "{terminal} -e {cmd}";
+        window-command = "wmctrl -i -R {window}";
+        window-match-fields = "all";
+        # icon-theme = ;
+        drun-match-fields = "name,generic,exec,categories";
+        drun-show-actions = false;
+        # drun-display-format = "{name} [<span weight='light' size='small'><i>({generic})</i></span>]";
+        drun-display-format = "{name}";
+        disable-history = false;
+        ignored-prefixes = "";
+        sort = false;
+        # sorting-method = ;
+        case-sensitive = false;
+        cycle = true;
+        sidebar-mode = false;
+        eh = 1;
+        auto-select = false;
+        parse-hosts = false;
+        parse-known-hosts = true;
+        combi-modi = "window,run";
+        matching = "normal";
+        tokenize = true;
+        m = "-5";
+        line-margin = 2;
+        line-padding = 1;
+        # filter = ;
+        separator-style = "dash";
+        hide-scrollbar = false;
+        fullscreen = false;
+        fake-transparency = false;
+        dpi = -1;
+        threads = 0;
+        scrollbar-width = 8;
+        scroll-method = 0;
+        fake-background = "screenshot";
+        window-format = "{w}    {c}   {t}";
+        click-to-exit = true;
+        show-match = true;
+        # theme = ;
+        # color-normal = ;
+        # color-urgent = ;
+        # color-active = ;
+        # color-window = ;
+        max-history-size = 25;
+        combi-hide-mode-prefix = false;
+        # matching-negate-char = '-' /* unsupported */;
+        # cache-dir = ;
+        pid = "/run/user/1000/rofi.pid";
+        # display-window = ;
+        # display-windowcd = ;
+        # display-run = ;
+        # display-ssh = ;
+        # display-drun = ;
+        # display-combi = ;
+        # display-keys = ;
+        kb-primary-paste = "Control+V,Shift+Insert";
+        kb-secondary-paste = "Control+v,Insert";
+        kb-clear-line = "Control+w";
+        kb-move-front = "Control+a";
+        kb-move-end = "Control+e";
+        kb-move-word-back = "Alt+b,Control+Left";
+        kb-move-word-forward = "Alt+f,Control+Right";
+        kb-move-char-back = "Left,Control+b";
+        kb-move-char-forward = "Right,Control+f";
+        kb-remove-word-back = "Control+Alt+h,Control+BackSpace";
+        kb-remove-word-forward = "Control+Alt+d";
+        kb-remove-char-forward = "Delete,Control+d";
+        kb-remove-char-back = "BackSpace,Shift+BackSpace,Control+h";
+        kb-remove-to-eol = "Control+k";
+        kb-remove-to-sol = "Control+u";
+        kb-accept-entry = "Control+j,Control+m,Return,KP_Enter";
+        kb-accept-custom = "Control+Return";
+        kb-accept-alt = "Shift+Return";
+        kb-delete-entry = "Shift+Delete";
+        kb-mode-next = "Shift+Right,Control+Tab";
+        kb-mode-previous = "Shift+Left,Control+ISO_Left_Tab";
+        kb-row-left = "Control+Page_Up";
+        kb-row-right = "Control+Page_Down";
+        kb-row-up = "Up,Control+p,ISO_Left_Tab";
+        kb-row-down = "Down,Control+n";
+        kb-row-tab = "Tab";
+        kb-page-prev = "Page_Up";
+        kb-page-next = "Page_Down";
+        kb-row-first = "Home,KP_Home";
+        kb-row-last = "End,KP_End";
+        kb-row-select = "Control+space";
+        kb-screenshot = "Alt+S";
+        kb-ellipsize = "Alt+period";
+        kb-toggle-case-sensitivity = "grave,dead_grave";
+        kb-toggle-sort = "Alt+grave";
+        kb-cancel = "Escape,Control+g,Control+bracketleft";
+        kb-custom-1 = "Alt+1";
+        kb-custom-2 = "Alt+2";
+        kb-custom-3 = "Alt+3";
+        kb-custom-4 = "Alt+4";
+        kb-custom-5 = "Alt+5";
+        kb-custom-6 = "Alt+6";
+        kb-custom-7 = "Alt+7";
+        kb-custom-8 = "Alt+8";
+        kb-custom-9 = "Alt+9";
+        kb-custom-10 = "Alt+0";
+        kb-custom-11 = "Alt+exclam";
+        kb-custom-12 = "Alt+at";
+        kb-custom-13 = "Alt+numbersign";
+        kb-custom-14 = "Alt+dollar";
+        kb-custom-15 = "Alt+percent";
+        kb-custom-16 = "Alt+dead_circumflex";
+        kb-custom-17 = "Alt+ampersand";
+        kb-custom-18 = "Alt+asterisk";
+        kb-custom-19 = "Alt+parenleft";
+        kb-select-1 = "Super+1";
+        kb-select-2 = "Super+2";
+        kb-select-3 = "Super+3";
+        kb-select-4 = "Super+4";
+        kb-select-5 = "Super+5";
+        kb-select-6 = "Super+6";
+        kb-select-7 = "Super+7";
+        kb-select-8 = "Super+8";
+        kb-select-9 = "Super+9";
+        kb-select-10 = "Super+0";
+        ml-row-left = "ScrollLeft";
+        ml-row-right = "ScrollRight";
+        ml-row-up = "ScrollUp";
+        ml-row-down = "ScrollDown";
+        me-select-entry = "MousePrimary";
+        me-accept-entry = "MouseDPrimary";
+        me-accept-custom = "Control+MouseDPrimary";
+      };
+      theme = let
+        # Use `mkLiteral` for string-like values that should show without
+        # quotes, e.g.:
+        # {
+        #   foo = "abc"; => foo: "abc";
+        #   bar = mkLiteral "abc"; => bar: abc;
+        # };
+        inherit (config.lib.formats.rasi) mkLiteral;
+      in {
+        "*" = {
+          font = "Iosevka Term 10";
+          red = mkLiteral "rgba ( 220, 50, 47, 100 % )";
+          selected-active-foreground =
+            mkLiteral "rgba ( 253, 246, 227, 100 % )";
+          lightfg = mkLiteral "rgba ( 88, 104, 117, 100 % )";
+          separatorcolor = mkLiteral "var(foreground)";
+          urgent-foreground = mkLiteral "rgba ( 220, 50, 47, 100 % )";
+          alternate-urgent-background = mkLiteral "var(urgent-background)";
+          lightbg = mkLiteral "rgba ( 238, 232, 213, 100 % )";
+          spacing = 2;
+          border-color = mkLiteral "rgba ( 0, 43, 54, 100 % )";
+          normal-background = mkLiteral "rgba ( 7, 54, 66, 100 % )";
+          background-color = mkLiteral "rgba ( 0, 0, 0, 0 % )";
+          alternate-active-background = mkLiteral "var(active-background)";
+          active-foreground = mkLiteral "rgba ( 38, 139, 210, 100 % )";
+          blue = mkLiteral "rgba ( 38, 139, 210, 100 % )";
+          urgent-background = mkLiteral "rgba ( 7, 54, 66, 100 % )";
+          alternate-normal-foreground = mkLiteral "var(foreground)";
+          selected-active-background = mkLiteral "rgba ( 38, 139, 210, 100 % )";
+          background = mkLiteral "rgba ( 7, 54, 66, 100 % )";
+          selected-normal-foreground =
+            mkLiteral "rgba ( 238, 232, 213, 100 % )";
+          active-background = mkLiteral "rgba ( 7, 54, 66, 100 % )";
+          alternate-active-foreground = mkLiteral "var(active-foreground)";
+          alternate-normal-background = mkLiteral "var(background)";
+          foreground = mkLiteral "rgba ( 131, 148, 150, 100 % )";
+          selected-urgent-background = mkLiteral "rgba ( 220, 50, 47, 100 % )";
+          selected-urgent-foreground =
+            mkLiteral "rgba ( 253, 246, 227, 100 % )";
+          normal-foreground = mkLiteral "var(foreground)";
+          alternate-urgent-foreground = mkLiteral "var(urgent-foreground)";
+          selected-normal-background = mkLiteral "rgba ( 88, 110, 117, 100 % )";
+        };
+        "#window" = {
+          anchor = mkLiteral "north";
+          location = mkLiteral "north";
+          width = mkLiteral "100%";
+          padding = mkLiteral "3px";
+          children = map mkLiteral [ "horibox" ];
+        };
+        "#horibox" = {
+          orientation = mkLiteral "horizontal";
+          children = map mkLiteral [ "prompt" "entry" "listview" ];
+        };
+        "#listview" = {
+          layout = mkLiteral "horizontal";
+          spacing = mkLiteral "5px";
+          lines = 100;
+        };
+        "#entry" = {
+          expand = false;
+          width = mkLiteral "10em";
+        };
+        "#element" = { padding = mkLiteral "0px 2px"; };
+        "#element selected" = { background-color = mkLiteral "SteelBlue"; };
+        window = { background-color = mkLiteral "var(background)"; };
+        textbox = { text-color = mkLiteral "var(foreground)"; };
+        listview = {
+          scrollbar = true;
+          border-color = mkLiteral "var(separatorcolor)";
+          spacing = mkLiteral "6px";
+          fixed-height = 0;
+        };
+        element = {
+          padding = mkLiteral "2px";
+          border = 0;
+        };
+        "element normal.normal" = {
+          background-color = mkLiteral "var(normal-background)";
+          text-color = mkLiteral "var(normal-foreground)";
+        };
+        "element normal.urgent" = {
+          background-color = mkLiteral "var(urgent-background)";
+          text-color = mkLiteral "var(urgent-foreground)";
+        };
+        "element normal.active" = {
+          background-color = mkLiteral "var(active-background)";
+          text-color = mkLiteral "var(active-foreground)";
+        };
+        "element selected.normal" = {
+          background-color = mkLiteral "var(selected-normal-background)";
+          text-color = mkLiteral "var(selected-normal-foreground)";
+        };
+        "element selected.urgent" = {
+          background-color = mkLiteral "var(selected-urgent-background)";
+          text-color = mkLiteral "var(selected-urgent-foreground)";
+        };
+        "element selected.active" = {
+          background-color = mkLiteral "var(selected-active-background)";
+          text-color = mkLiteral "var(selected-active-foreground)";
+        };
+        "element alternate.normal" = {
+          background-color = mkLiteral "var(alternate-normal-background)";
+          text-color = mkLiteral "var(alternate-normal-foreground)";
+        };
+        "element alternate.urgent" = {
+          background-color = mkLiteral "var(alternate-urgent-background)";
+          text-color = mkLiteral "var(alternate-urgent-foreground)";
+        };
+        "element alternate.active" = {
+          background-color = mkLiteral "var(alternate-active-background)";
+          text-color = mkLiteral "var(alternate-active-foreground)";
+        };
+        scrollbar = {
+          width = mkLiteral "4px ";
+          padding = 0;
+          handle-width = mkLiteral "8px ";
+          border = 0;
+          handle-color = mkLiteral "var(normal-foreground)";
+        };
+        mode-switcher = { border-color = mkLiteral "var(separatorcolor)"; };
+        button = {
+          spacing = 0;
+          text-color = mkLiteral "var(normal-foreground)";
+        };
+        "button selected" = {
+          background-color = mkLiteral "var(selected-normal-background)";
+          text-color = mkLiteral "var(selected-normal-foreground)";
+        };
+        inputbar = {
+          padding = mkLiteral "1px ";
+          spacing = mkLiteral "0px ";
+          text-color = mkLiteral "var(normal-foreground)";
+          children = map mkLiteral [
+            "prompt"
+            "textbox-prompt-colon"
+            "entry"
+            "overlay"
+            "case-indicator"
+          ];
+        };
+        case-indicator = {
+          spacing = 0;
+          text-color = mkLiteral "var(normal-foreground)";
+        };
+        entry = {
+          spacing = 0;
+          text-color = mkLiteral "var(normal-foreground)";
+        };
+        prompt = {
+          spacing = 0;
+          text-color = mkLiteral "var(normal-foreground)";
+        };
+        textbox-prompt-colon = {
+          margin = mkLiteral "0px 0.3000em 0.0000em 0.0000em ";
+          expand = false;
+          str = ":";
+          text-color = mkLiteral "inherit";
+        };
+        error-message = {
+          background-color = mkLiteral "rgba ( 0, 0, 0, 0 % )";
+          text-color = mkLiteral "var(normal-foreground)";
+        };
+      };
+    };
     starship = {
       enable = true;
       enableBashIntegration = true;
@@ -2102,318 +2429,6 @@ in {
             "\C-n": history-search-forward
         $endif
       '';
-      "rofi/config.rasi".text = ''
-        configuration {
-            modi: "window,run,ssh";
-            width: 50;
-            lines: 15;
-            columns: 1;
-            font: "Iosevka Term 12";
-            bw: 1;
-            location: 0;
-            padding: 5;
-            yoffset: 0;
-            xoffset: 0;
-            fixed-num-lines: true;
-            show-icons: true;
-            terminal: "rofi-sensible-terminal";
-            ssh-client: "ssh";
-            ssh-command: "{terminal} -e {ssh-client} {host} [-p {port}]";
-            run-command: "{cmd}";
-            run-list-command: "";
-            run-shell-command: "{terminal} -e {cmd}";
-            window-command: "wmctrl -i -R {window}";
-            window-match-fields: "all";
-            /* icon-theme: ; */
-            drun-match-fields: "name,generic,exec,categories";
-            drun-show-actions: false;
-            /* drun-display-format: "{name} [<span weight='light' size='small'><i>({generic})</i></span>]"; */
-            drun-display-format: "{name}";
-            disable-history: false;
-            ignored-prefixes: "";
-            sort: false;
-            /* sorting-method: ; */
-            case-sensitive: false;
-            cycle: true;
-            sidebar-mode: false;
-            eh: 1;
-            auto-select: false;
-            parse-hosts: false;
-            parse-known-hosts: true;
-            combi-modi: "window,run";
-            matching: "normal";
-            tokenize: true;
-            m: "-5";
-            line-margin: 2;
-            line-padding: 1;
-            /* filter: ; */
-            separator-style: "dash";
-            hide-scrollbar: false;
-            fullscreen: false;
-            fake-transparency: false;
-            dpi: -1;
-            threads: 0;
-            scrollbar-width: 8;
-            scroll-method: 0;
-            fake-background: "screenshot";
-            window-format: "{w}    {c}   {t}";
-            click-to-exit: true;
-            show-match: true;
-            /* theme: ; */
-            /* color-normal: ; */
-            /* color-urgent: ; */
-            /* color-active: ; */
-            /* color-window: ; */
-            max-history-size: 25;
-            combi-hide-mode-prefix: false;
-            // matching-negate-char: '-' /* unsupported */;
-            /* cache-dir: ; */
-            pid: "/run/user/1000/rofi.pid";
-            /* display-window: ; */
-            /* display-windowcd: ; */
-            /* display-run: ; */
-            /* display-ssh: ; */
-            /* display-drun: ; */
-            /* display-combi: ; */
-            /* display-keys: ; */
-            kb-primary-paste: "Control+V,Shift+Insert";
-            kb-secondary-paste: "Control+v,Insert";
-            kb-clear-line: "Control+w";
-            kb-move-front: "Control+a";
-            kb-move-end: "Control+e";
-            kb-move-word-back: "Alt+b,Control+Left";
-            kb-move-word-forward: "Alt+f,Control+Right";
-            kb-move-char-back: "Left,Control+b";
-            kb-move-char-forward: "Right,Control+f";
-            kb-remove-word-back: "Control+Alt+h,Control+BackSpace";
-            kb-remove-word-forward: "Control+Alt+d";
-            kb-remove-char-forward: "Delete,Control+d";
-            kb-remove-char-back: "BackSpace,Shift+BackSpace,Control+h";
-            kb-remove-to-eol: "Control+k";
-            kb-remove-to-sol: "Control+u";
-            kb-accept-entry: "Control+j,Control+m,Return,KP_Enter";
-            kb-accept-custom: "Control+Return";
-            kb-accept-alt: "Shift+Return";
-            kb-delete-entry: "Shift+Delete";
-            kb-mode-next: "Shift+Right,Control+Tab";
-            kb-mode-previous: "Shift+Left,Control+ISO_Left_Tab";
-            kb-row-left: "Control+Page_Up";
-            kb-row-right: "Control+Page_Down";
-            kb-row-up: "Up,Control+p,ISO_Left_Tab";
-            kb-row-down: "Down,Control+n";
-            kb-row-tab: "Tab";
-            kb-page-prev: "Page_Up";
-            kb-page-next: "Page_Down";
-            kb-row-first: "Home,KP_Home";
-            kb-row-last: "End,KP_End";
-            kb-row-select: "Control+space";
-            kb-screenshot: "Alt+S";
-            kb-ellipsize: "Alt+period";
-            kb-toggle-case-sensitivity: "grave,dead_grave";
-            kb-toggle-sort: "Alt+grave";
-            kb-cancel: "Escape,Control+g,Control+bracketleft";
-            kb-custom-1: "Alt+1";
-            kb-custom-2: "Alt+2";
-            kb-custom-3: "Alt+3";
-            kb-custom-4: "Alt+4";
-            kb-custom-5: "Alt+5";
-            kb-custom-6: "Alt+6";
-            kb-custom-7: "Alt+7";
-            kb-custom-8: "Alt+8";
-            kb-custom-9: "Alt+9";
-            kb-custom-10: "Alt+0";
-            kb-custom-11: "Alt+exclam";
-            kb-custom-12: "Alt+at";
-            kb-custom-13: "Alt+numbersign";
-            kb-custom-14: "Alt+dollar";
-            kb-custom-15: "Alt+percent";
-            kb-custom-16: "Alt+dead_circumflex";
-            kb-custom-17: "Alt+ampersand";
-            kb-custom-18: "Alt+asterisk";
-            kb-custom-19: "Alt+parenleft";
-            kb-select-1: "Super+1";
-            kb-select-2: "Super+2";
-            kb-select-3: "Super+3";
-            kb-select-4: "Super+4";
-            kb-select-5: "Super+5";
-            kb-select-6: "Super+6";
-            kb-select-7: "Super+7";
-            kb-select-8: "Super+8";
-            kb-select-9: "Super+9";
-            kb-select-10: "Super+0";
-            ml-row-left: "ScrollLeft";
-            ml-row-right: "ScrollRight";
-            ml-row-up: "ScrollUp";
-            ml-row-down: "ScrollDown";
-            me-select-entry: "MousePrimary";
-            me-accept-entry: "MouseDPrimary";
-            me-accept-custom: "Control+MouseDPrimary";
-        }
-
-        * {
-            font: "Iosevka Term 10";
-        }
-
-        #window {
-            anchor:     north;
-            location:   north;
-            width:      100%;
-            padding:    3px;
-            children:   [ horibox ];
-        }
-
-        #horibox {
-            orientation: horizontal;
-            children:   [ prompt, entry, listview ];
-        }
-
-        #listview {
-            layout:     horizontal;
-            spacing:    5px;
-            lines:      100;
-        }
-
-        #entry {
-            expand:     false;
-            width:      10em;
-        }
-
-        #element {
-            padding: 0px 2px;
-        }
-        #element selected {
-            background-color: SteelBlue;
-        }
-
-        * {
-            red:                         rgba ( 220, 50, 47, 100 % );
-            selected-active-foreground:  rgba ( 253, 246, 227, 100 % );
-            lightfg:                     rgba ( 88, 104, 117, 100 % );
-            separatorcolor:              var(foreground);
-            urgent-foreground:           rgba ( 220, 50, 47, 100 % );
-            alternate-urgent-background: var(urgent-background);
-            lightbg:                     rgba ( 238, 232, 213, 100 % );
-            spacing:                     2;
-            border-color:                rgba ( 0, 43, 54, 100 % );
-            normal-background:           rgba ( 7, 54, 66, 100 % );
-            background-color:            rgba ( 0, 0, 0, 0 % );
-            alternate-active-background: var(active-background);
-            active-foreground:           rgba ( 38, 139, 210, 100 % );
-            blue:                        rgba ( 38, 139, 210, 100 % );
-            urgent-background:           rgba ( 7, 54, 66, 100 % );
-            alternate-normal-foreground: var(foreground);
-            selected-active-background:  rgba ( 38, 139, 210, 100 % );
-            background:           rgba ( 7, 54, 66, 100 % );
-            selected-normal-foreground:  rgba ( 238, 232, 213, 100 % );
-            active-background:           rgba ( 7, 54, 66, 100 % );
-            alternate-active-foreground: var(active-foreground);
-            alternate-normal-background: var(background);
-            foreground:                  rgba ( 131, 148, 150, 100 % );
-            selected-urgent-background:  rgba ( 220, 50, 47, 100 % );
-            selected-urgent-foreground:  rgba ( 253, 246, 227, 100 % );
-            normal-foreground:           var(foreground);
-            alternate-urgent-foreground: var(urgent-foreground);
-            selected-normal-background:  rgba ( 88, 110, 117, 100 % );
-        }
-        window {
-            background-color: var(background);
-        }
-        textbox {
-            text-color: var(foreground);
-        }
-        listview {
-            scrollbar:    true;
-            border-color: var(separatorcolor);
-            spacing:      6px ;
-            fixed-height: 0;
-        }
-        element {
-            padding: 2px ;
-            border:  0;
-        }
-        element normal.normal {
-            background-color: var(normal-background);
-            text-color:       var(normal-foreground);
-        }
-        element normal.urgent {
-            background-color: var(urgent-background);
-            text-color:       var(urgent-foreground);
-        }
-        element normal.active {
-            background-color: var(active-background);
-            text-color:       var(active-foreground);
-        }
-        element selected.normal {
-            background-color: var(selected-normal-background);
-            text-color:       var(selected-normal-foreground);
-        }
-        element selected.urgent {
-            background-color: var(selected-urgent-background);
-            text-color:       var(selected-urgent-foreground);
-        }
-        element selected.active {
-            background-color: var(selected-active-background);
-            text-color:       var(selected-active-foreground);
-        }
-        element alternate.normal {
-            background-color: var(alternate-normal-background);
-            text-color:       var(alternate-normal-foreground);
-        }
-        element alternate.urgent {
-            background-color: var(alternate-urgent-background);
-            text-color:       var(alternate-urgent-foreground);
-        }
-        element alternate.active {
-            background-color: var(alternate-active-background);
-            text-color:       var(alternate-active-foreground);
-        }
-        scrollbar {
-            width:        4px ;
-            padding:      0;
-            handle-width: 8px ;
-            border:       0;
-            handle-color: var(normal-foreground);
-        }
-        mode-switcher {
-            border-color: var(separatorcolor);
-        }
-        button {
-            spacing:    0;
-            text-color: var(normal-foreground);
-        }
-        button selected {
-            background-color: var(selected-normal-background);
-            text-color:       var(selected-normal-foreground);
-        }
-        inputbar {
-            padding:    1px ;
-            spacing:    0px ;
-            text-color: var(normal-foreground);
-            children:   [ prompt,textbox-prompt-colon,entry,overlay,case-indicator ];
-        }
-        case-indicator {
-            spacing:    0;
-            text-color: var(normal-foreground);
-        }
-        entry {
-            spacing:    0;
-            text-color: var(normal-foreground);
-        }
-        prompt {
-            spacing:    0;
-            text-color: var(normal-foreground);
-        }
-        textbox-prompt-colon {
-            margin:     0px 0.3000em 0.0000em 0.0000em ;
-            expand:     false;
-            str:        ":";
-            text-color: inherit;
-        }
-        error-message {
-            background-color: rgba ( 0, 0, 0, 0 % );
-            text-color:       var(normal-foreground);
-        }
-      '';
       "todo/config".text = ''
         export TODO_DIR="${userDirs.documents}/todo"
         export TODO_FILE="$TODO_DIR/todo.txt"
@@ -3287,7 +3302,6 @@ in {
       ag
       xorg.xkill
       bc
-      rofi
       feh
       lxappearance
       xorg.xcursorthemes
