@@ -4,9 +4,21 @@ let
   unstable = import <nixos-unstable> {
     config = config.nixpkgs.config;
     overlays = [
+      # (import (builtins.fetchTarball {
+      #   url =
+      #     "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
+      # }))
+    ];
+  };
+  emacs-overlay = import (builtins.fetchTarball {
+    url =
+      "https://github.com/nixos/nixpkgs/archive/0ecf7d414811f831060cf55707c374d54fbb1dec.tar.gz";
+  }) {
+    config = config.nixpkgs.config;
+    overlays = [
       (import (builtins.fetchTarball {
         url =
-          "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
+          "https://github.com/nix-community/emacs-overlay/archive/46c8425e72efd4002343df959ba1ce47381e1eca.tar.gz";
       }))
     ];
   };
@@ -560,7 +572,7 @@ in {
     };
     emacs = {
       enable = true;
-      package = let emacsPkg = unstable.emacsPgtkGcc;
+      package = let emacsPkg = emacs-overlay.emacsPgtkGcc;
       in with pkgs;
       symlinkJoin {
         name = "emacs";
@@ -962,7 +974,7 @@ in {
 
         # https://github.com/akermu/emacs-libvterm
         if test -n "$INSIDE_EMACS"
-          source ${unstable.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${unstable.emacsPackages.vterm.version}/etc/emacs-vterm.fish
+          source ${emacs-overlay.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${emacs-overlay.emacsPackages.vterm.version}/etc/emacs-vterm.fish
         end
       '';
       # source ${config.programs.emacs.package.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${config.programs.emacs.package.pkgs.vterm.version}/etc/emacs-vterm.fish
