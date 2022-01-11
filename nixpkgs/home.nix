@@ -83,6 +83,10 @@ in {
 
   programs = {
     bash.enable = true;
+    browserpass = {
+      enable = config.programs.firefox.enable;
+      browsers = [ "firefox" "chromium" "chrome" ];
+    };
     dircolors = {
       enable = true;
       enableBashIntegration = true;
@@ -603,14 +607,17 @@ in {
     firefox = {
       enable = true;
       package =
-        # pkgs.latest.firefox-bin.override { cfg.enableTridactylNative = true; };
-        pkgs.firefox-bin.override { cfg.enableTridactylNative = true; };
+        # pkgs.latest.firefox-bin.override {
+        pkgs.firefox.override {
+          cfg.enableBrowserpass = true;
+          cfg.enableTridactylNative = true;
+        };
       extensions = with pkgs.nur.repos.rycee.firefox-addons;
         [
           clearurls
+          browserpass
           darkreader
           https-everywhere
-          keepassxc-browser
           netflix-1080p
           privacy-badger
           react-devtools
@@ -950,7 +957,7 @@ in {
           whitespace = "trailing-space,space-before-tab";
         };
         init.defaultBranch = "main";
-        credential.helper = "cache";
+        credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
         color.ui = true;
         push.default = "simple";
         advice = {
