@@ -611,6 +611,7 @@ in {
           darkreader
           https-everywhere
           keepassxc-browser
+          netflix-1080p
           privacy-badger
           react-devtools
           reddit-enhancement-suite
@@ -618,6 +619,9 @@ in {
           refined-github
           tridactyl
           ublock-origin
+        ] ++ [
+          pkgs.nur.repos.ethancedwards8.firefox-addons.enhancer-for-youtube
+          pkgs.nur.repos.pborzenkov.firefox-addons.wallabagger
         ] ++ [
           (buildFirefoxXpiAddon rec {
             pname = "containerise";
@@ -636,7 +640,7 @@ in {
           })
           (buildFirefoxXpiAddon rec {
             pname = "cookies.txt";
-            version = "0.2";
+            version = "0.3";
             addonId = "{12cf650b-1822-40aa-bff0-996df6948878}";
             url =
               "https://addons.mozilla.org/firefox/downloads/file/3588248/cookiestxt-${version}-fx.xpi";
@@ -661,36 +665,6 @@ in {
                 "https://github.com/spenibus/cors-everywhere-firefox-addon";
               description =
                 "Bypass CORS restrictions by altering http responses.";
-              licence = licences.mit;
-              platforms = platforms.all;
-            };
-          })
-          (buildFirefoxXpiAddon rec {
-            pname = "enhancer-for-youtube";
-            version = "2.0.104.12";
-            addonId = "enhancerforyoutube@maximerf.addons.mozilla.org";
-            url =
-              "https://addons.mozilla.org/firefox/downloads/file/3780706/enhancer_for_youtubetm-${version}-fx.xpi";
-            sha256 = "0zjs4jgvg0shjhj38jb17wp3v28fp51bbr10wnqy3fq9fj2pn88p";
-            meta = with lib; {
-              homepage = "https://www.mrfdev.com/enhancer-for-youtube";
-              description =
-                "Take control of YouTube and boost your user experience!";
-              licence = licences.gpl3;
-              platforms = platforms.all;
-            };
-          })
-          (buildFirefoxXpiAddon rec {
-            pname = "netflix-1080p";
-            version = "1.16.0";
-            addonId = "{f18f0257-10ad-4ff7-b51e-6895edeccfc8}";
-            url =
-              "https://addons.mozilla.org/firefox/downloads/file/3781739/netflix_1080p-${version}-fx.xpi";
-            sha256 = "07cfqj20n44pjynkv48arsva3fbzfn5xxcmhff3haw1yswf88zw9";
-            meta = with lib; {
-              homepage =
-                "https://github.com/TheGoddessInari/netflix-1080p-firefox";
-              description = "Force 1080p Netflix playback in Firefox";
               licence = licences.mit;
               platforms = platforms.all;
             };
@@ -723,21 +697,6 @@ in {
               description =
                 "Simplest add-on for Twitter. Share web pages, links and selected text on Twitter right from the context menu (right click menu) and the toolbar button.";
               licence = licences.mpl2;
-              platforms = platforms.all;
-            };
-          })
-          (buildFirefoxXpiAddon rec {
-            pname = "wallabagger";
-            version = "1.13.0";
-            addonId = "{7a7b1d36-d7a4-481b-92c6-9f5427cb9eb1}";
-            url =
-              "https://addons.mozilla.org/firefox/downloads/file/3782259/wallabagger-${version}-an+fx.xpi";
-            sha256 = "1w0jygwz486r7xli5fcm6agibyjrfdr89dxyir5371if9khixr37";
-            meta = with lib; {
-              homepage = "";
-              description =
-                "This wallabag v2 extension has the ability to edit title and tags and set starred, archived, or delete states. You can add a page from the icon or through the right click menu on a link or on a blank page spot.";
-              licence = with licences; [ mit x11 ];
               platforms = platforms.all;
             };
           })
