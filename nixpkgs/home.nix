@@ -574,7 +574,7 @@ in {
       enable = true;
       package = let emacsPkg = emacs-overlay.emacsPgtkGcc;
       in with pkgs;
-      symlinkJoin {
+      symlinkJoin (lib.recursiveUpdate {
         name = "emacs";
         paths = [ emacsPkg ];
         buildInputs = [ makeWrapper ];
@@ -595,9 +595,9 @@ in {
             --prefix PATH : "${editorconfig-core-c}/bin" \
             --prefix PATH : "${gcc}/bin"
         '';
-      } // {
-        inherit (emacsPkg) meta src;
-      };
+      } (lib.recursiveUpdate { inherit (emacsPkg) meta src; } {
+        meta.platforms = lib.platforms.linux;
+      }));
       extraPackages = epkgs: (with epkgs; [ vterm ]);
     };
     firefox = {
