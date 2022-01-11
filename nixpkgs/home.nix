@@ -1531,7 +1531,7 @@ in {
       # https://github.com/nix-community/home-manager/issues/1667
       # package = let vscodePkg = unstable.vscode;
       # in with pkgs;
-      # symlinkJoin {
+      # symlinkJoin (lib.recursiveUpdate {
       #   name = "vscode";
       #   paths = [ vscodePkg ];
       #   buildInputs = [ makeWrapper ];
@@ -1540,9 +1540,9 @@ in {
       #       --prefix PATH : "${docker}/bin" \
       #       --prefix PATH : "${docker-compose}/bin"
       #   '';
-      # } // {
+      # } {
       #   inherit (vscodePkg) meta src pname;
-      # };
+      # });
       # extensions = with unstable.vscode-extensions; [
       #   bbenoist.nix
       #   vscodevim.vim
@@ -1645,7 +1645,7 @@ in {
       enable = true;
       package = let picomPkg = pkgs.picom;
       in with pkgs;
-      symlinkJoin {
+      symlinkJoin (lib.recursiveUpdate {
         name = "picom";
         paths = [ picomPkg ];
         buildInputs = [ makeWrapper ];
@@ -1654,9 +1654,7 @@ in {
             --add-flags \''${ARG_0:+\"\$ARG_0\"} \
             --add-flags \''${ARG_1:+\"\$ARG_1\"}
         '';
-      } // {
-        inherit (picomPkg) meta src;
-      };
+      } { inherit (picomPkg) meta src; });
       fade = true;
       fadeDelta = 3;
       inactiveDim = "0.2";
