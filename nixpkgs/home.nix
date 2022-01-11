@@ -3393,6 +3393,7 @@ in {
       cachix
       nix-index
       nix-prefetch-git
+      keybase
 
       # Amphetype
       (with python38Packages;
