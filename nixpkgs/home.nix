@@ -84,7 +84,7 @@ in {
   programs = {
     bash.enable = true;
     browserpass = {
-      enable = config.programs.firefox.enable;
+      enable = true;
       browsers = [ "firefox" "chromium" "chrome" ];
     };
     dircolors = {
@@ -606,12 +606,10 @@ in {
     };
     firefox = {
       enable = true;
-      package =
-        # pkgs.latest.firefox-bin.override {
-        pkgs.firefox.override {
-          cfg.enableBrowserpass = true;
-          cfg.enableTridactylNative = true;
-        };
+      package = pkgs.latest.firefox-bin.override {
+        cfg.enableBrowserpass = true;
+        cfg.enableTridactylNative = true;
+      };
       extensions = with pkgs.nur.repos.rycee.firefox-addons;
         [
           clearurls
@@ -826,6 +824,39 @@ in {
           '';
         };
         blank = { id = 1; };
+        nightly = {
+          id = 2;
+          settings = commonSettings // noNoiseSuppression;
+          extraConfig = ''
+            // http://kb.mozillazine.org/About:config_entries
+
+            // Given that we're managing updates declaratively, we don't want to auto-update
+            user_pref("extensions.update.enabled", false);
+            user_pref("app.update.enabled", false);
+          '';
+        };
+        beta = {
+          id = 3;
+          settings = commonSettings // noNoiseSuppression;
+          extraConfig = ''
+            // http://kb.mozillazine.org/About:config_entries
+
+            // Given that we're managing updates declaratively, we don't want to auto-update
+            user_pref("extensions.update.enabled", false);
+            user_pref("app.update.enabled", false);
+          '';
+        };
+        esr = {
+          id = 4;
+          settings = commonSettings // noNoiseSuppression;
+          extraConfig = ''
+            // http://kb.mozillazine.org/About:config_entries
+
+            // Given that we're managing updates declaratively, we don't want to auto-update
+            user_pref("extensions.update.enabled", false);
+            user_pref("app.update.enabled", false);
+          '';
+        };
       };
     };
     fish = {
@@ -3349,21 +3380,99 @@ in {
       qutebrowser
       luakit
       surf
-      # (latest.firefox-nightly-bin.override {
-      #   browserName = "firefox-nightly";
-      #   pname = "firefox-nightly-bin";
-      #   desktopName = "Firefox Nightly";
-      # })
-      # (latest.firefox-beta-bin.override {
-      #   browserName = "firefox-beta";
-      #   pname = "firefox-beta-bin";
-      #   desktopName = "Firefox Beta";
-      # })
-      # (latest.firefox-esr-bin.override {
-      #   browserName = "firefox-esr";
-      #   pname = "firefox-esr-bin";
-      #   desktopName = "Firefox ESR";
-      # })
+      (let
+        pkg = (latest.firefox-nightly-bin.override {
+          cfg.enableBrowserpass = true;
+          cfg.enableTridactylNative = true;
+        }).overrideAttrs (old: {
+          desktopItem = makeDesktopItem {
+            name = "firefox-nightly";
+            exec = "firefox-nightly %U";
+            icon = "firefox-nightly";
+            comment = "";
+            desktopName = "Firefox Nightly";
+            genericName = "Web Browser";
+            categories = "Network;WebBrowser;";
+            mimeType = lib.concatStringsSep ";" [
+              "text/html"
+              "text/xml"
+              "application/xhtml+xml"
+              "application/vnd.mozilla.xul+xml"
+              "x-scheme-handler/http"
+              "x-scheme-handler/https"
+              "x-scheme-handler/ftp"
+            ];
+          };
+        });
+        wrapped = pkgs.writeShellScriptBin "firefox-nightly" ''
+          exec ${pkg}/bin/firefox --no-remote -P nightly "''${@}"
+        '';
+      in pkgs.symlinkJoin {
+        name = "firefox-nightly";
+        paths = [ wrapped pkg ];
+      })
+      (let
+        pkg = (latest.firefox-beta-bin.override {
+          cfg.enableBrowserpass = true;
+          cfg.enableTridactylNative = true;
+        }).overrideAttrs (old: {
+          desktopItem = makeDesktopItem {
+            name = "firefox-beta";
+            exec = "firefox-beta %U";
+            icon = "firefox-beta";
+            comment = "";
+            desktopName = "Firefox Beta";
+            genericName = "Web Browser";
+            categories = "Network;WebBrowser;";
+            mimeType = lib.concatStringsSep ";" [
+              "text/html"
+              "text/xml"
+              "application/xhtml+xml"
+              "application/vnd.mozilla.xul+xml"
+              "x-scheme-handler/http"
+              "x-scheme-handler/https"
+              "x-scheme-handler/ftp"
+            ];
+          };
+        });
+        wrapped = pkgs.writeShellScriptBin "firefox-beta" ''
+          exec ${pkg}/bin/firefox --no-remote -P beta "''${@}"
+        '';
+      in pkgs.symlinkJoin {
+        name = "firefox-beta";
+        paths = [ wrapped pkg ];
+      })
+      (let
+        pkg = (latest.firefox-esr-bin.override {
+          cfg.enableBrowserpass = true;
+          cfg.enableTridactylNative = true;
+        }).overrideAttrs (old: {
+          desktopItem = makeDesktopItem {
+            name = "firefox-esr";
+            exec = "firefox-esr %U";
+            icon = "firefox";
+            comment = "";
+            desktopName = "Firefox ESR";
+            genericName = "Web Browser";
+            categories = "Network;WebBrowser;";
+            mimeType = lib.concatStringsSep ";" [
+              "text/html"
+              "text/xml"
+              "application/xhtml+xml"
+              "application/vnd.mozilla.xul+xml"
+              "x-scheme-handler/http"
+              "x-scheme-handler/https"
+              "x-scheme-handler/ftp"
+            ];
+          };
+        });
+        wrapped = pkgs.writeShellScriptBin "firefox-esr" ''
+          exec ${pkg}/bin/firefox --no-remote -P esr "''${@}"
+        '';
+      in pkgs.symlinkJoin {
+        name = "firefox-esr";
+        paths = [ wrapped pkg ];
+      })
       ungoogled-chromium
       google-chrome
       google-chrome-beta
