@@ -1605,7 +1605,7 @@ in {
       settings = {
         global = {
           follow = "keyboard";
-          width = 600;
+          width = "(0, 500)";
           height = 100;
           offset = "0x24";
           separator_height = 4;
