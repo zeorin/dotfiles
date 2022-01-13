@@ -1176,7 +1176,7 @@ in {
         hide-scrollbar = false;
         fullscreen = false;
         fake-transparency = false;
-        dpi = -1;
+        dpi = 0;
         threads = 0;
         scrollbar-width = 8;
         scroll-method = 0;
