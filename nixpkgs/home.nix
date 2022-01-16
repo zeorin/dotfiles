@@ -1088,9 +1088,7 @@ in {
     gpg = {
       enable = true;
       homedir = "${config.xdg.dataHome}/gnupg";
-      settings = {
-        keyserver = "hkps://keys.openpgp.org/";
-      };
+      settings = { keyserver = "hkps://keys.openpgp.org/"; };
     };
     htop = {
       enable = true;
