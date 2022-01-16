@@ -1653,15 +1653,7 @@ in {
     flameshot.enable = true;
     gpg-agent.enable = true;
     network-manager-applet.enable = true;
-    nextcloud-client = {
-      enable = true;
-      package = (import (builtins.fetchGit {
-        name = "nixpkgs-20.05";
-        url = "https://github.com/NixOS/nixpkgs/";
-        ref = "refs/heads/nixos-20.09";
-        rev = "05b1f3f0c9db8327acaa20f8d660440f8adb1031";
-      }) { }).nextcloud-client;
-    };
+    nextcloud-client.enable = true;
     picom = {
       enable = true;
       package = let picomPkg = pkgs.picom;
