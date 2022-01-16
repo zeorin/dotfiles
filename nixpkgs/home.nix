@@ -30,7 +30,6 @@ in {
         "grp:alt_space_toggle"
         "grp_led:scroll"
         "shift:both_capslock"
-        "shift:breaks_caps"
         "compose:menu"
         "terminate:ctrl_alt_bksp"
       ];
