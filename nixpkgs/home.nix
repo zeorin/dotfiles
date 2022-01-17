@@ -40,6 +40,7 @@ in {
       VISUAL = "${EDITOR}";
       LESS = "-FiRx4";
       PAGER = "less ${LESS}";
+      PASSWORD_STORE_GENERATED_LENGTH = 128;
 
       # Help some tools actually adhere to XDG Base Dirs
       CURL_HOME = "${configHome}/curl";
