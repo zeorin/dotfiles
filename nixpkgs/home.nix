@@ -1833,10 +1833,6 @@ in {
         " Misc settings
         """"""""""""""""""
 
-        " Use Wikiwand as Wikipedia viewer
-        autocmd DocStart ^http(s?)://[a-z]{2}.wikipedia.org js tri.excmds.urlmodify("-r", /([a-z]{2})\.wikipedia.org\/wiki/, "www.wikiwand.com/$1")
-        bindurl wikiwand.com yy composite js document.location.href.replace(/www\.wikiwand\.com\/([a-z]{2})/, "$1.wikipedia.org/wiki") | clipboard yank
-
         " I’m a smooth operator
         set smoothscroll true
 
@@ -1851,13 +1847,6 @@ in {
         " Don't autofocus!
         autocmd TabEnter .* unfocus
         autocmd DocLoad .* unfocus
-
-        "
-        " URL redirects
-        "
-
-        " New reddit is bad
-        autocmd DocStart ^http(s?)://www.reddit.com js tri.excmds.urlmodify("-t", "www", "old")
       '';
       "tridactyl/themes/zeorin.css".text = ''
         @media (prefers-color-scheme: dark) {
