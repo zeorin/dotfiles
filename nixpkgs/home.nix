@@ -1885,86 +1885,66 @@ in {
         Xft.antialias: 1
         Xft.rgba: rgb
 
-        !
-        ! Solarized color scheme for the X Window System
-        !
-        ! http://ethanschoonover.com/solarized
+        ! Nord
+        ! https://github.com/arcticicestudio/nord-xresources/blob/develop/src/nord
 
-        ! Solarized colours
+        #define nord0 #2E3440
+        #define nord1 #3B4252
+        #define nord2 #434C5E
+        #define nord3 #4C566A
+        #define nord4 #D8DEE9
+        #define nord5 #E5E9F0
+        #define nord6 #ECEFF4
+        #define nord7 #8FBCBB
+        #define nord8 #88C0D0
+        #define nord9 #81A1C1
+        #define nord10 #5E81AC
+        #define nord11 #BF616A
+        #define nord12 #D08770
+        #define nord13 #EBCB8B
+        #define nord14 #A3BE8C
+        #define nord15 #B48EAD
 
-        #define S_yellow        #b58900
-        #define S_orange        #cb4b16
-        #define S_red           #dc322f
-        #define S_magenta       #d33682
-        #define S_violet        #6c71c4
-        #define S_blue          #268bd2
-        #define S_cyan          #2aa198
-        #define S_green         #859900
-        #define S_base03        #002b36
-        #define S_base02        #073642
-        #define S_base01        #586e75
-        #define S_base00        #657b83
-        #define S_base0         #839496
-        #define S_base1         #93a1a1
-        #define S_base2         #eee8d5
-        #define S_base3         #fdf6e3
+        *.foreground:   nord4
+        *.background:   nord0
+        *.cursorColor:  nord4
+        *fading: 35
+        *fadeColor: nord3
 
-        ! Common
-
-        st.color0:                  S_base02
-        st.color1:                  S_red
-        st.color2:                  S_green
-        st.color3:                  S_yellow
-        st.color4:                  S_blue
-        st.color5:                  S_magenta
-        st.color6:                  S_cyan
-        st.color7:                  S_base2
-        st.color8:                  S_base03
-        st.color9:                  S_orange
-        st.color10:                 S_base01
-        st.color11:                 S_base00
-        st.color12:                 S_base0
-        st.color13:                 S_violet
-        st.color14:                 S_base1
-        st.color15:                 S_base3
-
-        ! Dark
-
-        st.background:              S_base03
-        st.foreground:              S_base0
-        st.cursorColor:             S_base1
-        st.pointerColorBackground:  S_base01
-        st.pointerColorForeground:  S_base1
-        st.colorBD:                 S_base3
-
-        ! Light
-
-        ! *background:              S_base3
-        ! *foreground:              S_base00
-        ! *cursorColor:             S_base01
-        ! *pointerColorBackground:  S_base1
-        ! *pointerColorForeground:  S_base01
-        ! *colorBD:                 S_base03
+        *.color0: nord0
+        *.color1: nord11
+        *.color2: nord14
+        *.color3: nord13
+        *.color4: nord9
+        *.color5: nord15
+        *.color6: nord8
+        *.color7: nord5
+        *.color8: nord3
+        *.color9: nord11
+        *.color10: nord14
+        *.color11: nord13
+        *.color12: nord9
+        *.color13: nord15
+        *.color14: nord7
+        *.color15: nord6
       '';
       "xsettingsd/xsettingsd.conf".text = ''
-        Net/ThemeName "Arc-Dark"
+        Net/ThemeName "Nordic-Dark"
       '';
     };
     dataFile."applications/mimeapps.list".force =
       true; # Force overwrite, don't prompt
-    # TODO: Enable this on next home-manager stable release channel (current:
-    # 21.05), and remove the manually created desktop entry from `home.packages`
-    # desktopEntries = {
-    #   org-protocol = {
-    #     name = "org-protocol";
-    #     exec = "emacsclient %u";
-    #     icon = "emacs-icon";
-    #     type = "Application";
-    #     terminal = false;
-    #     categories = [ "System" ];
-    #     mimeType = [ "x-scheme-handler/org-protocol" ];
-    #   };
-    # };
+    desktopEntries = {
+      org-protocol = {
+        name = "org-protocol";
+        exec = "emacsclient %u";
+        icon = "emacs";
+        type = "Application";
+        terminal = false;
+        categories = [ "System" ];
+        mimeType = [ "x-scheme-handler/org-protocol" ];
+      };
+    };
     mimeApps = {
       enable = true;
       defaultApplications = {
@@ -2919,22 +2899,6 @@ in {
       noto-fonts-extra
       noto-fonts-cjk
 
-    ] ++ [
-
-      ###################
-      # DESKTOP ENTRIES #
-      ###################
-
-      (makeDesktopItem {
-        name = "org-protocol";
-        desktopName = "org-protocol";
-        exec = "emacsclient %u";
-        icon = "emacs-icon";
-        type = "Application";
-        terminal = false;
-        categories = "System;";
-        mimeType = "x-scheme-handler/org-protocol;";
-      })
     ];
 
   # This value determines the Home Manager release that your
