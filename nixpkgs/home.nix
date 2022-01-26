@@ -92,480 +92,14 @@ in {
       enableBashIntegration = true;
       enableFishIntegration = true;
       enableZshIntegration = true;
-      extraConfig = ''
-        # Exact Solarized color theme for the color GNU ls utility.
-        # Designed for dircolors (GNU coreutils) 5.97
-        #
-        # This simple theme was simultaneously designed for these terminal color schemes:
-        # - Solarized dark  (best)
-        # - Solarized light (best)
-        # - default dark
-        # - default light
-        #
-        # How the colors were selected:
-        # - Terminal emulators often have an option typically enabled by default that makes
-        #   bold a different color.  It is important to leave this option enabled so that
-        #   you can access the entire 16-color Solarized palette, and not just 8 colors.
-        # - We favor universality over a greater number of colors.  So we limit the number
-        #   of colors so that this theme will work out of the box in all terminals,
-        #   Solarized or not, dark or light.
-        # - We choose to have the following category of files:
-        #   NORMAL & FILE, DIR, LINK, EXEC and
-        #   editable text including source, unimportant text, binary docs & multimedia source
-        #   files, viewable multimedia, archived/compressed, and unimportant non-text
-        # - For uniqueness, we stay away from the Solarized foreground colors are -- either
-        #   base00 (brightyellow) or base0 (brightblue).  However, they can be used if
-        #   you know what the bg/fg colors of your terminal are, in order to optimize the display.
-        # - 3 different options are provided: universal, solarized dark, and solarized light.
-        #   The only difference between the universal scheme and one that's optimized for
-        #   dark/light is the color of "unimportant" files, which should blend more with the
-        #   background
-        # - We note that blue is the hardest color to see on dark bg and yellow is the hardest
-        #   color to see on light bg (with blue being particularly bad).  So we choose yellow
-        #   for multimedia files which are usually accessed in a GUI folder browser anyway.
-        #   And blue is kept for custom use of this scheme's user.
-        # - See table below to see the assignments.
-
-
-        # Installation instructions:
-        # This file goes in the /etc directory, and must be world readable.
-        # You can copy this file to .dir_colors in your $HOME directory to override
-        # the system defaults.
-
-        # COLOR needs one of these arguments: 'tty' colorizes output to ttys, but not
-        # pipes. 'all' adds color characters to all output. 'none' shuts colorization
-        # off.
-        COLOR tty
-
-        # Below, there should be one TERM entry for each termtype that is colorizable
-        TERM ansi
-        TERM color_xterm
-        TERM color-xterm
-        TERM con132x25
-        TERM con132x30
-        TERM con132x43
-        TERM con132x60
-        TERM con80x25
-        TERM con80x28
-        TERM con80x30
-        TERM con80x43
-        TERM con80x50
-        TERM con80x60
-        TERM cons25
-        TERM console
-        TERM cygwin
-        TERM dtterm
-        TERM dvtm
-        TERM dvtm-256color
-        TERM Eterm
-        TERM eterm-color
-        TERM fbterm
-        TERM gnome
-        TERM gnome-256color
-        TERM jfbterm
-        TERM konsole
-        TERM konsole-256color
-        TERM kterm
-        TERM linux
-        TERM linux-c
-        TERM mach-color
-        TERM mlterm
-        TERM nxterm
-        TERM putty
-        TERM putty-256color
-        TERM rxvt
-        TERM rxvt-256color
-        TERM rxvt-cygwin
-        TERM rxvt-cygwin-native
-        TERM rxvt-unicode
-        TERM rxvt-unicode256
-        TERM rxvt-unicode-256color
-        TERM screen
-        TERM screen-16color
-        TERM screen-16color-bce
-        TERM screen-16color-s
-        TERM screen-16color-bce-s
-        TERM screen-256color
-        TERM screen-256color-bce
-        TERM screen-256color-s
-        TERM screen-256color-bce-s
-        TERM screen-256color-italic
-        TERM screen-bce
-        TERM screen-w
-        TERM screen.xterm-256color
-        TERM screen.linux
-        TERM screen.xterm-new
-        TERM st
-        TERM st-meta
-        TERM st-256color
-        TERM st-meta-256color
-        TERM tmux
-        TERM tmux-256color
-        TERM vt100
-        TERM xterm
-        TERM xterm-new
-        TERM xterm-16color
-        TERM xterm-256color
-        TERM xterm-256color-italic
-        TERM xterm-88color
-        TERM xterm-color
-        TERM xterm-debian
-        TERM xterm-termite
-
-        # EIGHTBIT, followed by '1' for on, '0' for off. (8-bit output)
-        EIGHTBIT 1
-
-        #############################################################################
-        # Below are the color init strings for the basic file types. A color init
-        # string consists of one or more of the following numeric codes:
-        #
-        # Attribute codes:
-        #   00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
-        # Text color codes:
-        #   30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
-        # Background color codes:
-        #   40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
-        #
-        # NOTES:
-        # - See http://www.oreilly.com/catalog/wdnut/excerpt/color_names.html
-        # - Color combinations
-        #   ANSI Color code       Solarized  Notes                Universal             SolDark              SolLight
-        #   ~~~~~~~~~~~~~~~       ~~~~~~~~~  ~~~~~                ~~~~~~~~~             ~~~~~~~              ~~~~~~~~
-        #   00    none                                            NORMAL, FILE          <SAME>               <SAME>
-        #   30    black           base02
-        #   01;30 bright black    base03     bg of SolDark
-        #   31    red             red                             docs & mm src         <SAME>               <SAME>
-        #   01;31 bright red      orange                          EXEC                  <SAME>               <SAME>
-        #   32    green           green                           editable text         <SAME>               <SAME>
-        #   01;32 bright green    base01                          unimportant text      <SAME>
-        #   33    yellow          yellow     unclear in light bg  multimedia            <SAME>               <SAME>
-        #   01;33 bright yellow   base00     fg of SolLight                             unimportant non-text
-        #   34    blue            blue       unclear in dark bg   user customized       <SAME>               <SAME>
-        #   01;34 bright blue     base0      fg in SolDark                                                   unimportant text
-        #   35    magenta         magenta                         LINK                  <SAME>               <SAME>
-        #   01;35 bright magenta  violet                          archive/compressed    <SAME>               <SAME>
-        #   36    cyan            cyan                            DIR                   <SAME>               <SAME>
-        #   01;36 bright cyan     base1                           unimportant non-text                       <SAME>
-        #   37    white           base2
-        #   01;37 bright white    base3      bg in SolLight
-        #   05;37;41                         unclear in Putty dark
-
-
-        ### By file type
-
-        # global default
-        NORMAL 00
-        # normal file
-        FILE 00
-        # directory
-        DIR 36
-        # symbolic link
-        LINK 35
-
-        # pipe, socket, block device, character device (blue bg)
-        FIFO 30;44
-        SOCK 35;44
-        DOOR 35;44 # Solaris 2.5 and later
-        BLK  33;44
-        CHR  37;44
-
-
-        #############################################################################
-        ### By file attributes
-
-        # Orphaned symlinks (blinking white on red)
-        # Blink may or may not work (works on iTerm dark or light, and Putty dark)
-        ORPHAN  05;37;41
-        # ... and the files that orphaned symlinks point to (blinking white on red)
-        MISSING 05;37;41
-
-        # files with execute permission
-        EXEC 01;31  # Unix
-        .cmd 01;31  # Win
-        .exe 01;31  # Win
-        .com 01;31  # Win
-        .bat 01;31  # Win
-        .reg 01;31  # Win
-        .app 01;31  # OSX
-
-        #############################################################################
-        ### By extension
-
-        # List any file extensions like '.gz' or '.tar' that you would like ls
-        # to colorize below. Put the extension, a space, and the color init string.
-        # (and any comments you want to add after a '#')
-
-        ### Text formats
-
-        # Text that we can edit with a regular editor
-        .txt 32
-        .org 32
-        .md 32
-        .mkd 32
-
-        # Source text
-        .h 32
-        .hpp 32
-        .c 32
-        .C 32
-        .cc 32
-        .cpp 32
-        .cxx 32
-        .objc 32
-        .cl 32
-        .sh 32
-        .bash 32
-        .csh 32
-        .zsh 32
-        .el 32
-        .vim 32
-        .java 32
-        .pl 32
-        .pm 32
-        .py 32
-        .rb 32
-        .hs 32
-        .php 32
-        .htm 32
-        .html 32
-        .shtml 32
-        .erb 32
-        .haml 32
-        .xml 32
-        .rdf 32
-        .css 32
-        .sass 32
-        .scss 32
-        .less 32
-        .js 32
-        .coffee 32
-        .man 32
-        .0 32
-        .1 32
-        .2 32
-        .3 32
-        .4 32
-        .5 32
-        .6 32
-        .7 32
-        .8 32
-        .9 32
-        .l 32
-        .n 32
-        .p 32
-        .pod 32
-        .tex 32
-        .go 32
-        .sql 32
-        .csv 32
-
-        ### Multimedia formats
-
-        # Image
-        .bmp 33
-        .cgm 33
-        .dl 33
-        .dvi 33
-        .emf 33
-        .eps 33
-        .gif 33
-        .jpeg 33
-        .jpg 33
-        .JPG 33
-        .mng 33
-        .pbm 33
-        .pcx 33
-        .pdf 33
-        .pgm 33
-        .png 33
-        .PNG 33
-        .ppm 33
-        .pps 33
-        .ppsx 33
-        .ps 33
-        .svg 33
-        .svgz 33
-        .tga 33
-        .tif 33
-        .tiff 33
-        .xbm 33
-        .xcf 33
-        .xpm 33
-        .xwd 33
-        .xwd 33
-        .yuv 33
-
-        # Audio
-        .aac 33
-        .au  33
-        .flac 33
-        .m4a 33
-        .mid 33
-        .midi 33
-        .mka 33
-        .mp3 33
-        .mpa 33
-        .mpeg 33
-        .mpg 33
-        .ogg  33
-        .opus 33
-        .ra 33
-        .wav 33
-
-        # Video
-        .anx 33
-        .asf 33
-        .avi 33
-        .axv 33
-        .flc 33
-        .fli 33
-        .flv 33
-        .gl 33
-        .m2v 33
-        .m4v 33
-        .mkv 33
-        .mov 33
-        .MOV 33
-        .mp4 33
-        .mp4v 33
-        .mpeg 33
-        .mpg 33
-        .nuv 33
-        .ogm 33
-        .ogv 33
-        .ogx 33
-        .qt 33
-        .rm 33
-        .rmvb 33
-        .swf 33
-        .vob 33
-        .webm 33
-        .wmv 33
-
-        ### Misc
-
-        # Binary document formats and multimedia source
-        .doc 31
-        .docx 31
-        .rtf 31
-        .odt 31
-        .dot 31
-        .dotx 31
-        .ott 31
-        .xls 31
-        .xlsx 31
-        .ods 31
-        .ots 31
-        .ppt 31
-        .pptx 31
-        .odp 31
-        .otp 31
-        .fla 31
-        .psd 31
-
-        # Archives, compressed
-        .7z   1;35
-        .apk  1;35
-        .arj  1;35
-        .bin  1;35
-        .bz   1;35
-        .bz2  1;35
-        .cab  1;35  # Win
-        .deb  1;35
-        .dmg  1;35  # OSX
-        .gem  1;35
-        .gz   1;35
-        .iso  1;35
-        .jar  1;35
-        .msi  1;35  # Win
-        .rar  1;35
-        .rpm  1;35
-        .tar  1;35
-        .tbz  1;35
-        .tbz2 1;35
-        .tgz  1;35
-        .tx   1;35
-        .war  1;35
-        .xpi  1;35
-        .xz   1;35
-        .z    1;35
-        .Z    1;35
-        .zip  1;35
-
-        # For testing
-        .ANSI-30-black 30
-        .ANSI-01;30-brblack 01;30
-        .ANSI-31-red 31
-        .ANSI-01;31-brred 01;31
-        .ANSI-32-green 32
-        .ANSI-01;32-brgreen 01;32
-        .ANSI-33-yellow 33
-        .ANSI-01;33-bryellow 01;33
-        .ANSI-34-blue 34
-        .ANSI-01;34-brblue 01;34
-        .ANSI-35-magenta 35
-        .ANSI-01;35-brmagenta 01;35
-        .ANSI-36-cyan 36
-        .ANSI-01;36-brcyan 01;36
-        .ANSI-37-white 37
-        .ANSI-01;37-brwhite 01;37
-
-        #############################################################################
-        # Your customizations
-
-        # Unimportant text files
-        # For universal scheme, use brightgreen 01;32
-        # For optimal on light bg (but too prominent on dark bg), use white 01;34
-        .log 01;32
-        *~ 01;32
-        *# 01;32
-        #.log 01;34
-        #*~ 01;34
-        #*# 01;34
-
-        # Unimportant non-text files
-        # For universal scheme, use brightcyan 01;36
-        # For optimal on dark bg (but too prominent on light bg), change to 01;33
-        .bak 01;36
-        .BAK 01;36
-        .old 01;36
-        .OLD 01;36
-        .org_archive 01;36
-        .off 01;36
-        .OFF 01;36
-        .dist 01;36
-        .DIST 01;36
-        .orig 01;36
-        .ORIG 01;36
-        .swp 01;36
-        .swo 01;36
-        *,v 01;36
-        #.bak 01;33
-        #.BAK 01;33
-        #.old 01;33
-        #.OLD 01;33
-        #.org_archive 01;33
-        #.off 01;33
-        #.OFF 01;33
-        #.dist 01;33
-        #.DIST 01;33
-        #.orig 01;33
-        #.ORIG 01;33
-        #.swp 01;33
-        #.swo 01;33
-        #*,v 01;33
-
-        # The brightmagenta (Solarized: purple) color is free for you to use for your
-        # custom file type
-        .gpg 34
-        .gpg 34
-        .pgp 34
-        .asc 34
-        .3des 34
-        .aes 34
-        .enc 34
-        .sqlite 34
-      '';
+      extraConfig = builtins.readFile "${
+          pkgs.fetchFromGitHub {
+            owner = "arcticicestudio";
+            repo = "nord-dircolors";
+            rev = "v0.2.0";
+            sha256 = "1c9fa6dip266z6hfqd5nan5v6qjp6dg074lvk4rxisirm26djlzz";
+          }
+        }/src/dir_colors";
     };
     direnv = {
       enable = true;
@@ -1028,7 +562,7 @@ in {
         options = {
           features = "line-numbers decorations";
           white-space-error-style = "22 reverse";
-          syntax-theme = "Solarized (dark)";
+          syntax-theme = "Nord";
           decorations = {
             commit-decoration-style = "bold yellow box ul";
             file-style = "bold yellow ul";
@@ -1126,152 +660,10 @@ in {
     rofi = {
       enable = true;
       pass.enable = true;
-      extraConfig = {
-        modi = "window,run,ssh";
-        width = 50;
-        lines = 15;
-        columns = 1;
-        font = "Iosevka Term 12";
-        bw = 1;
-        location = 0;
-        padding = 5;
-        yoffset = 0;
-        xoffset = 0;
-        fixed-num-lines = true;
-        show-icons = true;
-        terminal = "rofi-sensible-terminal";
-        ssh-client = "ssh";
-        ssh-command = "{terminal} -e {ssh-client} {host} [-p {port}]";
-        run-command = "{cmd}";
-        run-list-command = "";
-        run-shell-command = "{terminal} -e {cmd}";
-        window-command = "wmctrl -i -R {window}";
-        window-match-fields = "all";
-        # icon-theme = ;
-        drun-match-fields = "name,generic,exec,categories";
-        drun-show-actions = false;
-        # drun-display-format = "{name} [<span weight='light' size='small'><i>({generic})</i></span>]";
-        drun-display-format = "{name}";
-        disable-history = false;
-        ignored-prefixes = "";
-        sort = false;
-        # sorting-method = ;
-        case-sensitive = false;
-        cycle = true;
-        sidebar-mode = false;
-        eh = 1;
-        auto-select = false;
-        parse-hosts = false;
-        parse-known-hosts = true;
-        combi-modi = "window,run";
-        matching = "normal";
-        tokenize = true;
-        m = "-5";
-        line-margin = 2;
-        line-padding = 1;
-        # filter = ;
-        separator-style = "dash";
-        hide-scrollbar = false;
-        fullscreen = false;
-        fake-transparency = false;
-        dpi = 0;
-        threads = 0;
-        scrollbar-width = 8;
-        scroll-method = 0;
-        fake-background = "screenshot";
-        window-format = "{w}    {c}   {t}";
-        click-to-exit = true;
-        show-match = true;
-        # theme = ;
-        # color-normal = ;
-        # color-urgent = ;
-        # color-active = ;
-        # color-window = ;
-        max-history-size = 25;
-        combi-hide-mode-prefix = false;
-        # matching-negate-char = '-' /* unsupported */;
-        # cache-dir = ;
-        pid = "/run/user/1000/rofi.pid";
-        # display-window = ;
-        # display-windowcd = ;
-        # display-run = ;
-        # display-ssh = ;
-        # display-drun = ;
-        # display-combi = ;
-        # display-keys = ;
-        kb-primary-paste = "Control+V,Shift+Insert";
-        kb-secondary-paste = "Control+v,Insert";
-        kb-clear-line = "Control+w";
-        kb-move-front = "Control+a";
-        kb-move-end = "Control+e";
-        kb-move-word-back = "Alt+b,Control+Left";
-        kb-move-word-forward = "Alt+f,Control+Right";
-        kb-move-char-back = "Left,Control+b";
-        kb-move-char-forward = "Right,Control+f";
-        kb-remove-word-back = "Control+Alt+h,Control+BackSpace";
-        kb-remove-word-forward = "Control+Alt+d";
-        kb-remove-char-forward = "Delete,Control+d";
-        kb-remove-char-back = "BackSpace,Shift+BackSpace,Control+h";
-        kb-remove-to-eol = "Control+k";
-        kb-remove-to-sol = "Control+u";
-        kb-accept-entry = "Control+j,Control+m,Return,KP_Enter";
-        kb-accept-custom = "Control+Return";
-        kb-accept-alt = "Shift+Return";
-        kb-delete-entry = "Shift+Delete";
-        kb-mode-next = "Shift+Right,Control+Tab";
-        kb-mode-previous = "Shift+Left,Control+ISO_Left_Tab";
-        kb-row-left = "Control+Page_Up";
-        kb-row-right = "Control+Page_Down";
-        kb-row-up = "Up,Control+p,ISO_Left_Tab";
-        kb-row-down = "Down,Control+n";
-        kb-row-tab = "Tab";
-        kb-page-prev = "Page_Up";
-        kb-page-next = "Page_Down";
-        kb-row-first = "Home,KP_Home";
-        kb-row-last = "End,KP_End";
-        kb-row-select = "Control+space";
-        kb-screenshot = "Alt+S";
-        kb-ellipsize = "Alt+period";
-        kb-toggle-case-sensitivity = "grave,dead_grave";
-        kb-toggle-sort = "Alt+grave";
-        kb-cancel = "Escape,Control+g,Control+bracketleft";
-        kb-custom-1 = "Alt+1";
-        kb-custom-2 = "Alt+2";
-        kb-custom-3 = "Alt+3";
-        kb-custom-4 = "Alt+4";
-        kb-custom-5 = "Alt+5";
-        kb-custom-6 = "Alt+6";
-        kb-custom-7 = "Alt+7";
-        kb-custom-8 = "Alt+8";
-        kb-custom-9 = "Alt+9";
-        kb-custom-10 = "Alt+0";
-        kb-custom-11 = "Alt+exclam";
-        kb-custom-12 = "Alt+at";
-        kb-custom-13 = "Alt+numbersign";
-        kb-custom-14 = "Alt+dollar";
-        kb-custom-15 = "Alt+percent";
-        kb-custom-16 = "Alt+dead_circumflex";
-        kb-custom-17 = "Alt+ampersand";
-        kb-custom-18 = "Alt+asterisk";
-        kb-custom-19 = "Alt+parenleft";
-        kb-select-1 = "Super+1";
-        kb-select-2 = "Super+2";
-        kb-select-3 = "Super+3";
-        kb-select-4 = "Super+4";
-        kb-select-5 = "Super+5";
-        kb-select-6 = "Super+6";
-        kb-select-7 = "Super+7";
-        kb-select-8 = "Super+8";
-        kb-select-9 = "Super+9";
-        kb-select-10 = "Super+0";
-        ml-row-left = "ScrollLeft";
-        ml-row-right = "ScrollRight";
-        ml-row-up = "ScrollUp";
-        ml-row-down = "ScrollDown";
-        me-select-entry = "MousePrimary";
-        me-accept-entry = "MouseDPrimary";
-        me-accept-custom = "Control+MouseDPrimary";
-      };
+      font = "Iosevka Term 12";
+      location = "center";
+      yoffset = -160;
+      extraConfig = { show-icons = true; };
       theme = let
         # Use `mkLiteral` for string-like values that should show without
         # quotes, e.g.:
@@ -1282,158 +674,65 @@ in {
         inherit (config.lib.formats.rasi) mkLiteral;
       in {
         "*" = {
-          font = "Iosevka Term 10";
-          red = mkLiteral "rgba ( 220, 50, 47, 100 % )";
-          selected-active-foreground =
-            mkLiteral "rgba ( 253, 246, 227, 100 % )";
-          lightfg = mkLiteral "rgba ( 88, 104, 117, 100 % )";
-          separatorcolor = mkLiteral "var(foreground)";
-          urgent-foreground = mkLiteral "rgba ( 220, 50, 47, 100 % )";
-          alternate-urgent-background = mkLiteral "var(urgent-background)";
-          lightbg = mkLiteral "rgba ( 238, 232, 213, 100 % )";
-          spacing = 2;
-          border-color = mkLiteral "rgba ( 0, 43, 54, 100 % )";
-          normal-background = mkLiteral "rgba ( 7, 54, 66, 100 % )";
-          background-color = mkLiteral "rgba ( 0, 0, 0, 0 % )";
-          alternate-active-background = mkLiteral "var(active-background)";
-          active-foreground = mkLiteral "rgba ( 38, 139, 210, 100 % )";
-          blue = mkLiteral "rgba ( 38, 139, 210, 100 % )";
-          urgent-background = mkLiteral "rgba ( 7, 54, 66, 100 % )";
-          alternate-normal-foreground = mkLiteral "var(foreground)";
-          selected-active-background = mkLiteral "rgba ( 38, 139, 210, 100 % )";
-          background = mkLiteral "rgba ( 7, 54, 66, 100 % )";
-          selected-normal-foreground =
-            mkLiteral "rgba ( 238, 232, 213, 100 % )";
-          active-background = mkLiteral "rgba ( 7, 54, 66, 100 % )";
-          alternate-active-foreground = mkLiteral "var(active-foreground)";
-          alternate-normal-background = mkLiteral "var(background)";
-          foreground = mkLiteral "rgba ( 131, 148, 150, 100 % )";
-          selected-urgent-background = mkLiteral "rgba ( 220, 50, 47, 100 % )";
-          selected-urgent-foreground =
-            mkLiteral "rgba ( 253, 246, 227, 100 % )";
-          normal-foreground = mkLiteral "var(foreground)";
-          alternate-urgent-foreground = mkLiteral "var(urgent-foreground)";
-          selected-normal-background = mkLiteral "rgba ( 88, 110, 117, 100 % )";
-        };
-        "#window" = {
-          anchor = mkLiteral "north";
-          location = mkLiteral "north";
-          width = mkLiteral "100%";
-          padding = mkLiteral "3px";
-          children = map mkLiteral [ "horibox" ];
-        };
-        "#horibox" = {
-          orientation = mkLiteral "horizontal";
-          children = map mkLiteral [ "prompt" "entry" "listview" ];
-        };
-        "#listview" = {
-          layout = mkLiteral "horizontal";
-          spacing = mkLiteral "5px";
-          lines = 100;
-        };
-        "#entry" = {
-          expand = false;
-          width = mkLiteral "10em";
-        };
-        "#element" = { padding = mkLiteral "0px 2px"; };
-        "#element selected" = { background-color = mkLiteral "SteelBlue"; };
-        window = { background-color = mkLiteral "var(background)"; };
-        textbox = { text-color = mkLiteral "var(foreground)"; };
-        listview = {
-          scrollbar = true;
-          border-color = mkLiteral "var(separatorcolor)";
-          spacing = mkLiteral "6px";
-          fixed-height = 0;
-        };
-        element = {
-          padding = mkLiteral "2px";
-          border = 0;
-        };
-        "element normal.normal" = {
-          background-color = mkLiteral "var(normal-background)";
-          text-color = mkLiteral "var(normal-foreground)";
-        };
-        "element normal.urgent" = {
-          background-color = mkLiteral "var(urgent-background)";
-          text-color = mkLiteral "var(urgent-foreground)";
-        };
-        "element normal.active" = {
-          background-color = mkLiteral "var(active-background)";
-          text-color = mkLiteral "var(active-foreground)";
-        };
-        "element selected.normal" = {
-          background-color = mkLiteral "var(selected-normal-background)";
-          text-color = mkLiteral "var(selected-normal-foreground)";
-        };
-        "element selected.urgent" = {
-          background-color = mkLiteral "var(selected-urgent-background)";
-          text-color = mkLiteral "var(selected-urgent-foreground)";
-        };
-        "element selected.active" = {
-          background-color = mkLiteral "var(selected-active-background)";
-          text-color = mkLiteral "var(selected-active-foreground)";
-        };
-        "element alternate.normal" = {
-          background-color = mkLiteral "var(alternate-normal-background)";
-          text-color = mkLiteral "var(alternate-normal-foreground)";
-        };
-        "element alternate.urgent" = {
-          background-color = mkLiteral "var(alternate-urgent-background)";
-          text-color = mkLiteral "var(alternate-urgent-foreground)";
-        };
-        "element alternate.active" = {
-          background-color = mkLiteral "var(alternate-active-background)";
-          text-color = mkLiteral "var(alternate-active-foreground)";
-        };
-        scrollbar = {
-          width = mkLiteral "4px ";
+          bg0 = mkLiteral "#2E3440";
+          bg1 = mkLiteral "#3B4252";
+          fg0 = mkLiteral "#D8DEE9";
+          accent-color = mkLiteral "#88C0D0";
+          urgent-color = "#EBCB8B";
+          background-color = mkLiteral "transparent";
+          text-color = mkLiteral "@fg0";
+          margin = 0;
           padding = 0;
-          handle-width = mkLiteral "8px ";
-          border = 0;
-          handle-color = mkLiteral "var(normal-foreground)";
-        };
-        mode-switcher = { border-color = mkLiteral "var(separatorcolor)"; };
-        button = {
           spacing = 0;
-          text-color = mkLiteral "var(normal-foreground)";
         };
-        "button selected" = {
-          background-color = mkLiteral "var(selected-normal-background)";
-          text-color = mkLiteral "var(selected-normal-foreground)";
+        window = {
+          width = mkLiteral "480px";
+          background-color = mkLiteral "@bg0";
         };
         inputbar = {
-          padding = mkLiteral "1px ";
-          spacing = mkLiteral "0px ";
-          text-color = mkLiteral "var(normal-foreground)";
-          children = map mkLiteral [
-            "prompt"
-            "textbox-prompt-colon"
-            "entry"
-            "overlay"
-            "case-indicator"
-          ];
-        };
-        case-indicator = {
-          spacing = 0;
-          text-color = mkLiteral "var(normal-foreground)";
-        };
-        entry = {
-          spacing = 0;
-          text-color = mkLiteral "var(normal-foreground)";
+          spacing = mkLiteral "8px";
+          padding = mkLiteral "8px";
+          background-color = mkLiteral "@bg1";
         };
         prompt = {
-          spacing = 0;
-          text-color = mkLiteral "var(normal-foreground)";
+          vertical-align = mkLiteral "0.5";
+          text-color = mkLiteral "@accent-color";
         };
-        textbox-prompt-colon = {
-          margin = mkLiteral "0px 0.3000em 0.0000em 0.0000em ";
-          expand = false;
-          str = ":";
+        entry = { vertical-align = mkLiteral "0.5"; };
+        textbox = {
+          padding = mkLiteral "8px";
+          background-color = mkLiteral "@bg1";
+        };
+        listview = {
+          padding = mkLiteral "4px 0";
+          lines = 8;
+          columns = 1;
+          fixed-height = false;
+        };
+        element = {
+          padding = mkLiteral "8px";
+          spacing = mkLiteral "8px";
+        };
+        "element normal normal" = { text-color = mkLiteral "@fg0"; };
+        "element normal urgent" = { text-color = mkLiteral "@urgent-color"; };
+        "element normal active" = { text-color = mkLiteral "@accent-color"; };
+        "element selected" = { text-color = mkLiteral "@bg0"; };
+        "element selected normal" = {
+          background-color = mkLiteral "@accent-color";
+        };
+        "element selected active" = {
+          background-color = mkLiteral "@accent-color";
+        };
+        "element selected urgent" = {
+          background-color = mkLiteral "@urgent-color";
+        };
+        element-icon = {
+          vertical-align = mkLiteral "0.5";
+          size = mkLiteral "0.8em";
+        };
+        element-text = {
+          vertical-align = mkLiteral "0.5";
           text-color = mkLiteral "inherit";
-        };
-        error-message = {
-          background-color = mkLiteral "rgba ( 0, 0, 0, 0 % )";
-          text-color = mkLiteral "var(normal-foreground)";
         };
       };
     };
@@ -1482,6 +781,7 @@ in {
         sessionist
         prefix-highlight
         fpp
+        nord
         {
           plugin = yank;
           extraConfig = ''
@@ -1493,12 +793,6 @@ in {
           plugin = open;
           extraConfig = ''
             set -g @open-S 'https://www.duckduckgo.com/'
-          '';
-        }
-        {
-          plugin = tmux-colors-solarized;
-          extraConfig = ''
-            set -g @colors-solarized 'dark'
           '';
         }
         {
@@ -1617,7 +911,7 @@ in {
           show_age_threshold = "5m";
           icon_position = "left";
           max_icon_size = 60;
-          icon_path = "${pkgs.arc-icon-theme}/share/icons/Arc";
+          icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro";
           enable_recursive_icon_lookup = "true";
           dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst";
           mouse_left_click = "close_current";
@@ -1627,18 +921,12 @@ in {
           timeout = "30s";
           startup_notification = false;
           markup = "full";
+          foreground = "#eceff4";
         };
-        urgency_low = {
-          background = "#002b36cc";
-          foreground = "#586e75";
-        };
-        urgency_normal = {
-          background = "#268bd2cc";
-          foreground = "#eee8d5";
-        };
+        urgency_low = { background = "#4c566acc"; };
+        urgency_normal = { background = "#5e81accc"; };
         urgency_critical = {
-          background = "#dc322fcc";
-          foreground = "#fdf6e3";
+          background = "#bf616acc";
           fullscreen = "show";
           timeout = 0;
         };
@@ -1860,7 +1148,7 @@ in {
     configFile = with config.xdg; {
       "mimeapps.list".force = true; # Force overwrite, don't prompt
       "bat/config".text = ''
-        --theme="Solarized (dark)"
+        --theme="Nord"
         --italic-text=always
         --map-syntax='.ignore:Git Ignore'
       '';
@@ -2737,6 +2025,17 @@ in {
     '';
   };
 
+  gtk = {
+    theme = {
+      package = pkgs.nordic;
+      name = "Nordic";
+    };
+    iconTheme = {
+      package = pkgs.zafiro-icons;
+      name = "Zafiro";
+    };
+  };
+
   qt = {
     enable = true;
     platformTheme = "gtk";
@@ -3300,8 +2599,8 @@ in {
       protontricks
       jrnl
       capitaine-cursors
-      arc-theme
-      arc-icon-theme
+      nordic
+      zafiro-icons
       gtk_engines
       gtk-engine-murrine
       wget

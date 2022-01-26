@@ -1,30 +1,30 @@
 [colors]
 
-base02 = ${xrdb:st.color0}
-red = ${xrdb:st.color1}
-green = ${xrdb:st.color2}
-yellow = ${xrdb:st.color3}
-blue = ${xrdb:st.color4}
-magenta = ${xrdb:st.color5}
-cyan = ${xrdb:st.color6}
-base2 = ${xrdb:st.color7}
-base03 = ${xrdb:st.color8}
-orange = ${xrdb:st.color9}
-base01 = ${xrdb:st.color10}
-base00 = ${xrdb:st.color11}
-base0 = ${xrdb:st.color12}
-violet = ${xrdb:st.color13}
-base1 = ${xrdb:st.color14}
-base3 = ${xrdb:st.color15}
+nord0 = "#2E3440"
+nord1 = "#3B4252"
+nord2 = "#434C5E"
+nord3 = "#4C566A"
+nord4 = "#D8DEE9"
+nord5 = "#E5E9F0"
+nord6 = "#ECEFF4"
+nord7 = "#8FBCBB"
+nord8 = "#88C0D0"
+nord9 = "#81A1C1"
+nord10 = "#5E81AC"
+nord11 = "#BF616A"
+nord12 = "#D08770"
+nord13 = "#EBCB8B"
+nord14 = "#A3BE8C"
+nord15 = "#B48EAD"
 
-background = ${self.base03}
-background-alt = ${self.base02}
-foreground = ${self.base3}
-foreground-alt = ${self.base2}
+background = ${self.nord0}
+background-alt = ${self.nord1}
+foreground = ${self.nord9}
+foreground-alt = ${self.nord10}
 
-primary = ${self.yellow}
-secondary = ${self.cyan}
-alert = ${self.orange}
+primary = nord9
+secondary = nord10
+alert = nord12
 
 [bar/top]
 monitor = ${env:MONITOR:}
@@ -42,11 +42,11 @@ modules-right = pipewire xkeyboard wlan battery date powermenu
 tray-position = right
 tray-padding = 2
 tray-maxsize = 32
-tray-background = ${colors.base00}
+tray-background = ${colors.nord3}
 tray-prefix = 
 tray-prefix-font = 4
-tray-prefix-foreground = ${colors.base1}
-tray-prefix-background = ${colors.base00}
+tray-prefix-foreground = ${colors.nord3}
+tray-prefix-background = ${colors.nord0}
 
 scroll-up = i3wm-wsnext
 scroll-down = i3wm-wsprev
@@ -61,21 +61,21 @@ font-4 = "Symbols Nerd Font:size=20;0"
 type = internal/i3
 strip-wsnumbers = true
 format = <label-state><label-mode>
-format-foreground = ${colors.base02}
-format-background = ${colors.base1}
+format-foreground = ${colors.nord0}
+format-background = ${colors.nord3}
 format-padding-left = 1
 format-prefix = " "
 format-suffix = 
 format-suffix-font = 4
-format-suffix-foreground = ${colors.base1}
-format-suffix-background = ${colors.base00}
+format-suffix-foreground = ${colors.nord3}
+format-suffix-background = ${colors.nord1}
 index-sort = true
 enable-scroll = false
 wrapping-scroll = false
 
 label-mode-padding = 1
 label-mode-font = 2
-label-mode-foreground = ${colors.base2}
+label-mode-foreground = ${colors.nord3}
 label-mode-background = ${self.format-background}
 
 ; unfocused = Inactive workspace on any monitor
@@ -86,33 +86,33 @@ label-unfocused-padding = 1
 
 ; focused = Active workspace on focused monitor
 label-focused = %name%
-label-focused-foreground = ${colors.base2}
+label-focused-foreground = ${colors.nord6}
 label-focused-background = ${self.format-background}
 label-focused-padding = 1
 
 ; visible = Active workspace on unfocused monitor
 label-visible = %name%
-label-visible-foreground = ${colors.base00}
+label-visible-foreground = ${colors.nord10}
 label-visible-background = ${self.format-background}
 label-visible-padding = 1
 
 ; urgent = Workspace with urgency hint set
 label-urgent = %name%
-label-urgent-foreground = ${colors.alert}
+label-urgent-foreground = ${colors.nord13}
 label-urgent-background = ${self.format-background}
 label-urgent-padding = 1
 
 [module/title]
 type = internal/xwindow
-format-background = ${colors.base00}
+format-background = ${colors.nord1}
 format-suffix = 
 format-suffix-font = 4
-format-suffix-foreground = ${colors.base00}
+format-suffix-foreground = ${colors.nord1}
 format-suffix-background = ${colors.background}
 ; Prepend a zero-width space to keep rendering
 ; the suffix even on an empty workspace
 label = "​%title:0:50:…%"
-label-foreground = ${colors.base2}
+label-foreground = ${colors.nord4}
 label-background = ${self.format-background}
 label-padding = 1
 label-font = 3
@@ -120,7 +120,7 @@ label-font = 3
 [module/mpd]
 type = internal/mpd
 format-online = <label-song> <bar-progress> <label-time>  <icon-prev> <icon-seekb> <icon-stop> <toggle> <icon-seekf> <icon-next>  <icon-repeat> <icon-random>
-format-online-foreground = ${colors.base00}
+format-online-foreground = ${colors.nord1}
 
 icon-foreground = ${self.format-online-foreground}
 
@@ -145,23 +145,23 @@ icon-random-foreground = ${self.icon-foreground}
 icon-repeat-foreground = ${self.icon-foreground}
 
 toggle-off-foreground = ${self.icon-foreground}
-toggle-on-foreground = ${colors.base2}
+toggle-on-foreground = ${colors.nord4}
 
 label-song-maxlen = 50
 label-song-ellipsis = true
 label-song-font = 3
-label-song-foreground = ${colors.base00}
+label-song-foreground = ${colors.nord4}
 
 label-time-font = 3
-label-time-foreground = ${colors.base00}
+label-time-foreground = ${colors.nord4}
 
 bar-progress-width = 30
 bar-progress-indicator = |
-bar-progress-indicator-foreground = ${colors.base00}
+bar-progress-indicator-foreground = ${colors.nord2}
 bar-progress-fill = ─
-bar-progress-fill-foreground = ${colors.base00}
+bar-progress-fill-foreground = ${colors.nord4}
 bar-progress-empty = ─
-bar-progress-empty-foreground = ${colors.base02}
+bar-progress-empty-foreground = ${colors.nord3}
 
 [module/xkeyboard]
 type = internal/xkeyboard
@@ -185,7 +185,7 @@ interface = net1
 interval = 3.0
 
 format-connected = <ramp-signal> <label-connected>
-format-connected-underline = #9f78e1
+format-connected-underline = ${colors.nord10}
 label-connected = %essid%
 
 format-disconnected =
@@ -229,7 +229,7 @@ time-alt = %H:%M:%S
 
 format-prefix = |
 format-prefix-foreground = ${colors.foreground-alt}
-format-underline = #0a6cf5
+format-underline = ${colors.nord10}
 
 label = %date% %time%
 
@@ -251,7 +251,7 @@ adapter = ADP1
 full-at = 98
 
 format-charging = <animation-charging> <label-charging>
-format-charging-underline = #ffb52a
+format-charging-underline = ${colors.nord13}
 
 format-discharging = <ramp-capacity> <label-discharging>
 format-discharging-underline = ${self.format-charging-underline}
@@ -277,7 +277,7 @@ thermal-zone = 0
 warn-temperature = 60
 
 format = <ramp> <label>
-format-underline = #f50a4d
+format-underline = ${colors.nord11}
 format-warn = <ramp> <label-warn>
 format-warn-underline = ${self.format-underline}
 

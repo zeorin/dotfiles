@@ -189,83 +189,8 @@
 	set conceallevel=1
 	set concealcursor=
 
-	" Solarized color scheme {{{
-		" Precision colors for machines and people
-		Plug 'altercation/vim-colors-solarized'
-		let g:solarized_termtrans = 1
-		" Create a dictionary of the colors for later use
-		let g:sol = {
-			\"gui": {
-				\"base03": "#002b36",
-				\"base02": "#073642",
-				\"base01": "#586e75",
-				\"base00": "#657b83",
-				\"base0": "#839496",
-				\"base1": "#93a1a1",
-				\"base2": "#eee8d5",
-				\"base3": "#fdf6e3",
-				\"yellow": "#b58900",
-				\"orange": "#cb4b16",
-				\"red": "#dc322f",
-				\"magenta": "#d33682",
-				\"violet": "#6c71c4",
-				\"blue": "#268bd2",
-				\"cyan": "#2aa198",
-				\"green": "#719e07"
-			\},
-			\"cterm": {
-				\"base03": 8,
-				\"base02": 0,
-				\"base01": 10,
-				\"base00": 11,
-				\"base0": 12,
-				\"base1": 14,
-				\"base2": 7,
-				\"base3": 15,
-				\"yellow": 3,
-				\"orange": 9,
-				\"red": 1,
-				\"magenta": 5,
-				\"violet": 13,
-				\"blue": 4,
-				\"cyan": 6,
-				\"green": 2
-			\}
-		\}
-		" Solarized bug fixes and tweaks
-		function! FixSolarized()
-			exec 'highlight SpecialKey gui=NONE cterm=NONE guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
-			exec 'highlight VertSplit ctermbg=NONE guibg=NONE'
-			if &background ==# 'dark'
-				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				" Better ALE styles
-				exec 'highlight ALEWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				exec 'highlight ALEErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				" Better git-gutter styles
-				exec 'highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.green.' ctermfg='.g:sol.cterm.green.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				exec 'highlight lineModified gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				exec 'highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				" Better fold styling
-				exec 'highlight Folded gui=NONE,underline cterm=NONE,underline guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-				exec 'highlight FoldColumn gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg='.g:sol.gui.base02.' ctermbg='.g:sol.cterm.base02
-			elseif &background ==# 'light'
-				exec 'highlight CursorLineNr gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
-				exec 'highlight SignColumn gui=NONE cterm=NONE guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
-				" Better Syntastic styles
-				exec 'highlight ALEWarningSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
-				exec 'highlight ALEErrorSign gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base1.' ctermbg='.g:sol.cterm.base2
-				" Better git-gutter styles
-				exec 'highlight lineAdded gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.green.' ctermfg='.g:sol.cterm.green.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
-				exec 'highlight lineModified gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow.' guibg='.g:sol.gui.base1.' ctermbg='.g:sol.cterm.base2
-				exec 'highlight lineRemoved gui=NONE,bold cterm=NONE,bold guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
-				" Better fold styling
-				exec 'highlight Folded gui=NONE,underline cterm=NONE,underline guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
-				exec 'highlight FoldColumn gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg='.g:sol.gui.base2.' ctermbg='.g:sol.cterm.base2
-			endif
-		endfunction
-		autocmd! ColorScheme solarized call FixSolarized()
-	" }}}
+	" Nord color scheme
+	Plug 'arcticicestudio/nord-vim'
 
 	" Remember background style {{{
 		if !exists('g:background_style')
@@ -297,28 +222,6 @@
 			\ ['   MRU'],            'files',
 			\ ['   Commands'],       'commands',
 			\ ]
-		" Better header colour
-		if &background ==# 'dark'
-			exec 'highlight StartifyHeader guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1
-		elseif &background ==# 'light'
-			exec 'highlight StartifyHeader guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01
-		endif
-		" Better section colour
-		exec 'highlight StartifySection guifg='.g:sol.gui.blue.' ctermfg='.g:sol.cterm.blue
-		" Better file colour
-		if &background ==# 'dark'
-			exec 'highlight StartifyFile guifg='.g:sol.gui.base0.' ctermfg='.g:sol.cterm.base0
-		elseif &background ==# 'light'
-			exec 'highlight StartifyFile guifg='.g:sol.gui.base00.' ctermfg='.g:sol.cterm.base00
-		endif
-		" Better special colour
-		exec 'highlight StartifySpecial gui=italic cterm=italic guifg='.g:sol.gui.yellow.' ctermfg='.g:sol.cterm.yellow
-		" Hide those ugly brackets
-		if &background ==# 'dark'
-			exec 'highlight StartifyBracket guifg='.g:sol.gui.base03.' ctermfg='.g:sol.cterm.base03
-		elseif &background ==# 'light'
-			exec 'highlight StartifyBracket guifg='.g:sol.gui.base3.' ctermfg='.g:sol.cterm.base3
-		endif
 		" Open NERDTree at the same time
 		autocmd! VimEnter *
 			\   if !argc()
@@ -328,27 +231,10 @@
 			\ | endif
 	" }}}
 
-	" Set white space colours {{{
-		augroup whitespace
-			autocmd!
-			exec 'autocmd ColorScheme solarized if &background ==# ''dark'' | '.
-				\ 'highlight Whitespace gui=NONE cterm=NONE guifg='.g:sol.gui.base02.' ctermfg='.g:sol.cterm.base02.' guibg=NONE ctermbg=NONE | '.
-				\ 'highlight NonText gui=NONE cterm=NONE guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' guibg=NONE ctermbg=NONE | '.
-				\ 'else | '.
-				\ 'highlight Whitespace gui=NONE cterm=NONE guifg='.g:sol.gui.base2.' ctermfg='.g:sol.cterm.base2.' guibg=NONE ctermbg=NONE | '.
-				\ 'highlight NonText gui=NONE cterm=NONE guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' guibg=NONE ctermbg=NONE | '.
-				\ 'endif'
-			" Highlight trailing white space
-			exec 'autocmd ColorScheme solarized highlight ExtraWhitespace gui=NONE cterm=NONE guifg='.g:sol.gui.red.' ctermfg='.g:sol.cterm.red.' guibg=NONE ctermbg=NONE'
-			autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-			autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-		augroup END
-	" }}}
-
 	" Use undercurl for spelling error highlight {{{
 		let &t_Cs = "\e[4:3m"
 		let &t_Ce = "\e[4:0m"
-		hi SpellBad gui=undercurl guisp=g:sol.cterm.red term=undercurl cterm=undercurl
+		hi SpellBad gui=undercurl term=undercurl cterm=undercurl
 	" }}}
 
 	" Show hex, rgb, and hsl colors
@@ -754,7 +640,7 @@
 	set shell=/bin/sh
 
 	" An LSP powered code-completion engine for Vim {{{
-		Plug 'neoclide/coc.nvim', { 'tag': '*', 'branch': 'release', 'do': 'yarn install' }
+		Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 
 		" Enter key confirms selection
 		inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
@@ -998,51 +884,6 @@
 		if exists("g:loaded_webdevicons")
 			call webdevicons#refresh()
 		endif
-		augroup devicons
-			autocmd!
-			autocmd FileType nerdtree setlocal nolist
-			autocmd FileType nerdtree syntax match hideBracketsInNerdTree "\]" contained conceal containedin=ALL
-			autocmd FileType nerdtree syntax match hideBracketsInNerdTree "\[" contained conceal containedin=ALL
-			autocmd FileType nerdtree setlocal conceallevel=3
-			autocmd FileType nerdtree setlocal concealcursor=nvic
-		augroup END
-		function! DeviconsColors(config)
-			let colors = keys(a:config)
-			augroup devicons_colors
-				autocmd!
-				for color in colors
-					if color ==# 'normal'
-						exec 'autocmd FileType nerdtree,startify if &background ==# ''dark'' | '.
-							\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
-							\ 'else | '.
-							\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
-							\ 'endif'
-					elseif color ==# 'emphasize'
-						exec 'autocmd FileType nerdtree,startify if &background ==# ''dark'' | '.
-							\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base1.' ctermfg='.g:sol.cterm.base1.' | '.
-							\ 'else | '.
-							\ 'highlight devicons_'.color.' guifg='.g:sol.gui.base01.' ctermfg='.g:sol.cterm.base01.' | '.
-							\ 'endif'
-					else
-						exec 'autocmd FileType nerdtree,startify highlight devicons_'.color.' guifg='.g:sol.gui[color].' ctermfg='.g:sol.cterm[color]
-					endif
-					exec 'autocmd FileType nerdtree,startify syntax match devicons_'.color.' /\v'.join(a:config[color], '.|').'./ containedin=ALL'
-				endfor
-			augroup END
-		endfunction
-		let g:devicons_colors = {
-			\'normal': ['', '', '', '', ''],
-			\'emphasize': ['', '', '', '', '', '', '', '', '', '', ''],
-			\'yellow': ['', '', ''],
-			\'orange': ['', '', '', 'λ', '', ''],
-			\'red': ['', '', '', '', '', '', '', '', ''],
-			\'magenta': [''],
-			\'violet': ['', '', '', ''],
-			\'blue': ['', '', '', '', '', '', '', '', '', '', '', '', ''],
-			\'cyan': ['', '', '', ''],
-			\'green': ['', '', '', '']
-		\}
-		call DeviconsColors(g:devicons_colors)
 	" }}}
 
 " }}}
@@ -1055,7 +896,7 @@
 
 " Set Colorscheme {{{
 
-	colorscheme solarized
+	colorscheme nord
 
 " }}}
 

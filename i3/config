@@ -227,10 +227,14 @@ mode "$mode_gaps_outer" {
         bindsym Escape mode "default"
 }
 
-client.focused #93a1a1 #93a1a1 #93a1a1 #b58900
-client.focused_inactive #657b83 #657b83 #657b83 #657b83
-client.unfocused #073642 #073642 #073642 #073642
-client.urgent #b58900 #b58900 #b58900 #b58900
+# Nord theme
+client.focused          #81a1c1 #81a1c1 #ffffff #81a1c1
+client.unfocused        #2e3440 #1f222d #888888 #1f222d
+client.focused_inactive #2e3440 #1f222d #888888 #1f222d
+client.placeholder      #2e3440 #1f222d #888888 #1f222d
+client.urgent           #900000 #900000 #ffffff #900000
+
+client.background       #242424
 
 #
 # Programs
