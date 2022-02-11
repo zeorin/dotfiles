@@ -1891,7 +1891,7 @@ in {
         *fading: 35
         *fadeColor: nord3
 
-        *.color0: nord0
+        *.color0: nord1
         *.color1: nord11
         *.color2: nord14
         *.color3: nord13
@@ -2143,11 +2143,11 @@ in {
           static unsigned int defaultrcs = 258;
 
           /* Colors used for selection */
-          unsigned int selectionbg = 259;
-          unsigned int selectionfg = 256;
+          unsigned int selectionbg = 3;
+          unsigned int selectionfg = 0;
           /* If 0 use selectionfg as foreground in order to have a uniform foreground-color */
           /* Else if 1 keep original foreground-color of each cell => more colors :) */
-          static int ignoreselfg = 1;
+          static int ignoreselfg = 0;
 
           /*
           * Default shape of cursor
