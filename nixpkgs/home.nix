@@ -616,6 +616,13 @@ in {
         vim_mode = true;
       };
     };
+    kitty = {
+      enable = true;
+      font = {
+        name = "Iosevka Term";
+        size = 10;
+      };
+    };
     mpv = {
       enable = true;
       config = {
