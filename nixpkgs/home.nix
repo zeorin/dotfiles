@@ -2731,6 +2731,7 @@ in {
       nix-index
       nix-prefetch-git
       keybase
+      unstable.comma
 
       # Amphetype
       (with python38Packages;
@@ -2770,9 +2771,6 @@ in {
             wrapQtApp "$out/bin/amphetype" --prefix PATH : /path/to/bin
           '';
         })
-
-      # https://github.com/Shopify/comma/issues/2#issuecomment-636572039
-      nur.repos.xe.comma
 
       # TODO: Remove this once the i3 & polybar configs are managed by
       # home-manager, as we’re only installing it so that we can use `pactl`
