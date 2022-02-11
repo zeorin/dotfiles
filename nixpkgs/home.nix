@@ -2787,6 +2787,8 @@ in {
       # For dark mode toggling
       xfce.xfconf
 
+      retroarchFull
+
     ] ++ [
 
       #########
