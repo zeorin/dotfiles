@@ -890,7 +890,7 @@ in {
           separator_height = 4;
           frame_width = 0;
           separator_color = "#00000000";
-          font = "Iosevka 10";
+          font = "Iosevka Term 10";
           format = ''
             <b>%s</b>
             %b'';
