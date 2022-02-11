@@ -662,7 +662,7 @@ in {
       pass.enable = true;
       font = "Iosevka Term 12";
       location = "center";
-      yoffset = -160;
+      yoffset = -280;
       extraConfig = { show-icons = true; };
       theme = let
         # Use `mkLiteral` for string-like values that should show without
@@ -678,7 +678,7 @@ in {
           bg1 = mkLiteral "#3B4252";
           fg0 = mkLiteral "#D8DEE9";
           accent-color = mkLiteral "#88C0D0";
-          urgent-color = "#EBCB8B";
+          urgent-color = mkLiteral "#EBCB8B";
           background-color = mkLiteral "transparent";
           text-color = mkLiteral "@fg0";
           margin = 0;
@@ -686,12 +686,12 @@ in {
           spacing = 0;
         };
         window = {
-          width = mkLiteral "480px";
+          width = mkLiteral "40em";
           background-color = mkLiteral "@bg0";
         };
         inputbar = {
-          spacing = mkLiteral "8px";
-          padding = mkLiteral "8px";
+          spacing = mkLiteral "0.75em";
+          padding = mkLiteral "0.75em";
           background-color = mkLiteral "@bg1";
         };
         prompt = {
@@ -700,18 +700,18 @@ in {
         };
         entry = { vertical-align = mkLiteral "0.5"; };
         textbox = {
-          padding = mkLiteral "8px";
+          padding = mkLiteral "0.75em";
           background-color = mkLiteral "@bg1";
         };
         listview = {
-          padding = mkLiteral "4px 0";
+          padding = mkLiteral "0.5em 0";
           lines = 8;
           columns = 1;
           fixed-height = false;
         };
         element = {
-          padding = mkLiteral "8px";
-          spacing = mkLiteral "8px";
+          padding = mkLiteral "0.75em";
+          spacing = mkLiteral "0.75em";
         };
         "element normal normal" = { text-color = mkLiteral "@fg0"; };
         "element normal urgent" = { text-color = mkLiteral "@urgent-color"; };
@@ -728,7 +728,7 @@ in {
         };
         element-icon = {
           vertical-align = mkLiteral "0.5";
-          size = mkLiteral "0.8em";
+          size = mkLiteral "1.5em";
         };
         element-text = {
           vertical-align = mkLiteral "0.5";
