@@ -1179,9 +1179,9 @@ in {
         ;;
         ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
         ;; font string. You generally only need these two:
-        (setq doom-font (font-spec :family "Iosevka" :size 12 :weight 'light)
-              doom-variable-pitch-font (font-spec :family "sans" :size 13)
-              doom-big-font (font-spec :family "Iosevka" :size 24 :weight 'light))
+        (setq doom-font (font-spec :family "Iosevka Term" :size 12 :weight 'light)
+              doom-variable-pitch-font (font-spec :family "Inter" :size 13)
+              doom-big-font (font-spec :family "Iosevka Term" :size 24 :weight 'light))
 
         ;; There are two ways to load a theme. Both assume the theme is installed and
         ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -2014,7 +2014,7 @@ in {
           *
           * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
           */
-          static char *font = "Iosevka:pixelsize=12:antialias=true:autohint=true";
+          static char *font = "Iosevka Term:pixelsize=12:antialias=true:autohint=true";
           /* Spare fonts */
           static char *font2[] = {
             "Joypixels:pixelsize=12:antialias=true:autohint=true",
