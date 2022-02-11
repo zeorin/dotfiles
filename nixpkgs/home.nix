@@ -891,7 +891,7 @@ in {
           show_age_threshold = "5m";
           icon_position = "left";
           max_icon_size = 60;
-          icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro";
+          icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro-icons";
           enable_recursive_icon_lookup = "true";
           dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst";
           mouse_left_click = "close_current";
