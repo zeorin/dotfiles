@@ -146,11 +146,19 @@ in {
       };
       extensions = with pkgs.nur.repos.rycee.firefox-addons;
         [
-          clearurls
+          a11ycss
+          auto-tab-discard
           browserpass
+          bypass-paywalls-clean
+          clearurls
+          cookies-txt
           darkreader
           https-everywhere
+          mailvelope
           netflix-1080p
+          octolinker
+          octotree
+          org-capture
           privacy-badger
           react-devtools
           reddit-enhancement-suite
@@ -158,37 +166,24 @@ in {
           refined-github
           tridactyl
           ublock-origin
+          wappalyzer
+          wayback-machine
         ] ++ [
           pkgs.nur.repos.ethancedwards8.firefox-addons.enhancer-for-youtube
           pkgs.nur.repos.pborzenkov.firefox-addons.wallabagger
         ] ++ [
           (buildFirefoxXpiAddon rec {
-            pname = "containerise";
-            version = "3.9.0";
-            addonId = "containerise@kinte.sh";
+            pname = "better_tweetdeck";
+            version = "4.7.2";
+            addonId = "BetterTweetDeckDev@erambert.me";
             url =
-              "https://addons.mozilla.org/firefox/downloads/file/3724805/containerise-${version}-fx.xpi";
-            sha256 = "1rfi22m844sn13kj1014k9hf34ixjxvjjiqx8b75wb2ic2hilldz";
+              "https://addons.mozilla.org/firefox/downloads/file/3891208/better_tweetdeck-${version}-fx.xpi";
+            sha256 = "1ckp7n2qjhwnzzdrsw50ahrcdsszcsgr6gsxamhf9p2dpfxhxiny";
             meta = with lib; {
-              homepage = "https://github.com/kintesh/containerise";
+              homepage = "https://better.tw/";
               description =
-                "Automatically open websites in a dedicated container. Simply add rules to map domain or subdomain to your container.";
+                "Improve your experience on TweetDeck web with emojis, thumbnails, and a lot of customization options to make TweetDeck even better for you.";
               licence = licences.mit;
-              platforms = platforms.all;
-            };
-          })
-          (buildFirefoxXpiAddon rec {
-            pname = "cookies.txt";
-            version = "0.3";
-            addonId = "{12cf650b-1822-40aa-bff0-996df6948878}";
-            url =
-              "https://addons.mozilla.org/firefox/downloads/file/3588248/cookiestxt-${version}-fx.xpi";
-            sha256 = "1byr53zlyjp54p9h8bkhmln1a9yf7zsk0jz8hsb035j01bijghp2";
-            meta = with lib; {
-              homepage = "https://github.com/lennonhill/cookies-txt";
-              description =
-                "Exports all cookies to a Netscape HTTP Cookie File, as used by curl, wget, and youtube-dl, among others.";
-              licence = licences.gpl3;
               platforms = platforms.all;
             };
           })
@@ -221,21 +216,6 @@ in {
               description =
                 "Automatically redirects AMP pages to the regular web page variant.";
               licence = with licences; [ mit x11 ];
-              platforms = platforms.all;
-            };
-          })
-          (buildFirefoxXpiAddon rec {
-            pname = "share-on-twitter";
-            version = "0.80.2";
-            addonId = "jid1-SmvuJ9Cq3Cx13w@jetpack";
-            url =
-              "https://addons.mozilla.org/firefox/downloads/file/3524067/share_on_twitter-${version}-fx.xpi";
-            sha256 = "14pvjqdffxy40mmf6208xmdkk3d1qmgbyw5p8srw5vzvvwkss8bn";
-            meta = with lib; {
-              homepage = "https://browsernative.com/twitter-share-firefox/";
-              description =
-                "Simplest add-on for Twitter. Share web pages, links and selected text on Twitter right from the context menu (right click menu) and the toolbar button.";
-              licence = licences.mpl2;
               platforms = platforms.all;
             };
           })
