@@ -155,6 +155,7 @@ in {
           darkreader
           https-everywhere
           mailvelope
+          metamask
           netflix-1080p
           octolinker
           octotree
