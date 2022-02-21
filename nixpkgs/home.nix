@@ -1236,6 +1236,17 @@ in {
               :desc "Reset font size"
               "0" #'text-scale-adjust)
 
+        ;; Enable some more Evil keybindings for org-mode
+        (after! evil-org
+          (evil-org-set-key-theme '(navigation
+                                    insert
+                                    textobjects
+                                    additional
+                                    calendar
+                                    shift
+                                    todo
+                                    heading)))
+
         (use-package! tree-sitter
           :config
           (cl-pushnew "${
@@ -1259,6 +1270,7 @@ in {
           (use-package! org-super-agenda
             :after org-agenda
             :init
+            (require 'evil-org-agenda)
             (setq org-super-agenda-groups '((:name "Today"
                                                    :time-grid t
                                                    :scheduled today)
@@ -1271,6 +1283,8 @@ in {
                                             (:name "Due soon"
                                                    :deadline future)))
             :config
+            ;; https://github.com/alphapapa/org-super-agenda/issues/50#issuecomment-817432643
+            (setq org-super-agenda-header-map evil-org-agenda-mode-map)
             (org-super-agenda-mode))
       '';
       "doom/init.el" = {
