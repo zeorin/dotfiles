@@ -2746,14 +2746,14 @@ in {
       unstable.tor-browser-bundle-bin
       virt-manager
       qemu
-      slack
-      discord
+      unstable.slack
+      unstable.discord
       unstable.tdesktop
-      teams
-      skype
-      signal-desktop
-      spotify
+      unstable.teams
+      unstable.skypeforlinux
+      unstable.signal-desktop
       unstable.zoom-us
+      spotify
       manix
       cachix
       nix-index
