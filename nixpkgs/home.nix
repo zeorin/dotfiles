@@ -151,6 +151,7 @@ in {
           auto-tab-discard
           browserpass
           bypass-paywalls-clean
+          canvasblocker
           clearurls
           cookies-txt
           darkreader
@@ -166,6 +167,8 @@ in {
           reddit-enhancement-suite
           reduxdevtools
           refined-github
+          tab-session-manager
+          tree-style-tab
           tridactyl
           ublock-origin
           wappalyzer
