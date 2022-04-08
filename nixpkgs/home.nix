@@ -2633,6 +2633,8 @@ in {
       krita
       libreoffice
       onlyoffice-bin
+      beancount
+      fava
       arandr
       barrier
       # TODO this is for the i3-fullscreen screensaver inhibition script, move to its own config later
