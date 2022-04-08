@@ -1,7 +1,8 @@
 { pkgs, config, lib, ... }:
 
 let
-  unstable = import <nixos-unstable> {
+  unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
+  emacsNixpkgs = import <nixos-unstable> {
     config = config.nixpkgs.config;
     overlays = [
       (import (builtins.fetchTarball {
@@ -110,7 +111,7 @@ in {
     };
     emacs = {
       enable = true;
-      package = let emacsPkg = unstable.emacsPgtkGcc;
+      package = let emacsPkg = emacsNixpkgs.emacsPgtkGcc;
       in with pkgs;
       symlinkJoin (lib.recursiveUpdate {
         name = "emacs";
@@ -486,7 +487,7 @@ in {
 
         # https://github.com/akermu/emacs-libvterm
         if test -n "$INSIDE_EMACS"
-          source ${unstable.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${unstable.emacsPackages.vterm.version}/etc/emacs-vterm.fish
+          source ${emacsNixpkgs.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${emacsNixpkgs.emacsPackages.vterm.version}/etc/emacs-vterm.fish
         end
       '';
       # source ${config.programs.emacs.package.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${config.programs.emacs.package.pkgs.vterm.version}/etc/emacs-vterm.fish
