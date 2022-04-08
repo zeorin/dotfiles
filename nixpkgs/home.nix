@@ -2753,6 +2753,7 @@ in {
       unstable.skypeforlinux
       unstable.signal-desktop
       unstable.zoom-us
+      unstable.element-web
       spotify
       manix
       cachix
