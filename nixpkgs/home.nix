@@ -2810,6 +2810,7 @@ in {
       xfce.xfconf
 
       retroarchFull
+      mangohud
 
     ] ++ [
 
