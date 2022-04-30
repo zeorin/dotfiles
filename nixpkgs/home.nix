@@ -2,12 +2,16 @@
 
 let
   unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
-  emacsNixpkgs = import <nixos-unstable> {
+  emacsNixpkgs = import (builtins.fetchTarball {
+    url =
+      "https://github.com/NixOS/nixpkgs/archive/75ad56bdc927f3a9f9e05e3c3614c4c1fcd99fcb.tar.gz";
+  }) {
     config = config.nixpkgs.config;
     overlays = [
       (import (builtins.fetchTarball {
         url =
-          "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
+          # "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
+          "https://github.com/nix-community/emacs-overlay/archive/7d6da471364bab045f561d891fe97706ae308c47.tar.gz";
       }))
     ];
   };
