@@ -2571,6 +2571,7 @@ in {
       xclip
       xdotool
       curl
+      httpie
       lxqt.lxqt-policykit
       xdg-user-dirs
       unstable.wineWowPackages.stable
