@@ -2574,8 +2574,8 @@ in {
       httpie
       lxqt.lxqt-policykit
       xdg-user-dirs
-      unstable.wineWowPackages.stable
-      unstable.winetricks
+      wineWowPackages.stable
+      winetricks
       protontricks
       jrnl
       capitaine-cursors
