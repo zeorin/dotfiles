@@ -1859,12 +1859,6 @@ in {
         autocmd DocLoad .* unfocus
       '';
       "tridactyl/themes/zeorin.css".text = ''
-        @media (prefers-color-scheme: dark) {
-          .TridactylOwnNamespace body {
-            filter: invert(1) hue-rotate(180deg);
-          }
-        }
-
         .TridactylOwnNamespace body {
             top: 0;
         }
