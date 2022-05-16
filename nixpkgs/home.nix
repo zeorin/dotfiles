@@ -2766,6 +2766,7 @@ in {
       nix-prefetch-git
       keybase
       unstable.comma
+      zeal
 
       # Amphetype
       (with python38Packages;
