@@ -136,6 +136,7 @@ in {
             --prefix PATH : "${nixfmt}/bin" \
             --prefix PATH : "${sqlite}/bin" \
             --prefix PATH : "${editorconfig-core-c}/bin" \
+            --prefix PATH : "${nodePackages.mermaid-cli}/bin" \
             --prefix PATH : "${gcc}/bin"
         '';
       } (lib.recursiveUpdate { inherit (emacsPkg) meta src; } {
@@ -1296,6 +1297,9 @@ in {
             ;; https://github.com/alphapapa/org-super-agenda/issues/50#issuecomment-817432643
             (setq org-super-agenda-header-map evil-org-agenda-mode-map)
             (org-super-agenda-mode))
+
+          (add-to-list 'auto-mode-alist '("\\.mermaid\\'" . mermaid-mode))
+          (setq mermaid-output-format ".svg")
       '';
       "doom/init.el" = {
         text = ''
@@ -1551,6 +1555,8 @@ in {
           (package! tree-sitter-langs)
 
           (package! org-super-agenda)
+
+          (package! mermaid-mode)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
