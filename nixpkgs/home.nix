@@ -159,7 +159,6 @@ in {
           clearurls
           cookies-txt
           darkreader
-          https-everywhere
           mailvelope
           metamask
           netflix-1080p
@@ -282,6 +281,9 @@ in {
           "gfx.font_rendering.fontconfig.max_generic_substitutions" = 127;
           # Use system emoji
           "font.name-list.emoji" = "emoji";
+          # HTTPS-only
+          "dom.security.https_only_mode" = true;
+          "dom.security.https_only_mode_ever_enabled" = true;
         };
         noNoiseSuppression = {
           "media.getusermedia.aec_enabled" = false;
