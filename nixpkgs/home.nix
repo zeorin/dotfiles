@@ -137,6 +137,7 @@ in {
             --prefix PATH : "${sqlite}/bin" \
             --prefix PATH : "${editorconfig-core-c}/bin" \
             --prefix PATH : "${nodePackages.mermaid-cli}/bin" \
+            --prefix PATH : "${pandoc}/bin" \
             --prefix PATH : "${gcc}/bin"
         '';
       } (lib.recursiveUpdate { inherit (emacsPkg) meta src; } {
