@@ -1,17 +1,12 @@
 { pkgs, config, lib, ... }:
 
 let
-  unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
-  emacsNixpkgs = import (builtins.fetchTarball {
-    url =
-      "https://github.com/NixOS/nixpkgs/archive/75ad56bdc927f3a9f9e05e3c3614c4c1fcd99fcb.tar.gz";
-  }) {
+  unstable = import <nixos-unstable> {
     config = config.nixpkgs.config;
     overlays = [
       (import (builtins.fetchTarball {
         url =
-          # "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
-          "https://github.com/nix-community/emacs-overlay/archive/7d6da471364bab045f561d891fe97706ae308c47.tar.gz";
+          "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
       }))
     ];
   };
@@ -115,7 +110,7 @@ in {
     };
     emacs = {
       enable = true;
-      package = let emacsPkg = emacsNixpkgs.emacsPgtkGcc;
+      package = let emacsPkg = unstable.emacsPgtkNativeComp;
       in with pkgs;
       symlinkJoin (lib.recursiveUpdate {
         name = "emacs";
@@ -498,7 +493,7 @@ in {
 
         # https://github.com/akermu/emacs-libvterm
         if test -n "$INSIDE_EMACS"
-          source ${emacsNixpkgs.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${emacsNixpkgs.emacsPackages.vterm.version}/etc/emacs-vterm.fish
+          source ${unstable.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${unstable.emacsPackages.vterm.version}/etc/emacs-vterm.fish
         end
       '';
       # source ${config.programs.emacs.package.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${config.programs.emacs.package.pkgs.vterm.version}/etc/emacs-vterm.fish
