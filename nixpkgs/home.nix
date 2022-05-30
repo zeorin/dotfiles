@@ -2815,6 +2815,7 @@ in {
 
       retroarchFull
       mangohud
+      protonup
 
     ] ++ [
 
