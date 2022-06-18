@@ -2592,6 +2592,7 @@ in {
       zip
       unzip
       numlockx
+      filezilla
       ag
       xorg.xkill
       bc
