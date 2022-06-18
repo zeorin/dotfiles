@@ -6,7 +6,7 @@ let
     overlays = [
       (import (builtins.fetchTarball {
         url =
-          "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
+          "https://github.com/nix-community/emacs-overlay/archive/master@{1%20day%20ago}.tar.gz";
       }))
     ];
   };
