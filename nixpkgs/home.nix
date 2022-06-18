@@ -2753,7 +2753,6 @@ in {
       unstable.slack
       unstable.discord
       unstable.tdesktop
-      unstable.teams
       unstable.skypeforlinux
       unstable.signal-desktop
       unstable.zoom-us
