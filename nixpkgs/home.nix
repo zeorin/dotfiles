@@ -2550,7 +2550,7 @@ in {
       unzip
       numlockx
       filezilla
-      ag
+      silver-searcher
       xorg.xkill
       bc
       feh
@@ -2586,7 +2586,7 @@ in {
       keepassxc
       pcmanfm
       lxmenu-data
-      shared_mime_info
+      shared-mime-info
       unstable.lutris
       vulkan-tools
       gimp
@@ -2619,8 +2619,11 @@ in {
             comment = "";
             desktopName = "Firefox Nightly";
             genericName = "Web Browser";
-            categories = "Network;WebBrowser;";
-            mimeType = lib.concatStringsSep ";" [
+            categories = [
+              "Network"
+              "WebBrowser"
+            ];
+            mimeTypes = [
               "text/html"
               "text/xml"
               "application/xhtml+xml"
@@ -2650,8 +2653,11 @@ in {
             comment = "";
             desktopName = "Firefox Beta";
             genericName = "Web Browser";
-            categories = "Network;WebBrowser;";
-            mimeType = lib.concatStringsSep ";" [
+            categories = [
+              "Network"
+              "WebBrowser"
+            ];
+            mimeTypes = [
               "text/html"
               "text/xml"
               "application/xhtml+xml"
@@ -2681,8 +2687,11 @@ in {
             comment = "";
             desktopName = "Firefox ESR";
             genericName = "Web Browser";
-            categories = "Network;WebBrowser;";
-            mimeType = lib.concatStringsSep ";" [
+            categories = [
+              "Network"
+              "WebBrowser"
+            ];
+            mimeTypes = [
               "text/html"
               "text/xml"
               "application/xhtml+xml"
@@ -2765,6 +2774,7 @@ in {
       # home-manager, as we’re only installing it so that we can use `pactl`
       # https://nixos.wiki/wiki/PipeWire#pactl_not_found
       pulseaudio
+      pamixer
 
       # For dark mode toggling
       xfce.xfconf

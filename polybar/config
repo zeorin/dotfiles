@@ -37,7 +37,7 @@ foreground = ${colors.foreground}
 
 modules-left = i3 title
 ; modules-center = mpd
-modules-right = pipewire xkeyboard wlan battery date powermenu
+modules-right = pipewire-simple xkeyboard wlan battery date powermenu
 
 tray-position = right
 tray-padding = 2
@@ -233,16 +233,16 @@ format-underline = ${colors.nord10}
 
 label = %date% %time%
 
-[module/pipewire]
+[module/pipewire-simple]
 type = custom/script
 label = "%output%"
 label-font = 2
-interval = 2.0
-exec = ~/.config/polybar/pipewire.sh
+exec = ~/.config/polybar/pipewire-simple.sh
+interval = 2
 click-right = exec pavucontrol &
-click-left = ~/.config/polybar/pipewire.sh mute &
-scroll-up = ~/.config/polybar/pipewire.sh up &
-scroll-down = ~/.config/polybar/pipewire.sh down &
+click-left = ~/.config/polybar/pipewire-simple.sh --mute &
+scroll-up = ~/.config/polybar/pipewire-simple.sh --up &
+scroll-down = ~/.config/polybar/pipewire-simple.sh --down &
 
 [module/battery]
 type = internal/battery
