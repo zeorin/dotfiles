@@ -1165,10 +1165,10 @@ in {
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
           if [ ! -d "$DOOMLOCALDIR" ]; then
-            ${configHome}/doom-emacs/bin/doom -y install
+            ${configHome}/doom-emacs/bin/doom --force install
           else
-            ${configHome}/doom-emacs/bin/doom -y clean
-            ${configHome}/doom-emacs/bin/doom -y sync -u
+            ${configHome}/doom-emacs/bin/doom --force clean
+            ${configHome}/doom-emacs/bin/doom --force sync -u
           fi
         ''}";
       };
@@ -1491,7 +1491,7 @@ in {
         onChange = "${pkgs.writeShellScript "doom-config-init-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
-          ${configHome}/doom-emacs/bin/doom -y sync
+          ${configHome}/doom-emacs/bin/doom --force sync
         ''}";
       };
       "doom/packages.el" = {
@@ -1557,7 +1557,7 @@ in {
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
-          ${configHome}/doom-emacs/bin/doom -y sync
+          ${configHome}/doom-emacs/bin/doom --force sync
         ''}";
       };
       emacs.source = pkgs.fetchFromGitHub {
