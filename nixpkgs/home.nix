@@ -1254,26 +1254,6 @@ in {
                                     todo
                                     heading)))
 
-        (use-package! tree-sitter
-          :config
-          (cl-pushnew "${
-            pkgs.runCommandLocal "tree-sitter-grammars-bundle" { } ''
-              mkdir -p $out/bin
-              ${
-                lib.concatStringsSep "\n" (lib.mapAttrsToList (name: src:
-                  "ln -s ${src}/parser $out/bin/${
-                    (builtins.replaceStrings [ "tree-sitter-" ] [ "" ] name)
-                  }.so") pkgs.tree-sitter.builtGrammars)
-              };
-            ''
-          }/bin" tree-sitter-load-path)
-          (require 'tree-sitter-langs)
-          (global-tree-sitter-mode)
-          (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-
-          ;; Don't use LSP formatters
-          (setq +format-with-lsp nil)
-
           (use-package! org-super-agenda
             :after org-agenda
             :init
@@ -1405,6 +1385,7 @@ in {
                  ;;terraform         ; infrastructure as code
                  ;;tmux              ; an API for interacting with tmux
                  ;;upload            ; map local to remote projects via ssh/ftp
+                 tree-sitter       ; better syntax highlighting and structural text objects
 
                  :os
                  (:if IS-MAC macos)  ; improve compatibility with macOS
@@ -1546,9 +1527,6 @@ in {
           ;(unpin! pinned-package another-pinned-package)
           ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
           ;(unpin! t)
-
-          (package! tree-sitter)
-          (package! tree-sitter-langs)
 
           (package! org-super-agenda)
 
