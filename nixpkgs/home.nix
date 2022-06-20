@@ -2738,45 +2738,6 @@ in {
       unstable.comma
       zeal
 
-      # Amphetype
-      (with python38Packages;
-        with qt5;
-        let
-          translitcodec = buildPythonPackage rec {
-            pname = "translitcodec";
-            version = "0.6.0";
-            src = fetchPypi {
-              inherit pname version;
-              sha256 = "1xh2mqfh3ckl18jqx7sc4bzx8hmg9sxrzhs6vk2x21678xa45j6w";
-            };
-          };
-          editdistance = buildPythonPackage rec {
-            pname = "editdistance";
-            version = "0.5.3";
-            src = fetchPypi {
-              inherit pname version;
-              sha256 = "07qc2a3igcqaspnj0139zlmn2yssflvl7cqjkv2b4ja6l3fidl49";
-            };
-          };
-        in mkDerivationWith buildPythonPackage rec {
-          pname = "amphetype";
-          version = "1.0.1";
-
-          src = fetchPypi {
-            inherit pname version;
-            sha256 = "1sdn0l36r5sxmlkjlly8h6irzhp52krsxpg6m3izqabwpzwc5gp4";
-          };
-
-          propagatedBuildInputs = [ pyqt5 qtbase translitcodec editdistance ];
-
-          doCheck = false;
-
-          dontWrapQtApps = true;
-          preFixup = ''
-            wrapQtApp "$out/bin/amphetype" --prefix PATH : /path/to/bin
-          '';
-        })
-
       # TODO: Remove this once the i3 & polybar configs are managed by
       # home-manager, as we’re only installing it so that we can use `pactl`
       # https://nixos.wiki/wiki/PipeWire#pactl_not_found
