@@ -973,9 +973,7 @@ in {
     redshift = {
       enable = true;
       tray = true;
-      provider = "manual";
-      latitude = "-26.20";
-      longitude = "28.02";
+      provider = "geoclue2";
       settings.redshift.adjustment-method = "randr";
     };
     unclutter = {
