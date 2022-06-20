@@ -2729,6 +2729,7 @@ in {
       unstable.zoom-us
       unstable.element-desktop
       spotify
+      unstable.minecraft
       manix
       cachix
       nix-prefetch-git
