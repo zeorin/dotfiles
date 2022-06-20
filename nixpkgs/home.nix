@@ -53,7 +53,6 @@ in {
       PSQL_HISTORY = "${cacheHome}/pg/psql_history";
       XCOMPOSECACHE = "${cacheHome}/X11/xcompose";
       GOPATH = "${dataHome}/go";
-      LEDGER_FILE = "${dataHome}/hledger.journal";
       MYSQL_HISTFILE = "${dataHome}/mysql_history";
       NODE_REPL_HISTORY = "${dataHome}/node_repl_history";
       PASSWORD_STORE_DIR = "${dataHome}/pass";
@@ -1422,7 +1421,7 @@ in {
                  ;;latex             ; writing papers in Emacs has never been so fun
                  ;;lean
                  ;;factor
-                 ledger            ; an accounting system in Emacs
+                 ;;ledger            ; an accounting system in Emacs
                  ;;lua               ; one-based indices? one-based indices
                  markdown          ; writing docs for people to ignore
                  ;;nim               ; python + lisp at the speed of c
