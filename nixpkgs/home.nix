@@ -474,16 +474,6 @@ in {
         end
         delta_sidebyside
 
-        #  Use nix-locate to suggest packages that contain missing commands
-        function __fish_command_not_found_handler --on-event fish_command_not_found
-          ${
-            pkgs.writeShellScript "nix-command-not-found" ''
-              source ${pkgs.nix-index}/etc/profile.d/command-not-found.sh
-              command_not_found_handle "$@"
-            ''
-          } $argv
-        end
-
         # https://github.com/akermu/emacs-libvterm
         if test -n "$INSIDE_EMACS"
           source ${unstable.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${unstable.emacsPackages.vterm.version}/etc/emacs-vterm.fish
@@ -632,6 +622,7 @@ in {
         profile = "gpu-hq";
       };
     };
+    nix-index.enable = true;
     password-store = {
       enable = true;
       package = pkgs.pass.withExtensions (exts:
@@ -2726,7 +2717,6 @@ in {
       spotify
       manix
       cachix
-      nix-index
       nix-prefetch-git
       keybase
       unstable.comma
