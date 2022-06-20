@@ -1893,12 +1893,18 @@ in {
         *.color14: nord7
         *.color15: nord6
       '';
-      "xsettingsd/xsettingsd.conf".text = ''
-        Net/ThemeName "Nordic-Dark"
-      '';
     };
-    dataFile."applications/mimeapps.list".force =
-      true; # Force overwrite, don't prompt
+    dataFile = with config.xdg; {
+      "applications/mimeapps.list".force = true; # Force overwrite, don't prompt
+      "dark-mode.d/gtk-theme.sh".source =
+        pkgs.writeShellScript "set-dark-theme.sh" ''
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Nordic"
+        '';
+      "light-mode.d/gtk-theme.sh".source =
+        pkgs.writeShellScript "set-light-theme.sh" ''
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Nordic-Polar"
+        '';
+    };
     desktopEntries = {
       org-protocol = {
         name = "org-protocol";
@@ -1962,11 +1968,11 @@ in {
   gtk = {
     theme = {
       package = pkgs.nordic;
-      name = "Nordic";
+      name = "Nordic-Polar";
     };
     iconTheme = {
-      package = pkgs.zafiro-icons;
-      name = "Zafiro";
+      package = pkgs.la-capitaine-icon-theme;
+      name = "La Capitaine";
     };
   };
 
@@ -2534,6 +2540,7 @@ in {
       protontricks
       jrnl
       capitaine-cursors
+      la-capitaine-icon-theme
       nordic
       zafiro-icons
       gtk_engines
