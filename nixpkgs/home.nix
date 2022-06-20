@@ -88,9 +88,6 @@ in {
     };
     dircolors = {
       enable = true;
-      enableBashIntegration = true;
-      enableFishIntegration = true;
-      enableZshIntegration = true;
       extraConfig = builtins.readFile "${
           pkgs.fetchFromGitHub {
             owner = "arcticicestudio";
@@ -102,9 +99,6 @@ in {
     };
     direnv = {
       enable = true;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableFishIntegration = true;
       nix-direnv.enable = true;
     };
     emacs = {
@@ -730,12 +724,7 @@ in {
         };
       };
     };
-    starship = {
-      enable = true;
-      enableBashIntegration = true;
-      enableZshIntegration = true;
-      enableFishIntegration = true;
-    };
+    starship.enable = true;
     tmux = {
       enable = true;
       baseIndex = 1;
