@@ -524,10 +524,16 @@ in {
         };
         log.abbrevCommit = true;
       };
-      includes = [{
-        path = "~/Code/WyzeTalk/.gitconfig";
-        condition = "gitdir:~/Code/WyzeTalk/";
-      }];
+      includes = [
+        {
+          path = "~/Code/WyzeTalk/.gitconfig";
+          condition = "gitdir:~/Code/WyzeTalk/";
+        }
+        {
+          path = "~/Code/NectaTech/.gitconfig";
+          condition = "gitdir:~/Code/NectaTech/";
+        }
+      ];
       delta = {
         enable = true;
         options = {
