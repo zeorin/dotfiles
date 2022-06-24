@@ -76,6 +76,10 @@ in {
         done
         $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
           --mode=700 ${dataHome}/gnupg
+
+        # Flameshot dir
+        $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
+          ${config.home.homeDirectory}/Screenshots
       '';
     };
   };
@@ -1551,8 +1555,8 @@ in {
           drawColor=#1e6cc5
           drawThickness=2
           saveAfterCopy=true
-          saveAfterCopyPath=/home/zeorin/Screenshots
-          savePath=/home/zeorin/Screenshots/
+          ; saveAfterCopyPath=/home/zeorin/Screenshots
+          savePath=/home/zeorin/Screenshots
           savePathFixed=false
           showHelp=false
           showStartupLaunchMessage=true
@@ -1596,36 +1600,6 @@ in {
           ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
         ''}";
       };
-      "flameshot/flameshot.sh".source = pkgs.writeShellScript "flameshot.sh" ''
-        if [ "$1" = "activewindow" ]; then
-          # Get active window geometry
-          eval $(${pkgs.xdotool}/bin/xdotool getactivewindow getwindowgeometry --shell)
-        elif [ "$1" = "selectwindow" ]; then
-          # Let the user select a window and get its geometry
-          eval $(${pkgs.xdotool}/bin/xdotool selectwindow getwindowgeometry --shell)
-        else
-          # Get screen geometry
-          WIDTH=$(${pkgs.xorg.xrandr}/bin/xrandr --query | ${pkgs.gawk}/bin/awk -F '[ x,+]' '/\<connected\>/{print $3}')
-          HEIGHT=$(${pkgs.xorg.xrandr}/bin/xrandr --query | ${pkgs.gawk}/bin/awk -F '[ x,+]' '/\<connected\>/{print $4}')
-          X=0
-          Y=0
-        fi
-
-        # Get mouse position
-        eval $(echo $(${pkgs.xdotool}/bin/xdotool getmouselocation --shell) | ${pkgs.gnused}/bin/sed "s/\(X\|Y\)/MOUSE\1/g")
-
-        # Launch the screenshot gui
-        ${pkgs.flameshot}/bin/flameshot gui && sleep 0.3
-
-        # Move the mouse to the top left corner and drag it to to the right bottom corner
-        ${pkgs.xdotool}/bin/xdotool mousemove $X $Y
-        ${pkgs.xdotool}/bin/xdotool mousedown 1 # press and hold
-        ${pkgs.xdotool}/bin/xdotool mousemove_relative $WIDTH $HEIGHT
-        ${pkgs.xdotool}/bin/xdotool mouseup 1 # release
-
-        # Restore mouse to previous location
-        ${pkgs.xdotool}/bin/xdotool mousemove $MOUSEX $MOUSEY
-      '';
       "less/lesskey".source = pkgs.runCommand "lesskey" { }
         "${pkgs.less}/bin/lesskey --output $out ${
           pkgs.writeText "lesskey_input" ''
@@ -2528,6 +2502,24 @@ in {
           rev = "5703aa0390484dd7da4bd9c388c85708d8fcd339";
         };
       })))
+      (pkgs.writeShellScriptBin "flameshot-region" ''
+        if [ "$1" = "activewindow" ]; then
+          # Get active window geometry
+          eval $(${pkgs.xdotool}/bin/xdotool getactivewindow getwindowgeometry --shell)
+          REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
+        elif [ "$1" = "selectwindow" ]; then
+          # Let the user select a window and get its geometry
+          eval $(${pkgs.xdotool}/bin/xdotool selectwindow getwindowgeometry --shell)
+          REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
+        else
+          # Get current screen
+          SCREEN=$(${pkgs.xdotool}/bin/xdotool get_desktop)
+          REGION="screen''${SCREEN}"
+        fi
+
+        # Launch the screenshot gui
+        ${pkgs.flameshot}/bin/flameshot gui --region "$REGION"
+      '')
       webcamoid
       libnotify
       file

@@ -18,8 +18,8 @@ bindsym $mod+d exec --no-startup-id "rofi -dpi 0 -show drun -run-shell-command '
 
 # Screenshot
 bindsym Print exec --no-startup-id "flameshot gui"
-bindsym $mod+Print exec --no-startup-id "$HOME/.config/flameshot/flameshot.sh activewindow"
-bindsym $mod+Shift+Print exec --no-startup-id "$HOME/.config/flameshot/flameshot.sh"
+bindsym $mod+Print exec --no-startup-id "flameshot-region activewindow"
+bindsym $mod+Shift+Print exec --no-startup-id "flameshot-region"
 
 # Notifications
 bindsym $mod+dollar exec --no-startup-id "dunstctl close"
