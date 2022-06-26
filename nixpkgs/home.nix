@@ -1182,7 +1182,7 @@ in {
         ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
         ;; font string. You generally only need these two:
         (setq doom-font (font-spec :family "Iosevka Term" :size 12 :weight 'light)
-              doom-variable-pitch-font (font-spec :family "Inter" :size 13)
+              doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13)
               doom-big-font (font-spec :family "Iosevka Term" :size 24 :weight 'light))
 
         ;; There are two ways to load a theme. Both assume the theme is installed and
@@ -2793,7 +2793,6 @@ in {
       comic-relief
       fira
       fira-mono
-      inter
       lato
       libertine
       libertinus
@@ -2817,6 +2816,8 @@ in {
       league-of-moveable-type
 
       (nerdfonts.override { fonts = [ "Iosevka" ]; })
+      (iosevka-bin.override { variant = "aile"; })
+      (iosevka-bin.override { variant = "etoile"; })
 
       # Coding fonts
       # iosevka
