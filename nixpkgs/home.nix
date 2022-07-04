@@ -17,6 +17,10 @@ in {
     }))
   ];
 
+  imports = [
+    "${fetchTarball "https://github.com/msteen/nixos-vscode-server/tarball/master"}/modules/vscode-server/home.nix"
+  ];
+
   programs.home-manager.enable = true;
   programs.man.generateCaches = true;
 
@@ -825,36 +829,18 @@ in {
     };
     vscode = {
       enable = true;
-      # https://github.com/nix-community/home-manager/issues/1667
-      # package = let vscodePkg = unstable.vscode;
-      # in with pkgs;
-      # symlinkJoin (lib.recursiveUpdate {
-      #   name = "vscode";
-      #   paths = [ vscodePkg ];
-      #   buildInputs = [ makeWrapper ];
-      #   postBuild = ''
-      #     wrapProgram $out/bin/code \
-      #       --prefix PATH : "${docker}/bin" \
-      #       --prefix PATH : "${docker-compose}/bin"
-      #   '';
-      # } {
-      #   inherit (vscodePkg) meta src pname;
-      # });
-      # extensions = with unstable.vscode-extensions; [
-      #   bbenoist.nix
-      #   vscodevim.vim
-      #   ms-vsliveshare.vsliveshare
-      # ];
-      package = (unstable.vscode-with-extensions.override {
-        vscode = unstable.vscode;
-        vscodeExtensions = with unstable.vscode-extensions; [
-          bbenoist.nix
-          vscodevim.vim
-          ms-vsliveshare.vsliveshare
-        ];
-      }).overrideAttrs
-        (old: { inherit (unstable.vscode) meta src pname version; });
-      extensions = [ ];
+      package = unstable.vscode-fhsWithPackages (ps: with ps; [
+        python3
+      ]);
+      extensions = (with unstable.vscode-extensions; [
+        bbenoist.nix
+        vscodevim.vim
+      ]) ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [{
+        name = "direnv";
+        publisher = "mkhl";
+        version = "0.6.1";
+        sha256 = "5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
+      }];
     };
     zathura = {
       enable = true;
@@ -986,6 +972,7 @@ in {
       provider = "geoclue2";
       settings.redshift.adjustment-method = "randr";
     };
+    vscode-server.enable = true;
     unclutter = {
       enable = true;
       threshold = 10;
