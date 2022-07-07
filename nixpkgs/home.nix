@@ -1868,10 +1868,12 @@ in {
       "dark-mode.d/gtk-theme.sh".source =
         pkgs.writeShellScript "set-dark-theme.sh" ''
           ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Nordic"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
         '';
       "light-mode.d/gtk-theme.sh".source =
         pkgs.writeShellScript "set-light-theme.sh" ''
           ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Nordic-Polar"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
         '';
     };
     desktopEntries = {

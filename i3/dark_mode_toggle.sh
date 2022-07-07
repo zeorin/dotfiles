@@ -3,7 +3,7 @@
 dark_mode_on=$( [ "$(xfconf-query -c xsettings -p /Net/ThemeName)" = "Nordic" ]; echo $? )
 
 if [ $dark_mode_on = 0 ]; then
-	xfconf-query --create --type=string -c xsettings -p /Net/ThemeName -s "Nordic-Polar"
+	~/.local/share/light-mode.d/gtk-theme.sh
 else
-	xfconf-query --create --type=string -c xsettings -p /Net/ThemeName -s "Nordic"
+	~/.local/share/dark-mode.d/gtk-theme.sh
 fi
