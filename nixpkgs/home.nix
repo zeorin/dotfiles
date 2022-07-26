@@ -2724,6 +2724,7 @@ in {
       manix
       cachix
       nix-prefetch-git
+      nix-prefetch
       keybase
       unstable.comma
       zeal
