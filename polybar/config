@@ -28,7 +28,7 @@ alert = nord12
 
 [bar/top]
 monitor = ${env:MONITOR:}
-dpi = 96
+dpi = 0
 width = 1920
 height = 24
 
@@ -42,7 +42,8 @@ modules-right = pipewire-simple xkeyboard wlan battery date powermenu
 tray-position = right
 tray-padding = 2
 tray-maxsize = 32
-tray-background = ${colors.nord3}
+tray-foreground = ${colors.nord4}
+tray-background = ${colors.background}
 tray-prefix = 
 tray-prefix-font = 4
 tray-prefix-foreground = ${colors.nord3}
