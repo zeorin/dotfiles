@@ -35,7 +35,7 @@ bindsym $mod+g exec --no-startup-id "$([ -f ~/.local/share/picom/env ] && rm ~/.
 bindsym $mod+Shift+d exec --no-startup-id "$HOME/.config/i3/dark_mode_toggle.sh"
 
 # Lock screen
-bindsym $mod+x exec --no-startup-id "sleep 0.3; xset s activate"
+bindsym $mod+x exec --no-startup-id "loginctl lock-session"
 
 # change focus (Vi keybindings)
 bindsym $mod+h focus left
