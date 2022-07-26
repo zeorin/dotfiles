@@ -29,10 +29,10 @@ bindsym $mod+m exec --no-startup-id "dunstctl action 0"
 bindsym $mod+Shift+m exec --no-startup-id "dunstctl context"
 
 # Toggle grayscale
-bindsym $mod+g exec "$([ -f ~/.local/share/picom/env ] && rm ~/.local/share/picom/env || ln -s ~/.config/picom/env-grayscale ~/.local/share/picom/env); systemctl --user restart picom.service"
+bindsym $mod+g exec --no-startup-id "$([ -f ~/.local/share/picom/env ] && rm ~/.local/share/picom/env || ln -s ~/.config/picom/env-grayscale ~/.local/share/picom/env); systemctl --user restart picom.service"
 
 # Toggle dark mode
-bindsym $mod+Shift+d exec "$HOME/.config/i3/dark_mode_toggle.sh"
+bindsym $mod+Shift+d exec --no-startup-id "$HOME/.config/i3/dark_mode_toggle.sh"
 
 # Lock screen
 bindsym $mod+x exec --no-startup-id "sleep 0.3; xset s activate"
@@ -178,8 +178,8 @@ bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set 5%+
 bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
 
 # Toggle touchpad
-bindsym XF86TouchpadToggle exec ~/.config/i3/toggletouchpad.sh
-bindsym $mod+BackSpace exec ~/.config/i3/toggletouchpad.sh
+bindsym XF86TouchpadToggle exec --no-startup-id ~/.config/i3/toggletouchpad.sh
+bindsym $mod+BackSpace exec --no-startup-id ~/.config/i3/toggletouchpad.sh
 
 #
 # i3-gaps settings
