@@ -1087,6 +1087,16 @@ in {
 
   systemd.user = {
     services = {
+      batsignal = {
+        Unit.Description = "Battery monitor daemon";
+        Service = {
+          Type = "simple";
+          ExecStart = "${pkgs.batsignal}/bin/batsignal";
+          Restart = "on-failure";
+          RestartSec = 1;
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
       # Allow for bluetooth devices to interface with MPRIS
       mpris-proxy = {
         Unit = {
