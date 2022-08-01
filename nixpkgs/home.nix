@@ -3011,6 +3011,7 @@ in {
       numlockx
       filezilla
       silver-searcher
+      ripgrep
       xorg.xkill
       bc
       feh
