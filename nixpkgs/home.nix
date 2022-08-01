@@ -599,7 +599,6 @@ in {
       # Help some tools actually adhere to XDG Base Dirs
       CURL_HOME = "${configHome}/curl";
       INPUTRC = "${configHome}/readline/inputrc";
-      LESSKEY = "${configHome}/less/lesskey";
       NPM_CONFIG_USERCONFIG = "${configHome}/npm/npmrc";
       WEECHAT_HOME = "${configHome}/weechat";
       WGETRC = "${configHome}/wget/wgetrc";
@@ -1181,6 +1180,14 @@ in {
         name = "Iosevka Term";
         size = 10;
       };
+    };
+    less = {
+      enable = true;
+      keys = ''
+        #line-edit
+        ^P  up
+        ^N  down
+      '';
     };
     mpv = {
       enable = true;
@@ -2633,14 +2640,6 @@ in {
           ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
         ''}";
       };
-      "less/lesskey".source = pkgs.runCommand "lesskey" { }
-        "${pkgs.less}/bin/lesskey --output $out ${
-          pkgs.writeText "lesskey_input" ''
-            #line-edit
-            ^P  up
-            ^N  down
-          ''
-        }";
       "npm/npmrc".text = ''
         init-author-name=Xandor Schiefer
         init-author-email=me@xandor.co.za
