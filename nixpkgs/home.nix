@@ -28,6 +28,96 @@ let
     "nord14" = "#A3BE8C";
     "nord15" = "#B48EAD";
   };
+  scripts = {
+    isSshSession = pkgs.writeShellScript "is-ssh-session.sh" ''
+      if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -n "$SSH_CONNECTION" ]; then
+        exit 0
+      else
+        case $(ps -o comm= -p $PPID) in
+          sshd|*/sshd) exit 0;;
+        esac
+      fi
+      exit 1
+    '';
+    tmux = {
+      addTmuxTerminfo = pkgs.writeShellScript "add-tmux-terminfo.sh" ''
+        cat <<EOF|${pkgs.ncurses}/bin/tic -x -
+        tmux|tmux terminal multiplexer,
+          ritm=\E[23m, rmso=\E[27m, sitm=\E[3m, smso=\E[7m, Ms@,
+          use=xterm+tmux, use=screen,
+
+        tmux-256color|tmux with 256 colors,
+          use=xterm+256setaf, use=tmux,
+        EOF
+      '';
+      sessionChooser = pkgs.writeShellScript "tmux-session-chooser.sh" ''
+        if [ -z "$TMUX" ] && \
+          [ -z "$EMACS" ] && \
+          [ -z "$VIM" ] && \
+          [ -z "$INSIDE_EMACS" ] && \
+          [ "$TERM_PROGRAM" != "vscode" ]; then
+
+          # If this is a remote tty, allow the MOTD, banner, etc. to be seen first
+          parent_process=$(${pkgs.procps}/bin/ps -o comm= -p "$PPID")
+          if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -z "''${parent_process##*sshd}" ]; then
+            echo -e '\e[7mPress any key to continue…\e[0m';
+            saved_tty=$(stty -g </dev/tty)
+            stty raw -echo
+            dd if=/dev/tty bs=1 count=1 >/dev/null 2>&1
+            stty "$saved_tty"
+          fi
+
+          tmux_unattached_sessions=$(${pkgs.tmux}/bin/tmux list-sessions -F '#{session_name} #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//')
+
+          if [ -z "$tmux_unattached_sessions" ]; then
+            exec ${pkgs.tmux}/bin/tmux new-session
+          else
+            tmux_new_session=$(${pkgs.tmux}/bin/tmux new-session -dPF '#{session_name}')
+            exec ${pkgs.tmux}/bin/tmux \
+              attach -t "$tmux_new_session" \; \
+              choose-tree -s -f '#{?session_attached,0,1}' \
+                "switch-client -t '%%'; kill-session -t '$tmux_new_session'"
+          fi
+        fi
+      '';
+      sessionChooserFish = pkgs.writeTextFile {
+        name = "tmux-session-chooser.fish";
+        text = ''
+          #!${pkgs.fish}/bin/fish
+
+          if [ -z "$TMUX" ] && \
+            [ -z "$EMACS" ] && \
+            [ -z "$VIM" ] && \
+            [ -z "$INSIDE_EMACS" ] && \
+            [ "$TERM_PROGRAM" != "vscode" ]
+
+            # If this is a remote tty, allow the MOTD, banner, etc. to be seen first
+            set parent_process (${pkgs.procps}/bin/ps -o comm= -p (${pkgs.procps}/bin/ps -o ppid= -p $fish_pid | string trim))
+            if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || string match -q -- sshd $parent_process
+              echo -ne '\e[7mPress any key to continue…\e[0m';
+              set saved_tty (stty -g </dev/tty)
+              stty raw -echo
+              dd if=/dev/tty bs=1 count=1 >/dev/null 2>&1
+              stty "$saved_tty"
+            end
+
+            set tmux_unattached_sessions (${pkgs.tmux}/bin/tmux list-sessions -F '#{session_name} #{session_attached}' 2>/dev/null | grep ' 0$' | sed -e 's/ 0$//')
+
+            if [ -z "$tmux_unattached_sessions" ]
+              exec ${pkgs.tmux}/bin/tmux new-session
+            else
+              set tmux_new_session (${pkgs.tmux}/bin/tmux new-session -dPF '#{session_name}')
+              exec ${pkgs.tmux}/bin/tmux \
+                attach -t "$tmux_new_session" \; \
+                choose-tree -s -f '#{?session_attached,0,1}' \
+                  "switch-client -t '%%'; kill-session -t '$tmux_new_session'"
+            end
+          end
+        '';
+        executable = true;
+      };
+    };
+  };
   st = let
     config = pkgs.writeText "config.h" ''
       /* See LICENSE file for copyright and license details. */
@@ -1008,7 +1098,7 @@ in {
         set fish_greeting
 
         # Tmux session chooser
-        test -e ~/.tmux/session_chooser.fish && source ~/.tmux/session_chooser.fish
+        source ${scripts.tmux.sessionChooserFish}
 
         # Vi cursor
         fish_vi_cursor
