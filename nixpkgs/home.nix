@@ -1593,7 +1593,7 @@ in {
 
           label-mode-padding = 1;
           label-mode-font = 2;
-          label-mode-foreground = colors.nord3;
+          label-mode-foreground = colors.nord6;
           label-mode-background = "\${self.format-background}";
 
           # unfocused = Inactive workspace on any monitor
