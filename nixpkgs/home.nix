@@ -3062,108 +3062,55 @@ in {
       qutebrowser
       luakit
       surf
-      (let
-        pkg = (latest.firefox-nightly-bin.override {
-          cfg.enableBrowserpass = true;
-          cfg.enableTridactylNative = true;
-        }).overrideAttrs (old: {
-          desktopItem = makeDesktopItem {
-            name = "firefox-nightly";
-            exec = "firefox-nightly %U";
-            icon = "firefox-nightly";
-            comment = "";
-            desktopName = "Firefox Nightly";
-            genericName = "Web Browser";
-            categories = [
-              "Network"
-              "WebBrowser"
-            ];
-            mimeTypes = [
-              "text/html"
-              "text/xml"
-              "application/xhtml+xml"
-              "application/vnd.mozilla.xul+xml"
-              "x-scheme-handler/http"
-              "x-scheme-handler/https"
-              "x-scheme-handler/ftp"
-            ];
-          };
-        });
-        wrapped = pkgs.writeShellScriptBin "firefox-nightly" ''
-          exec ${pkg}/bin/firefox --no-remote -P nightly "''${@}"
-        '';
-      in pkgs.symlinkJoin {
+    ] ++ (let
+      mkFirefox = { name, desktopName, profileName }:
+        let
+          pkg = (latest."${name}-bin".override {
+            cfg.enableBrowserpass = true;
+            cfg.enableTridactylNative = true;
+          }).overrideAttrs (old: rec {
+            desktopItem = makeDesktopItem {
+              inherit name desktopName;
+              exec = "${name} %U";
+              icon = name;
+              comment = "";
+              genericName = "Web Browser";
+              categories = [ "Network" "WebBrowser" ];
+              mimeTypes = [
+                "text/html"
+                "text/xml"
+                "application/xhtml+xml"
+                "application/vnd.mozilla.xul+xml"
+                "x-scheme-handler/http"
+                "x-scheme-handler/https"
+                "x-scheme-handler/ftp"
+              ];
+            };
+          });
+          wrapped = pkgs.writeShellScriptBin name ''
+            exec ${pkg}/bin/firefox --no-remote -P ${profileName} "''${@}"
+          '';
+        in pkgs.symlinkJoin {
+          inherit name;
+          paths = [ wrapped pkg ];
+        };
+    in [
+      (mkFirefox {
         name = "firefox-nightly";
-        paths = [ wrapped pkg ];
+        desktopName = "Firefox Nightly";
+        profileName = "nightly";
       })
-      (let
-        pkg = (latest.firefox-beta-bin.override {
-          cfg.enableBrowserpass = true;
-          cfg.enableTridactylNative = true;
-        }).overrideAttrs (old: {
-          desktopItem = makeDesktopItem {
-            name = "firefox-beta";
-            exec = "firefox-beta %U";
-            icon = "firefox-beta";
-            comment = "";
-            desktopName = "Firefox Beta";
-            genericName = "Web Browser";
-            categories = [
-              "Network"
-              "WebBrowser"
-            ];
-            mimeTypes = [
-              "text/html"
-              "text/xml"
-              "application/xhtml+xml"
-              "application/vnd.mozilla.xul+xml"
-              "x-scheme-handler/http"
-              "x-scheme-handler/https"
-              "x-scheme-handler/ftp"
-            ];
-          };
-        });
-        wrapped = pkgs.writeShellScriptBin "firefox-beta" ''
-          exec ${pkg}/bin/firefox --no-remote -P beta "''${@}"
-        '';
-      in pkgs.symlinkJoin {
+      (mkFirefox {
         name = "firefox-beta";
-        paths = [ wrapped pkg ];
+        desktopName = "Firefox Beta";
+        profileName = "beta";
       })
-      (let
-        pkg = (latest.firefox-esr-bin.override {
-          cfg.enableBrowserpass = true;
-          cfg.enableTridactylNative = true;
-        }).overrideAttrs (old: {
-          desktopItem = makeDesktopItem {
-            name = "firefox-esr";
-            exec = "firefox-esr %U";
-            icon = "firefox";
-            comment = "";
-            desktopName = "Firefox ESR";
-            genericName = "Web Browser";
-            categories = [
-              "Network"
-              "WebBrowser"
-            ];
-            mimeTypes = [
-              "text/html"
-              "text/xml"
-              "application/xhtml+xml"
-              "application/vnd.mozilla.xul+xml"
-              "x-scheme-handler/http"
-              "x-scheme-handler/https"
-              "x-scheme-handler/ftp"
-            ];
-          };
-        });
-        wrapped = pkgs.writeShellScriptBin "firefox-esr" ''
-          exec ${pkg}/bin/firefox --no-remote -P esr "''${@}"
-        '';
-      in pkgs.symlinkJoin {
+      (mkFirefox {
         name = "firefox-esr";
-        paths = [ wrapped pkg ];
+        desktopName = "Firefox ESR";
+        profileName = "esr";
       })
+    ]) ++ [
       ungoogled-chromium
       google-chrome
       google-chrome-beta
