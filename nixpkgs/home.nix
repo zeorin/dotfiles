@@ -646,6 +646,7 @@ let
       rev = "5703aa0390484dd7da4bd9c388c85708d8fcd339";
     };
   }));
+  terminal-emulator-bin = st;
   terminal-emulator = "${st}/bin/st";
 in {
   nixpkgs.overlays = [
@@ -3083,6 +3084,7 @@ in {
 
   home.packages = with pkgs;
     [
+      terminal-emulator-bin
       webcamoid
       libnotify
       file
