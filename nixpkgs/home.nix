@@ -1189,6 +1189,7 @@ in {
         ^N  down
       '';
     };
+    lesspipe.enable = true;
     mpv = {
       enable = true;
       config = {
