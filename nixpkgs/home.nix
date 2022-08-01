@@ -28,535 +28,534 @@ let
     "nord14" = "#A3BE8C";
     "nord15" = "#B48EAD";
   };
-  st = 
-    let
-      config = pkgs.writeText "config.h" ''
-        /* See LICENSE file for copyright and license details. */
+  st = let
+    config = pkgs.writeText "config.h" ''
+      /* See LICENSE file for copyright and license details. */
 
-        /*
-        * appearance
-        *
-        * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
-        */
-        static char *font = "Iosevka Term:pixelsize=14:antialias=true:autohint=true";
-        /* Spare fonts */
-        static char *font2[] = {
-          "Joypixels:pixelsize=14:antialias=true:autohint=true",
-          "Unifont:pixelsize=14:antialias=true:autohint=true",
-          "Symbola:pixelsize=14:antialias=true:autohint=true",
-        };
-
-        static int borderpx = 14;
-
-        /*
-        * What program is execed by st depends of these precedence rules:
-        * 1: program passed with -e
-        * 2: utmp option
-        * 3: SHELL environment variable
-        * 4: value of shell in /etc/passwd
-        * 5: value of shell in config.h
-        */
-        static char *shell = "/bin/sh";
-        char *utmp = NULL;
-        char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";
-
-        /* identification sequence returned in DA and DECID */
-        char *vtiden = "\033[?6c";
-
-        /* Kerning / character bounding-box multipliers */
-        static float cwscale = 1.0;
-        static float chscale = 1.0;
-
-        /*
-        * word delimiter string
-        *
-        * More advanced example: L" `'\"()[]{}"
-        */
-        wchar_t *worddelimiters = L" ";
-
-        /* selection timeouts (in milliseconds) */
-        static unsigned int doubleclicktimeout = 300;
-        static unsigned int tripleclicktimeout = 600;
-
-        /* alt screens */
-        int allowaltscreen = 1;
-
-        /* frames per second st should at maximum draw to the screen */
-        static unsigned int xfps = 120;
-        static unsigned int actionfps = 30;
-
-        /*
-        * blinking timeout (set to 0 to disable blinking) for the terminal blinking
-        * attribute.
-        */
-        static unsigned int blinktimeout = 800;
-
-        /*
-        * thickness of underline and bar cursors
-        */
-        static unsigned int cursorthickness = 2;
-
-        /*
-        * bell volume. It must be a value between -100 and 100. Use 0 for disabling
-        * it
-        */
-        static int bellvolume = 0;
-
-        /* default TERM value */
-        char *termname = "st-256color";
-
-        /*
-        * spaces per tab
-        *
-        * When you are changing this value, don't forget to adapt the »it« value in
-        * the st.info and appropriately install the st.info in the environment where
-        * you use this st version.
-        *
-        *	it#$tabspaces,
-        *
-        * Secondly make sure your kernel is not expanding tabs. When running `stty
-        * -a` »tab0« should appear. You can tell the terminal to not expand tabs by
-        *  running following command:
-        *
-        *	stty tabs
-        */
-        unsigned int tabspaces = 8;
-
-        /* bg opacity */
-        float alpha = 1;
-
-        /* Terminal colors (16 first used in escape sequence) */
-        static const char *colorname[] = {
-          /* 8 normal colors */
-          "black",
-          "red3",
-          "green3",
-          "yellow3",
-          "blue2",
-          "magenta3",
-          "cyan3",
-          "gray90",
-
-          /* 8 bright colors */
-          "gray50",
-          "red",
-          "green",
-          "yellow",
-          "#5c5cff",
-          "magenta",
-          "cyan",
-          "white",
-
-          [255] = 0,
-
-          /* more colors can be added after 255 to use with DefaultXX */
-          "#cccccc",
-          "#555555",
-          "black",
-          "${colors.nord0}",
-        };
-
-
-        /*
-        * Default colors (colorname index)
-        * foreground, background, cursor, reverse cursor
-        */
-        unsigned int defaultfg = 257;
-        unsigned int defaultbg = 256;
-        static unsigned int defaultcs = 258;
-        static unsigned int defaultrcs = 258;
-
-        /* Colors used for selection */
-        unsigned int selectionbg = 3;
-        unsigned int selectionfg = 0;
-        /* If 0 use selectionfg as foreground in order to have a uniform foreground-color */
-        /* Else if 1 keep original foreground-color of each cell => more colors : */
-        static int ignoreselfg = 0;
-
-        /*
-        * Default shape of cursor
-        * 2: Block ("█")
-        * 4: Underline ("_")
-        * 6: Bar ("|")
-        * 7: Snowman ("☃")
-        */
-        static unsigned int cursorshape = 2;
-
-        /*
-        * Default columns and rows numbers
-        */
-
-        static unsigned int cols = 80;
-        static unsigned int rows = 24;
-
-        /*
-        * Default shape of the mouse cursor
-        */
-
-        static char* mouseshape = "xterm";
-
-        /*
-        * Color used to display font attributes when fontconfig selected a font which
-        * doesn't match the ones requested.
-        */
-        static unsigned int defaultattr = 11;
-
-        /*
-        * Force mouse select/shortcuts while mask is active (when MODE_MOUSE is set).
-        * Note that if you want to use ShiftMask with selmasks, set this to an other
-        * modifier, set to 0 to not use it.
-        */
-        static uint forcemousemod = ShiftMask;
-
-        /*
-        * Xresources preferences to load at startup
-        */
-        ResourcePref resources[] = {
-            { "font",         STRING,  &font },
-            { "color0",       STRING,  &colorname[0] },
-            { "color1",       STRING,  &colorname[1] },
-            { "color2",       STRING,  &colorname[2] },
-            { "color3",       STRING,  &colorname[3] },
-            { "color4",       STRING,  &colorname[4] },
-            { "color5",       STRING,  &colorname[5] },
-            { "color6",       STRING,  &colorname[6] },
-            { "color7",       STRING,  &colorname[7] },
-            { "color8",       STRING,  &colorname[8] },
-            { "color9",       STRING,  &colorname[9] },
-            { "color10",      STRING,  &colorname[10] },
-            { "color11",      STRING,  &colorname[11] },
-            { "color12",      STRING,  &colorname[12] },
-            { "color13",      STRING,  &colorname[13] },
-            { "color14",      STRING,  &colorname[14] },
-            { "color15",      STRING,  &colorname[15] },
-            { "background",   STRING,  &colorname[256] },
-            { "foreground",   STRING,  &colorname[257] },
-            { "cursorColor",  STRING,  &colorname[258] },
-            { "selection",    STRING,  &colorname[259] },
-            { "termname",     STRING,  &termname },
-            { "shell",        STRING,  &shell },
-            { "xfps",         INTEGER, &xfps },
-            { "actionfps",    INTEGER, &actionfps },
-            { "blinktimeout", INTEGER, &blinktimeout },
-            { "bellvolume",   INTEGER, &bellvolume },
-            { "tabspaces",    INTEGER, &tabspaces },
-            { "borderpx",     INTEGER, &borderpx },
-            { "cwscale",      FLOAT,   &cwscale },
-            { "chscale",      FLOAT,   &chscale },
-        };
-
-        /*
-        * Internal mouse shortcuts.
-        * Beware that overloading Button1 will disable the selection.
-        */
-        static MouseShortcut mshortcuts[] = {
-          /* mask                 button   function        argument       release */
-          { XK_ANY_MOD,           Button2, selpaste,       {.i = 0},      1 },
-          { XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },
-          { XK_ANY_MOD,           Button5, ttysend,        {.s = "\005"} },
-        };
-
-        /* Internal keyboard shortcuts. */
-        #define MODKEY Mod1Mask
-        #define TERMMOD (ControlMask|ShiftMask)
-
-        static Shortcut shortcuts[] = {
-          /* mask                 keysym          function        argument */
-          { XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
-          { ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
-          { ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
-          { XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-          { TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
-          { TERMMOD,              XK_Next,        zoom,           {.f = -1} },
-          { TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
-          { TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
-          { TERMMOD,              XK_V,           clippaste,      {.i =  0} },
-          { TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
-          { ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
-          { TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-        };
-
-        /*
-        * Special keys (change & recompile st.info accordingly)
-        *
-        * Mask value:
-        * * Use XK_ANY_MOD to match the key no matter modifiers state
-        * * Use XK_NO_MOD to match the key alone (no modifiers)
-        * appkey value:
-        * * 0: no value
-        * * > 0: keypad application mode enabled
-        * *   = 2: term.numlock = 1
-        * * < 0: keypad application mode disabled
-        * appcursor value:
-        * * 0: no value
-        * * > 0: cursor application mode enabled
-        * * < 0: cursor application mode disabled
-        *
-        * Be careful with the order of the definitions because st searches in
-        * this table sequentially, so any XK_ANY_MOD must be in the last
-        * position for a key.
-        */
-
-        /*
-        * If you want keys other than the X11 function keys (0xFD00 - 0xFFFF)
-        * to be mapped below, add them to this array.
-        */
-        static KeySym mappedkeys[] = { -1 };
-
-        /*
-        * State bits to ignore when matching key or button events.  By default,
-        * numlock (Mod2Mask) and keyboard layout (XK_SWITCH_MOD) are ignored.
-        */
-        static uint ignoremod = Mod2Mask|XK_SWITCH_MOD;
-
-        /*
-        * This is the huge key array which defines all compatibility to the Linux
-        * world. Please decide about changes wisely.
-        */
-        static Key key[] = {
-          /* keysym           mask            string      appkey appcursor */
-          { XK_KP_Home,       ShiftMask,      "\033[2J",       0,   -1},
-          { XK_KP_Home,       ShiftMask,      "\033[1;2H",     0,   +1},
-          { XK_KP_Home,       XK_ANY_MOD,     "\033[H",        0,   -1},
-          { XK_KP_Home,       XK_ANY_MOD,     "\033[1~",       0,   +1},
-          { XK_KP_Up,         XK_ANY_MOD,     "\033Ox",       +1,    0},
-          { XK_KP_Up,         XK_ANY_MOD,     "\033[A",        0,   -1},
-          { XK_KP_Up,         XK_ANY_MOD,     "\033OA",        0,   +1},
-          { XK_KP_Down,       XK_ANY_MOD,     "\033Or",       +1,    0},
-          { XK_KP_Down,       XK_ANY_MOD,     "\033[B",        0,   -1},
-          { XK_KP_Down,       XK_ANY_MOD,     "\033OB",        0,   +1},
-          { XK_KP_Left,       XK_ANY_MOD,     "\033Ot",       +1,    0},
-          { XK_KP_Left,       XK_ANY_MOD,     "\033[D",        0,   -1},
-          { XK_KP_Left,       XK_ANY_MOD,     "\033OD",        0,   +1},
-          { XK_KP_Right,      XK_ANY_MOD,     "\033Ov",       +1,    0},
-          { XK_KP_Right,      XK_ANY_MOD,     "\033[C",        0,   -1},
-          { XK_KP_Right,      XK_ANY_MOD,     "\033OC",        0,   +1},
-          { XK_KP_Prior,      ShiftMask,      "\033[5;2~",     0,    0},
-          { XK_KP_Prior,      XK_ANY_MOD,     "\033[5~",       0,    0},
-          { XK_KP_Begin,      XK_ANY_MOD,     "\033[E",        0,    0},
-          { XK_KP_End,        ControlMask,    "\033[J",       -1,    0},
-          { XK_KP_End,        ControlMask,    "\033[1;5F",    +1,    0},
-          { XK_KP_End,        ShiftMask,      "\033[K",       -1,    0},
-          { XK_KP_End,        ShiftMask,      "\033[1;2F",    +1,    0},
-          { XK_KP_End,        XK_ANY_MOD,     "\033[4~",       0,    0},
-          { XK_KP_Next,       ShiftMask,      "\033[6;2~",     0,    0},
-          { XK_KP_Next,       XK_ANY_MOD,     "\033[6~",       0,    0},
-          { XK_KP_Insert,     ShiftMask,      "\033[2;2~",    +1,    0},
-          { XK_KP_Insert,     ShiftMask,      "\033[4l",      -1,    0},
-          { XK_KP_Insert,     ControlMask,    "\033[L",       -1,    0},
-          { XK_KP_Insert,     ControlMask,    "\033[2;5~",    +1,    0},
-          { XK_KP_Insert,     XK_ANY_MOD,     "\033[4h",      -1,    0},
-          { XK_KP_Insert,     XK_ANY_MOD,     "\033[2~",      +1,    0},
-          { XK_KP_Delete,     ControlMask,    "\033[M",       -1,    0},
-          { XK_KP_Delete,     ControlMask,    "\033[3;5~",    +1,    0},
-          { XK_KP_Delete,     ShiftMask,      "\033[2K",      -1,    0},
-          { XK_KP_Delete,     ShiftMask,      "\033[3;2~",    +1,    0},
-          { XK_KP_Delete,     XK_ANY_MOD,     "\033[P",       -1,    0},
-          { XK_KP_Delete,     XK_ANY_MOD,     "\033[3~",      +1,    0},
-          { XK_KP_Multiply,   XK_ANY_MOD,     "\033Oj",       +2,    0},
-          { XK_KP_Add,        XK_ANY_MOD,     "\033Ok",       +2,    0},
-          { XK_KP_Enter,      XK_ANY_MOD,     "\033OM",       +2,    0},
-          { XK_KP_Enter,      XK_ANY_MOD,     "\r",           -1,    0},
-          { XK_KP_Subtract,   XK_ANY_MOD,     "\033Om",       +2,    0},
-          { XK_KP_Decimal,    XK_ANY_MOD,     "\033On",       +2,    0},
-          { XK_KP_Divide,     XK_ANY_MOD,     "\033Oo",       +2,    0},
-          { XK_KP_0,          XK_ANY_MOD,     "\033Op",       +2,    0},
-          { XK_KP_1,          XK_ANY_MOD,     "\033Oq",       +2,    0},
-          { XK_KP_2,          XK_ANY_MOD,     "\033Or",       +2,    0},
-          { XK_KP_3,          XK_ANY_MOD,     "\033Os",       +2,    0},
-          { XK_KP_4,          XK_ANY_MOD,     "\033Ot",       +2,    0},
-          { XK_KP_5,          XK_ANY_MOD,     "\033Ou",       +2,    0},
-          { XK_KP_6,          XK_ANY_MOD,     "\033Ov",       +2,    0},
-          { XK_KP_7,          XK_ANY_MOD,     "\033Ow",       +2,    0},
-          { XK_KP_8,          XK_ANY_MOD,     "\033Ox",       +2,    0},
-          { XK_KP_9,          XK_ANY_MOD,     "\033Oy",       +2,    0},
-          { XK_Up,            ShiftMask,      "\033[1;2A",     0,    0},
-          { XK_Up,            Mod1Mask,       "\033[1;3A",     0,    0},
-          { XK_Up,         ShiftMask|Mod1Mask,"\033[1;4A",     0,    0},
-          { XK_Up,            ControlMask,    "\033[1;5A",     0,    0},
-          { XK_Up,      ShiftMask|ControlMask,"\033[1;6A",     0,    0},
-          { XK_Up,       ControlMask|Mod1Mask,"\033[1;7A",     0,    0},
-          { XK_Up,ShiftMask|ControlMask|Mod1Mask,"\033[1;8A",  0,    0},
-          { XK_Up,            XK_ANY_MOD,     "\033[A",        0,   -1},
-          { XK_Up,            XK_ANY_MOD,     "\033OA",        0,   +1},
-          { XK_Down,          ShiftMask,      "\033[1;2B",     0,    0},
-          { XK_Down,          Mod1Mask,       "\033[1;3B",     0,    0},
-          { XK_Down,       ShiftMask|Mod1Mask,"\033[1;4B",     0,    0},
-          { XK_Down,          ControlMask,    "\033[1;5B",     0,    0},
-          { XK_Down,    ShiftMask|ControlMask,"\033[1;6B",     0,    0},
-          { XK_Down,     ControlMask|Mod1Mask,"\033[1;7B",     0,    0},
-          { XK_Down,ShiftMask|ControlMask|Mod1Mask,"\033[1;8B",0,    0},
-          { XK_Down,          XK_ANY_MOD,     "\033[B",        0,   -1},
-          { XK_Down,          XK_ANY_MOD,     "\033OB",        0,   +1},
-          { XK_Left,          ShiftMask,      "\033[1;2D",     0,    0},
-          { XK_Left,          Mod1Mask,       "\033[1;3D",     0,    0},
-          { XK_Left,       ShiftMask|Mod1Mask,"\033[1;4D",     0,    0},
-          { XK_Left,          ControlMask,    "\033[1;5D",     0,    0},
-          { XK_Left,    ShiftMask|ControlMask,"\033[1;6D",     0,    0},
-          { XK_Left,     ControlMask|Mod1Mask,"\033[1;7D",     0,    0},
-          { XK_Left,ShiftMask|ControlMask|Mod1Mask,"\033[1;8D",0,    0},
-          { XK_Left,          XK_ANY_MOD,     "\033[D",        0,   -1},
-          { XK_Left,          XK_ANY_MOD,     "\033OD",        0,   +1},
-          { XK_Right,         ShiftMask,      "\033[1;2C",     0,    0},
-          { XK_Right,         Mod1Mask,       "\033[1;3C",     0,    0},
-          { XK_Right,      ShiftMask|Mod1Mask,"\033[1;4C",     0,    0},
-          { XK_Right,         ControlMask,    "\033[1;5C",     0,    0},
-          { XK_Right,   ShiftMask|ControlMask,"\033[1;6C",     0,    0},
-          { XK_Right,    ControlMask|Mod1Mask,"\033[1;7C",     0,    0},
-          { XK_Right,ShiftMask|ControlMask|Mod1Mask,"\033[1;8C",0,   0},
-          { XK_Right,         XK_ANY_MOD,     "\033[C",        0,   -1},
-          { XK_Right,         XK_ANY_MOD,     "\033OC",        0,   +1},
-          { XK_ISO_Left_Tab,  ShiftMask,      "\033[Z",        0,    0},
-          { XK_Return,        Mod1Mask,       "\033\r",        0,    0},
-          { XK_Return,        XK_ANY_MOD,     "\r",            0,    0},
-          { XK_Insert,        ShiftMask,      "\033[4l",      -1,    0},
-          { XK_Insert,        ShiftMask,      "\033[2;2~",    +1,    0},
-          { XK_Insert,        ControlMask,    "\033[L",       -1,    0},
-          { XK_Insert,        ControlMask,    "\033[2;5~",    +1,    0},
-          { XK_Insert,        XK_ANY_MOD,     "\033[4h",      -1,    0},
-          { XK_Insert,        XK_ANY_MOD,     "\033[2~",      +1,    0},
-          { XK_Delete,        ControlMask,    "\033[M",       -1,    0},
-          { XK_Delete,        ControlMask,    "\033[3;5~",    +1,    0},
-          { XK_Delete,        ShiftMask,      "\033[2K",      -1,    0},
-          { XK_Delete,        ShiftMask,      "\033[3;2~",    +1,    0},
-          { XK_Delete,        XK_ANY_MOD,     "\033[P",       -1,    0},
-          { XK_Delete,        XK_ANY_MOD,     "\033[3~",      +1,    0},
-          { XK_BackSpace,     XK_NO_MOD,      "\177",          0,    0},
-          { XK_BackSpace,     Mod1Mask,       "\033\177",      0,    0},
-          { XK_Home,          ShiftMask,      "\033[2J",       0,   -1},
-          { XK_Home,          ShiftMask,      "\033[1;2H",     0,   +1},
-          { XK_Home,          XK_ANY_MOD,     "\033[H",        0,   -1},
-          { XK_Home,          XK_ANY_MOD,     "\033[1~",       0,   +1},
-          { XK_End,           ControlMask,    "\033[J",       -1,    0},
-          { XK_End,           ControlMask,    "\033[1;5F",    +1,    0},
-          { XK_End,           ShiftMask,      "\033[K",       -1,    0},
-          { XK_End,           ShiftMask,      "\033[1;2F",    +1,    0},
-          { XK_End,           XK_ANY_MOD,     "\033[4~",       0,    0},
-          { XK_Prior,         ControlMask,    "\033[5;5~",     0,    0},
-          { XK_Prior,         ShiftMask,      "\033[5;2~",     0,    0},
-          { XK_Prior,         XK_ANY_MOD,     "\033[5~",       0,    0},
-          { XK_Next,          ControlMask,    "\033[6;5~",     0,    0},
-          { XK_Next,          ShiftMask,      "\033[6;2~",     0,    0},
-          { XK_Next,          XK_ANY_MOD,     "\033[6~",       0,    0},
-          { XK_F1,            XK_NO_MOD,      "\033OP" ,       0,    0},
-          { XK_F1, /* F13 */  ShiftMask,      "\033[1;2P",     0,    0},
-          { XK_F1, /* F25 */  ControlMask,    "\033[1;5P",     0,    0},
-          { XK_F1, /* F37 */  Mod4Mask,       "\033[1;6P",     0,    0},
-          { XK_F1, /* F49 */  Mod1Mask,       "\033[1;3P",     0,    0},
-          { XK_F1, /* F61 */  Mod3Mask,       "\033[1;4P",     0,    0},
-          { XK_F2,            XK_NO_MOD,      "\033OQ" ,       0,    0},
-          { XK_F2, /* F14 */  ShiftMask,      "\033[1;2Q",     0,    0},
-          { XK_F2, /* F26 */  ControlMask,    "\033[1;5Q",     0,    0},
-          { XK_F2, /* F38 */  Mod4Mask,       "\033[1;6Q",     0,    0},
-          { XK_F2, /* F50 */  Mod1Mask,       "\033[1;3Q",     0,    0},
-          { XK_F2, /* F62 */  Mod3Mask,       "\033[1;4Q",     0,    0},
-          { XK_F3,            XK_NO_MOD,      "\033OR" ,       0,    0},
-          { XK_F3, /* F15 */  ShiftMask,      "\033[1;2R",     0,    0},
-          { XK_F3, /* F27 */  ControlMask,    "\033[1;5R",     0,    0},
-          { XK_F3, /* F39 */  Mod4Mask,       "\033[1;6R",     0,    0},
-          { XK_F3, /* F51 */  Mod1Mask,       "\033[1;3R",     0,    0},
-          { XK_F3, /* F63 */  Mod3Mask,       "\033[1;4R",     0,    0},
-          { XK_F4,            XK_NO_MOD,      "\033OS" ,       0,    0},
-          { XK_F4, /* F16 */  ShiftMask,      "\033[1;2S",     0,    0},
-          { XK_F4, /* F28 */  ControlMask,    "\033[1;5S",     0,    0},
-          { XK_F4, /* F40 */  Mod4Mask,       "\033[1;6S",     0,    0},
-          { XK_F4, /* F52 */  Mod1Mask,       "\033[1;3S",     0,    0},
-          { XK_F5,            XK_NO_MOD,      "\033[15~",      0,    0},
-          { XK_F5, /* F17 */  ShiftMask,      "\033[15;2~",    0,    0},
-          { XK_F5, /* F29 */  ControlMask,    "\033[15;5~",    0,    0},
-          { XK_F5, /* F41 */  Mod4Mask,       "\033[15;6~",    0,    0},
-          { XK_F5, /* F53 */  Mod1Mask,       "\033[15;3~",    0,    0},
-          { XK_F6,            XK_NO_MOD,      "\033[17~",      0,    0},
-          { XK_F6, /* F18 */  ShiftMask,      "\033[17;2~",    0,    0},
-          { XK_F6, /* F30 */  ControlMask,    "\033[17;5~",    0,    0},
-          { XK_F6, /* F42 */  Mod4Mask,       "\033[17;6~",    0,    0},
-          { XK_F6, /* F54 */  Mod1Mask,       "\033[17;3~",    0,    0},
-          { XK_F7,            XK_NO_MOD,      "\033[18~",      0,    0},
-          { XK_F7, /* F19 */  ShiftMask,      "\033[18;2~",    0,    0},
-          { XK_F7, /* F31 */  ControlMask,    "\033[18;5~",    0,    0},
-          { XK_F7, /* F43 */  Mod4Mask,       "\033[18;6~",    0,    0},
-          { XK_F7, /* F55 */  Mod1Mask,       "\033[18;3~",    0,    0},
-          { XK_F8,            XK_NO_MOD,      "\033[19~",      0,    0},
-          { XK_F8, /* F20 */  ShiftMask,      "\033[19;2~",    0,    0},
-          { XK_F8, /* F32 */  ControlMask,    "\033[19;5~",    0,    0},
-          { XK_F8, /* F44 */  Mod4Mask,       "\033[19;6~",    0,    0},
-          { XK_F8, /* F56 */  Mod1Mask,       "\033[19;3~",    0,    0},
-          { XK_F9,            XK_NO_MOD,      "\033[20~",      0,    0},
-          { XK_F9, /* F21 */  ShiftMask,      "\033[20;2~",    0,    0},
-          { XK_F9, /* F33 */  ControlMask,    "\033[20;5~",    0,    0},
-          { XK_F9, /* F45 */  Mod4Mask,       "\033[20;6~",    0,    0},
-          { XK_F9, /* F57 */  Mod1Mask,       "\033[20;3~",    0,    0},
-          { XK_F10,           XK_NO_MOD,      "\033[21~",      0,    0},
-          { XK_F10, /* F22 */ ShiftMask,      "\033[21;2~",    0,    0},
-          { XK_F10, /* F34 */ ControlMask,    "\033[21;5~",    0,    0},
-          { XK_F10, /* F46 */ Mod4Mask,       "\033[21;6~",    0,    0},
-          { XK_F10, /* F58 */ Mod1Mask,       "\033[21;3~",    0,    0},
-          { XK_F11,           XK_NO_MOD,      "\033[23~",      0,    0},
-          { XK_F11, /* F23 */ ShiftMask,      "\033[23;2~",    0,    0},
-          { XK_F11, /* F35 */ ControlMask,    "\033[23;5~",    0,    0},
-          { XK_F11, /* F47 */ Mod4Mask,       "\033[23;6~",    0,    0},
-          { XK_F11, /* F59 */ Mod1Mask,       "\033[23;3~",    0,    0},
-          { XK_F12,           XK_NO_MOD,      "\033[24~",      0,    0},
-          { XK_F12, /* F24 */ ShiftMask,      "\033[24;2~",    0,    0},
-          { XK_F12, /* F36 */ ControlMask,    "\033[24;5~",    0,    0},
-          { XK_F12, /* F48 */ Mod4Mask,       "\033[24;6~",    0,    0},
-          { XK_F12, /* F60 */ Mod1Mask,       "\033[24;3~",    0,    0},
-          { XK_F13,           XK_NO_MOD,      "\033[1;2P",     0,    0},
-          { XK_F14,           XK_NO_MOD,      "\033[1;2Q",     0,    0},
-          { XK_F15,           XK_NO_MOD,      "\033[1;2R",     0,    0},
-          { XK_F16,           XK_NO_MOD,      "\033[1;2S",     0,    0},
-          { XK_F17,           XK_NO_MOD,      "\033[15;2~",    0,    0},
-          { XK_F18,           XK_NO_MOD,      "\033[17;2~",    0,    0},
-          { XK_F19,           XK_NO_MOD,      "\033[18;2~",    0,    0},
-          { XK_F20,           XK_NO_MOD,      "\033[19;2~",    0,    0},
-          { XK_F21,           XK_NO_MOD,      "\033[20;2~",    0,    0},
-          { XK_F22,           XK_NO_MOD,      "\033[21;2~",    0,    0},
-          { XK_F23,           XK_NO_MOD,      "\033[23;2~",    0,    0},
-          { XK_F24,           XK_NO_MOD,      "\033[24;2~",    0,    0},
-          { XK_F25,           XK_NO_MOD,      "\033[1;5P",     0,    0},
-          { XK_F26,           XK_NO_MOD,      "\033[1;5Q",     0,    0},
-          { XK_F27,           XK_NO_MOD,      "\033[1;5R",     0,    0},
-          { XK_F28,           XK_NO_MOD,      "\033[1;5S",     0,    0},
-          { XK_F29,           XK_NO_MOD,      "\033[15;5~",    0,    0},
-          { XK_F30,           XK_NO_MOD,      "\033[17;5~",    0,    0},
-          { XK_F31,           XK_NO_MOD,      "\033[18;5~",    0,    0},
-          { XK_F32,           XK_NO_MOD,      "\033[19;5~",    0,    0},
-          { XK_F33,           XK_NO_MOD,      "\033[20;5~",    0,    0},
-          { XK_F34,           XK_NO_MOD,      "\033[21;5~",    0,    0},
-          { XK_F35,           XK_NO_MOD,      "\033[23;5~",    0,    0},
-        };
-
-        /*
-        * Selection types' masks.
-        * Use the same masks as usual.
-        * Button1Mask is always unset, to make masks match between ButtonPress.
-        * ButtonRelease and MotionNotify.
-        * If no match is found, regular selection is used.
-        */
-        static uint selmasks[] = {
-          [SEL_RECTANGULAR] = Mod1Mask,
-        };
-
-        /*
-        * Printable characters in ASCII, used to estimate the advance width
-        * of single wide characters.
-        */
-        static char ascii_printable[] =
-          " !\"#$%&'()*+,-./0123456789:;<=>?"
-          "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-          "`abcdefghijklmnopqrstuvwxyz{|}~";
-      '';
-    in ((pkgs.st.override {
-      patches = [ /etc/nixos/st-patches.diff ];
-      extraLibs = with pkgs; [ harfbuzz xorg.libXcursor ];
-    }).overrideAttrs (oldAttrs: {
-      preBuild = "cp ${config} config.h";
-      src = builtins.fetchGit {
-        url = "git://git.suckless.org/st";
-        ref = "master";
-        rev = "5703aa0390484dd7da4bd9c388c85708d8fcd339";
+      /*
+      * appearance
+      *
+      * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
+      */
+      static char *font = "Iosevka Term:pixelsize=14:antialias=true:autohint=true";
+      /* Spare fonts */
+      static char *font2[] = {
+        "Joypixels:pixelsize=14:antialias=true:autohint=true",
+        "Unifont:pixelsize=14:antialias=true:autohint=true",
+        "Symbola:pixelsize=14:antialias=true:autohint=true",
       };
-    }));
+
+      static int borderpx = 14;
+
+      /*
+      * What program is execed by st depends of these precedence rules:
+      * 1: program passed with -e
+      * 2: utmp option
+      * 3: SHELL environment variable
+      * 4: value of shell in /etc/passwd
+      * 5: value of shell in config.h
+      */
+      static char *shell = "/bin/sh";
+      char *utmp = NULL;
+      char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";
+
+      /* identification sequence returned in DA and DECID */
+      char *vtiden = "\033[?6c";
+
+      /* Kerning / character bounding-box multipliers */
+      static float cwscale = 1.0;
+      static float chscale = 1.0;
+
+      /*
+      * word delimiter string
+      *
+      * More advanced example: L" `'\"()[]{}"
+      */
+      wchar_t *worddelimiters = L" ";
+
+      /* selection timeouts (in milliseconds) */
+      static unsigned int doubleclicktimeout = 300;
+      static unsigned int tripleclicktimeout = 600;
+
+      /* alt screens */
+      int allowaltscreen = 1;
+
+      /* frames per second st should at maximum draw to the screen */
+      static unsigned int xfps = 120;
+      static unsigned int actionfps = 30;
+
+      /*
+      * blinking timeout (set to 0 to disable blinking) for the terminal blinking
+      * attribute.
+      */
+      static unsigned int blinktimeout = 800;
+
+      /*
+      * thickness of underline and bar cursors
+      */
+      static unsigned int cursorthickness = 2;
+
+      /*
+      * bell volume. It must be a value between -100 and 100. Use 0 for disabling
+      * it
+      */
+      static int bellvolume = 0;
+
+      /* default TERM value */
+      char *termname = "st-256color";
+
+      /*
+      * spaces per tab
+      *
+      * When you are changing this value, don't forget to adapt the »it« value in
+      * the st.info and appropriately install the st.info in the environment where
+      * you use this st version.
+      *
+      *	it#$tabspaces,
+      *
+      * Secondly make sure your kernel is not expanding tabs. When running `stty
+      * -a` »tab0« should appear. You can tell the terminal to not expand tabs by
+      *  running following command:
+      *
+      *	stty tabs
+      */
+      unsigned int tabspaces = 8;
+
+      /* bg opacity */
+      float alpha = 1;
+
+      /* Terminal colors (16 first used in escape sequence) */
+      static const char *colorname[] = {
+        /* 8 normal colors */
+        "black",
+        "red3",
+        "green3",
+        "yellow3",
+        "blue2",
+        "magenta3",
+        "cyan3",
+        "gray90",
+
+        /* 8 bright colors */
+        "gray50",
+        "red",
+        "green",
+        "yellow",
+        "#5c5cff",
+        "magenta",
+        "cyan",
+        "white",
+
+        [255] = 0,
+
+        /* more colors can be added after 255 to use with DefaultXX */
+        "#cccccc",
+        "#555555",
+        "black",
+        "${colors.nord0}",
+      };
+
+
+      /*
+      * Default colors (colorname index)
+      * foreground, background, cursor, reverse cursor
+      */
+      unsigned int defaultfg = 257;
+      unsigned int defaultbg = 256;
+      static unsigned int defaultcs = 258;
+      static unsigned int defaultrcs = 258;
+
+      /* Colors used for selection */
+      unsigned int selectionbg = 3;
+      unsigned int selectionfg = 0;
+      /* If 0 use selectionfg as foreground in order to have a uniform foreground-color */
+      /* Else if 1 keep original foreground-color of each cell => more colors : */
+      static int ignoreselfg = 0;
+
+      /*
+      * Default shape of cursor
+      * 2: Block ("█")
+      * 4: Underline ("_")
+      * 6: Bar ("|")
+      * 7: Snowman ("☃")
+      */
+      static unsigned int cursorshape = 2;
+
+      /*
+      * Default columns and rows numbers
+      */
+
+      static unsigned int cols = 80;
+      static unsigned int rows = 24;
+
+      /*
+      * Default shape of the mouse cursor
+      */
+
+      static char* mouseshape = "xterm";
+
+      /*
+      * Color used to display font attributes when fontconfig selected a font which
+      * doesn't match the ones requested.
+      */
+      static unsigned int defaultattr = 11;
+
+      /*
+      * Force mouse select/shortcuts while mask is active (when MODE_MOUSE is set).
+      * Note that if you want to use ShiftMask with selmasks, set this to an other
+      * modifier, set to 0 to not use it.
+      */
+      static uint forcemousemod = ShiftMask;
+
+      /*
+      * Xresources preferences to load at startup
+      */
+      ResourcePref resources[] = {
+          { "font",         STRING,  &font },
+          { "color0",       STRING,  &colorname[0] },
+          { "color1",       STRING,  &colorname[1] },
+          { "color2",       STRING,  &colorname[2] },
+          { "color3",       STRING,  &colorname[3] },
+          { "color4",       STRING,  &colorname[4] },
+          { "color5",       STRING,  &colorname[5] },
+          { "color6",       STRING,  &colorname[6] },
+          { "color7",       STRING,  &colorname[7] },
+          { "color8",       STRING,  &colorname[8] },
+          { "color9",       STRING,  &colorname[9] },
+          { "color10",      STRING,  &colorname[10] },
+          { "color11",      STRING,  &colorname[11] },
+          { "color12",      STRING,  &colorname[12] },
+          { "color13",      STRING,  &colorname[13] },
+          { "color14",      STRING,  &colorname[14] },
+          { "color15",      STRING,  &colorname[15] },
+          { "background",   STRING,  &colorname[256] },
+          { "foreground",   STRING,  &colorname[257] },
+          { "cursorColor",  STRING,  &colorname[258] },
+          { "selection",    STRING,  &colorname[259] },
+          { "termname",     STRING,  &termname },
+          { "shell",        STRING,  &shell },
+          { "xfps",         INTEGER, &xfps },
+          { "actionfps",    INTEGER, &actionfps },
+          { "blinktimeout", INTEGER, &blinktimeout },
+          { "bellvolume",   INTEGER, &bellvolume },
+          { "tabspaces",    INTEGER, &tabspaces },
+          { "borderpx",     INTEGER, &borderpx },
+          { "cwscale",      FLOAT,   &cwscale },
+          { "chscale",      FLOAT,   &chscale },
+      };
+
+      /*
+      * Internal mouse shortcuts.
+      * Beware that overloading Button1 will disable the selection.
+      */
+      static MouseShortcut mshortcuts[] = {
+        /* mask                 button   function        argument       release */
+        { XK_ANY_MOD,           Button2, selpaste,       {.i = 0},      1 },
+        { XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },
+        { XK_ANY_MOD,           Button5, ttysend,        {.s = "\005"} },
+      };
+
+      /* Internal keyboard shortcuts. */
+      #define MODKEY Mod1Mask
+      #define TERMMOD (ControlMask|ShiftMask)
+
+      static Shortcut shortcuts[] = {
+        /* mask                 keysym          function        argument */
+        { XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
+        { ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
+        { ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
+        { XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
+        { TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
+        { TERMMOD,              XK_Next,        zoom,           {.f = -1} },
+        { TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
+        { TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
+        { TERMMOD,              XK_V,           clippaste,      {.i =  0} },
+        { TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+        { ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
+        { TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+      };
+
+      /*
+      * Special keys (change & recompile st.info accordingly)
+      *
+      * Mask value:
+      * * Use XK_ANY_MOD to match the key no matter modifiers state
+      * * Use XK_NO_MOD to match the key alone (no modifiers)
+      * appkey value:
+      * * 0: no value
+      * * > 0: keypad application mode enabled
+      * *   = 2: term.numlock = 1
+      * * < 0: keypad application mode disabled
+      * appcursor value:
+      * * 0: no value
+      * * > 0: cursor application mode enabled
+      * * < 0: cursor application mode disabled
+      *
+      * Be careful with the order of the definitions because st searches in
+      * this table sequentially, so any XK_ANY_MOD must be in the last
+      * position for a key.
+      */
+
+      /*
+      * If you want keys other than the X11 function keys (0xFD00 - 0xFFFF)
+      * to be mapped below, add them to this array.
+      */
+      static KeySym mappedkeys[] = { -1 };
+
+      /*
+      * State bits to ignore when matching key or button events.  By default,
+      * numlock (Mod2Mask) and keyboard layout (XK_SWITCH_MOD) are ignored.
+      */
+      static uint ignoremod = Mod2Mask|XK_SWITCH_MOD;
+
+      /*
+      * This is the huge key array which defines all compatibility to the Linux
+      * world. Please decide about changes wisely.
+      */
+      static Key key[] = {
+        /* keysym           mask            string      appkey appcursor */
+        { XK_KP_Home,       ShiftMask,      "\033[2J",       0,   -1},
+        { XK_KP_Home,       ShiftMask,      "\033[1;2H",     0,   +1},
+        { XK_KP_Home,       XK_ANY_MOD,     "\033[H",        0,   -1},
+        { XK_KP_Home,       XK_ANY_MOD,     "\033[1~",       0,   +1},
+        { XK_KP_Up,         XK_ANY_MOD,     "\033Ox",       +1,    0},
+        { XK_KP_Up,         XK_ANY_MOD,     "\033[A",        0,   -1},
+        { XK_KP_Up,         XK_ANY_MOD,     "\033OA",        0,   +1},
+        { XK_KP_Down,       XK_ANY_MOD,     "\033Or",       +1,    0},
+        { XK_KP_Down,       XK_ANY_MOD,     "\033[B",        0,   -1},
+        { XK_KP_Down,       XK_ANY_MOD,     "\033OB",        0,   +1},
+        { XK_KP_Left,       XK_ANY_MOD,     "\033Ot",       +1,    0},
+        { XK_KP_Left,       XK_ANY_MOD,     "\033[D",        0,   -1},
+        { XK_KP_Left,       XK_ANY_MOD,     "\033OD",        0,   +1},
+        { XK_KP_Right,      XK_ANY_MOD,     "\033Ov",       +1,    0},
+        { XK_KP_Right,      XK_ANY_MOD,     "\033[C",        0,   -1},
+        { XK_KP_Right,      XK_ANY_MOD,     "\033OC",        0,   +1},
+        { XK_KP_Prior,      ShiftMask,      "\033[5;2~",     0,    0},
+        { XK_KP_Prior,      XK_ANY_MOD,     "\033[5~",       0,    0},
+        { XK_KP_Begin,      XK_ANY_MOD,     "\033[E",        0,    0},
+        { XK_KP_End,        ControlMask,    "\033[J",       -1,    0},
+        { XK_KP_End,        ControlMask,    "\033[1;5F",    +1,    0},
+        { XK_KP_End,        ShiftMask,      "\033[K",       -1,    0},
+        { XK_KP_End,        ShiftMask,      "\033[1;2F",    +1,    0},
+        { XK_KP_End,        XK_ANY_MOD,     "\033[4~",       0,    0},
+        { XK_KP_Next,       ShiftMask,      "\033[6;2~",     0,    0},
+        { XK_KP_Next,       XK_ANY_MOD,     "\033[6~",       0,    0},
+        { XK_KP_Insert,     ShiftMask,      "\033[2;2~",    +1,    0},
+        { XK_KP_Insert,     ShiftMask,      "\033[4l",      -1,    0},
+        { XK_KP_Insert,     ControlMask,    "\033[L",       -1,    0},
+        { XK_KP_Insert,     ControlMask,    "\033[2;5~",    +1,    0},
+        { XK_KP_Insert,     XK_ANY_MOD,     "\033[4h",      -1,    0},
+        { XK_KP_Insert,     XK_ANY_MOD,     "\033[2~",      +1,    0},
+        { XK_KP_Delete,     ControlMask,    "\033[M",       -1,    0},
+        { XK_KP_Delete,     ControlMask,    "\033[3;5~",    +1,    0},
+        { XK_KP_Delete,     ShiftMask,      "\033[2K",      -1,    0},
+        { XK_KP_Delete,     ShiftMask,      "\033[3;2~",    +1,    0},
+        { XK_KP_Delete,     XK_ANY_MOD,     "\033[P",       -1,    0},
+        { XK_KP_Delete,     XK_ANY_MOD,     "\033[3~",      +1,    0},
+        { XK_KP_Multiply,   XK_ANY_MOD,     "\033Oj",       +2,    0},
+        { XK_KP_Add,        XK_ANY_MOD,     "\033Ok",       +2,    0},
+        { XK_KP_Enter,      XK_ANY_MOD,     "\033OM",       +2,    0},
+        { XK_KP_Enter,      XK_ANY_MOD,     "\r",           -1,    0},
+        { XK_KP_Subtract,   XK_ANY_MOD,     "\033Om",       +2,    0},
+        { XK_KP_Decimal,    XK_ANY_MOD,     "\033On",       +2,    0},
+        { XK_KP_Divide,     XK_ANY_MOD,     "\033Oo",       +2,    0},
+        { XK_KP_0,          XK_ANY_MOD,     "\033Op",       +2,    0},
+        { XK_KP_1,          XK_ANY_MOD,     "\033Oq",       +2,    0},
+        { XK_KP_2,          XK_ANY_MOD,     "\033Or",       +2,    0},
+        { XK_KP_3,          XK_ANY_MOD,     "\033Os",       +2,    0},
+        { XK_KP_4,          XK_ANY_MOD,     "\033Ot",       +2,    0},
+        { XK_KP_5,          XK_ANY_MOD,     "\033Ou",       +2,    0},
+        { XK_KP_6,          XK_ANY_MOD,     "\033Ov",       +2,    0},
+        { XK_KP_7,          XK_ANY_MOD,     "\033Ow",       +2,    0},
+        { XK_KP_8,          XK_ANY_MOD,     "\033Ox",       +2,    0},
+        { XK_KP_9,          XK_ANY_MOD,     "\033Oy",       +2,    0},
+        { XK_Up,            ShiftMask,      "\033[1;2A",     0,    0},
+        { XK_Up,            Mod1Mask,       "\033[1;3A",     0,    0},
+        { XK_Up,         ShiftMask|Mod1Mask,"\033[1;4A",     0,    0},
+        { XK_Up,            ControlMask,    "\033[1;5A",     0,    0},
+        { XK_Up,      ShiftMask|ControlMask,"\033[1;6A",     0,    0},
+        { XK_Up,       ControlMask|Mod1Mask,"\033[1;7A",     0,    0},
+        { XK_Up,ShiftMask|ControlMask|Mod1Mask,"\033[1;8A",  0,    0},
+        { XK_Up,            XK_ANY_MOD,     "\033[A",        0,   -1},
+        { XK_Up,            XK_ANY_MOD,     "\033OA",        0,   +1},
+        { XK_Down,          ShiftMask,      "\033[1;2B",     0,    0},
+        { XK_Down,          Mod1Mask,       "\033[1;3B",     0,    0},
+        { XK_Down,       ShiftMask|Mod1Mask,"\033[1;4B",     0,    0},
+        { XK_Down,          ControlMask,    "\033[1;5B",     0,    0},
+        { XK_Down,    ShiftMask|ControlMask,"\033[1;6B",     0,    0},
+        { XK_Down,     ControlMask|Mod1Mask,"\033[1;7B",     0,    0},
+        { XK_Down,ShiftMask|ControlMask|Mod1Mask,"\033[1;8B",0,    0},
+        { XK_Down,          XK_ANY_MOD,     "\033[B",        0,   -1},
+        { XK_Down,          XK_ANY_MOD,     "\033OB",        0,   +1},
+        { XK_Left,          ShiftMask,      "\033[1;2D",     0,    0},
+        { XK_Left,          Mod1Mask,       "\033[1;3D",     0,    0},
+        { XK_Left,       ShiftMask|Mod1Mask,"\033[1;4D",     0,    0},
+        { XK_Left,          ControlMask,    "\033[1;5D",     0,    0},
+        { XK_Left,    ShiftMask|ControlMask,"\033[1;6D",     0,    0},
+        { XK_Left,     ControlMask|Mod1Mask,"\033[1;7D",     0,    0},
+        { XK_Left,ShiftMask|ControlMask|Mod1Mask,"\033[1;8D",0,    0},
+        { XK_Left,          XK_ANY_MOD,     "\033[D",        0,   -1},
+        { XK_Left,          XK_ANY_MOD,     "\033OD",        0,   +1},
+        { XK_Right,         ShiftMask,      "\033[1;2C",     0,    0},
+        { XK_Right,         Mod1Mask,       "\033[1;3C",     0,    0},
+        { XK_Right,      ShiftMask|Mod1Mask,"\033[1;4C",     0,    0},
+        { XK_Right,         ControlMask,    "\033[1;5C",     0,    0},
+        { XK_Right,   ShiftMask|ControlMask,"\033[1;6C",     0,    0},
+        { XK_Right,    ControlMask|Mod1Mask,"\033[1;7C",     0,    0},
+        { XK_Right,ShiftMask|ControlMask|Mod1Mask,"\033[1;8C",0,   0},
+        { XK_Right,         XK_ANY_MOD,     "\033[C",        0,   -1},
+        { XK_Right,         XK_ANY_MOD,     "\033OC",        0,   +1},
+        { XK_ISO_Left_Tab,  ShiftMask,      "\033[Z",        0,    0},
+        { XK_Return,        Mod1Mask,       "\033\r",        0,    0},
+        { XK_Return,        XK_ANY_MOD,     "\r",            0,    0},
+        { XK_Insert,        ShiftMask,      "\033[4l",      -1,    0},
+        { XK_Insert,        ShiftMask,      "\033[2;2~",    +1,    0},
+        { XK_Insert,        ControlMask,    "\033[L",       -1,    0},
+        { XK_Insert,        ControlMask,    "\033[2;5~",    +1,    0},
+        { XK_Insert,        XK_ANY_MOD,     "\033[4h",      -1,    0},
+        { XK_Insert,        XK_ANY_MOD,     "\033[2~",      +1,    0},
+        { XK_Delete,        ControlMask,    "\033[M",       -1,    0},
+        { XK_Delete,        ControlMask,    "\033[3;5~",    +1,    0},
+        { XK_Delete,        ShiftMask,      "\033[2K",      -1,    0},
+        { XK_Delete,        ShiftMask,      "\033[3;2~",    +1,    0},
+        { XK_Delete,        XK_ANY_MOD,     "\033[P",       -1,    0},
+        { XK_Delete,        XK_ANY_MOD,     "\033[3~",      +1,    0},
+        { XK_BackSpace,     XK_NO_MOD,      "\177",          0,    0},
+        { XK_BackSpace,     Mod1Mask,       "\033\177",      0,    0},
+        { XK_Home,          ShiftMask,      "\033[2J",       0,   -1},
+        { XK_Home,          ShiftMask,      "\033[1;2H",     0,   +1},
+        { XK_Home,          XK_ANY_MOD,     "\033[H",        0,   -1},
+        { XK_Home,          XK_ANY_MOD,     "\033[1~",       0,   +1},
+        { XK_End,           ControlMask,    "\033[J",       -1,    0},
+        { XK_End,           ControlMask,    "\033[1;5F",    +1,    0},
+        { XK_End,           ShiftMask,      "\033[K",       -1,    0},
+        { XK_End,           ShiftMask,      "\033[1;2F",    +1,    0},
+        { XK_End,           XK_ANY_MOD,     "\033[4~",       0,    0},
+        { XK_Prior,         ControlMask,    "\033[5;5~",     0,    0},
+        { XK_Prior,         ShiftMask,      "\033[5;2~",     0,    0},
+        { XK_Prior,         XK_ANY_MOD,     "\033[5~",       0,    0},
+        { XK_Next,          ControlMask,    "\033[6;5~",     0,    0},
+        { XK_Next,          ShiftMask,      "\033[6;2~",     0,    0},
+        { XK_Next,          XK_ANY_MOD,     "\033[6~",       0,    0},
+        { XK_F1,            XK_NO_MOD,      "\033OP" ,       0,    0},
+        { XK_F1, /* F13 */  ShiftMask,      "\033[1;2P",     0,    0},
+        { XK_F1, /* F25 */  ControlMask,    "\033[1;5P",     0,    0},
+        { XK_F1, /* F37 */  Mod4Mask,       "\033[1;6P",     0,    0},
+        { XK_F1, /* F49 */  Mod1Mask,       "\033[1;3P",     0,    0},
+        { XK_F1, /* F61 */  Mod3Mask,       "\033[1;4P",     0,    0},
+        { XK_F2,            XK_NO_MOD,      "\033OQ" ,       0,    0},
+        { XK_F2, /* F14 */  ShiftMask,      "\033[1;2Q",     0,    0},
+        { XK_F2, /* F26 */  ControlMask,    "\033[1;5Q",     0,    0},
+        { XK_F2, /* F38 */  Mod4Mask,       "\033[1;6Q",     0,    0},
+        { XK_F2, /* F50 */  Mod1Mask,       "\033[1;3Q",     0,    0},
+        { XK_F2, /* F62 */  Mod3Mask,       "\033[1;4Q",     0,    0},
+        { XK_F3,            XK_NO_MOD,      "\033OR" ,       0,    0},
+        { XK_F3, /* F15 */  ShiftMask,      "\033[1;2R",     0,    0},
+        { XK_F3, /* F27 */  ControlMask,    "\033[1;5R",     0,    0},
+        { XK_F3, /* F39 */  Mod4Mask,       "\033[1;6R",     0,    0},
+        { XK_F3, /* F51 */  Mod1Mask,       "\033[1;3R",     0,    0},
+        { XK_F3, /* F63 */  Mod3Mask,       "\033[1;4R",     0,    0},
+        { XK_F4,            XK_NO_MOD,      "\033OS" ,       0,    0},
+        { XK_F4, /* F16 */  ShiftMask,      "\033[1;2S",     0,    0},
+        { XK_F4, /* F28 */  ControlMask,    "\033[1;5S",     0,    0},
+        { XK_F4, /* F40 */  Mod4Mask,       "\033[1;6S",     0,    0},
+        { XK_F4, /* F52 */  Mod1Mask,       "\033[1;3S",     0,    0},
+        { XK_F5,            XK_NO_MOD,      "\033[15~",      0,    0},
+        { XK_F5, /* F17 */  ShiftMask,      "\033[15;2~",    0,    0},
+        { XK_F5, /* F29 */  ControlMask,    "\033[15;5~",    0,    0},
+        { XK_F5, /* F41 */  Mod4Mask,       "\033[15;6~",    0,    0},
+        { XK_F5, /* F53 */  Mod1Mask,       "\033[15;3~",    0,    0},
+        { XK_F6,            XK_NO_MOD,      "\033[17~",      0,    0},
+        { XK_F6, /* F18 */  ShiftMask,      "\033[17;2~",    0,    0},
+        { XK_F6, /* F30 */  ControlMask,    "\033[17;5~",    0,    0},
+        { XK_F6, /* F42 */  Mod4Mask,       "\033[17;6~",    0,    0},
+        { XK_F6, /* F54 */  Mod1Mask,       "\033[17;3~",    0,    0},
+        { XK_F7,            XK_NO_MOD,      "\033[18~",      0,    0},
+        { XK_F7, /* F19 */  ShiftMask,      "\033[18;2~",    0,    0},
+        { XK_F7, /* F31 */  ControlMask,    "\033[18;5~",    0,    0},
+        { XK_F7, /* F43 */  Mod4Mask,       "\033[18;6~",    0,    0},
+        { XK_F7, /* F55 */  Mod1Mask,       "\033[18;3~",    0,    0},
+        { XK_F8,            XK_NO_MOD,      "\033[19~",      0,    0},
+        { XK_F8, /* F20 */  ShiftMask,      "\033[19;2~",    0,    0},
+        { XK_F8, /* F32 */  ControlMask,    "\033[19;5~",    0,    0},
+        { XK_F8, /* F44 */  Mod4Mask,       "\033[19;6~",    0,    0},
+        { XK_F8, /* F56 */  Mod1Mask,       "\033[19;3~",    0,    0},
+        { XK_F9,            XK_NO_MOD,      "\033[20~",      0,    0},
+        { XK_F9, /* F21 */  ShiftMask,      "\033[20;2~",    0,    0},
+        { XK_F9, /* F33 */  ControlMask,    "\033[20;5~",    0,    0},
+        { XK_F9, /* F45 */  Mod4Mask,       "\033[20;6~",    0,    0},
+        { XK_F9, /* F57 */  Mod1Mask,       "\033[20;3~",    0,    0},
+        { XK_F10,           XK_NO_MOD,      "\033[21~",      0,    0},
+        { XK_F10, /* F22 */ ShiftMask,      "\033[21;2~",    0,    0},
+        { XK_F10, /* F34 */ ControlMask,    "\033[21;5~",    0,    0},
+        { XK_F10, /* F46 */ Mod4Mask,       "\033[21;6~",    0,    0},
+        { XK_F10, /* F58 */ Mod1Mask,       "\033[21;3~",    0,    0},
+        { XK_F11,           XK_NO_MOD,      "\033[23~",      0,    0},
+        { XK_F11, /* F23 */ ShiftMask,      "\033[23;2~",    0,    0},
+        { XK_F11, /* F35 */ ControlMask,    "\033[23;5~",    0,    0},
+        { XK_F11, /* F47 */ Mod4Mask,       "\033[23;6~",    0,    0},
+        { XK_F11, /* F59 */ Mod1Mask,       "\033[23;3~",    0,    0},
+        { XK_F12,           XK_NO_MOD,      "\033[24~",      0,    0},
+        { XK_F12, /* F24 */ ShiftMask,      "\033[24;2~",    0,    0},
+        { XK_F12, /* F36 */ ControlMask,    "\033[24;5~",    0,    0},
+        { XK_F12, /* F48 */ Mod4Mask,       "\033[24;6~",    0,    0},
+        { XK_F12, /* F60 */ Mod1Mask,       "\033[24;3~",    0,    0},
+        { XK_F13,           XK_NO_MOD,      "\033[1;2P",     0,    0},
+        { XK_F14,           XK_NO_MOD,      "\033[1;2Q",     0,    0},
+        { XK_F15,           XK_NO_MOD,      "\033[1;2R",     0,    0},
+        { XK_F16,           XK_NO_MOD,      "\033[1;2S",     0,    0},
+        { XK_F17,           XK_NO_MOD,      "\033[15;2~",    0,    0},
+        { XK_F18,           XK_NO_MOD,      "\033[17;2~",    0,    0},
+        { XK_F19,           XK_NO_MOD,      "\033[18;2~",    0,    0},
+        { XK_F20,           XK_NO_MOD,      "\033[19;2~",    0,    0},
+        { XK_F21,           XK_NO_MOD,      "\033[20;2~",    0,    0},
+        { XK_F22,           XK_NO_MOD,      "\033[21;2~",    0,    0},
+        { XK_F23,           XK_NO_MOD,      "\033[23;2~",    0,    0},
+        { XK_F24,           XK_NO_MOD,      "\033[24;2~",    0,    0},
+        { XK_F25,           XK_NO_MOD,      "\033[1;5P",     0,    0},
+        { XK_F26,           XK_NO_MOD,      "\033[1;5Q",     0,    0},
+        { XK_F27,           XK_NO_MOD,      "\033[1;5R",     0,    0},
+        { XK_F28,           XK_NO_MOD,      "\033[1;5S",     0,    0},
+        { XK_F29,           XK_NO_MOD,      "\033[15;5~",    0,    0},
+        { XK_F30,           XK_NO_MOD,      "\033[17;5~",    0,    0},
+        { XK_F31,           XK_NO_MOD,      "\033[18;5~",    0,    0},
+        { XK_F32,           XK_NO_MOD,      "\033[19;5~",    0,    0},
+        { XK_F33,           XK_NO_MOD,      "\033[20;5~",    0,    0},
+        { XK_F34,           XK_NO_MOD,      "\033[21;5~",    0,    0},
+        { XK_F35,           XK_NO_MOD,      "\033[23;5~",    0,    0},
+      };
+
+      /*
+      * Selection types' masks.
+      * Use the same masks as usual.
+      * Button1Mask is always unset, to make masks match between ButtonPress.
+      * ButtonRelease and MotionNotify.
+      * If no match is found, regular selection is used.
+      */
+      static uint selmasks[] = {
+        [SEL_RECTANGULAR] = Mod1Mask,
+      };
+
+      /*
+      * Printable characters in ASCII, used to estimate the advance width
+      * of single wide characters.
+      */
+      static char ascii_printable[] =
+        " !\"#$%&'()*+,-./0123456789:;<=>?"
+        "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+        "`abcdefghijklmnopqrstuvwxyz{|}~";
+    '';
+  in ((pkgs.st.override {
+    patches = [ /etc/nixos/st-patches.diff ];
+    extraLibs = with pkgs; [ harfbuzz xorg.libXcursor ];
+  }).overrideAttrs (oldAttrs: {
+    preBuild = "cp ${config} config.h";
+    src = builtins.fetchGit {
+      url = "git://git.suckless.org/st";
+      ref = "master";
+      rev = "5703aa0390484dd7da4bd9c388c85708d8fcd339";
+    };
+  }));
   terminal-emulator = "${st}/bin/st";
 in {
   nixpkgs.overlays = [
@@ -566,7 +565,10 @@ in {
   ];
 
   imports = [
-    "${fetchTarball "https://github.com/msteen/nixos-vscode-server/tarball/master"}/modules/vscode-server/home.nix"
+    "${
+      fetchTarball
+      "https://github.com/msteen/nixos-vscode-server/tarball/master"
+    }/modules/vscode-server/home.nix"
   ];
 
   programs.home-manager.enable = true;
@@ -1382,18 +1384,15 @@ in {
     };
     vscode = {
       enable = true;
-      package = unstable.vscode-fhsWithPackages (ps: with ps; [
-        python3
-      ]);
-      extensions = (with unstable.vscode-extensions; [
-        bbenoist.nix
-        vscodevim.vim
-      ]) ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [{
-        name = "direnv";
-        publisher = "mkhl";
-        version = "0.6.1";
-        sha256 = "5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
-      }];
+      package = unstable.vscode-fhsWithPackages (ps: with ps; [ python3 ]);
+      extensions =
+        (with unstable.vscode-extensions; [ bbenoist.nix vscodevim.vim ])
+        ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [{
+          name = "direnv";
+          publisher = "mkhl";
+          version = "0.6.1";
+          sha256 = "5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
+        }];
     };
     zathura = {
       enable = true;
@@ -1525,265 +1524,259 @@ in {
         i3GapsSupport = true;
         mpdSupport = true;
       };
-      settings = 
-        let
-          superColors = colors;
-        in let
-          colors = superColors // {
-            background = colors.nord0;
-            background-alt = colors.nord1;
-            foreground = colors.nord9;
-            foreground-alt = colors.nord10;
-            primary = colors.nord9;
-            secondary = colors.nord10;
-            alert = colors.nord12;
-          };
-        in
-          {
-            settings = {
-              screenchange-reload = true;
-            };
-            "bar/top" = {
-              inherit (colors) background foreground;
-              monitor = "\${env:MONITOR:}";
-              dpi = 0;
-              width = 1920;
-              height = 24;
+      settings = let superColors = colors;
+      in let
+        colors = superColors // {
+          background = colors.nord0;
+          background-alt = colors.nord1;
+          foreground = colors.nord9;
+          foreground-alt = colors.nord10;
+          primary = colors.nord9;
+          secondary = colors.nord10;
+          alert = colors.nord12;
+        };
+      in {
+        settings = { screenchange-reload = true; };
+        "bar/top" = {
+          inherit (colors) background foreground;
+          monitor = "\${env:MONITOR:}";
+          dpi = 0;
+          width = 1920;
+          height = 24;
 
-              modules-left = "i3 title";
-              # modules-center = "mpd";
-              modules-right = "pipewire-simple xkeyboard battery date";
+          modules-left = "i3 title";
+          # modules-center = "mpd";
+          modules-right = "pipewire-simple xkeyboard battery date";
 
-              tray-position = "right";
-              tray-padding = 2;
-              tray-maxsize = 32;
-              tray-foreground = colors.nord4;
-              tray-background = colors.background;
-              tray-prefix = "";
-              tray-prefix-font = 4;
-              tray-prefix-foreground = colors.nord3;
-              tray-prefix-background = colors.nord0;
+          tray-position = "right";
+          tray-padding = 2;
+          tray-maxsize = 32;
+          tray-foreground = colors.nord4;
+          tray-background = colors.background;
+          tray-prefix = "";
+          tray-prefix-font = 4;
+          tray-prefix-foreground = colors.nord3;
+          tray-prefix-background = colors.nord0;
 
-              scroll-up = "i3wm-wsnext";
-              scroll-down = "i3wm-wsprev";
+          scroll-up = "i3wm-wsnext";
+          scroll-down = "i3wm-wsprev";
 
-              font-0 = "Iosevka Nerd Font:size=10;3";
-              font-1 = "Iosevka Nerd Font:size=10;3";
-              font-2 = "Iosevka Nerd Font:size=8;3";
-              font-3 = "Iosevka Nerd Font:size=16;4";
-              font-4 = "Iosevka Nerd Font:size=20;0";
-            };
-            "module/i3" = {
-              type = "internal/i3";
-              strip-wsnumbers = true;
-              format = "<label-state><label-mode>";
-              format-foreground = colors.nord0;
-              format-background = colors.nord3;
-              format-padding-left = 1;
-              format-prefix = ''" "'';
-              format-suffix = "";
-              format-suffix-font = 4;
-              format-suffix-foreground = colors.nord3;
-              format-suffix-background = colors.nord1;
-              index-sort = true;
-              enable-scroll = false;
-              wrapping-scroll = false;
+          font-0 = "Iosevka Nerd Font:size=10;3";
+          font-1 = "Iosevka Nerd Font:size=10;3";
+          font-2 = "Iosevka Nerd Font:size=8;3";
+          font-3 = "Iosevka Nerd Font:size=16;4";
+          font-4 = "Iosevka Nerd Font:size=20;0";
+        };
+        "module/i3" = {
+          type = "internal/i3";
+          strip-wsnumbers = true;
+          format = "<label-state><label-mode>";
+          format-foreground = colors.nord0;
+          format-background = colors.nord3;
+          format-padding-left = 1;
+          format-prefix = ''" "'';
+          format-suffix = "";
+          format-suffix-font = 4;
+          format-suffix-foreground = colors.nord3;
+          format-suffix-background = colors.nord1;
+          index-sort = true;
+          enable-scroll = false;
+          wrapping-scroll = false;
 
-              label-mode-padding = 1;
-              label-mode-font = 2;
-              label-mode-foreground = colors.nord3;
-              label-mode-background = "\${self.format-background}";
+          label-mode-padding = 1;
+          label-mode-font = 2;
+          label-mode-foreground = colors.nord3;
+          label-mode-background = "\${self.format-background}";
 
-              # unfocused = Inactive workspace on any monitor
-              label-unfocused = "%name%";
-              label-unfocused-foreground = "\${self.format-foreground}";
-              label-unfocused-background = "\${self.format-background}";
-              label-unfocused-padding = 1;
+          # unfocused = Inactive workspace on any monitor
+          label-unfocused = "%name%";
+          label-unfocused-foreground = "\${self.format-foreground}";
+          label-unfocused-background = "\${self.format-background}";
+          label-unfocused-padding = 1;
 
-              # focused = Active workspace on focused monitor
-              label-focused = "%name%";
-              label-focused-foreground = colors.nord6;
-              label-focused-background = "\${self.format-background}";
-              label-focused-padding = 1;
+          # focused = Active workspace on focused monitor
+          label-focused = "%name%";
+          label-focused-foreground = colors.nord6;
+          label-focused-background = "\${self.format-background}";
+          label-focused-padding = 1;
 
-              # visible = Active workspace on unfocused monitor
-              label-visible = "%name%";
-              label-visible-foreground = colors.nord10;
-              label-visible-background = "\${self.format-background}";
-              label-visible-padding = 1;
+          # visible = Active workspace on unfocused monitor
+          label-visible = "%name%";
+          label-visible-foreground = colors.nord10;
+          label-visible-background = "\${self.format-background}";
+          label-visible-padding = 1;
 
-              # urgent = Workspace with urgency hint set
-              label-urgent = "%name%";
-              label-urgent-foreground = colors.nord13;
-              label-urgent-background = "\${self.format-background}";
-              label-urgent-padding = 1;
-            };
-            "module/title" = {
-              type = "internal/xwindow";
-              format-background = colors.nord1;
-              format-suffix = "";
-              format-suffix-font = 4;
-              format-suffix-foreground = colors.nord1;
-              format-suffix-background = colors.background;
-              # Prepend a zero-width space to keep rendering
-              # the suffix even on an empty workspace
-              label = "​%title:0:50:…%";
-              label-foreground = colors.nord4;
-              label-background = "\${self.format-background}";
-              label-padding = 1;
-              label-font = 3;
-            };
-            "module/mpd" = {
-              type = "internal/mpd";
-              format-online = "<label-song> <bar-progress> <label-time>  <icon-prev> <icon-seekb> <icon-stop> <toggle> <icon-seekf> <icon-next>  <icon-repeat> <icon-random>";
-              format-online-foreground = colors.nord1;
+          # urgent = Workspace with urgency hint set
+          label-urgent = "%name%";
+          label-urgent-foreground = colors.nord13;
+          label-urgent-background = "\${self.format-background}";
+          label-urgent-padding = 1;
+        };
+        "module/title" = {
+          type = "internal/xwindow";
+          format-background = colors.nord1;
+          format-suffix = "";
+          format-suffix-font = 4;
+          format-suffix-foreground = colors.nord1;
+          format-suffix-background = colors.background;
+          # Prepend a zero-width space to keep rendering
+          # the suffix even on an empty workspace
+          label = "​%title:0:50:…%";
+          label-foreground = colors.nord4;
+          label-background = "\${self.format-background}";
+          label-padding = 1;
+          label-font = 3;
+        };
+        "module/mpd" = {
+          type = "internal/mpd";
+          format-online =
+            "<label-song> <bar-progress> <label-time>  <icon-prev> <icon-seekb> <icon-stop> <toggle> <icon-seekf> <icon-next>  <icon-repeat> <icon-random>";
+          format-online-foreground = colors.nord1;
 
-              icon-foreground = "\${self.format-online-foreground}";
+          icon-foreground = "\${self.format-online-foreground}";
 
-              icon-play = "⏵";
-              icon-pause = "⏸";
-              icon-stop = "⏹";
-              icon-prev = "⏮";
-              icon-next = "⏭";
-              icon-seekb = "⏪";
-              icon-seekf = "⏩";
-              icon-random = "🔀";
-              icon-repeat = "🔁";
+          icon-play = "⏵";
+          icon-pause = "⏸";
+          icon-stop = "⏹";
+          icon-prev = "⏮";
+          icon-next = "⏭";
+          icon-seekb = "⏪";
+          icon-seekf = "⏩";
+          icon-random = "🔀";
+          icon-repeat = "🔁";
 
-              icon-play-foreground = "\${self.icon-foreground}";
-              icon-pause-foreground = "\${self.icon-foreground}";
-              icon-stop-foreground = "\${self.icon-foreground}";
-              icon-prev-foreground = "\${self.icon-foreground}";
-              icon-next-foreground = "\${self.icon-foreground}";
-              icon-seekb-foreground = "\${self.icon-foreground}";
-              icon-seekf-foreground = "\${self.icon-foreground}";
-              icon-random-foreground = "\${self.icon-foreground}";
-              icon-repeat-foreground = "\${self.icon-foreground}";
+          icon-play-foreground = "\${self.icon-foreground}";
+          icon-pause-foreground = "\${self.icon-foreground}";
+          icon-stop-foreground = "\${self.icon-foreground}";
+          icon-prev-foreground = "\${self.icon-foreground}";
+          icon-next-foreground = "\${self.icon-foreground}";
+          icon-seekb-foreground = "\${self.icon-foreground}";
+          icon-seekf-foreground = "\${self.icon-foreground}";
+          icon-random-foreground = "\${self.icon-foreground}";
+          icon-repeat-foreground = "\${self.icon-foreground}";
 
-              toggle-off-foreground = "\${self.icon-foreground}";
-              toggle-on-foreground = colors.nord4;
+          toggle-off-foreground = "\${self.icon-foreground}";
+          toggle-on-foreground = colors.nord4;
 
-              label-song-maxlen = 50;
-              label-song-ellipsis = true;
-              label-song-font = 3;
-              label-song-foreground = colors.nord4;
+          label-song-maxlen = 50;
+          label-song-ellipsis = true;
+          label-song-font = 3;
+          label-song-foreground = colors.nord4;
 
-              label-time-font = 3;
-              label-time-foreground = colors.nord4;
+          label-time-font = 3;
+          label-time-foreground = colors.nord4;
 
-              bar-progress-width = 30;
-              bar-progress-indicator = "|";
-              bar-progress-indicator-foreground = colors.nord2;
-              bar-progress-fill = "─";
-              bar-progress-fill-foreground = colors.nord4;
-              bar-progress-empty = "─";
-              bar-progress-empty-foreground = colors.nord3;
-            };
-            "module/xkeyboard" = {
-              type = "internal/xkeyboard";
-              blacklist-0 = "num lock";
+          bar-progress-width = 30;
+          bar-progress-indicator = "|";
+          bar-progress-indicator-foreground = colors.nord2;
+          bar-progress-fill = "─";
+          bar-progress-fill-foreground = colors.nord4;
+          bar-progress-empty = "─";
+          bar-progress-empty-foreground = colors.nord3;
+        };
+        "module/xkeyboard" = {
+          type = "internal/xkeyboard";
+          blacklist-0 = "num lock";
 
-              format-prefix = " ";
-              format-prefix-foreground = colors.foreground-alt;
-              format-prefix-underline = colors.secondary;
+          format-prefix = " ";
+          format-prefix-foreground = colors.foreground-alt;
+          format-prefix-underline = colors.secondary;
 
-              label-layout = "%name%";
-              label-layout-underline = colors.secondary;
+          label-layout = "%name%";
+          label-layout-underline = colors.secondary;
 
-              label-indicator-padding = 2;
-              label-indicator-margin = 1;
-              label-indicator-background = colors.secondary;
-              label-indicator-underline = colors.secondary;
-            };
-            "module/date" = {
-              type = "internal/date";
-              interval = 1;
+          label-indicator-padding = 2;
+          label-indicator-margin = 1;
+          label-indicator-background = colors.secondary;
+          label-indicator-underline = colors.secondary;
+        };
+        "module/date" = {
+          type = "internal/date";
+          interval = 1;
 
-              date = "";
-              date-alt = " %Y-%m-%d";
+          date = "";
+          date-alt = " %Y-%m-%d";
 
-              time = "%H:%M";
-              time-alt = "%H:%M:%S";
+          time = "%H:%M";
+          time-alt = "%H:%M:%S";
 
-              format-prefix = "|";
-              format-prefix-foreground = colors.foreground-alt;
-              format-underline = colors.nord10;
+          format-prefix = "|";
+          format-prefix-foreground = colors.foreground-alt;
+          format-underline = colors.nord10;
 
-              label = "%date% %time%";
-            };
-            "module/battery" = {
-              type = "internal/battery";
-              battery = "BAT0";
-              adapter = "ADP1";
-              full-at = "98";
+          label = "%date% %time%";
+        };
+        "module/battery" = {
+          type = "internal/battery";
+          battery = "BAT0";
+          adapter = "ADP1";
+          full-at = "98";
 
-              format-charging = "<animation-charging> <label-charging>";
-              format-charging-underline = colors.nord13;
+          format-charging = "<animation-charging> <label-charging>";
+          format-charging-underline = colors.nord13;
 
-              format-discharging = "<ramp-capacity> <label-discharging>";
-              format-discharging-underline = "\${self.format-charging-underline}";
+          format-discharging = "<ramp-capacity> <label-discharging>";
+          format-discharging-underline = "\${self.format-charging-underline}";
 
-              format-full-prefix = " ";
-              format-full-prefix-foreground = colors.foreground-alt;
-              format-full-underline = "\${self.format-charging-underline}";
+          format-full-prefix = " ";
+          format-full-prefix-foreground = colors.foreground-alt;
+          format-full-underline = "\${self.format-charging-underline}";
 
-              ramp-capacity-0 = "";
-              ramp-capacity-1 = "";
-              ramp-capacity-2 = "";
-              ramp-capacity-foreground = colors.foreground-alt;
+          ramp-capacity-0 = "";
+          ramp-capacity-1 = "";
+          ramp-capacity-2 = "";
+          ramp-capacity-foreground = colors.foreground-alt;
 
-              animation-charging-0 = "";
-              animation-charging-1 = "";
-              animation-charging-2 = "";
-              animation-charging-foreground = colors.foreground-alt;
-              animation-charging-framerate = 750;
-            };
-            "module/pipewire-simple" =
-              let
-                pipewire-simple = pkgs.writeShellScript "pipewire-simple.sh" ''
-                  getDefaultSink() {
-                      defaultSink=$(${pkgs.pulseaudio}/bin/pactl info | ${pkgs.gawk}/bin/awk -F : '/Default Sink:/{print $2}')
-                      description=$(${pkgs.pulseaudio}/bin/pactl list sinks | ${pkgs.gnused}/bin/sed -n "/''${defaultSink}/,/Description/p; /Description/q" | ${pkgs.gnused}/bin/sed -n 's/^.*Description: \(.*\)$/\1/p')
-                      echo "''${description}"
-                  }
+          animation-charging-0 = "";
+          animation-charging-1 = "";
+          animation-charging-2 = "";
+          animation-charging-foreground = colors.foreground-alt;
+          animation-charging-framerate = 750;
+        };
+        "module/pipewire-simple" = let
+          pipewire-simple = pkgs.writeShellScript "pipewire-simple.sh" ''
+            getDefaultSink() {
+                defaultSink=$(${pkgs.pulseaudio}/bin/pactl info | ${pkgs.gawk}/bin/awk -F : '/Default Sink:/{print $2}')
+                description=$(${pkgs.pulseaudio}/bin/pactl list sinks | ${pkgs.gnused}/bin/sed -n "/''${defaultSink}/,/Description/p; /Description/q" | ${pkgs.gnused}/bin/sed -n 's/^.*Description: \(.*\)$/\1/p')
+                echo "''${description}"
+            }
 
-                  getDefaultSource() {
-                      defaultSource=$(${pkgs.pulseaudio}/bin/pactl info | ${pkgs.gawk}/bin/awk -F : '/Default Source:/{print $2}')
-                      description=$(${pkgs.pulseaudio}/bin/pactl list sources | ${pkgs.gnused}/bin/sed -n "/''${defaultSource}/,/Description/p; /Description/q" | ${pkgs.gnused}/bin/sed -n 's/^.*Description: \(.*\)$/\1/p')
-                      echo "''${description}"
-                  }
+            getDefaultSource() {
+                defaultSource=$(${pkgs.pulseaudio}/bin/pactl info | ${pkgs.gawk}/bin/awk -F : '/Default Source:/{print $2}')
+                description=$(${pkgs.pulseaudio}/bin/pactl list sources | ${pkgs.gnused}/bin/sed -n "/''${defaultSource}/,/Description/p; /Description/q" | ${pkgs.gnused}/bin/sed -n 's/^.*Description: \(.*\)$/\1/p')
+                echo "''${description}"
+            }
 
-                  VOLUME=$(${pkgs.pamixer}/bin/pamixer --get-volume-human)
-                  SINK=$(getDefaultSink)
-                  SOURCE=$(getDefaultSource)
+            VOLUME=$(${pkgs.pamixer}/bin/pamixer --get-volume-human)
+            SINK=$(getDefaultSink)
+            SOURCE=$(getDefaultSource)
 
-                  case $1 in
-                      "--up")
-                          ${pkgs.pamixer}/bin/pamixer --increase 5
-                          ;;
-                      "--down")
-                          ${pkgs.pamixer}/bin/pamixer --decrease 5
-                          ;;
-                      "--mute")
-                          ${pkgs.pamixer}/bin/pamixer --toggle-mute
-                          ;;
-                      *)
-                          echo "Source: ''${SOURCE} | Sink: ''${VOLUME} ''${SINK}"
-                  esac
-                '';
-              in
-                {
-                  type = "custom/script";
-                  label = "%output%";
-                  label-font = 2;
-                  interval = 2;
-                  click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-                  click-left = "${pipewire-simple} --mute &";
-                  scroll-up = "${pipewire-simple} --up &";
-                  scroll-down = "${pipewire-simple} --down &";
-                  exec = pipewire-simple;
-                };
-          };
+            case $1 in
+                "--up")
+                    ${pkgs.pamixer}/bin/pamixer --increase 5
+                    ;;
+                "--down")
+                    ${pkgs.pamixer}/bin/pamixer --decrease 5
+                    ;;
+                "--mute")
+                    ${pkgs.pamixer}/bin/pamixer --toggle-mute
+                    ;;
+                *)
+                    echo "Source: ''${SOURCE} | Sink: ''${VOLUME} ''${SINK}"
+            esac
+          '';
+        in {
+          type = "custom/script";
+          label = "%output%";
+          label-font = 2;
+          interval = 2;
+          click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
+          click-left = "${pipewire-simple} --mute &";
+          scroll-up = "${pipewire-simple} --up &";
+          scroll-down = "${pipewire-simple} --down &";
+          exec = pipewire-simple;
+        };
+      };
       script = ''
         # Launch bar on each monitor
         for m in $(polybar --list-monitors | ${pkgs.coreutils}/bin/cut -d":" -f1); do
@@ -1799,79 +1792,81 @@ in {
     };
     sxhkd = {
       enable = true;
-      keybindings =
-        let
-          flameshot-region = (pkgs.writeShellScript "flameshot-region" ''
-            if [ "$1" = "activewindow" ]; then
-              # Get active window geometry
-              eval $(${pkgs.xdotool}/bin/xdotool getactivewindow getwindowgeometry --shell)
-              REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
-            elif [ "$1" = "selectwindow" ]; then
-              # Let the user select a window and get its geometry
-              eval $(${pkgs.xdotool}/bin/xdotool selectwindow getwindowgeometry --shell)
-              REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
-            else
-              # Get current screen
-              SCREEN=$(${pkgs.xdotool}/bin/xdotool get_desktop)
-              REGION="screen''${SCREEN}"
-            fi
+      keybindings = let
+        flameshot-region = (pkgs.writeShellScript "flameshot-region" ''
+          if [ "$1" = "activewindow" ]; then
+            # Get active window geometry
+            eval $(${pkgs.xdotool}/bin/xdotool getactivewindow getwindowgeometry --shell)
+            REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
+          elif [ "$1" = "selectwindow" ]; then
+            # Let the user select a window and get its geometry
+            eval $(${pkgs.xdotool}/bin/xdotool selectwindow getwindowgeometry --shell)
+            REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
+          else
+            # Get current screen
+            SCREEN=$(${pkgs.xdotool}/bin/xdotool get_desktop)
+            REGION="screen''${SCREEN}"
+          fi
 
-            # Launch the screenshot gui
-            ${pkgs.flameshot}/bin/flameshot gui --region "$REGION"
-          '');
-        in
-          {
-            # Screenshot
-            "Print" = "${pkgs.flameshot}/bin/flameshot gui";
-            "super + Print" = "${flameshot-region} activewindow";
-            "super + shift + Print" = "${flameshot-region}";
+          # Launch the screenshot gui
+          ${pkgs.flameshot}/bin/flameshot gui --region "$REGION"
+        '');
+      in {
+        # Screenshot
+        "Print" = "${pkgs.flameshot}/bin/flameshot gui";
+        "super + Print" = "${flameshot-region} activewindow";
+        "super + shift + Print" = "${flameshot-region}";
 
-            # Notifications
-            "super + dollar" = "${pkgs.dunst}/bin/dunstctl close";
-            "super + shift + dollar" = "${pkgs.dunst}/bin/dunstctl close-all";
-            "super + ampersand" = "${pkgs.dunst}/bin/dunstctl history-pop";
-            "super + m" = "${pkgs.dunst}/bin/dunstctl action 0";
-            "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
+        # Notifications
+        "super + dollar" = "${pkgs.dunst}/bin/dunstctl close";
+        "super + shift + dollar" = "${pkgs.dunst}/bin/dunstctl close-all";
+        "super + ampersand" = "${pkgs.dunst}/bin/dunstctl history-pop";
+        "super + m" = "${pkgs.dunst}/bin/dunstctl action 0";
+        "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
 
-            # Toggle grayscale
-            "super + shift + g" = "${pkgs.writeShellScript "toggle-grayscale.sh" ''
-              if [ -f ${config.xdg.dataHome}/picom/env ]; then
-                rm ${config.xdg.dataHome}/picom/env
-              else
-                ln -s ${config.xdg.configHome}/picom/env-grayscale ${config.xdg.dataHome}/picom/env
-              fi
-              ${pkgs.systemd}/bin/systemctl --user restart picom.service
-            ''}";
+        # Toggle grayscale
+        "super + shift + g" = "${pkgs.writeShellScript "toggle-grayscale.sh" ''
+          if [ -f ${config.xdg.dataHome}/picom/env ]; then
+            rm ${config.xdg.dataHome}/picom/env
+          else
+            ln -s ${config.xdg.configHome}/picom/env-grayscale ${config.xdg.dataHome}/picom/env
+          fi
+          ${pkgs.systemd}/bin/systemctl --user restart picom.service
+        ''}";
 
-            # Toggle dark mode
-            "super + shift + d" = "${pkgs.writeShellScript "toggle-dark-mode.sh" ''
-              dark_mode_on=$( [ "$(${pkgs.xfce.xfconf}/bin/xfconf-query -c xsettings -p /Net/ThemeName)" = "Nordic" ]; echo $? )
+        # Toggle dark mode
+        "super + shift + d" = "${pkgs.writeShellScript "toggle-dark-mode.sh" ''
+          dark_mode_on=$( [ "$(${pkgs.xfce.xfconf}/bin/xfconf-query -c xsettings -p /Net/ThemeName)" = "Nordic" ]; echo $? )
 
-              if [ $dark_mode_on = 0 ]; then
-                ${config.xdg.dataHome}/light-mode.d/gtk-theme.sh
-              else
-                ${config.xdg.dataHome}/dark-mode.d/gtk-theme.sh
-              fi
-            ''}";
+          if [ $dark_mode_on = 0 ]; then
+            ${config.xdg.dataHome}/light-mode.d/gtk-theme.sh
+          else
+            ${config.xdg.dataHome}/dark-mode.d/gtk-theme.sh
+          fi
+        ''}";
 
-            # Lock screen
-            "super + x" = "${pkgs.systemd}/bin/loginctl lock-session";
+        # Lock screen
+        "super + x" = "${pkgs.systemd}/bin/loginctl lock-session";
 
-            # Audio controls
-            "XF86AudioRaiseVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 +5%";
-            "XF86AudioLowerVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 -5%";
-            "XF86AudioMute" = "${pkgs.pulseaudio}/bin/pactl set-sink-mute 0 toggle";
-            "XF86AudioPlay" = "${pkgs.playerctl}/bin/playerctl play-pause";
-            "XF86AudioPause" = "${pkgs.playerctl}/bin/playerctl pause";
-            "XF86AudioNext" = "${pkgs.playerctl}/bin/playerctl next";
-            "XF86AudioPrev" = "${pkgs.playerctl}/bin/playerctl previous";
-            "XF86AudioForward" = "${pkgs.playerctl}/bin/playerctl position 5+";
-            "XF86AudioRewind" = "${pkgs.playerctl}/bin/playerctl position 5-";
+        # Audio controls
+        "XF86AudioRaiseVolume" =
+          "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 +5%";
+        "XF86AudioLowerVolume" =
+          "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 -5%";
+        "XF86AudioMute" = "${pkgs.pulseaudio}/bin/pactl set-sink-mute 0 toggle";
+        "XF86AudioPlay" = "${pkgs.playerctl}/bin/playerctl play-pause";
+        "XF86AudioPause" = "${pkgs.playerctl}/bin/playerctl pause";
+        "XF86AudioNext" = "${pkgs.playerctl}/bin/playerctl next";
+        "XF86AudioPrev" = "${pkgs.playerctl}/bin/playerctl previous";
+        "XF86AudioForward" = "${pkgs.playerctl}/bin/playerctl position 5+";
+        "XF86AudioRewind" = "${pkgs.playerctl}/bin/playerctl position 5-";
 
-            # Screen brightness controls
-            "XF86MonBrightnessUp" = "${pkgs.brightnessctl}/bin/brightnessctl set 5%+";
-            "XF86MonBrightnessDown" = "${pkgs.brightnessctl}/bin/brightnessctl set 5%-";
-          };
+        # Screen brightness controls
+        "XF86MonBrightnessUp" =
+          "${pkgs.brightnessctl}/bin/brightnessctl set 5%+";
+        "XF86MonBrightnessDown" =
+          "${pkgs.brightnessctl}/bin/brightnessctl set 5%-";
+      };
     };
     vscode-server.enable = true;
     unclutter = {
@@ -1883,223 +1878,242 @@ in {
 
   xsession = {
     enable = true;
-    initExtra =
-      let
-        backgroundImage = ../backgrounds/hidden-valley.jpg;
-      in
-        "${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${backgroundImage} &";
+    initExtra = let backgroundImage = ../backgrounds/hidden-valley.jpg;
+    in "${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${backgroundImage} &";
     windowManager.i3 = {
       enable = true;
       package = pkgs.i3-gaps;
-      config =
-        let
-          mode-gaps = "Gaps: (o) outer, (i) inner";
-          mode-gaps-inner = "Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)";
-          mode-gaps-outer = "Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)";
-        in {
-          bars = [];
-          gaps = {
-            inner = 0;
-            outer = 0;
-          };
-          fonts = {
-            names = [ "DejaVu Sans Mono" ];
-            style = "Regular";
-            size = 0.0;
-          };
-          modifier = "Mod4";
-          terminal = terminal-emulator;
-          menu = ''"${pkgs.rofi}/bin/rofi -dpi 0 -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
-          focus.followMouse = false;
-          focus.newWindow = "urgent";
-          startup = [
-            { command = "${pkgs.dex}/bin/dex --autostart --environment i3"; notification = false; }
-            # https://github.com/nix-community/home-manager/issues/213#issuecomment-366962925
-            { command = "${pkgs.systemd}/bin/systemctl --user restart polybar"; always = true; notification = false; }
-          ];
-          colors = {
-            # Nord theme
-            focused = {
-              border = colors.nord9;
-              background = colors.nord9;
-              text = "#ffffff";
-              indicator = colors.nord9;
-              childBorder = colors.nord9;
-            };
-            unfocused = {
-              border = colors.nord0;
-              background = "#1f222d";
-              text = "#888888";
-              indicator = "#1f222d";
-              childBorder = colors.nord0;
-            };
-            focusedInactive = {
-              border = colors.nord0;
-              background = "#1f222d";
-              text = "#888888";
-              indicator = "#1f222d";
-              childBorder = colors.nord0;
-            };
-            placeholder = {
-              border = colors.nord0;
-              background = "#1f222d";
-              text = "#888888";
-              indicator = "#1f222d";
-              childBorder = colors.nord0;
-            };
-            urgent = {
-              border = "#900000";
-              background = "#900000";
-              text = "#ffffff";
-              indicator = "#900000";
-              childBorder = "#900000";
-            };
-            background = "#242424";
-          };
-          keybindings = 
-            let
-              mod = config.xsession.windowManager.i3.config.modifier;
-            in lib.mkOptionDefault {
-              # Define workspace names
-              "${mod}+1" = "workspace 1: ";
-              "${mod}+2" = "workspace 2: ";
-              "${mod}+3" = "workspace 3: ";
-              "${mod}+4" = "workspace 4: ";
-              "${mod}+5" = "workspace 5: ";
-              "${mod}+6" = "workspace 6: 6";
-              "${mod}+7" = "workspace 7: 7";
-              "${mod}+8" = "workspace 8: ";
-              "${mod}+9" = "workspace 9: ";
-              "${mod}+0" = "workspace 10: ";
-              # move focused container to workspace
-              "${mod}+Shift+1" = "move container to workspace number 1; workspace number 1";
-              "${mod}+Shift+2" = "move container to workspace number 2; workspace number 2";
-              "${mod}+Shift+3" = "move container to workspace number 3; workspace number 3";
-              "${mod}+Shift+4" = "move container to workspace number 4; workspace number 4";
-              "${mod}+Shift+5" = "move container to workspace number 5; workspace number 5";
-              "${mod}+Shift+6" = "move container to workspace number 6; workspace number 6";
-              "${mod}+Shift+7" = "move container to workspace number 7; workspace number 7";
-              "${mod}+Shift+8" = "move container to workspace number 8; workspace number 8";
-              "${mod}+Shift+9" = "move container to workspace number 9; workspace number 9";
-              "${mod}+Shift+0" = "move container to workspace number 10; workspace number 10";
-
-              # change focus (Vi keybindings)
-              "${mod}+h" = "focus left";
-              "${mod}+j" = "focus down";
-              "${mod}+k" = "focus up";
-              "${mod}+l" = "focus right";
-              "${mod}+Shift+h" = "move left";
-              "${mod}+Shift+j" = "move down";
-              "${mod}+Shift+k" = "move up";
-              "${mod}+Shift+l" = "move right";
-
-              # split in horizontal orientation
-              "${mod}+backslash" = "split h";
-              "${mod}+Shift+backslash" = "split h";
-              # split in vertical orientation
-              "${mod}+minus" = "split v";
-              "${mod}+Shift+minus" = "split v";
-
-              # Toggle scratchpad
-              "${mod}+numbersign" = "scratchpad show";
-              # Move window to scratchpad
-              "${mod}+Shift+numbersign" = "move scratchpad";
-
-              # focus the parent container
-              "${mod}+a" = "focus parent";
-              # focus the child container
-              "${mod}+Shift+a" = "focus child";
-              "${mod}+apostrophe" = "focus child";
-
-              # Move focus/workspace/window to different monitor
-              "${mod}+at" = "focus output left";
-              "${mod}+Shift+at" = "move container to output left; focus output left";
-              "${mod}+Shift+Ctrl+at" = "move workspace to output left";
-              "${mod}+slash" = "focus output right";
-              "${mod}+Shift+slash" = "move container to output right; focus output right";
-              "${mod}+Shift+Ctrl+slash" = "move workspace to output right";
-
-              # Gaps mode
-              "${mod}+g" = "mode \"${mode-gaps}\"";
-            };
-          modes = {
-            resize = {
-              "h" = "resize shrink width 20 px or 10 ppt";
-              "j" = "resize grow height 20 px or 10 ppt";
-              "k" = "resize shrink height 20 px or 10 ppt";
-              "l" = "resize grow width 20 px or 10 ppt";
-              "Shift+h" = "resize shrink width 200 px or 20 ppt";
-              "Shift+j" = "resize grow height 200 px or 20 ppt";
-              "Shift+k" = "resize shrink height 200 px or 20 ppt";
-              "Shift+l" = "resize grow width 200 px or 20 ppt";
-              "Return" = "mode default";
-              "Escape" = "mode default";
-            };
-            "${mode-gaps}" = {
-              "o" = "mode \"${mode-gaps-inner}\"";
-              "i" = "mode \"${mode-gaps-inner}\"";
-              "Return" = "mode default";
-              "Escape" = "mode default";
-            };
-            "${mode-gaps-inner}" = {
-              "plus" = "gaps inner current plus 6";
-              "minus" = "gaps inner current minus 6";
-              "asterisk" = "gaps inner current set 0";
-              "Shift+plus" = "gaps inner all plus 6";
-              "Shift+minus" = "gaps inner all minus 6";
-              "Shift+asterisk" = "gaps inner all set 0";
-              "Return" = "mode default";
-              "Escape" = "mode default";
-            };
-            "${mode-gaps-outer}" = {
-              "plus" = "gaps outer current plus 6";
-              "minus" = "gaps outer current minus 6";
-              "asterisk" = "gaps outer current set 0";
-              "Shift+plus" = "gaps outer all plus 6";
-              "Shift+minus" = "gaps outer all minus 6";
-              "Shift+asterisk" = "gaps outer all set 0";
-              "Return" = "mode default";
-              "Escape" = "mode default";
-            };
-          };
-          assigns = {
-            "number 2" = [
-              { class = "^Firefox$"; window_role = "(?i)^((?!dialog).)+$"; }
-            ];
-            "number 9" = [
-              { class = "^Thunderbird$"; }
-            ];
-            "number 10" = [
-              { class = "^TelegramDesktop$"; }
-              { class = "^Slack$"; }
-              { class = "^Skype$"; }
-              { class = "^Signal$"; }
-            ];
-          };
-          window.border = 0;
-          window.hideEdgeBorders = "both";
-          window.commands =
-            let
-              mkCommand = command: criteria: { inherit command criteria; };
-              mkFloating = mkCommand "floating enable";
-              mkSticky = mkCommand "sticky enable";
-            in [
-              { criteria = { class = ".*"; }; command = "border pixel 0"; }
-              (mkFloating { class = "^Tor Browser$"; })
-              (mkFloating { class = "^gnome-calculator$"; })
-              (mkFloating { class = "^feh$"; })
-              (mkFloating { class = "^Sxiv$"; })
-              (mkFloating { class = "^Thunderbird$"; instance="^Calendar$"; })
-              (mkFloating { class = "^(?i)zoom$"; })
-              (mkFloating { class = "(?i)blueman-manager"; })
-              (mkFloating { window_type = "dialog"; })
-              (mkFloating { window_role = "pop-up"; })
-              (mkFloating { window_role = "(?i)about"; })
-              (mkFloating { window_role = "(?i)preferences"; })
-              (mkSticky { title = "Picture-in-Picture"; })
-              (mkSticky { title = "AlarmWindow"; })
-            ];
+      config = let
+        mode-gaps = "Gaps: (o) outer, (i) inner";
+        mode-gaps-inner = "Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)";
+        mode-gaps-outer = "Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)";
+      in {
+        bars = [ ];
+        gaps = {
+          inner = 0;
+          outer = 0;
         };
+        fonts = {
+          names = [ "DejaVu Sans Mono" ];
+          style = "Regular";
+          size = 0.0;
+        };
+        modifier = "Mod4";
+        terminal = terminal-emulator;
+        menu = ''
+          "${pkgs.rofi}/bin/rofi -dpi 0 -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
+        focus.followMouse = false;
+        focus.newWindow = "urgent";
+        startup = [
+          {
+            command = "${pkgs.dex}/bin/dex --autostart --environment i3";
+            notification = false;
+          }
+          # https://github.com/nix-community/home-manager/issues/213#issuecomment-366962925
+          {
+            command = "${pkgs.systemd}/bin/systemctl --user restart polybar";
+            always = true;
+            notification = false;
+          }
+        ];
+        colors = {
+          # Nord theme
+          focused = {
+            border = colors.nord9;
+            background = colors.nord9;
+            text = "#ffffff";
+            indicator = colors.nord9;
+            childBorder = colors.nord9;
+          };
+          unfocused = {
+            border = colors.nord0;
+            background = "#1f222d";
+            text = "#888888";
+            indicator = "#1f222d";
+            childBorder = colors.nord0;
+          };
+          focusedInactive = {
+            border = colors.nord0;
+            background = "#1f222d";
+            text = "#888888";
+            indicator = "#1f222d";
+            childBorder = colors.nord0;
+          };
+          placeholder = {
+            border = colors.nord0;
+            background = "#1f222d";
+            text = "#888888";
+            indicator = "#1f222d";
+            childBorder = colors.nord0;
+          };
+          urgent = {
+            border = "#900000";
+            background = "#900000";
+            text = "#ffffff";
+            indicator = "#900000";
+            childBorder = "#900000";
+          };
+          background = "#242424";
+        };
+        keybindings =
+          let mod = config.xsession.windowManager.i3.config.modifier;
+          in lib.mkOptionDefault {
+            # Define workspace names
+            "${mod}+1" = "workspace 1: ";
+            "${mod}+2" = "workspace 2: ";
+            "${mod}+3" = "workspace 3: ";
+            "${mod}+4" = "workspace 4: ";
+            "${mod}+5" = "workspace 5: ";
+            "${mod}+6" = "workspace 6: 6";
+            "${mod}+7" = "workspace 7: 7";
+            "${mod}+8" = "workspace 8: ";
+            "${mod}+9" = "workspace 9: ";
+            "${mod}+0" = "workspace 10: ";
+            # move focused container to workspace
+            "${mod}+Shift+1" =
+              "move container to workspace number 1; workspace number 1";
+            "${mod}+Shift+2" =
+              "move container to workspace number 2; workspace number 2";
+            "${mod}+Shift+3" =
+              "move container to workspace number 3; workspace number 3";
+            "${mod}+Shift+4" =
+              "move container to workspace number 4; workspace number 4";
+            "${mod}+Shift+5" =
+              "move container to workspace number 5; workspace number 5";
+            "${mod}+Shift+6" =
+              "move container to workspace number 6; workspace number 6";
+            "${mod}+Shift+7" =
+              "move container to workspace number 7; workspace number 7";
+            "${mod}+Shift+8" =
+              "move container to workspace number 8; workspace number 8";
+            "${mod}+Shift+9" =
+              "move container to workspace number 9; workspace number 9";
+            "${mod}+Shift+0" =
+              "move container to workspace number 10; workspace number 10";
+
+            # change focus (Vi keybindings)
+            "${mod}+h" = "focus left";
+            "${mod}+j" = "focus down";
+            "${mod}+k" = "focus up";
+            "${mod}+l" = "focus right";
+            "${mod}+Shift+h" = "move left";
+            "${mod}+Shift+j" = "move down";
+            "${mod}+Shift+k" = "move up";
+            "${mod}+Shift+l" = "move right";
+
+            # split in horizontal orientation
+            "${mod}+backslash" = "split h";
+            "${mod}+Shift+backslash" = "split h";
+            # split in vertical orientation
+            "${mod}+minus" = "split v";
+            "${mod}+Shift+minus" = "split v";
+
+            # Toggle scratchpad
+            "${mod}+numbersign" = "scratchpad show";
+            # Move window to scratchpad
+            "${mod}+Shift+numbersign" = "move scratchpad";
+
+            # focus the parent container
+            "${mod}+a" = "focus parent";
+            # focus the child container
+            "${mod}+Shift+a" = "focus child";
+            "${mod}+apostrophe" = "focus child";
+
+            # Move focus/workspace/window to different monitor
+            "${mod}+at" = "focus output left";
+            "${mod}+Shift+at" =
+              "move container to output left; focus output left";
+            "${mod}+Shift+Ctrl+at" = "move workspace to output left";
+            "${mod}+slash" = "focus output right";
+            "${mod}+Shift+slash" =
+              "move container to output right; focus output right";
+            "${mod}+Shift+Ctrl+slash" = "move workspace to output right";
+
+            # Gaps mode
+            "${mod}+g" = ''mode "${mode-gaps}"'';
+          };
+        modes = {
+          resize = {
+            "h" = "resize shrink width 20 px or 10 ppt";
+            "j" = "resize grow height 20 px or 10 ppt";
+            "k" = "resize shrink height 20 px or 10 ppt";
+            "l" = "resize grow width 20 px or 10 ppt";
+            "Shift+h" = "resize shrink width 200 px or 20 ppt";
+            "Shift+j" = "resize grow height 200 px or 20 ppt";
+            "Shift+k" = "resize shrink height 200 px or 20 ppt";
+            "Shift+l" = "resize grow width 200 px or 20 ppt";
+            "Return" = "mode default";
+            "Escape" = "mode default";
+          };
+          "${mode-gaps}" = {
+            "o" = ''mode "${mode-gaps-inner}"'';
+            "i" = ''mode "${mode-gaps-inner}"'';
+            "Return" = "mode default";
+            "Escape" = "mode default";
+          };
+          "${mode-gaps-inner}" = {
+            "plus" = "gaps inner current plus 6";
+            "minus" = "gaps inner current minus 6";
+            "asterisk" = "gaps inner current set 0";
+            "Shift+plus" = "gaps inner all plus 6";
+            "Shift+minus" = "gaps inner all minus 6";
+            "Shift+asterisk" = "gaps inner all set 0";
+            "Return" = "mode default";
+            "Escape" = "mode default";
+          };
+          "${mode-gaps-outer}" = {
+            "plus" = "gaps outer current plus 6";
+            "minus" = "gaps outer current minus 6";
+            "asterisk" = "gaps outer current set 0";
+            "Shift+plus" = "gaps outer all plus 6";
+            "Shift+minus" = "gaps outer all minus 6";
+            "Shift+asterisk" = "gaps outer all set 0";
+            "Return" = "mode default";
+            "Escape" = "mode default";
+          };
+        };
+        assigns = {
+          "number 2" = [{
+            class = "^Firefox$";
+            window_role = "(?i)^((?!dialog).)+$";
+          }];
+          "number 9" = [{ class = "^Thunderbird$"; }];
+          "number 10" = [
+            { class = "^TelegramDesktop$"; }
+            { class = "^Slack$"; }
+            { class = "^Skype$"; }
+            { class = "^Signal$"; }
+          ];
+        };
+        window.border = 0;
+        window.hideEdgeBorders = "both";
+        window.commands = let
+          mkCommand = command: criteria: { inherit command criteria; };
+          mkFloating = mkCommand "floating enable";
+          mkSticky = mkCommand "sticky enable";
+        in [
+          {
+            criteria = { class = ".*"; };
+            command = "border pixel 0";
+          }
+          (mkFloating { class = "^Tor Browser$"; })
+          (mkFloating { class = "^gnome-calculator$"; })
+          (mkFloating { class = "^feh$"; })
+          (mkFloating { class = "^Sxiv$"; })
+          (mkFloating {
+            class = "^Thunderbird$";
+            instance = "^Calendar$";
+          })
+          (mkFloating { class = "^(?i)zoom$"; })
+          (mkFloating { class = "(?i)blueman-manager"; })
+          (mkFloating { window_type = "dialog"; })
+          (mkFloating { window_role = "pop-up"; })
+          (mkFloating { window_role = "(?i)about"; })
+          (mkFloating { window_role = "(?i)preferences"; })
+          (mkSticky { title = "Picture-in-Picture"; })
+          (mkSticky { title = "AlarmWindow"; })
+        ];
+      };
     };
   };
 
