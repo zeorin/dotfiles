@@ -1657,9 +1657,6 @@ in {
           tray-prefix-foreground = colors.nord3;
           tray-prefix-background = colors.nord0;
 
-          scroll-up = "i3wm-wsnext";
-          scroll-down = "i3wm-wsprev";
-
           font-0 = "Iosevka Nerd Font:size=10;3";
           font-1 = "Iosevka Nerd Font:size=10;3";
           font-2 = "Iosevka Nerd Font:size=8;3";
@@ -1983,6 +1980,18 @@ in {
       enable = true;
       package = pkgs.i3-gaps;
       config = let
+        # Define workspace names
+        workspace1 = ''number "1: "'';
+        workspace2 = ''number "2: "'';
+        workspace3 = ''number "3: "'';
+        workspace4 = ''number "4: "'';
+        workspace5 = ''number "5: "'';
+        workspace6 = ''number "6: 6"'';
+        workspace7 = ''number "7: 7"'';
+        workspace8 = ''number "8: 8"'';
+        workspace9 = ''number "9: "'';
+        workspace10 = ''number "10: "'';
+        # Gaps modes
         mode-gaps = "Gaps: (o) outer, (i) inner";
         mode-gaps-inner = "Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)";
         mode-gaps-outer = "Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)";
@@ -2057,38 +2066,36 @@ in {
         keybindings =
           let mod = config.xsession.windowManager.i3.config.modifier;
           in lib.mkOptionDefault {
-            # Define workspace names
-            "${mod}+1" = "workspace 1: ";
-            "${mod}+2" = "workspace 2: ";
-            "${mod}+3" = "workspace 3: ";
-            "${mod}+4" = "workspace 4: ";
-            "${mod}+5" = "workspace 5: ";
-            "${mod}+6" = "workspace 6: 6";
-            "${mod}+7" = "workspace 7: 7";
-            "${mod}+8" = "workspace 8: ";
-            "${mod}+9" = "workspace 9: ";
-            "${mod}+0" = "workspace 10: ";
-            # move focused container to workspace
+            "${mod}+1" = "workspace ${workspace1}";
+            "${mod}+2" = "workspace ${workspace2}";
+            "${mod}+3" = "workspace ${workspace3}";
+            "${mod}+4" = "workspace ${workspace4}";
+            "${mod}+5" = "workspace ${workspace5}";
+            "${mod}+6" = "workspace ${workspace6}";
+            "${mod}+7" = "workspace ${workspace7}";
+            "${mod}+8" = "workspace ${workspace8}";
+            "${mod}+9" = "workspace ${workspace9}";
+            "${mod}+0" = "workspace ${workspace10}";
             "${mod}+Shift+1" =
-              "move container to workspace number 1; workspace number 1";
+              "move container to workspace ${workspace1}; workspace ${workspace1}";
             "${mod}+Shift+2" =
-              "move container to workspace number 2; workspace number 2";
+              "move container to workspace ${workspace2}; workspace ${workspace2}";
             "${mod}+Shift+3" =
-              "move container to workspace number 3; workspace number 3";
+              "move container to workspace ${workspace3}; workspace ${workspace3}";
             "${mod}+Shift+4" =
-              "move container to workspace number 4; workspace number 4";
+              "move container to workspace ${workspace4}; workspace ${workspace4}";
             "${mod}+Shift+5" =
-              "move container to workspace number 5; workspace number 5";
+              "move container to workspace ${workspace5}; workspace ${workspace5}";
             "${mod}+Shift+6" =
-              "move container to workspace number 6; workspace number 6";
+              "move container to workspace ${workspace6}; workspace ${workspace6}";
             "${mod}+Shift+7" =
-              "move container to workspace number 7; workspace number 7";
+              "move container to workspace ${workspace7}; workspace ${workspace7}";
             "${mod}+Shift+8" =
-              "move container to workspace number 8; workspace number 8";
+              "move container to workspace ${workspace8}; workspace ${workspace8}";
             "${mod}+Shift+9" =
-              "move container to workspace number 9; workspace number 9";
+              "move container to workspace ${workspace9}; workspace ${workspace9}";
             "${mod}+Shift+0" =
-              "move container to workspace number 10; workspace number 10";
+              "move container to workspace ${workspace10}; workspace ${workspace10}";
 
             # change focus (Vi keybindings)
             "${mod}+h" = "focus left";
@@ -2172,12 +2179,12 @@ in {
           };
         };
         assigns = {
-          "number 2" = [{
+          "${workspace2}" = [{
             class = "^Firefox$";
             window_role = "(?i)^((?!dialog).)+$";
           }];
-          "number 9" = [{ class = "^Thunderbird$"; }];
-          "number 10" = [
+          "${workspace9}" = [{ class = "^Thunderbird$"; }];
+          "${workspace10}" = [
             { class = "^TelegramDesktop$"; }
             { class = "^Slack$"; }
             { class = "^Skype$"; }
