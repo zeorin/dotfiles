@@ -28,6 +28,7 @@ let
     "nord14" = "#A3BE8C";
     "nord15" = "#B48EAD";
   };
+
   scripts = {
     isSshSession = pkgs.writeShellScript "is-ssh-session.sh" ''
       if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -n "$SSH_CONNECTION" ]; then
@@ -118,6 +119,7 @@ let
       };
     };
   };
+
   st = let
     config = pkgs.writeText "config.h" ''
       /* See LICENSE file for copyright and license details. */
@@ -648,6 +650,7 @@ let
   }));
   terminal-emulator-bin = st;
   terminal-emulator = "${st}/bin/st";
+
 in {
   nixpkgs.overlays = [
     (import (builtins.fetchTarball {
@@ -2225,17 +2228,6 @@ in {
 
   systemd.user = {
     services = {
-      batsignal = {
-        Unit.Description = "Battery monitor daemon";
-        Service = {
-          Type = "simple";
-          ExecStart = "${pkgs.batsignal}/bin/batsignal";
-          Restart = "on-failure";
-          RestartSec = 1;
-        };
-        Install.WantedBy = [ "graphical-session.target" ];
-      };
-      # Allow for bluetooth devices to interface with MPRIS
       mpris-proxy = {
         Unit = {
           Description = "Forward bluetooth media controls to MPRIS";
@@ -2331,9 +2323,9 @@ in {
 
         ;; If you use `org' and don't want your org files in the default location below,
         ;; change `org-directory'. It must be set before org loads!
-        (setq org-directory "~/Documents/notes"
-              org-roam-directory "~/Documents/notes"
-              org-agenda-files '("~/Documents/notes" "~/Documents/notes/daily"))
+        (setq org-directory "${userDirs.documents}/notes"
+              org-roam-directory "${userDirs.documents}/notes"
+              org-agenda-files '("${userDirs.documents}/notes" "${userDirs.documents}/notes/daily"))
 
         ;; This determines the style of line numbers in effect. If set to `nil', line
         ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -3236,26 +3228,9 @@ in {
       unstable.tdesktop
       unstable.skypeforlinux
       unstable.signal-desktop
-      (symlinkJoin {
-        name = "zoom-us";
-        paths = [ unstable.zoom-us ];
-        buildInputs = [ makeWrapper ];
-        postBuild = ''
-          wrapProgram $out/bin/zoom \
-            --set QT_AUTO_SCREEN_SCALE_FACTOR 0 \
-            --set QT_SCALE_FACTOR 2
-        '';
-      })
+      unstable.zoom-us
       unstable.element-desktop
-      (symlinkJoin {
-        name = "spotify";
-        paths = [ spotify ];
-        buildInputs = [ makeWrapper ];
-        postBuild = ''
-          wrapProgram $out/bin/spotify \
-            --add-flags "--force-device-scale-factor=2"
-        '';
-      })
+      unstable.spotify
       unstable.minecraft
       manix
       cachix
