@@ -6,10 +6,14 @@ let
     overlays = [
       (import (builtins.fetchTarball {
         url =
-          "https://github.com/nix-community/emacs-overlay/archive/master@{1%20day%20ago}.tar.gz";
+          "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
       }))
     ];
   };
+
+  my-emacs = with unstable; (emacsPackagesFor emacsPgtkNativeComp).emacsWithPackages
+    (epkgs: with epkgs; [ vterm all-the-icons ]);
+
   colors = {
     "nord0" = "#2E3440";
     "nord1" = "#3B4252";
@@ -756,38 +760,6 @@ in {
         warn_timeout = "30s";
       };
     };
-    emacs = {
-      enable = true;
-      package = let emacsPkg = unstable.emacsPgtkNativeComp;
-      in with pkgs;
-      symlinkJoin (lib.recursiveUpdate {
-        name = "emacs";
-        paths = [ emacsPkg ];
-        buildInputs = [ makeWrapper ];
-        postBuild = ''
-          wrapProgram $out/bin/emacs \
-            --prefix PATH : "${binutils}/bin" \
-            --prefix PATH : "${ripgrep.override { withPCRE2 = true; }}/bin" \
-            --prefix PATH : "${gnutls}/bin" \
-            --prefix PATH : "${fd}/bin" \
-            --prefix PATH : "${imagemagick}/bin" \
-            --prefix PATH : "${zstd}/bin" \
-            --prefix PATH : "${nodePackages.typescript-language-server}/bin" \
-            --prefix PATH : "${nodePackages.vscode-css-languageserver-bin}/bin" \
-            --prefix PATH : "${nodePackages.vscode-html-languageserver-bin}/bin" \
-            --prefix PATH : "${nodePackages.prettier}/bin" \
-            --prefix PATH : "${nixfmt}/bin" \
-            --prefix PATH : "${sqlite}/bin" \
-            --prefix PATH : "${editorconfig-core-c}/bin" \
-            --prefix PATH : "${nodePackages.mermaid-cli}/bin" \
-            --prefix PATH : "${pandoc}/bin" \
-            --prefix PATH : "${gcc}/bin"
-        '';
-      } (lib.recursiveUpdate { inherit (emacsPkg) meta src; } {
-        meta.platforms = lib.platforms.linux;
-      }));
-      extraPackages = epkgs: (with epkgs; [ vterm ]);
-    };
     firefox = {
       enable = true;
       package = pkgs.latest.firefox-bin.override {
@@ -1131,10 +1103,9 @@ in {
 
         # https://github.com/akermu/emacs-libvterm
         if test -n "$INSIDE_EMACS"
-          source ${unstable.emacsPackages.vterm}/share/emacs/site-lisp/elpa/vterm-${unstable.emacsPackages.vterm.version}/etc/emacs-vterm.fish
+          source ${my-emacs.emacs.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${my-emacs.emacs.pkgs.vterm.version}/etc/emacs-vterm.fish
         end
       '';
-      # source ${config.programs.emacs.package.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${config.programs.emacs.package.pkgs.vterm.version}/etc/emacs-vterm.fish
     };
     git = {
       enable = true;
@@ -1558,6 +1529,7 @@ in {
     };
     emacs = {
       enable = true;
+      package = my-emacs;
       client.enable = true;
     };
     flameshot.enable = true;
@@ -2296,6 +2268,41 @@ in {
         ;; Place your private configuration here! Remember, you do not need to run 'doom
         ;; sync' after modifying this file!
 
+        ;; Add binaries to the path so DOOM can use them
+        (setq exec-path (append exec-path
+                                '(${
+                                  (lib.concatMapStrings (pkg: ''"${pkg}/bin" '')
+                                    (with pkgs; [
+                                      binutils
+                                      (ripgrep.override { withPCRE2 = true; })
+                                      fd
+                                      gnutls
+                                      fd
+                                      imagemagick
+                                      zstd
+                                      shfmt
+                                      shellcheck
+                                      sqlite
+                                      editorconfig-core-c
+                                      nodePackages.mermaid-cli
+                                      pandoc
+                                      gcc
+                                      graphviz-nox
+                                      haskellPackages.hoogle
+                                      haskellPackages.cabal-install
+                                      haskellPackages.brittany
+                                      haskellPackages.hlint
+                                      html-tidy
+                                      nodePackages.stylelint
+                                      nodePackages.js-beautify
+                                      nodePackages.typescript-language-server
+                                      nodePackages.vscode-css-languageserver-bin
+                                      nodePackages.vscode-html-languageserver-bin
+                                      nodePackages.prettier
+                                      jq
+                                      nixfmt
+                                    ]))
+                                })))
 
         ;; Some functionality uses this to identify you, e.g. GPG configuration, email
         ;; clients, file templates and snippets.
@@ -2995,7 +3002,7 @@ in {
     desktopEntries = {
       org-protocol = {
         name = "org-protocol";
-        exec = "emacsclient %u";
+        exec = "${my-emacs}/bin/emacsclient -c %u";
         icon = "emacs";
         type = "Application";
         terminal = false;
@@ -3084,6 +3091,7 @@ in {
   home.packages = with pkgs;
     [
       terminal-emulator-bin
+      my-emacs
       webcamoid
       libnotify
       file
@@ -3252,9 +3260,6 @@ in {
       #########
       # FONTS #
       #########
-
-      # Icon fonts
-      emacs-all-the-icons-fonts
 
       # Emoji
       # emojione
