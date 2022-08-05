@@ -2185,6 +2185,10 @@ in {
             class = "^Thunderbird$";
             instance = "^Calendar$";
           })
+          (mkFloating {
+            class = "^Steam$";
+            instance = "Steam Guard";
+          })
           (mkFloating { class = "^(?i)zoom$"; })
           (mkFloating { class = "(?i)blueman-manager"; })
           (mkFloating { window_type = "dialog"; })
