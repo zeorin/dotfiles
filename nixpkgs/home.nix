@@ -133,15 +133,15 @@ let
       *
       * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
       */
-      static char *font = "Iosevka Term:pixelsize=14:antialias=true:autohint=true";
+      static char *font = "Iosevka Term:pixelsize=12:antialias=true:autohint=true";
       /* Spare fonts */
       static char *font2[] = {
-        "Joypixels:pixelsize=14:antialias=true:autohint=true",
-        "Unifont:pixelsize=14:antialias=true:autohint=true",
-        "Symbola:pixelsize=14:antialias=true:autohint=true",
+        "Joypixels:pixelsize=12:antialias=true:autohint=true",
+        "Unifont:pixelsize=12:antialias=true:autohint=true",
+        "Symbola:pixelsize=12:antialias=true:autohint=true",
       };
 
-      static int borderpx = 14;
+      static int borderpx = 12;
 
       /*
       * What program is execed by st depends of these precedence rules:
