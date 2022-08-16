@@ -1587,14 +1587,20 @@ in {
         paths = [ picomPkg ];
         buildInputs = [ makeWrapper ];
         postBuild = ''
+          # Needed for the service EnvironmentFile to work
           wrapProgram $out/bin/picom \
             --add-flags \''${ARG_0:+\"\$ARG_0\"} \
             --add-flags \''${ARG_1:+\"\$ARG_1\"}
         '';
       });
+      backend = "glx";
+      experimentalBackends = true;
+      blur = true;
       fade = true;
       fadeDelta = 3;
       inactiveDim = "0.2";
+      inactiveOpacity = "0.8";
+      menuOpacity = "0.9";
       shadow = true;
       shadowOffsets = [ (-7) (-7) ];
       shadowExclude = [
@@ -1615,15 +1621,77 @@ in {
         # Mozilla fixes
         "class_g *?= 'Firefox' && argb"
         "class_g *?= 'Thunderbird' && argb"
+        # Zoom
+        "name = 'cpt_frame_xcb_window'"
+        "class_g *?= 'zoom' && name *?= 'meeting'"
+      ];
+      blurExclude = [
+        # unknown windows
+        "! name~=''"
+        # shaped windows
+        "bounding_shaped && !rounded_corners"
+        # hidden windows
+        "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
+        # stacked / tabbed windows
+        "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
+        "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
+        "_GTK_FRAME_EXTENTS@:c"
+        # Mozilla fixes
+        "class_g *?= 'Firefox' && argb"
+        "class_g *?= 'Thunderbird' && argb"
+        # Zoom
+        "name = 'cpt_frame_xcb_window'"
+        "class_g *?= 'zoom' && name *?= 'meeting'"
+      ];
+      opacityRule = [
+        "100:class_g *?= 'zoom' && name *?= 'meeting'"
+        "90:class_g *?= 'emacs'"
+        "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
+        "0:_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
+        "0:_NET_WM_STATE@[2]:32a *= '_NET_WM_STATE_HIDDEN'"
+        "0:_NET_WM_STATE@[3]:32a *= '_NET_WM_STATE_HIDDEN'"
+        "0:_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
       ];
       vSync = true;
+      # blur = {
+      #   method = "kernel";
+      #   kernel = "${builtins.readFile (pkgs.runCommand "kernel-blur" { } ''
+      #     $out < ${
+      #       pkgs.writeScript "generate-kernel-blur" ''
+      #         #!${
+      #           unstable.octave.withPackages (ps: with ps; [ image ])
+      #         }/bin/octave
+      #         %INFO https://www.reddit.com/r/unixporn/comments/jncrqp/oc_a_generator_for_gaussian_background_blur/
+      #         pkg load image
+
+      #         width = 23; %anything above 16 here is big and might cause slow rendering
+      #         height = 23;
+      #         sigma = 2*pi; %sigma is the standard deviation (i.e. the "width" or sharpness of the blur)
+
+      #         h = fspecial('gaussian', [width height], sigma)(:); %generates the gaussian matrix
+      #         [scale, index] = max(h);
+      #         h = h / scale; %scales the matrix so that the max element = 1
+      #         h([index]) = []; %removes the max element (the center one)
+
+      #         fprintf('%d,%d,', width, height)
+      #         for n=1:size(h,1)
+      #           fprintf('%.8f,', h(n))
+      #         end
+      #         fprintf('\n')
+      #       ''
+      #     }
+      #   '')}";
+      # };
       extraOptions = ''
+        blur = {
+          method = "dual_kawase";
+          strength = "5";
+        };
         mark-wmwin-focused = true;
         mark-ovredir-focused = true;
-        detect-rounded-corners = true;
         detect-client-opacity = true;
         detect-transient = true;
-        glx-no-stencil = true
+        glx-no-stencil = true;
         glx-no-rebind-pixmap = true;
         use-damage = true;
         shadow-radius = 7;
@@ -1631,8 +1699,15 @@ in {
         xrender-sync-fence = true;
         focus-exclude = [
           "name = 'Picture-in-Picture'",
-          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_FULLSCREEN'"
+          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_FULLSCREEN'",
+          "class_g *?= 'zoom' && name *?= 'meeting'",
         ];
+        detect-rounded-corners = true;
+        # corner-radius = 10;
+        # rounded-corners-exclude = [
+        #   # notifications
+        #   "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_DOCK'",
+        # ];
       '';
     };
     polybar = {
