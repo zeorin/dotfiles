@@ -1540,7 +1540,7 @@ in {
       enable = true;
       package = let picomPkg = pkgs.picom;
       in with pkgs;
-      symlinkJoin (lib.recursiveUpdate {
+      picomPkg // (symlinkJoin {
         name = "picom";
         paths = [ picomPkg ];
         buildInputs = [ makeWrapper ];
@@ -1549,7 +1549,7 @@ in {
             --add-flags \''${ARG_0:+\"\$ARG_0\"} \
             --add-flags \''${ARG_1:+\"\$ARG_1\"}
         '';
-      } { inherit (picomPkg) meta src; });
+      });
       fade = true;
       fadeDelta = 3;
       inactiveDim = "0.2";
@@ -1571,7 +1571,8 @@ in {
         # notifications
         "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_NOTIFICATION'"
         # Mozilla fixes
-        "(class_g = 'Firefox' || class_g = 'Thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
+        "class_g *?= 'Firefox' && argb"
+        "class_g *?= 'Thunderbird' && argb"
       ];
       vSync = true;
       extraOptions = ''
