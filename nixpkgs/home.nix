@@ -2317,6 +2317,9 @@ in {
           (mkSticky { title = "AlarmWindow"; })
         ];
       };
+      extraConfig = ''
+        popup_during_fullscreen leave_fullscreen
+      '';
     };
   };
 
