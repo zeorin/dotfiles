@@ -2834,7 +2834,6 @@ in {
         init-license=LGPL-3.0
         prefix=${dataHome}/npm
         cache=${cacheHome}/npm
-        tmp=$XDG_RUNTIME_DIR/npm
       '';
       "picom/env-grayscale".text = ''
         ARG_0="--glx-fshader-win"
