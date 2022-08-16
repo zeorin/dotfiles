@@ -11,8 +11,50 @@ let
     ];
   };
 
-  my-emacs = with unstable; (emacsPackagesFor emacsPgtkNativeComp).emacsWithPackages
-    (epkgs: with epkgs; [ vterm all-the-icons ]);
+  my-emacs = let
+    emacsPkg = with unstable;
+      (emacsPackagesFor emacsPgtkNativeComp).emacsWithPackages
+      (ps: with ps; [ vterm all-the-icons ]);
+    pathDeps = with pkgs; [
+      binutils
+      (ripgrep.override { withPCRE2 = true; })
+      fd
+      gnutls
+      imagemagick
+      zstd
+      shfmt
+      shellcheck
+      sqlite
+      editorconfig-core-c
+      nodePackages.mermaid-cli
+      pandoc
+      gcc
+      graphviz-nox
+      haskellPackages.hoogle
+      haskellPackages.cabal-install
+      haskellPackages.brittany
+      haskellPackages.hlint
+      html-tidy
+      nodePackages.stylelint
+      nodePackages.js-beautify
+      nodePackages.typescript-language-server
+      nodePackages.vscode-css-languageserver-bin
+      nodePackages.vscode-html-languageserver-bin
+      nodePackages.prettier
+      jq
+      nixfmt
+    ];
+  in emacsPkg // (pkgs.symlinkJoin {
+    name = "my-emacs";
+    paths = [ emacsPkg ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/emacs --prefix PATH : ${lib.makeBinPath pathDeps}
+      wrapProgram $out/bin/emacsclient --prefix PATH : ${
+        lib.makeBinPath pathDeps
+      }
+    '';
+  });
 
   colors = {
     "nord0" = "#2E3440";
@@ -2273,42 +2315,6 @@ in {
         ;; Place your private configuration here! Remember, you do not need to run 'doom
         ;; sync' after modifying this file!
 
-        ;; Add binaries to the path so DOOM can use them
-        (setq exec-path (append exec-path
-                                '(${
-                                  (lib.concatMapStrings (pkg: ''"${pkg}/bin" '')
-                                    (with pkgs; [
-                                      binutils
-                                      (ripgrep.override { withPCRE2 = true; })
-                                      fd
-                                      gnutls
-                                      fd
-                                      imagemagick
-                                      zstd
-                                      shfmt
-                                      shellcheck
-                                      sqlite
-                                      editorconfig-core-c
-                                      nodePackages.mermaid-cli
-                                      pandoc
-                                      gcc
-                                      graphviz-nox
-                                      haskellPackages.hoogle
-                                      haskellPackages.cabal-install
-                                      haskellPackages.brittany
-                                      haskellPackages.hlint
-                                      html-tidy
-                                      nodePackages.stylelint
-                                      nodePackages.js-beautify
-                                      nodePackages.typescript-language-server
-                                      nodePackages.vscode-css-languageserver-bin
-                                      nodePackages.vscode-html-languageserver-bin
-                                      nodePackages.prettier
-                                      jq
-                                      nixfmt
-                                    ]))
-                                })))
-
         ;; Some functionality uses this to identify you, e.g. GPG configuration, email
         ;; clients, file templates and snippets.
         (setq user-full-name "Xandor Schiefer"
@@ -3015,6 +3021,7 @@ in {
         terminal = false;
         categories = [ "System" ];
         mimeType = [ "x-scheme-handler/org-protocol" ];
+        noDisplay = true;
       };
     };
     mimeApps = {
