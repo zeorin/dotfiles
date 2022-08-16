@@ -2091,7 +2091,7 @@ in {
       in {
         bars = [ ];
         gaps = {
-          inner = 0;
+          inner = 20;
           outer = 0;
         };
         fonts = {
@@ -2251,11 +2251,11 @@ in {
             "Escape" = "mode default";
           };
           "${mode-gaps-inner}" = {
-            "plus" = "gaps inner current plus 6";
-            "minus" = "gaps inner current minus 6";
+            "plus" = "gaps inner current plus 5";
+            "minus" = "gaps inner current minus 5";
             "asterisk" = "gaps inner current set 0";
-            "Shift+plus" = "gaps inner all plus 6";
-            "Shift+minus" = "gaps inner all minus 6";
+            "Shift+plus" = "gaps inner all plus 5";
+            "Shift+minus" = "gaps inner all minus 5";
             "Shift+asterisk" = "gaps inner all set 0";
             "Return" = "mode default";
             "Escape" = "mode default";
