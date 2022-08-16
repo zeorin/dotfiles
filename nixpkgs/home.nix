@@ -3258,8 +3258,6 @@ in {
       fava
       arandr
       barrier
-      # TODO this is for the i3-fullscreen screensaver inhibition script, move to its own config later
-      (python3.withPackages (python-packages: [ python-packages.i3ipc ]))
       ethtool
       pavucontrol
       ncdu
