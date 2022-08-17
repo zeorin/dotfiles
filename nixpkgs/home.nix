@@ -2059,7 +2059,7 @@ in {
 
   xsession = {
     enable = true;
-    initExtra = let backgroundImage = ../backgrounds/hidden-valley.jpg;
+    initExtra = let backgroundImage = ../backgrounds/martian-terrain.jpg;
     in "${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${backgroundImage} &";
     windowManager.i3 = {
       enable = true;
