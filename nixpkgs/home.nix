@@ -1635,6 +1635,7 @@ in {
       ];
       opacityRule = [
         "100:class_g *?= 'zoom' && name *?= 'meeting'"
+        "100:role = 'browser' && name ^= 'Meet -'"
         "90:class_g *?= 'emacs'"
         "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
         "0:_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
@@ -1691,6 +1692,7 @@ in {
           "name = 'Picture-in-Picture'",
           "_NET_WM_STATE@:32a *= '_NET_WM_STATE_FULLSCREEN'",
           "class_g *?= 'zoom' && name *?= 'meeting'",
+          "role = 'browser' && name ^= 'Meet -'",
         ];
         detect-rounded-corners = true;
         # corner-radius = 10;
