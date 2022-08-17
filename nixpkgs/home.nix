@@ -1,19 +1,11 @@
 { pkgs, config, lib, ... }:
 
 let
-  unstable = import <nixos-unstable> {
-    config = config.nixpkgs.config;
-    overlays = [
-      (import (builtins.fetchTarball {
-        url =
-          "https://github.com/nix-community/emacs-overlay/archive/master@{2%20hours%20ago}.tar.gz";
-      }))
-    ];
-  };
+  unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 
   my-emacs = let
-    emacsPkg = with unstable;
-      (emacsPackagesFor emacsPgtkNativeComp).emacsWithPackages
+    emacsPkg = with pkgs;
+      (emacsPackagesFor emacsNativeComp).emacsWithPackages
       (ps: with ps; [ vterm all-the-icons ]);
     pathDeps = with pkgs; [
       binutils
