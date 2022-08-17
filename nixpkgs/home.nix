@@ -2253,11 +2253,11 @@ in {
             "Escape" = "mode default";
           };
           "${mode-gaps-outer}" = {
-            "plus" = "gaps outer current plus 6";
-            "minus" = "gaps outer current minus 6";
+            "plus" = "gaps outer current plus 5";
+            "minus" = "gaps outer current minus 5";
             "asterisk" = "gaps outer current set 0";
-            "Shift+plus" = "gaps outer all plus 6";
-            "Shift+minus" = "gaps outer all minus 6";
+            "Shift+plus" = "gaps outer all plus 5";
+            "Shift+minus" = "gaps outer all minus 5";
             "Shift+asterisk" = "gaps outer all set 0";
             "Return" = "mode default";
             "Escape" = "mode default";
