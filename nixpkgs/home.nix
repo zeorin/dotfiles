@@ -1032,17 +1032,27 @@ in {
         }
       ];
     };
-    vscode = {
+    vscode = with pkgs; {
       enable = true;
-      package = unstable.vscode-fhsWithPackages (ps: with ps; [ python3 ]);
-      extensions =
-        (with unstable.vscode-extensions; [ bbenoist.nix vscodevim.vim ])
-        ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [{
+      package = vscode-fhs;
+      extensions = (with vscode-extensions; [
+        bbenoist.nix
+        vscodevim.vim
+        ms-vscode-remote.remote-ssh
+      ]) ++ vscode-utils.extensionsFromVscodeMarketplace [
+        {
           name = "direnv";
           publisher = "mkhl";
           version = "0.6.1";
           sha256 = "5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
-        }];
+        }
+        {
+          name = "remote-containers";
+          publisher = "ms-vscode-remote";
+          version = "0.247.0";
+          sha256 = "gWFNjkx2+zjkpKDC5a1qIZ5SbcDN8ahtXDPX1upWUg8=";
+        }
+      ];
     };
     zathura = {
       enable = true;
