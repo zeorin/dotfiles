@@ -898,7 +898,43 @@ in {
         };
       };
     };
-    starship.enable = true;
+    starship = {
+      enable = true;
+      settings = {
+        aws.symbol = " ";
+        azure.symbol = "ﴃ ";
+        c.symbol = " ";
+        container.symbol = " ";
+        dart.symbol = " ";
+        docker_context.symbol = " ";
+        dotnet.symbol = " ";
+        elixir.symbol = " ";
+        elm.symbol = " ";
+        gcloud.symbol = " ";
+        git_branch.symbol = " ";
+        git_commit.tag_symbol = " ";
+        golang.symbol = " ";
+        haskell.symbol = " ";
+        hostname.ssh_symbol = " ";
+        hg_branch.symbol = " ";
+        java.symbol = " ";
+        jobs.symbol = " ";
+        julia.symbol = " ";
+        lua.symbol = " ";
+        memory_usage.symbol = " ";
+        nim.symbol = " ";
+        nix_shell.symbol = " ";
+        nodejs.symbol = " ";
+        package.symbol = " ";
+        perl.symbol = " ";
+        php.symbol = " ";
+        python.symbol = " ";
+        ruby.symbol = " ";
+        rust.symbol = " ";
+        scala.symbol = " ";
+        swift.symbol = " ";
+      };
+    };
     tmux = {
       enable = true;
       baseIndex = 1;
