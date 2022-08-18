@@ -915,7 +915,7 @@ in {
         git_commit.tag_symbol = " ";
         golang.symbol = " ";
         haskell.symbol = " ";
-        hostname.ssh_symbol = " ";
+        # hostname.ssh_symbol = " ";
         hg_branch.symbol = " ";
         java.symbol = " ";
         jobs.symbol = " ";
