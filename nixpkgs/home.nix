@@ -2977,7 +2977,7 @@ in {
       # Nerd Fonts but just the symbols
       # Set FontConfig to use it as a fallback for most monospaced fonts
       (stdenv.mkDerivation {
-        name = "symbols-nerd-font";
+        pname = "symbols-nerd-font";
         version = "2.2.0";
         src = fetchFromGitHub {
           owner = "ryanoasis";
@@ -3006,6 +3006,66 @@ in {
         '';
         enableParallelBuilding = true;
       })
+
+      # Apple Fonts
+    ] ++ (let
+      mkAppleFont = { name, src }:
+        stdenv.mkDerivation {
+          inherit name src;
+          nativeBuildInputs = [ p7zip ];
+          unpackCmd = "7z x $curSrc";
+          postUnpack = ''
+            cd $sourceRoot
+            7z x *.pkg
+            7z x Payload~
+            cd ..
+          '';
+          dontConfigure = true;
+          dontBuild = true;
+          installPhase = ''
+            runHook preInstall
+
+            fontdir="$out/share/fonts/truetype"
+            install -d "$fontdir"
+            install "Library/Fonts"/* "$fontdir"
+
+            runHook postInstall
+          '';
+        };
+    in [
+      (mkAppleFont {
+        name = "san-francisco-pro";
+        src = fetchurl {
+          url =
+            "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg";
+          sha256 = "o1Zis9kymOicTyDdTPGON2A5LNpDbgOD1XtyQOdxc0M=";
+        };
+      })
+      (mkAppleFont {
+        name = "san-francisco-compact";
+        src = fetchurl {
+          url =
+            "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg";
+          sha256 = "Ot/p5Wo84AibMjEjesdTDj/MpzYE1XNECsUH2aszR/o=";
+        };
+      })
+      (mkAppleFont {
+        name = "san-francisco-mono";
+        src = fetchurl {
+          url =
+            "https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg";
+          sha256 = "jnhTTmSy5J8MJotbsI8g5hxotgjvyDbccymjABwajYw=";
+        };
+      })
+      (mkAppleFont {
+        name = "new-york";
+        src = fetchurl {
+          url =
+            "https://devimages-cdn.apple.com/design/resources/download/NY.dmg";
+          sha256 = "Rr0UpJa7kemczCqNn6b8HNtW6PiWO/Ez1LUh/WNk8S8=";
+        };
+      })
+    ]) ++ [
 
       # Non-latin character sets
       junicode
