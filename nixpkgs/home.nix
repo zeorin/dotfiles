@@ -1314,7 +1314,7 @@ in {
     rofi = {
       enable = true;
       pass.enable = true;
-      font = "Iosevka Term 12";
+      font = "Iosevka 12";
       location = "center";
       terminal = terminal-emulator;
       yoffset = -280;
@@ -1532,7 +1532,7 @@ in {
           separator_height = 4;
           frame_width = 0;
           separator_color = "#00000000";
-          font = "Iosevka Term 10";
+          font = "Iosevka 10";
           format = ''
             <b>%s</b>
             %b'';
@@ -1732,21 +1732,19 @@ in {
           # modules-center = "mpd";
           modules-right = "pipewire-simple xkeyboard battery date";
 
+          font-0 = "Symbols Nerd Font:size=18;3";
+          font-1 = "Symbols Nerd Font:size=10;2";
+          font-2 = "Iosevka:size=8;2";
+
           tray-position = "right";
           tray-padding = 2;
-          tray-maxsize = 32;
+          tray-maxsize = 18;
           tray-foreground = colors.nord4;
           tray-background = colors.background;
           tray-prefix = "";
-          tray-prefix-font = 4;
+          tray-prefix-font = 1;
           tray-prefix-foreground = colors.nord3;
           tray-prefix-background = colors.nord0;
-
-          font-0 = "Iosevka Nerd Font:size=10;3";
-          font-1 = "Iosevka Nerd Font:size=10;3";
-          font-2 = "Iosevka Nerd Font:size=8;3";
-          font-3 = "Iosevka Nerd Font:size=16;4";
-          font-4 = "Iosevka Nerd Font:size=20;0";
         };
         "module/i3" = {
           type = "internal/i3";
@@ -1757,7 +1755,7 @@ in {
           format-padding-left = 1;
           format-prefix = ''" "'';
           format-suffix = "";
-          format-suffix-font = 4;
+          format-suffix-font = 1;
           format-suffix-foreground = colors.nord3;
           format-suffix-background = colors.nord1;
           index-sort = true;
@@ -1771,24 +1769,28 @@ in {
 
           # unfocused = Inactive workspace on any monitor
           label-unfocused = "%name%";
+          label-unfocused-font = 2;
           label-unfocused-foreground = "\${self.format-foreground}";
           label-unfocused-background = "\${self.format-background}";
           label-unfocused-padding = 1;
 
           # focused = Active workspace on focused monitor
           label-focused = "%name%";
+          label-focused-font = 2;
           label-focused-foreground = colors.nord6;
           label-focused-background = "\${self.format-background}";
           label-focused-padding = 1;
 
           # visible = Active workspace on unfocused monitor
           label-visible = "%name%";
+          label-visible-font = 2;
           label-visible-foreground = colors.nord10;
           label-visible-background = "\${self.format-background}";
           label-visible-padding = 1;
 
           # urgent = Workspace with urgency hint set
           label-urgent = "%name%";
+          label-urgent-font = 2;
           label-urgent-foreground = colors.nord13;
           label-urgent-background = "\${self.format-background}";
           label-urgent-padding = 1;
@@ -1797,7 +1799,7 @@ in {
           type = "internal/xwindow";
           format-background = colors.nord1;
           format-suffix = "";
-          format-suffix-font = 4;
+          format-suffix-font = 1;
           format-suffix-foreground = colors.nord1;
           format-suffix-background = colors.background;
           # Prepend a zero-width space to keep rendering
@@ -1864,6 +1866,7 @@ in {
           format-prefix-underline = colors.secondary;
 
           label-layout = "%name%";
+          label-layout-font = 3;
           label-layout-underline = colors.secondary;
 
           label-indicator-padding = 2;
@@ -1886,12 +1889,14 @@ in {
           format-underline = colors.nord10;
 
           label = "%date% %time%";
+          label-font = 3;
         };
         "module/battery" = {
           type = "internal/battery";
           battery = "BAT0";
           adapter = "ADP1";
           full-at = "98";
+          label-font = 3;
 
           format-charging = "<animation-charging> <label-charging>";
           format-charging-underline = colors.nord13;
@@ -1949,7 +1954,7 @@ in {
         in {
           type = "custom/script";
           label = "%output%";
-          label-font = 2;
+          label-font = 3;
           interval = 2;
           click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
           click-left = "${pipewire-simple} --mute &";
@@ -2400,9 +2405,9 @@ in {
         ;;
         ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
         ;; font string. You generally only need these two:
-        (setq doom-font (font-spec :family "Iosevka Term" :size 12 :weight 'light)
+        (setq doom-font (font-spec :family "Iosevka" :size 12 :weight 'light)
               doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13)
-              doom-big-font (font-spec :family "Iosevka Term" :size 24 :weight 'light))
+              doom-big-font (font-spec :family "Iosevka" :size 24 :weight 'light))
 
         ;; There are two ways to load a theme. Both assume the theme is installed and
         ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -3400,12 +3405,12 @@ in {
       google-fonts
       league-of-moveable-type
 
-      (nerdfonts.override { fonts = [ "Iosevka" ]; })
+      # Iosevka and friends
+      iosevka-bin
       (iosevka-bin.override { variant = "aile"; })
       (iosevka-bin.override { variant = "etoile"; })
 
-      # Coding fonts
-      # iosevka
+      # Other Coding fonts
       # hack-font
       # go-font
       # hasklig
@@ -3414,9 +3419,38 @@ in {
       # mononoki
       # fantasque-sans-mono
 
-      # Icon fonts
-      font-awesome
-      material-icons
+      # Nerd Fonts but just the symbols
+      # Set FontConfig to use it as a fallback for most monospaced fonts
+      (stdenv.mkDerivation {
+        name = "symbols-nerd-font";
+        version = "2.2.0";
+        src = fetchFromGitHub {
+          owner = "ryanoasis";
+          repo = "nerd-fonts";
+          rev = "FontPatcher";
+          sha256 = "ORQUN4oMxgf9y1K0cQqgiREefk6edbvmRFPQ5G4uKwo=";
+          sparseCheckout = ''
+            10-nerd-font-symbols.conf
+            patched-fonts/NerdFontsSymbolsOnly
+          '';
+        };
+        dontConfigure = true;
+        dontBuild = true;
+        installPhase = ''
+          runHook preInstall
+
+          fontconfigdir="$out/etc/fonts/conf.d"
+          install -d "$fontconfigdir"
+          install 10-nerd-font-symbols.conf "$fontconfigdir"
+
+          fontdir="$out/share/fonts/truetype"
+          install -d "$fontdir"
+          install "patched-fonts/NerdFontsSymbolsOnly/complete/Symbols-2048-em Nerd Font Complete.ttf" "$fontdir"
+
+          runHook postInstall
+        '';
+        enableParallelBuilding = true;
+      })
 
       # Non-latin character sets
       junicode
