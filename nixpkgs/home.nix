@@ -1188,6 +1188,7 @@ in {
       ];
       opacityRule = [
         "100:class_g *?= 'zoom' && name *?= 'meeting'"
+        "100:role = 'browser' && name ^= 'Netflix'"
         "100:role = 'browser' && name ^= 'Meet -'"
         "100:role = 'browser' && name ~= '\\\\(.*\\\\) \\\\| Microsoft Teams'"
         "90:class_g = 'Emacs'"
@@ -1247,6 +1248,7 @@ in {
           "name = 'Picture-in-Picture'",
           "_NET_WM_STATE@:32a *= '_NET_WM_STATE_FULLSCREEN'",
           "class_g *?= 'zoom' && name *?= 'meeting'",
+          "role = 'browser' && name ^= 'Netflix'",
           "role = 'browser' && name ^= 'Meet -'",
           "role = 'browser' && name ~= '\\\\(.*\\\\) \\\\| Microsoft Teams'"
         ];
