@@ -1186,19 +1186,22 @@ in {
         "name = 'cpt_frame_xcb_window'"
         "class_g *?= 'zoom' && name *?= 'meeting'"
       ];
-      opacityRule = [
-        "100:class_g *?= 'zoom' && name *?= 'meeting'"
-        "100:role = 'browser' && name ^= 'Netflix'"
-        "100:role = 'browser' && name ^= 'Meet -'"
-        "100:role = 'browser' && name ~= '\\\\(.*\\\\) \\\\| Microsoft Teams'"
-        "90:class_g = 'Emacs'"
-        "90:class_g = 'kitty'"
-        "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
-        "0:_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
-        "0:_NET_WM_STATE@[2]:32a *= '_NET_WM_STATE_HIDDEN'"
-        "0:_NET_WM_STATE@[3]:32a *= '_NET_WM_STATE_HIDDEN'"
-        "0:_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
-      ];
+      opacityRule =
+        # Only apply these opacity rules if the windows are not hidden
+        map (str: str + " && !_NET_WM_STATE@:32a") [
+          "100:class_g *?= 'zoom' && name *?= 'meeting'"
+          "100:role = 'browser' && name ^= 'Meet -'"
+          "100:role = 'browser' && name ~= '\\\\(.*\\\\) \\\\| Microsoft Teams'"
+          "100:role = 'browser' && name ^= 'Netflix'"
+          "90:class_g = 'Emacs'"
+          "90:class_g = 'kitty'"
+        ] ++ [
+          "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
+          "0:_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
+          "0:_NET_WM_STATE@[2]:32a *= '_NET_WM_STATE_HIDDEN'"
+          "0:_NET_WM_STATE@[3]:32a *= '_NET_WM_STATE_HIDDEN'"
+          "0:_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
+        ];
       vSync = true;
       # blur = {
       #   method = "kernel";
