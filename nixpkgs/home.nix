@@ -1188,7 +1188,7 @@ in {
       ];
       opacityRule =
         # Only apply these opacity rules if the windows are not hidden
-        map (str: str + " && !_NET_WM_STATE@:32a") [
+        map (str: str + " && !(_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN')") [
           "100:class_g *?= 'zoom' && name *?= 'meeting'"
           "100:role = 'browser' && name ^= 'Meet -'"
           "100:role = 'browser' && name ~= '\\\\(.*\\\\) \\\\| Microsoft Teams'"
