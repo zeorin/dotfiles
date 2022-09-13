@@ -8,6 +8,8 @@ let
       (emacsPackagesFor emacsNativeComp).emacsWithPackages
       (ps: with ps; [ vterm all-the-icons ]);
     pathDeps = with pkgs; [
+      python3
+      aspell
       binutils
       (ripgrep.override { withPCRE2 = true; })
       fd
