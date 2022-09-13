@@ -2780,7 +2780,10 @@ in {
       xorg.xcursorthemes
       protonvpn-gui
       # protonvpn-cli
-      thunderbird
+      # https://github.com/jobisoft/TbSync/issues/591
+      # https://github.com/jobisoft/EAS-4-TbSync/issues/167
+      # thunderbird
+      thunderbird-91
       neomutt
       isync
       zathura
