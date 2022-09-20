@@ -2906,6 +2906,11 @@ in {
       transmission-gtk
       mpv
       weechat
+      yubikey-manager
+      yubikey-manager-qt
+      yubikey-personalization
+      yubikey-personalization-gui
+      yubioath-desktop
       pcmanfm
       lxmenu-data
       shared-mime-info
