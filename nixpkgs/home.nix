@@ -2906,7 +2906,6 @@ in {
       transmission-gtk
       mpv
       weechat
-      keepassxc
       pcmanfm
       lxmenu-data
       shared-mime-info
