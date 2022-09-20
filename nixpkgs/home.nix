@@ -614,6 +614,15 @@ in {
         end
       '';
     };
+    fzf = {
+      enable = true;
+      defaultCommand =
+        "${pkgs.fd}/bin/fd --type file --strip-cwd-prefix --glob";
+      fileWidgetCommand =
+        "${pkgs.fd}/bin/fd --type empty --type file --strip-cwd-prefix --hidden --follow --glob";
+      changeDirWidgetCommand =
+        "${pkgs.fd}/bin/fd --type empty --type directory --strip-cwd-prefix --hidden --follow --glob";
+    };
     git = {
       enable = true;
       userName = "Xandor Schiefer";
