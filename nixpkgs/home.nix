@@ -538,8 +538,6 @@ in {
           "${pkgs.todo-txt-cli}/bin/todo.sh -d ${config.xdg.configHome}/todo/config";
         dud = "du -d 1 -h";
         duf = "du -sh *";
-        fd = "find . -type d -name";
-        ff = "find . -type f -name";
         sortnr = "sort -n -r";
       };
       # Functions defined here are lazy-loaded, so any functions that react to
@@ -2780,6 +2778,7 @@ in {
       filezilla
       silver-searcher
       ripgrep
+      fd
       xorg.xkill
       bc
       feh
