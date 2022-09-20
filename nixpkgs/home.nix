@@ -1146,8 +1146,8 @@ in {
       fade = true;
       fadeDelta = 3;
       inactiveDim = "0.2";
-      inactiveOpacity = "0.8";
-      menuOpacity = "0.9";
+      inactiveOpacity = "0.95";
+      menuOpacity = "0.95";
       shadow = true;
       shadowOffsets = [ (-7) (-7) ];
       shadowExclude = [
@@ -1195,8 +1195,8 @@ in {
           "100:role = 'browser' && name ^= 'Meet -'"
           "100:role = 'browser' && name ~= '\\\\(.*\\\\) \\\\| Microsoft Teams'"
           "100:role = 'browser' && name ^= 'Netflix'"
-          "90:class_g = 'Emacs'"
-          "90:class_g = 'kitty'"
+          "95:class_g = 'Emacs'"
+          "95:class_g = 'kitty'"
         ] ++ [
           "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
           "0:_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
