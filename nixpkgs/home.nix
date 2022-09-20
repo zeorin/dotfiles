@@ -1604,6 +1604,20 @@ in {
           fi
         ''}";
 
+        # Transparency controls
+        "super + Home" = "${pkgs.picom}/bin/picom-trans --current --delete";
+        "super + button2" = "${pkgs.picom}/bin/picom-trans --current --delete";
+        "super + Prior" =
+          "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
+        "super + button5" =
+          "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
+        "super + Next" = "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
+        "super + button4" =
+          "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
+        "super + End" = "${pkgs.picom}/bin/picom-trans --current --opacity=100";
+        "super + shift + button2" =
+          "${pkgs.picom}/bin/picom-trans --current --opacity=100";
+
         # Lock screen
         "super + x" = "${pkgs.systemd}/bin/loginctl lock-session";
 
