@@ -24,6 +24,8 @@ let
       pandoc
       gcc
       graphviz-nox
+      beancount
+      fava
       haskellPackages.hoogle
       haskellPackages.cabal-install
       haskellPackages.brittany
@@ -34,6 +36,7 @@ let
       nodePackages.typescript-language-server
       nodePackages.vscode-css-languageserver-bin
       nodePackages.vscode-html-languageserver-bin
+      nodePackages.beancount-langserver # TODO This has been rewritten in Rust
       nodePackages.prettier
       jq
       nixfmt
@@ -2170,6 +2173,7 @@ in {
 
                  :lang
                  ;;agda              ; types of types of types of types...
+                 (beancount +lsp)    ; Mind the GAAP
                  ;;cc                ; C/C++/Obj-C madness
                  ;;clojure           ; java with a lisp
                  ;;common-lisp       ; if you've seen one lisp, you've seen them all
@@ -2308,6 +2312,8 @@ in {
           (package! org-super-agenda)
 
           (package! mermaid-mode)
+
+          (package! csv-mode)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
