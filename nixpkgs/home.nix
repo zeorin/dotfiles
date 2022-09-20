@@ -2054,6 +2054,8 @@ in {
 
           (add-to-list 'auto-mode-alist '("\\.mermaid\\'" . mermaid-mode))
           (setq mermaid-output-format ".svg")
+
+          (setq fancy-splash-image "${../backgrounds/doom.png}")
       '';
       "doom/init.el" = {
         text = ''
