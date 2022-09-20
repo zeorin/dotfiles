@@ -1869,6 +1869,10 @@ in {
           })
           (mkFloating { class = "^(?i)zoom$"; })
           (mkFloating { class = "(?i)blueman-manager"; })
+          (mkFloating {
+            class = "^Steam$";
+            title = "^Steam Guard";
+          })
           (mkFloating { window_type = "dialog"; })
           (mkFloating { window_role = "pop-up"; })
           (mkFloating { window_role = "(?i)about"; })
