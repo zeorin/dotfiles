@@ -742,7 +742,8 @@ in {
     gpg = {
       enable = true;
       homedir = "${config.xdg.dataHome}/gnupg";
-      settings = {
+      settings = let myKey = "0x5E1C0971FE4F665A";
+      in {
         # https://github.com/drduh/config/blob/master/gpg.conf
         # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
         # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
@@ -773,13 +774,20 @@ in {
         no-greeting = true;
         # Long hexidecimal key format
         keyid-format = "0xlong";
-        # Display UID validity
-        list-options = "show-uid-validity";
-        verify-options = "show-uid-validity";
+        list-options = lib.strings.concatStringsSep "," [
+          # Display UID validity
+          "show-uid-validity"
+          # Show expired keys
+          "show-unusable-subkeys"
+        ];
+        verify-options = lib.strings.concatStringsSep "," [
+          # Display UID validity
+          "show-uid-validity"
+        ];
         # Display all keys and their fingerprints
         with-fingerprint = true;
         # Display key origins and updates
-        #with-key-origin = true;
+        with-key-origin = true;
         # Cross-certify subkeys are present and valid
         require-cross-certification = true;
         # Disable caching of passphrase for symmetrical ops
@@ -789,10 +797,13 @@ in {
         # Disable recipient key ID in messages
         throw-keyids = true;
         # Default/trusted key ID to use (helpful with throw-keyids)
-        default-key = "0x52ABD68B752E5959";
-        trusted-key = "0x52ABD68B752E5959";
-        # Group recipient keys (preferred ID last)
-        #"group keygroup" = "0xFF00000000000001 0xFF00000000000002 0xFF3E7D88647EBCDB";
+        default-key = myKey;
+        # If no explicit recipient(s) are given, encrypt to the default key
+        default-recipient-self = true;
+        # If recipient(s) are given, also encrypt to self so we can also decrypt it, but don't mention it
+        hidden-encrypt-to = myKey;
+        # Always trust our own key
+        trusted-key = myKey;
         # Keyserver URL
         keyserver = [
           "hkps://keys.openpgp.org"
@@ -800,10 +811,6 @@ in {
           "hkps://hkps.pool.sks-keyservers.net"
           "hkps://pgp.ocf.berkeley.edu"
         ];
-        # Verbose output
-        #verbose = true;
-        # Show expired subkeys
-        #list-options = "show-unusable-subkeys";
       };
     };
     htop = {
