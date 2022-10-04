@@ -805,12 +805,12 @@ in {
         # Always trust our own key
         trusted-key = myKey;
         # Keyserver URL
-        keyserver = [
-          "hkps://keys.openpgp.org"
-          "hkps://keyserver.ubuntu.com"
-          "hkps://hkps.pool.sks-keyservers.net"
-          "hkps://pgp.ocf.berkeley.edu"
-        ];
+        keyserver = "hkps://keys.openpgp.org";
+        # keyserver = "hkps://keyserver.ubuntu.com";
+        # keyserver = "hkps://pgp.mit.edu";
+        # keyserver = "hkps://keyoxide.org";
+        # keyserver = "hkps://keybase.io";
+        # keyserver = "hkps://keys.mailvelope.com";
       };
     };
     htop = {
