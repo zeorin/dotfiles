@@ -3,6 +3,8 @@
 let
   unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 
+  myKey = "0x5E1C0971FE4F665A";
+
   my-emacs = let
     emacsPkg = with pkgs;
       (emacsPackagesFor emacsNativeComp).emacsWithPackages
@@ -674,7 +676,7 @@ in {
         }
       ];
       signing = {
-        key = null;
+        key = myKey;
         signByDefault = true;
       };
       delta = {
@@ -743,8 +745,7 @@ in {
     gpg = {
       enable = true;
       homedir = "${config.xdg.dataHome}/gnupg";
-      settings = let myKey = "0x5E1C0971FE4F665A";
-      in {
+      settings = {
         # https://github.com/drduh/config/blob/master/gpg.conf
         # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Configuration-Options.html
         # https://www.gnupg.org/documentation/manuals/gnupg/GPG-Esoteric-Options.html
@@ -1406,7 +1407,8 @@ in {
           height = 24;
 
           modules-left = "i3 title";
-          # modules-center = "mpd";
+          # modules-center = "yubikey mpd";
+          modules-center = "yubikey";
           modules-right = "pipewire-simple xkeyboard battery date";
 
           font-0 = "Symbols Nerd Font:size=18;3";
@@ -1595,6 +1597,29 @@ in {
           animation-charging-2 = "";
           animation-charging-foreground = colors.foreground-alt;
           animation-charging-framerate = 750;
+        };
+        "module/yubikey" = let
+          indicator-script =
+            pkgs.writeShellScript "yubikey-indicator-script.sh" ''
+              ${pkgs.nmap}/bin/ncat --unixsock $XDG_RUNTIME_DIR/yubikey-touch-detector.socket | while read -n5 message; do
+                [[ $message = *1 ]] && echo "                " || echo ""
+              done
+            '';
+        in {
+          type = "custom/script";
+          exec = indicator-script;
+          tail = true;
+          format-background = colors.alert;
+          format-foreground = colors.background;
+          label-font = 2;
+          format-prefix = "";
+          format-prefix-font = 1;
+          format-prefix-foreground = colors.alert;
+          format-prefix-background = colors.background;
+          format-suffix = "";
+          format-suffix-font = 1;
+          format-suffix-foreground = colors.alert;
+          format-suffix-background = colors.background;
         };
         "module/pipewire-simple" = let
           pipewire-simple = pkgs.writeShellScript "pipewire-simple.sh" ''
@@ -2022,8 +2047,8 @@ in {
           Description = "Forward bluetooth media controls to MPRIS";
           After = [ "network.target" "sound.target" ];
         };
-        Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
         Install.WantedBy = [ "default.target" ];
+        Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
       };
       picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
       xfsettingsd = {
@@ -2032,12 +2057,24 @@ in {
           After = [ "graphical-session-pre.target" ];
           PartOf = [ "graphical-session.target" ];
         };
-
         Install.WantedBy = [ "graphical-session.target" ];
-
         Service = {
           Environment = "PATH=${config.home.profileDirectory}/bin";
           ExecStart = "${pkgs.xfce.xfce4-settings}/bin/xfsettingsd";
+          Restart = "on-abort";
+        };
+      };
+      yubikey-touch-detector = {
+        Unit = {
+          Description =
+            "A tool to detect when your YubiKey is waiting for a touch";
+          After = [ "graphical-session-pre.target" ];
+          PartOf = [ "graphical-session.target" ];
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
+        Service = {
+          ExecStart =
+            "${pkgs.yubikey-touch-detector}/bin/yubikey-touch-detector --libnotify";
           Restart = "on-abort";
         };
       };
