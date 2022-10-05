@@ -673,6 +673,10 @@ in {
           condition = "gitdir:~/Code/NectaTech/";
         }
       ];
+      signing = {
+        key = null;
+        signByDefault = true;
+      };
       delta = {
         enable = true;
         options = {
