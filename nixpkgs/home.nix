@@ -206,7 +206,6 @@ in {
       CURL_HOME = "${configHome}/curl";
       INPUTRC = "${configHome}/readline/inputrc";
       NPM_CONFIG_USERCONFIG = "${configHome}/npm/npmrc";
-      WEECHAT_HOME = "${configHome}/weechat";
       WGETRC = "${configHome}/wget/wgetrc";
       LESSHISTFILE = "${cacheHome}/less/history";
       PSQL_HISTORY = "${cacheHome}/pg/psql_history";
