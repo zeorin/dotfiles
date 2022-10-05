@@ -985,6 +985,29 @@ in {
         };
       };
     };
+    ssh = {
+      enable = true;
+      # Enable compression for slow networks, for fast ones this slows it down
+      # compression = true;
+      # Share connections to same host
+      controlMaster = "auto";
+      controlPersist = "10m";
+      extraConfig = ''
+        # Only attempt explicitly specified identities
+        IdentitiesOnly yes
+        IdentityFile ~/.ssh/id_ed25519
+
+        # By default add the key to the agent so we're not asked for the passphrase again
+        AddKeysToAgent yes
+
+        # Use a faster cipher
+        Ciphers aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+
+        # Login more quickly by bypassing IPv6 lookup
+        AddressFamily inet
+      '';
+      includes = [ "config_local" ];
+    };
     starship = {
       enable = true;
       settings = {
