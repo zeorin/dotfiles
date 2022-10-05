@@ -895,10 +895,11 @@ in {
           pass-genphrase
           pass-tomb
         ]);
-        settings = {
-          PASSWORD_STORE_GPG_OPTS = "--no-throw-keyids";
-          PASSWORD_STORE_GENERATED_LENGTH = "128";
-        };
+      settings = {
+        PASSWORD_STORE_GPG_OPTS = "--no-throw-keyids";
+        PASSWORD_STORE_GENERATED_LENGTH = "128";
+        PASSWORD_STORE_CHARACTER_SET = "[:print:]"; # All printable characters
+      };
     };
     rofi = {
       enable = true;
