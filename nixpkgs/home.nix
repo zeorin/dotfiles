@@ -201,7 +201,6 @@ in {
       VISUAL = "${EDITOR}";
       LESS = "-FiRx4";
       PAGER = "less ${LESS}";
-      PASSWORD_STORE_GENERATED_LENGTH = 128;
 
       # Help some tools actually adhere to XDG Base Dirs
       CURL_HOME = "${configHome}/curl";
@@ -215,7 +214,6 @@ in {
       GOPATH = "${dataHome}/go";
       MYSQL_HISTFILE = "${dataHome}/mysql_history";
       NODE_REPL_HISTORY = "${dataHome}/node_repl_history";
-      PASSWORD_STORE_DIR = "${dataHome}/pass";
       STACK_ROOT = "${dataHome}/stack";
       WINEPREFIX = "${dataHome}/wineprefixes/default";
       DOOMDIR = "${configHome}/doom";
@@ -898,6 +896,10 @@ in {
           pass-genphrase
           pass-tomb
         ]);
+        settings = {
+          PASSWORD_STORE_GPG_OPTS = "--no-throw-keyids";
+          PASSWORD_STORE_GENERATED_LENGTH = "128";
+        };
     };
     rofi = {
       enable = true;
