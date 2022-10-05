@@ -2940,6 +2940,12 @@ in {
       qutebrowser
       luakit
       surf
+      (qmk.overrideAttrs (oldAttrs: {
+        propagatedBuildInputs = oldAttrs.propagatedBuildInputs
+          ++ (with python3Packages; [ pyserial pillow ]);
+      }))
+      dfu-programmer
+      vial
     ] ++ (let
       mkFirefox = { name, desktopName, profileName }:
         let
