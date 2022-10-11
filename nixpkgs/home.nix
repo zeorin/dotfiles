@@ -2740,6 +2740,12 @@ in {
         " Don't autofocus!
         autocmd TabEnter .* unfocus
         autocmd DocLoad .* unfocus
+
+        " Disable Tridactyl on certain websites
+        blacklistadd monkeytype\.com
+        blacklistadd codepen\.io
+        blacklistadd codesandbox\.io
+        blacklistadd github\.dev
       '';
       "tridactyl/themes/zeorin.css".text = ''
         .TridactylOwnNamespace body {
