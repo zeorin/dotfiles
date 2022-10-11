@@ -3067,7 +3067,9 @@ in {
       unstable.zoom-us
       unstable.element-desktop
       unstable.spotify
-      unstable.minecraft
+      # https://github.com/NixOS/nixpkgs/issues/179323
+      # unstable.minecraft
+      polymc
       manix
       cachix
       nix-prefetch-git
