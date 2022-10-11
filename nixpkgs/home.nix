@@ -2696,16 +2696,9 @@ in {
         " Open right click menu on links
         bind ;C composite hint_focus; !s ${pkgs.xdotool}/bin/xdotool key Menu
 
-        " Comment toggler for Reddit, Hacker News and Lobste.rs
-        bind ;c hint -Jc [class*="expand"],[class="togg"],[class="comment_folder"]
-
         " The default is unintuitive
         bind J tabnext
         bind K tabprev
-
-        " Don't steal my focus
-        autocmd TabEnter .* unfocus
-        autocmd DocLoad .* unfocus
 
         " Emulate arrow keys in insert mode!
         bind --mode=insert <C-h> !s ${pkgs.xdotool}/bin/xdotool key Left
