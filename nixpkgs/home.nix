@@ -992,7 +992,7 @@ in {
       # compression = true;
       # Share connections to same host
       controlMaster = "auto";
-      controlPersist = "10m";
+      controlPersist = "yes";
       extraConfig = ''
         # Only attempt explicitly specified identities
         IdentitiesOnly yes
