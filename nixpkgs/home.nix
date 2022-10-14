@@ -2958,7 +2958,10 @@ in {
       # https://github.com/jobisoft/TbSync/issues/591
       # https://github.com/jobisoft/EAS-4-TbSync/issues/167
       # thunderbird
-      thunderbird-91
+      # thunderbird-91
+      (import (builtins.fetchTarball {
+        url = "https://github.com/NixOS/nixpkgs/archive/92626510b67ffef7cbc758b07fc52617380e9efb.tar.gz";
+      }) {}).thunderbird-91
       neomutt
       isync
       zathura
