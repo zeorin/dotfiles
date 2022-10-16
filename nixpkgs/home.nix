@@ -2940,7 +2940,12 @@ in {
       httpie
       lxqt.lxqt-policykit
       xdg-user-dirs
-      wineWowPackages.stable
+      # https://github.com/NixOS/nixpkgs/issues/189567
+      # wineWowPackages.stable
+      (import (builtins.fetchTarball {
+        url =
+          "https://github.com/NixOS/nixpkgs/archive/7342cdc70156522050ce813386f6e159ca749d82.tar.gz";
+      }) { }).wineWowPackages.stable
       winetricks
       protontricks
       jrnl
