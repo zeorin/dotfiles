@@ -219,6 +219,11 @@ in {
       WINEPREFIX = "${dataHome}/wineprefixes/default";
       DOOMDIR = "${configHome}/doom";
       DOOMLOCALDIR = "${dataHome}/doom";
+      # Use `pass` to input the sudo password
+      SUDO_ASKPASS = pkgs.writeShellScript "sudo-askpass-pass.sh" ''
+        hostname="$(${pkgs.hostname}/bin/hostname)"
+        ${pkgs.pass}/bin/pass "$hostname/$USER" | head -n1
+      '';
     };
     activation = with config.xdg; {
       createXdgCacheAndDataDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -541,6 +546,7 @@ in {
         dud = "du -d 1 -h";
         duf = "du -sh *";
         sortnr = "sort -n -r";
+        sudo = "sudo --askpass";
       };
       # Functions defined here are lazy-loaded, so any functions that react to
       # signals shouldn’t be defined here.
