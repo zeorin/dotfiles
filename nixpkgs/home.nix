@@ -219,6 +219,13 @@ in {
       WINEPREFIX = "${dataHome}/wineprefixes/default";
       DOOMDIR = "${configHome}/doom";
       DOOMLOCALDIR = "${dataHome}/doom";
+
+      # Use `pass` to input SSH passwords
+      SSH_ASKPASS_REQUIRE = "force";
+      SSH_ASKPASS = pkgs.writeShellScript "ssh-askpass-pass.sh" ''
+        key="$(echo "$1" | sed -e "s/^.*\/\(.*[^']\)'\{0,1\}:.*$/\1/")"
+        ${pkgs.pass}/bin/pass "ssh/$key" | head -n1
+      '';
       # Use `pass` to input the sudo password
       SUDO_ASKPASS = pkgs.writeShellScript "sudo-askpass-pass.sh" ''
         hostname="$(${pkgs.hostname}/bin/hostname)"
@@ -1243,6 +1250,8 @@ in {
       pinentryFlavor = "gnome3";
       defaultCacheTtl = 60;
       maxCacheTtl = 120;
+      defaultCacheTtlSsh = 60;
+      maxCacheTtlSsh = 120;
     };
     network-manager-applet.enable = true;
     nextcloud-client.enable = true;
