@@ -1005,6 +1005,7 @@ in {
       # compression = true;
       # Share connections to same host
       controlMaster = "auto";
+      controlPath = "\${XDG_RUNTIME_DIR}/master-%r@%n:%p";
       controlPersist = "yes";
       extraConfig = ''
         # Only attempt explicitly specified identities
