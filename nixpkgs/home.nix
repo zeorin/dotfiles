@@ -2986,8 +2986,9 @@ in {
       # thunderbird
       # thunderbird-91
       (import (builtins.fetchTarball {
-        url = "https://github.com/NixOS/nixpkgs/archive/92626510b67ffef7cbc758b07fc52617380e9efb.tar.gz";
-      }) {}).thunderbird-91
+        url =
+          "https://github.com/NixOS/nixpkgs/archive/92626510b67ffef7cbc758b07fc52617380e9efb.tar.gz";
+      }) { }).thunderbird-91
       neomutt
       isync
       zathura
