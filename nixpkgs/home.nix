@@ -446,6 +446,7 @@ in {
         };
         enableUserChrome = {
           "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+          "browser.autofocus" = false;
         };
         saneNewTab = {
           # Don't open links in new tabs, except when it makes sense
@@ -2754,14 +2755,18 @@ in {
         set hintdelay 100
 
         " Don't autofocus!
-        autocmd TabEnter .* unfocus
-        autocmd DocLoad .* unfocus
+        set allowautofocus false
 
         " Disable Tridactyl on certain websites
-        blacklistadd monkeytype\.com
-        blacklistadd codepen\.io
-        blacklistadd codesandbox\.io
-        blacklistadd github\.dev
+        ${lib.strings.concatMapStrings (url: ''
+          blacklistadd ${url}
+          seturl ${url} allowautofocus true
+        '') [
+          "monkeytype\\.com"
+          "codepen\\.io"
+          "codesandbox\\.io"
+          "github\\.dev"
+        ]}
       '';
       "tridactyl/themes/zeorin.css".text = ''
         .TridactylOwnNamespace body {
