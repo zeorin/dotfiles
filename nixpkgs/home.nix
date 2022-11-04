@@ -181,7 +181,6 @@ in {
   ];
 
   programs.home-manager.enable = true;
-  programs.man.generateCaches = true;
 
   home = {
     username = "zeorin";
