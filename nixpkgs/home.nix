@@ -3128,8 +3128,7 @@ in {
       unstable.element-desktop
       unstable.spotify
       # https://github.com/NixOS/nixpkgs/issues/179323
-      # unstable.minecraft
-      polymc
+      prismlauncher
       manix
       cachix
       nix-prefetch-git
