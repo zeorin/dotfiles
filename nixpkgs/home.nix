@@ -250,6 +250,36 @@ in {
           ${config.home.homeDirectory}/Screenshots
       '';
     };
+    shellAliases = with pkgs; {
+      g = "${git}/bin/git";
+      e = "$EDITOR";
+      m = "${neomutt}/bin/neomutt";
+      h = "${home-manager}/bin/home-manager";
+      o = "${xdg-utils}/bin/xdg-open";
+      s = "${systemd}/bin/systemctl";
+      t = "tail -f";
+      d = "${docker}/bin/docker";
+      j = "${systemd}/bin/journalctl -xe";
+      ls = "${lsd}/bin/lsd";
+      l = "ls -lFh"; # size,show type,human readable
+      la = "ls -lAFh"; # long list,show almost all,show type,human readable
+      lr = "ls -tRFh"; # sorted by date,recursive,show type,human readable
+      lt = "ls -ltFh"; # long list,sorted by date,show type,human readable
+      ll = "ls -l"; # long list
+      ldot = "ls -ld .*";
+      lS = "ls -1FSsh";
+      lart = "ls -1Fcart";
+      lrt = "ls -1Fcrt";
+      tree = "${lsd}/bin/lsd --tree";
+      cat = "${bat}/bin/bat";
+      grep = "grep --color=auto";
+      sgrep = "grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS}";
+      hgrep = "fc -El 0 | grep";
+      dud = "du -d 1 -h";
+      duf = "du -sh *";
+      sortnr = "sort -n -r";
+      sudo = "sudo --askpass";
+    };
   };
 
   programs = {
@@ -522,38 +552,6 @@ in {
     };
     fish = {
       enable = true;
-      shellAliases = {
-        g = "git";
-        e = "$EDITOR";
-        m = "neomutt";
-        h = "home-manager";
-        o = "xdg-open";
-        s = "systemctl";
-        t = "tail -f";
-        d = "docker";
-        j = "journalctl -xe";
-        ls = "${pkgs.lsd}/bin/lsd";
-        l = "ls -lFh"; # size,show type,human readable
-        la = "ls -lAFh"; # long list,show almost all,show type,human readable
-        lr = "ls -tRFh"; # sorted by date,recursive,show type,human readable
-        lt = "ls -ltFh"; # long list,sorted by date,show type,human readable
-        ll = "ls -l"; # long list
-        ldot = "ls -ld .*";
-        lS = "ls -1FSsh";
-        lart = "ls -1Fcart";
-        lrt = "ls -1Fcrt";
-        tree = "${pkgs.lsd}/bin/lsd --tree";
-        cat = "${pkgs.bat}/bin/bat";
-        grep = "grep --color=auto";
-        sgrep = "grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS}";
-        hgrep = "fc -El 0 | grep";
-        todo =
-          "${pkgs.todo-txt-cli}/bin/todo.sh -d ${config.xdg.configHome}/todo/config";
-        dud = "du -d 1 -h";
-        duf = "du -sh *";
-        sortnr = "sort -n -r";
-        sudo = "sudo --askpass";
-      };
       # Functions defined here are lazy-loaded, so any functions that react to
       # signals shouldn’t be defined here.
       functions = {
