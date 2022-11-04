@@ -180,8 +180,6 @@ in {
     }/modules/vscode-server/home.nix"
   ];
 
-  programs.home-manager.enable = true;
-
   home = {
     username = "zeorin";
     homeDirectory = "/home/${config.home.username}";
@@ -255,6 +253,7 @@ in {
   };
 
   programs = {
+    home-manager.enable = true;
     bash.enable = true;
     browserpass = {
       enable = true;
