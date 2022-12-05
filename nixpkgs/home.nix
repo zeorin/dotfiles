@@ -251,15 +251,15 @@ in {
       '';
     };
     shellAliases = with pkgs; {
-      g = "${git}/bin/git";
+      g = "git";
       e = "$EDITOR";
-      m = "${neomutt}/bin/neomutt";
-      h = "${home-manager}/bin/home-manager";
-      o = "${xdg-utils}/bin/xdg-open";
-      s = "${systemd}/bin/systemctl";
+      m = "neomutt";
+      h = "home-manager";
+      o = "xdg-open";
+      s = "systemctl";
       t = "tail -f";
-      d = "${docker}/bin/docker";
-      j = "${systemd}/bin/journalctl -xe";
+      d = "docker";
+      j = "journalctl -xe";
       ls = "${lsd}/bin/lsd";
       l = "ls -lFh"; # size,show type,human readable
       la = "ls -lAFh"; # long list,show almost all,show type,human readable
