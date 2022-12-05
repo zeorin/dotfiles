@@ -7,7 +7,7 @@ let
 
   my-emacs = let
     emacsPkg = with pkgs;
-      (emacsPackagesFor emacsNativeComp).emacsWithPackages
+      (emacsPackagesFor emacs).emacsWithPackages
       (ps: with ps; [ vterm all-the-icons ]);
     pathDeps = with pkgs; [
       python3
@@ -27,6 +27,7 @@ let
       gcc
       graphviz-nox
       beancount
+      beancount-language-server
       fava
       haskellPackages.hoogle
       haskellPackages.cabal-install
@@ -38,7 +39,6 @@ let
       nodePackages.typescript-language-server
       nodePackages.vscode-css-languageserver-bin
       nodePackages.vscode-html-languageserver-bin
-      nodePackages.beancount-langserver # TODO This has been rewritten in Rust
       nodePackages.prettier
       jq
       nixfmt
@@ -3006,7 +3006,7 @@ in {
       lxappearance
       xorg.xcursorthemes
       protonvpn-gui
-      # protonvpn-cli
+      protonvpn-cli
       # https://github.com/jobisoft/TbSync/issues/591
       # https://github.com/jobisoft/EAS-4-TbSync/issues/167
       # thunderbird
@@ -3025,7 +3025,7 @@ in {
       }))
       gnome.gnome-calculator
       gnome.file-roller
-      unstable.yt-dlp
+      yt-dlp
       screenkey
       slop
       system-config-printer
@@ -3042,7 +3042,7 @@ in {
       pcmanfm
       lxmenu-data
       shared-mime-info
-      unstable.lutris
+      lutris
       vulkan-tools
       gimp
       inkscape
@@ -3118,17 +3118,17 @@ in {
       google-chrome
       google-chrome-beta
       google-chrome-dev
-      unstable.tor-browser-bundle-bin
+      tor-browser-bundle-bin
       virt-manager
       qemu
-      unstable.slack
-      unstable.discord
-      unstable.tdesktop
-      unstable.skypeforlinux
-      unstable.signal-desktop
-      unstable.zoom-us
-      unstable.element-desktop
-      unstable.spotify
+      slack
+      discord
+      tdesktop
+      skypeforlinux
+      signal-desktop
+      zoom-us
+      element-desktop
+      spotify
       # https://github.com/NixOS/nixpkgs/issues/179323
       prismlauncher
       manix
@@ -3136,7 +3136,7 @@ in {
       nix-prefetch-git
       nix-prefetch
       keybase
-      unstable.comma
+      comma
       zeal
 
       # For dark mode toggling
@@ -3234,10 +3234,10 @@ in {
           repo = "nerd-fonts";
           rev = "FontPatcher";
           sha256 = "ORQUN4oMxgf9y1K0cQqgiREefk6edbvmRFPQ5G4uKwo=";
-          sparseCheckout = ''
-            10-nerd-font-symbols.conf
-            patched-fonts/NerdFontsSymbolsOnly
-          '';
+          sparseCheckout = [
+            "10-nerd-font-symbols.conf"
+            "patched-fonts/NerdFontsSymbolsOnly"
+          ];
         };
         dontConfigure = true;
         dontBuild = true;
