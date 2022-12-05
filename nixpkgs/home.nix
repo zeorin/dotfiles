@@ -949,9 +949,7 @@ in {
       enable = true;
       pass.enable = true;
       font = "Iosevka 12";
-      location = "center";
       terminal = terminal-emulator;
-      yoffset = -280;
       extraConfig = { show-icons = true; };
       theme = let
         # Use `mkLiteral` for string-like values that should show without
@@ -975,6 +973,9 @@ in {
           spacing = 0;
         };
         window = {
+          location = mkLiteral "north";
+          anchor = mkLiteral "north";
+          y-offset = mkLiteral "280px";
           width = mkLiteral "40em";
           background-color = mkLiteral "@bg0";
         };
