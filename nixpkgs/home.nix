@@ -3156,7 +3156,6 @@ in {
       meslo-lg
 
       # Libre fonts
-      gentium
       gentium-book-basic
       crimson
       dejavu_fonts
