@@ -3042,7 +3042,15 @@ in {
       pcmanfm
       lxmenu-data
       shared-mime-info
-      lutris
+      # https://github.com/lutris/lutris/issues/3965#issuecomment-1100904672
+      (lutris.overrideAttrs (oldAttrs: {
+        installPhase = (oldAttrs.installPhase or "") + ''
+          mkdir -p $out/share
+          rm $out/share/applications
+          cp -R ${lutris-unwrapped}/share/applications $out/share
+          sed -i -e 's/Exec=lutris/Exec=env WEBKIT_DISABLE_COMPOSITING_MODE=1 lutris/' $out/share/applications/*lutris*.desktop
+        '';
+      }))
       vulkan-tools
       gimp
       inkscape
