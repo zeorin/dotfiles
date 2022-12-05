@@ -2978,6 +2978,7 @@ in {
       }) { }).wineWowPackages.stable
       winetricks
       protontricks
+      protonup
       jrnl
       capitaine-cursors
       la-capitaine-icon-theme
