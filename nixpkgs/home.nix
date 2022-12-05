@@ -1298,13 +1298,10 @@ in {
         '';
       });
       backend = "glx";
-      experimentalBackends = true;
-      blur = true;
       fade = true;
       fadeDelta = 3;
-      inactiveDim = "0.2";
-      inactiveOpacity = "0.95";
-      menuOpacity = "0.95";
+      inactiveOpacity = 0.95;
+      menuOpacity = 0.95;
       shadow = true;
       shadowOffsets = [ (-7) (-7) ];
       shadowExclude = [
@@ -1328,29 +1325,12 @@ in {
         "name = 'cpt_frame_xcb_window'"
         "class_g *?= 'zoom' && name *?= 'meeting'"
       ];
-      blurExclude = [
-        # unknown windows
-        "! name~=''"
-        # shaped windows
-        "bounding_shaped && !rounded_corners"
-        # hidden windows
-        "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
-        # stacked / tabbed windows
-        "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
-        "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
-        "_GTK_FRAME_EXTENTS@:c"
-        # Mozilla fixes
-        "(class_g *?= 'Firefox' || class_g *?= 'Thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
-        # Zoom
-        "name = 'cpt_frame_xcb_window'"
-        "class_g *?= 'zoom' && name *?= 'meeting'"
-      ];
-      opacityRule =
+      opacityRules =
         # Only apply these opacity rules if the windows are not hidden
         map (str: str + " && !(_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN')") [
           "100:class_g *?= 'zoom' && name *?= 'meeting'"
           "100:role = 'browser' && name ^= 'Meet -'"
-          "100:role = 'browser' && name ~= '\\\\(.*\\\\) \\\\| Microsoft Teams'"
+          "100:role = 'browser' && name ~= '(.*) | Microsoft Teams'"
           "100:role = 'browser' && name ^= 'Netflix'"
           "95:class_g = 'Emacs'"
           "95:class_g = 'kitty'"
@@ -1362,40 +1342,29 @@ in {
           "0:_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
         ];
       vSync = true;
-      # blur = {
-      #   method = "kernel";
-      #   kernel = "${builtins.readFile (pkgs.runCommand "kernel-blur" { } ''
-      #     $out < ${
-      #       pkgs.writeScript "generate-kernel-blur" ''
-      #         #!${
-      #           unstable.octave.withPackages (ps: with ps; [ image ])
-      #         }/bin/octave
-      #         %INFO https://www.reddit.com/r/unixporn/comments/jncrqp/oc_a_generator_for_gaussian_background_blur/
-      #         pkg load image
-
-      #         width = 23; %anything above 16 here is big and might cause slow rendering
-      #         height = 23;
-      #         sigma = 2*pi; %sigma is the standard deviation (i.e. the "width" or sharpness of the blur)
-
-      #         h = fspecial('gaussian', [width height], sigma)(:); %generates the gaussian matrix
-      #         [scale, index] = max(h);
-      #         h = h / scale; %scales the matrix so that the max element = 1
-      #         h([index]) = []; %removes the max element (the center one)
-
-      #         fprintf('%d,%d,', width, height)
-      #         for n=1:size(h,1)
-      #           fprintf('%.8f,', h(n))
-      #         end
-      #         fprintf('\n')
-      #       ''
-      #     }
-      #   '')}";
-      # };
-      extraOptions = ''
+      settings = {
+        inactive-dim = "0.2";
         blur = {
           method = "dual_kawase";
           strength = "5";
         };
+        blur-exclude = [
+          # unknown windows
+          "! name~=''"
+          # shaped windows
+          "bounding_shaped && !rounded_corners"
+          # hidden windows
+          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
+          # stacked / tabbed windows
+          "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
+          "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
+          "_GTK_FRAME_EXTENTS@:c"
+          # Mozilla fixes
+          "(class_g *?= 'Firefox' || class_g *?= 'Thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
+          # Zoom
+          "name = 'cpt_frame_xcb_window'"
+          "class_g *?= 'zoom' && name *?= 'meeting'"
+        ];
         mark-wmwin-focused = true;
         mark-ovredir-focused = true;
         detect-client-opacity = true;
@@ -1407,12 +1376,12 @@ in {
         xinerama-shadow-crop = true;
         xrender-sync-fence = true;
         focus-exclude = [
-          "name = 'Picture-in-Picture'",
-          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_FULLSCREEN'",
-          "class_g *?= 'zoom' && name *?= 'meeting'",
-          "role = 'browser' && name ^= 'Netflix'",
-          "role = 'browser' && name ^= 'Meet -'",
-          "role = 'browser' && name ~= '\\\\(.*\\\\) \\\\| Microsoft Teams'"
+          "name = 'Picture-in-Picture'"
+          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_FULLSCREEN'"
+          "class_g *?= 'zoom' && name *?= 'meeting'"
+          "role = 'browser' && name ^= 'Netflix'"
+          "role = 'browser' && name ^= 'Meet -'"
+          "role = 'browser' && name ~= '(.*) | Microsoft Teams'"
         ];
         detect-rounded-corners = true;
         # corner-radius = 10;
@@ -1420,7 +1389,7 @@ in {
         #   # notifications
         #   "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_DOCK'",
         # ];
-      '';
+      };
     };
     polybar = {
       enable = true;
