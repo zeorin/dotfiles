@@ -5,7 +5,7 @@ let
 
   myKey = "0x5E1C0971FE4F665A";
 
-  my-emacs = let
+  my-doom-emacs = let
     emacsPkg = with pkgs;
       (emacsPackagesFor emacs).emacsWithPackages
       (ps: with ps; [ vterm all-the-icons ]);
@@ -44,7 +44,7 @@ let
       nixfmt
     ];
   in emacsPkg // (pkgs.symlinkJoin {
-    name = "my-emacs";
+    name = "my-doom-emacs";
     paths = [ emacsPkg ];
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
@@ -620,7 +620,7 @@ in {
 
         # https://github.com/akermu/emacs-libvterm
         if test -n "$INSIDE_EMACS"
-          source ${my-emacs.emacs.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${my-emacs.emacs.pkgs.vterm.version}/etc/emacs-vterm.fish
+          source ${my-doom-emacs.emacs.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${my-doom-emacs.emacs.pkgs.vterm.version}/etc/emacs-vterm.fish
         end
       '';
     };
@@ -1268,7 +1268,7 @@ in {
     };
     emacs = {
       enable = true;
-      package = my-emacs;
+      package = my-doom-emacs;
       client.enable = true;
     };
     flameshot.enable = true;
@@ -2840,13 +2840,21 @@ in {
     desktopEntries = {
       org-protocol = {
         name = "org-protocol";
-        exec = "${my-emacs}/bin/emacsclient -c %u";
+        exec = "${my-doom-emacs}/bin/emacsclient -c %u";
         icon = "emacs";
         type = "Application";
         terminal = false;
         categories = [ "System" ];
         mimeType = [ "x-scheme-handler/org-protocol" ];
         noDisplay = true;
+      };
+      my-emacs = {
+        name = "My Emacs";
+        exec = "${pkgs.emacs-gtk}/bin/emacs --with-profile default";
+        icon = "emacs";
+        type = "Application";
+        terminal = false;
+        categories = [ "System" ];
       };
     };
     mimeApps = {
@@ -2929,7 +2937,7 @@ in {
 
   home.packages = with pkgs;
     [
-      my-emacs
+      my-doom-emacs
       webcamoid
       libnotify
       file
