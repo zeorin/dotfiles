@@ -1816,7 +1816,7 @@ in {
       in {
         bars = [ ];
         gaps = {
-          inner = 20;
+          inner = 0;
           outer = 0;
         };
         fonts = {
