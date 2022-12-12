@@ -2899,10 +2899,10 @@ in {
     '';
     ".xprofile".text = ''
       # Set up Xresources
-      xrdb -load ${configHome}/X11/xresources
+      ${pkgs.xorg.xrdb}/bin/xrdb -load ${configHome}/X11/xresources
 
       # Polkit agent
-      lxqt-policykit-agent &
+      ${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent &
     '';
   };
 
@@ -2946,7 +2946,6 @@ in {
       xclip
       curl
       httpie
-      lxqt.lxqt-policykit
       xdg-user-dirs
       # https://github.com/NixOS/nixpkgs/issues/189567
       # wineWowPackages.stable
