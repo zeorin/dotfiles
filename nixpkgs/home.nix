@@ -1257,10 +1257,10 @@ in {
           markup = "full";
           foreground = colors.nord6;
         };
-        urgency_low = { background = "${colors.nord3}cc"; };
-        urgency_normal = { background = "${colors.nord10}cc"; };
+        urgency_low = { background = "${colors.nord3}99"; };
+        urgency_normal = { background = "${colors.nord10}99"; };
         urgency_critical = {
-          background = "${colors.nord11}cc";
+          background = "${colors.nord11}99";
           fullscreen = "show";
           timeout = 0;
         };
