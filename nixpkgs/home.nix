@@ -852,6 +852,7 @@ in {
       };
       theme = "Nord";
       settings = {
+        background_opacity = "0.95";
         clear_all_shortcuts = true;
         scrollback_lines = 0;
         url_style = "none";
@@ -1334,7 +1335,6 @@ in {
           "100:role = 'browser' && name ^= 'Meet -'"
           "100:role = 'browser' && name ^= 'Netflix'"
           "95:class_g = 'Emacs'"
-          "95:class_g = 'kitty'"
         ] ++ [ "0:_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'" ];
       vSync = true;
       settings = {
@@ -2226,6 +2226,7 @@ in {
           (setq mermaid-output-format ".svg")
 
           (setq fancy-splash-image "${../backgrounds/doom.png}")
+          # (add-to-list 'default-frame-alist '(alpha-background . 95))
       '';
       "doom/init.el" = {
         text = ''
