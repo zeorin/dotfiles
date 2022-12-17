@@ -1328,34 +1328,28 @@ in {
       ];
       opacityRules =
         # Only apply these opacity rules if the windows are not hidden
-        map (str: str + " && !(_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN')") [
+        map
+        (str: str + " && !(_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN')") [
           "100:class_g *?= 'zoom' && name *?= 'meeting'"
           "100:role = 'browser' && name ^= 'Meet -'"
-          "100:role = 'browser' && name ~= '(.*) | Microsoft Teams'"
           "100:role = 'browser' && name ^= 'Netflix'"
           "95:class_g = 'Emacs'"
           "95:class_g = 'kitty'"
-        ] ++ [
-          "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
-          "0:_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
-          "0:_NET_WM_STATE@[2]:32a *= '_NET_WM_STATE_HIDDEN'"
-          "0:_NET_WM_STATE@[3]:32a *= '_NET_WM_STATE_HIDDEN'"
-          "0:_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
-        ];
+        ] ++ [ "0:_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'" ];
       vSync = true;
       settings = {
-        inactive-dim = "0.2";
+        inactive-dim = 0.2;
         blur = {
           method = "dual_kawase";
-          strength = "5";
+          strength = 5;
         };
-        blur-exclude = [
+        blur-background-exclude = [
           # unknown windows
           "! name~=''"
           # shaped windows
           "bounding_shaped && !rounded_corners"
           # hidden windows
-          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
+          "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'"
           # stacked / tabbed windows
           "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
           "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
@@ -1378,11 +1372,10 @@ in {
         xrender-sync-fence = true;
         focus-exclude = [
           "name = 'Picture-in-Picture'"
-          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_FULLSCREEN'"
+          "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_FULLSCREEN'"
           "class_g *?= 'zoom' && name *?= 'meeting'"
           "role = 'browser' && name ^= 'Netflix'"
           "role = 'browser' && name ^= 'Meet -'"
-          "role = 'browser' && name ~= '(.*) | Microsoft Teams'"
         ];
         detect-rounded-corners = true;
         # corner-radius = 10;
