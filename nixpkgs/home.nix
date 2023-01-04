@@ -2226,7 +2226,7 @@ in {
           (setq mermaid-output-format ".svg")
 
           (setq fancy-splash-image "${../backgrounds/doom.png}")
-          # (add-to-list 'default-frame-alist '(alpha-background . 95))
+          ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
       '';
       "doom/init.el" = {
         text = ''
