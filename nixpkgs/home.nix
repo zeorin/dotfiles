@@ -324,6 +324,7 @@ in {
           clearurls
           cookies-txt
           darkreader
+          fediact
           mailvelope
           metamask
           netflix-1080p
