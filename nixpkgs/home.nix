@@ -2090,7 +2090,6 @@ in {
     enable = true;
     userDirs.enable = true;
     configFile = with config.xdg; {
-      "mimeapps.list".force = true; # Force overwrite, don't prompt
       "bat/config".text = ''
         --theme="Nord"
         --italic-text=always
@@ -2817,7 +2816,6 @@ in {
       '';
     };
     dataFile = with config.xdg; {
-      "applications/mimeapps.list".force = true; # Force overwrite, don't prompt
       "dark-mode.d/gtk-theme.sh".source =
         pkgs.writeShellScript "set-dark-theme.sh" ''
           ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Nordic"
@@ -2849,19 +2847,6 @@ in {
         type = "Application";
         terminal = false;
         categories = [ "System" ];
-      };
-    };
-    mimeApps = {
-      enable = true;
-      defaultApplications = {
-        "application/pdf" = [ "org.pwmt.zathura-pdf-mupdf.desktop" ];
-        "application/xhtml+xml" = [ "firefox.desktop" ];
-        "inode/directory" = [ "pcmanfm.desktop" ];
-        "text/html" = [ "firefox.desktop" ];
-        "text/xml" = [ "firefox.desktop" ];
-        "x-scheme-handler/http" = [ "firefox.desktop" ];
-        "x-scheme-handler/https" = [ "firefox.desktop" ];
-        "x-scheme-handler/org-protocol" = [ "org-protocol.desktop" ];
       };
     };
   };
