@@ -3104,6 +3104,7 @@ in {
       signal-desktop
       zoom-us
       element-desktop
+      ferdium
       spotify
       # https://github.com/NixOS/nixpkgs/issues/179323
       prismlauncher
