@@ -2155,7 +2155,7 @@ in {
         ;; font string. You generally only need these two:
         (setq doom-font (font-spec :family "Iosevka" :size 12 :weight 'light)
               doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13)
-              doom-big-font (font-spec :family "Iosevka" :size 24 :weight 'light))
+              doom-big-font (font-spec :family "Iosevka" :size 18 :weight 'light))
 
         ;; There are two ways to load a theme. Both assume the theme is installed and
         ;; available. You can either set `doom-theme' or manually load a theme with the
