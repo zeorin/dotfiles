@@ -949,7 +949,15 @@ in {
     };
     rofi = {
       enable = true;
-      pass.enable = true;
+      pass = {
+        enable = true;
+        extraConfig = ''
+          USERNAME_field='login'
+          default_autotype='path :tab pass'
+          # https://github.com/carnager/rofi-pass/issues/226
+          help_color="#4872FF"
+        '';
+      };
       font = "Iosevka 12";
       terminal = terminal-emulator;
       extraConfig = { show-icons = true; };
@@ -1755,6 +1763,9 @@ in {
 
         # Lock screen
         "super + x" = "${pkgs.systemd}/bin/loginctl lock-session";
+
+        # Programs
+        "super + p" = "${pkgs.rofi-pass}/bin/rofi-pass";
 
         # Audio controls
         "XF86AudioRaiseVolume" =
