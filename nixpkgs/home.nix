@@ -952,6 +952,10 @@ in {
       pass = {
         enable = true;
         extraConfig = ''
+          _rofi () {
+              rofi -dpi 0 -i -no-auto-select "$@"
+          }
+
           USERNAME_field='login'
           default_autotype='path :tab pass'
           # https://github.com/carnager/rofi-pass/issues/226
