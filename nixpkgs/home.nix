@@ -2016,6 +2016,7 @@ in {
             { class = "^Slack$"; }
             { class = "^Skype$"; }
             { class = "^Signal$"; }
+            { class = "^Ferdium$"; }
           ];
         };
         window.border = 0;
