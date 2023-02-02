@@ -2250,6 +2250,11 @@ in {
           (add-to-list 'auto-mode-alist '("\\.mermaid\\'" . mermaid-mode))
           (setq mermaid-output-format ".svg")
 
+          ;; Don't auto-resolve clocks, because all our org-roam files are also
+          ;; agenda files, auto-resolution takes forever as org has to open each
+          ;; of them.
+          (setq org-clock-auto-clock-resolution nil)
+
           (setq fancy-splash-image "${../backgrounds/doom.png}")
           ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
       '';
