@@ -2255,6 +2255,9 @@ in {
           ;; of them.
           (setq org-clock-auto-clock-resolution nil)
 
+          ;; Don't use language servers to auto-format
+          (setq +format-with-lsp nil)
+
           (setq fancy-splash-image "${../backgrounds/doom.png}")
           ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
       '';
