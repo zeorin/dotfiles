@@ -217,6 +217,10 @@ in {
       DOOMDIR = "${configHome}/doom";
       DOOMLOCALDIR = "${dataHome}/doom";
 
+      # Suppress direnv's verbose output
+      # https://github.com/direnv/direnv/issues/68#issuecomment-42525172
+      DIRENV_LOG_FORMAT = "";
+
       # Use `pass` to input SSH passwords
       SSH_ASKPASS_REQUIRE = "force";
       SSH_ASKPASS = pkgs.writeShellScript "ssh-askpass-pass.sh" ''
@@ -1099,6 +1103,11 @@ in {
         rust.symbol = " ";
         scala.symbol = " ";
         swift.symbol = " ";
+        custom.direnv = {
+          format = "[\\[direnv\\]]($style) ";
+          style = "fg:yellow dimmed";
+          when = "env | grep -E '^DIRENV_FILE='";
+        };
       };
     };
     tmux = {
