@@ -1303,10 +1303,10 @@ in {
       enable = true;
       enableSshSupport = true;
       pinentryFlavor = "gnome3";
-      defaultCacheTtl = 60;
-      maxCacheTtl = 120;
-      defaultCacheTtlSsh = 60;
-      maxCacheTtlSsh = 120;
+      defaultCacheTtl = 0;
+      maxCacheTtl = 0;
+      defaultCacheTtlSsh = 0;
+      maxCacheTtlSsh = 0;
     };
     network-manager-applet.enable = true;
     nextcloud-client.enable = true;
