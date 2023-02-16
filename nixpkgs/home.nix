@@ -50,10 +50,12 @@ let
     paths = [ emacsPkg ];
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
-      wrapProgram $out/bin/emacs --prefix PATH : ${lib.makeBinPath pathDeps}
-      wrapProgram $out/bin/emacsclient --prefix PATH : ${
-        lib.makeBinPath pathDeps
-      }
+      wrapProgram $out/bin/emacs \
+        --prefix PATH : ${lib.makeBinPath pathDeps} \
+        --set LSP_USE_PLISTS true
+      wrapProgram $out/bin/emacsclient \
+        --prefix PATH : ${lib.makeBinPath pathDeps} \
+        --set LSP_USE_PLISTS true
     '';
   });
 
@@ -2259,6 +2261,12 @@ in {
 
           ;; Don't use language servers to auto-format
           (setq +format-with-lsp nil)
+
+          ;; LSP perf tweaks
+          ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+          (setq read-process-output-max (* 1024 1024)) ;; 1mb
+          (setq lsp-idle-delay 0.500)
+          (setq gc-cons-threshold 100000000) ;; 100mb
 
           (setq fancy-splash-image "${../backgrounds/doom.png}")
           ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
