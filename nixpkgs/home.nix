@@ -7,8 +7,10 @@ let
 
   my-doom-emacs = let
     emacsPkg = with pkgs;
-      (emacsPackagesFor emacs).emacsWithPackages
-      (ps: with ps; [ vterm all-the-icons ]);
+      (emacsPackagesFor (emacs.override {
+        nativeComp = true;
+        withPgtk = true;
+      })).emacsWithPackages (ps: with ps; [ vterm all-the-icons ]);
     pathDeps = with pkgs; [
       python3
       aspell
