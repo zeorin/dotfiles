@@ -2268,6 +2268,14 @@ in {
           (setq lsp-idle-delay 0.500)
           (setq gc-cons-threshold 100000000) ;; 100mb
 
+          ;; ts-ls bugfix, should be unnecessary for Emacs 29
+          ;; https://github.com/emacs-lsp/lsp-mode/issues/2681#issuecomment-1214902146
+          (advice-add 'json-parse-buffer :around
+                      (lambda (orig &rest rest)
+                        (while (re-search-forward "\\u0000" nil t)
+                          (replace-match ""))
+                        (apply orig rest)))
+
           (setq fancy-splash-image "${../backgrounds/doom.png}")
           ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
       '';
@@ -2527,6 +2535,11 @@ in {
           (package! mermaid-mode)
 
           (package! csv-mode)
+
+          ;; Temp fix for https://github.com/doomemacs/doomemacs/issues/7078 until either DOOM is fixed or Emacs 29
+          (package! compat :pin "6f73eac")
+          (package! transient :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440")
+          (package! with-editor :pin "391e76a256aeec6b9e4cbd733088f30c677d965b")
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
