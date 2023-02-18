@@ -2535,11 +2535,6 @@ in {
           (package! mermaid-mode)
 
           (package! csv-mode)
-
-          ;; Temp fix for https://github.com/doomemacs/doomemacs/issues/7078 until either DOOM is fixed or Emacs 29
-          (package! compat :pin "6f73eac")
-          (package! transient :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440")
-          (package! with-editor :pin "391e76a256aeec6b9e4cbd733088f30c677d965b")
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
