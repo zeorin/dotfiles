@@ -647,6 +647,10 @@ in {
       userName = "Xandor Schiefer";
       extraConfig = {
         user.useConfigOnly = true;
+        github.user = "zeorin";
+        gitlab.user = "zeorin";
+        bitbucket.user = "zeorin";
+        gitlab.pixeltheory.user = "zeorin";
         core = {
           autocrlf = "input";
           eol = "lf";
@@ -2382,7 +2386,7 @@ in {
                  ;;gist              ; interacting with github gists
                  lookup              ; navigate your code and its documentation
                  (lsp +peek)
-                 magit             ; a git porcelain for Emacs
+                 (magit +forge)             ; a git porcelain for Emacs
                  ;;make              ; run make tasks from Emacs
                  ;;pass              ; password manager for nerds
                  ;;pdf               ; pdf enhancements
