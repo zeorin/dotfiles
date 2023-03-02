@@ -2193,6 +2193,11 @@ in {
 
         (setq projectile-project-search-path '(("~/Code/" . 2)))
 
+        ;; Handle secrets with `pass`
+        (require 'password-store)
+        (setq auth-sources '(password-store))
+        (setq auth-source-pass-filename "${config.programs.password-store.settings.PASSWORD_STORE_DIR}")
+
         ;; Here are some additional functions/macros that could help you configure Doom:
         ;;
         ;; - `load!' for loading external *.el files relative to this one
