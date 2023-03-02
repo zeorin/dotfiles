@@ -1310,6 +1310,7 @@ in {
     };
     network-manager-applet.enable = true;
     nextcloud-client.enable = true;
+    password-store-sync.enable = true;
     picom = {
       enable = true;
       package = let picomPkg = pkgs.picom;
