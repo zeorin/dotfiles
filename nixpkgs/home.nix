@@ -199,44 +199,65 @@ in {
       ];
     };
     sessionPath = [ "${config.xdg.configHome}/doom-emacs/bin" ];
-    sessionVariables = with config.xdg; rec {
-      EDITOR = "nvim";
-      VISUAL = "${EDITOR}";
-      LESS = "-FiRx4";
-      PAGER = "less ${LESS}";
+    sessionVariables = with config.xdg;
+      let
+        EDITOR = pkgs.writeShellScript "EDITOR.sh" ''
+          if [ -n "$INSIDE_EMACS" ]; then
+            ${my-doom-emacs}/bin/emacsclient --quiet "$@"
+          else
+            ${my-doom-emacs}/bin/emacsclient --tty --alternate-editor="" --quiet "$@"
+          fi
+        '';
+        VISUAL = pkgs.writeShellScript "VISUAL.sh" ''
+          if [ -n "$INSIDE_EMACS" ]; then
+            ${my-doom-emacs}/bin/emacsclient --quiet "$@"
+          elif [ "$SSH_TTY$DISPLAY" = "''${DISPLAY#*:[1-9][0-9]}" ]; then
+            # If we're not connected via SSH and the DISPLAY is less than 10
+            ${my-doom-emacs}/bin/emacsclient --create-frame --alternate-editor="" --quiet "$@"
+          else
+            ${EDITOR} "$@"
+          fi
+        '';
+      in rec {
+        inherit EDITOR VISUAL;
+        SUDO_EDITOR = VISUAL;
+        LESS = "-FiRx4";
+        PAGER = "less ${LESS}";
 
-      # Help some tools actually adhere to XDG Base Dirs
-      CURL_HOME = "${configHome}/curl";
-      INPUTRC = "${configHome}/readline/inputrc";
-      NPM_CONFIG_USERCONFIG = "${configHome}/npm/npmrc";
-      WGETRC = "${configHome}/wget/wgetrc";
-      LESSHISTFILE = "${cacheHome}/less/history";
-      PSQL_HISTORY = "${cacheHome}/pg/psql_history";
-      XCOMPOSECACHE = "${cacheHome}/X11/xcompose";
-      GOPATH = "${dataHome}/go";
-      MYSQL_HISTFILE = "${dataHome}/mysql_history";
-      NODE_REPL_HISTORY = "${dataHome}/node_repl_history";
-      STACK_ROOT = "${dataHome}/stack";
-      WINEPREFIX = "${dataHome}/wineprefixes/default";
-      DOOMDIR = "${configHome}/doom";
-      DOOMLOCALDIR = "${dataHome}/doom";
+        # Help some tools actually adhere to XDG Base Dirs
+        CURL_HOME = "${configHome}/curl";
+        INPUTRC = "${configHome}/readline/inputrc";
+        NPM_CONFIG_USERCONFIG = "${configHome}/npm/npmrc";
+        WGETRC = "${configHome}/wget/wgetrc";
+        LESSHISTFILE = "${cacheHome}/less/history";
+        PSQL_HISTORY = "${cacheHome}/pg/psql_history";
+        XCOMPOSECACHE = "${cacheHome}/X11/xcompose";
+        GOPATH = "${dataHome}/go";
+        MYSQL_HISTFILE = "${dataHome}/mysql_history";
+        NODE_REPL_HISTORY = "${dataHome}/node_repl_history";
+        STACK_ROOT = "${dataHome}/stack";
+        WINEPREFIX = "${dataHome}/wineprefixes/default";
+        DOOMDIR = "${configHome}/doom";
+        DOOMLOCALDIR = "${dataHome}/doom";
 
-      # Suppress direnv's verbose output
-      # https://github.com/direnv/direnv/issues/68#issuecomment-42525172
-      DIRENV_LOG_FORMAT = "";
+        # Suppress direnv's verbose output
+        # https://github.com/direnv/direnv/issues/68#issuecomment-42525172
+        DIRENV_LOG_FORMAT = "";
 
-      # Use `pass` to input SSH passwords
-      SSH_ASKPASS_REQUIRE = "force";
-      SSH_ASKPASS = pkgs.writeShellScript "ssh-askpass-pass.sh" ''
-        key="$(echo "$1" | sed -e "s/^.*\/\(.*[^']\)'\{0,1\}:.*$/\1/")"
-        ${pkgs.pass}/bin/pass "ssh/$key" | head -n1
-      '';
-      # Use `pass` to input the sudo password
-      SUDO_ASKPASS = pkgs.writeShellScript "sudo-askpass-pass.sh" ''
-        hostname="$(${pkgs.hostname}/bin/hostname)"
-        ${pkgs.pass}/bin/pass "$hostname/$USER" | head -n1
-      '';
-    };
+        # TODO: figure out how to fall back to regular entry if no GPG smartcard
+        # is found / no key is unlocked
+        # Use `pass` to input SSH passwords
+        SSH_ASKPASS_REQUIRE = "force";
+        SSH_ASKPASS = pkgs.writeShellScript "ssh-askpass-pass.sh" ''
+          key="$(echo "$1" | sed -e "s/^.*\/\(.*[^']\)'\{0,1\}:.*$/\1/")"
+          ${pkgs.pass}/bin/pass "ssh/$key" | head -n1
+        '';
+        # Use `pass` to input the sudo password
+        SUDO_ASKPASS = pkgs.writeShellScript "sudo-askpass-pass.sh" ''
+          hostname="$(${pkgs.hostname}/bin/hostname)"
+          ${pkgs.pass}/bin/pass "$hostname/$USER" | head -n1
+        '';
+      };
     activation = with config.xdg; {
       createXdgCacheAndDataDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         # Cache dirs
@@ -260,7 +281,7 @@ in {
     };
     shellAliases = with pkgs; {
       g = "git";
-      e = "$EDITOR";
+      e = "$VISUAL";
       m = "neomutt";
       h = "home-manager";
       o = "xdg-open";
@@ -734,7 +755,7 @@ in {
         stash-unapply = "!git stash show -p | git apply -R";
         assume-unchanged = "!git ls-files -v | grep '^[[:lower:]]'";
         edit-dirty =
-          "!git status --porcelain | ${pkgs.gnused}/bin/sed s/^...// | xargs $EDITOR";
+          "!git status --porcelain | ${pkgs.gnused}/bin/sed s/^...// | xargs $VISUAL";
         tracked-ignores = "!git ls-files | git check-ignore --no-index --stdin";
         # https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
         rm-gone = ''
@@ -2894,7 +2915,8 @@ in {
     desktopEntries = {
       org-protocol = {
         name = "org-protocol";
-        exec = "${my-doom-emacs}/bin/emacsclient -c %u";
+        exec = ''
+          ${my-doom-emacs}/bin/emacsclient --create-frame --alternate-editor="" %u'';
         icon = "emacs";
         type = "Application";
         terminal = false;
