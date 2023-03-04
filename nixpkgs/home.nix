@@ -984,20 +984,142 @@ in {
       enable = true;
       pass = {
         enable = true;
-        extraConfig = ''
+        extraConfig = let
+          remove-binding = binding: str:
+            let bindings = lib.strings.splitString "," str;
+            in let newBindings = lib.lists.remove binding bindings;
+            in lib.strings.concatStringsSep "," newBindings;
+        in with config.programs.rofi.extraConfig; ''
+          # rofi command. Make sure to have "$@" as last argument
           _rofi () {
-              rofi -dpi 0 -i -no-auto-select "$@"
+              ${pkgs.rofi}/bin/rofi \
+                -dpi 0 \
+                -i \
+                -kb-accept-custom "" \
+                -kb-row-down "${remove-binding "Control+n" kb-row-down}" \
+                -kb-row-up "${remove-binding "Control+p" kb-row-up}" \
+                -kb-mode-complete "" \
+                -kb-remove-char-back "BackSpace,Shift+BackSpace" \
+                -kb-move-front "" \
+                -kb-remove-to-sol "" \
+                -no-auto-select \
+                "$@"
           }
 
+          # default command to generate passwords
+          _pwgen () {
+            ${pkgs.pwgen}/bin/pwgen -y "$@"
+          }
+
+          # image viewer to display qrcode of selected entry
+          # qrencode is needed to generate the image and a viewer
+          # that can read from pipes. Known viewers to work are feh and display
+          _image_viewer () {
+            ${pkgs.feh}/bin/feh -
+          #    display
+          }
+
+          # It is possible to use wl-copy and wl-paste from wl-clipboard
+          # Just uncomment the lines with wl-copy and wl-paste
+          # and comment the xclip lines
+          #
+          _clip_in_primary() {
+            ${pkgs.xclip}/bin/xclip
+            # wl-copy-p
+          }
+
+          _clip_in_clipboard() {
+            ${pkgs.xclip}/bin/xclip -selection clipboard
+            # wl-copy
+          }
+
+          _clip_out_primary() {
+            ${pkgs.xclip}/bin/xclip -o
+            # wl-paste -p
+          }
+
+          _clip_out_clipboard() {
+            ${pkgs.xclip}/bin/xclip --selection clipboard -o
+            # wl-paste
+          }
+
+          # fields to be used
+          URL_field='url'
           USERNAME_field='login'
-          default_autotype='path :tab pass'
+          AUTOTYPE_field='autotype'
+
+          # delay to be used for :delay keyword
+          delay=2
+
+          # rofi-pass needs to close itself before it can type passwords. Set delay here.
+          wait=0.2
+
+          # delay between keypresses when typing (in ms)
+          xdotool_delay=12
+
+          ## Programs to be used
+          # Editor
+          EDITOR='${config.home.sessionVariables.VISUAL}'
+
+          # Browser
+          BROWSER='${pkgs.xdg-utils}/bin/xdg-open'
+
+          ## Misc settings
+
+          default_do='menu' # menu, autotype, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
+          auto_enter='false'
+          notify='false'
+          default_autotype='user :tab pass'
+
+          # color of the help messages
+          # leave empty for autodetection
           # https://github.com/carnager/rofi-pass/issues/226
           help_color="#4872FF"
+
+          # Clipboard settings
+          # Possible options: primary, clipboard, both
+          clip=both
+
+          # Seconds before clearing pass from clipboard
+          clip_clear=45
+
+          ## Options for generating new password entries
+
+          # open new password entries in editor
+          edit_new_pass="true"
+
+          # default_user is also used for password files that have no user field.
+          default_user=':filename'
+          password_length=${config.programs.password-store.settings.PASSWORD_STORE_GENERATED_LENGTH}
+
+          # Custom Keybindings
+          autotype="Control+Return"
+          type_user="Control+u"
+          type_pass="Control+p"
+          open_url="Control+l"
+          copy_name="Alt+u"
+          copy_url="Alt+l"
+          copy_pass="Alt+p"
+          show="Control+o"
+          copy_menu="Control+c"
+          action_menu="Control+a"
+          type_menu="Control+t"
+          help="Control+h"
+          switch="Control+x"
+          insert_pass="Control+n"
         '';
       };
       font = "Iosevka 12";
       terminal = terminal-emulator;
-      extraConfig = { show-icons = true; };
+      extraConfig = {
+        show-icons = true;
+        # Remove some keys from the default bindings
+        kb-accept-entry = "Control+m,Return,KP_Enter"; # Removed Control+j
+        kb-remove-to-eol = ""; # Removed Control+k
+        # Set our custom bindings
+        kb-row-down = "Down,Control+n,Control+j";
+        kb-row-up = "Up,Control+p,Control+k";
+      };
       theme = let
         # Use `mkLiteral` for string-like values that should show without
         # quotes, e.g.:
