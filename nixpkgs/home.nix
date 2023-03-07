@@ -281,7 +281,7 @@ in {
     };
     shellAliases = with pkgs; {
       g = "git";
-      e = "$VISUAL";
+      e = "edit.sh";
       m = "neomutt";
       h = "home-manager";
       o = "xdg-open";
@@ -3123,6 +3123,16 @@ in {
   home.packages = with pkgs;
     [
       my-doom-emacs
+      (writeShellScriptBin "edit.sh" ''
+        if [ -n "$INSIDE_EMACS" ]; then
+          ${my-doom-emacs}/bin/emacsclient --no-wait --quiet "$@"
+        elif [ "$SSH_TTY$DISPLAY" = "''${DISPLAY#*:[1-9][0-9]}" ]; then
+          # If we're not connected via SSH and the DISPLAY is less than 10
+          ${my-doom-emacs}/bin/emacsclient --no-wait --create-frame --alternate-editor="" --quiet "$@"
+        else
+          ${my-doom-emacs}/bin/emacsclient --no-wait --tty --alternate-editor="" --quiet "$@"
+        fi
+      '')
       webcamoid
       libnotify
       file
