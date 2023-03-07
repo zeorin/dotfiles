@@ -2959,6 +2959,7 @@ in {
           "codepen\\.io"
           "codesandbox\\.io"
           "github\\.dev"
+          "typescriptlang\\.org/play"
         ]}
       '';
       "tridactyl/themes/zeorin.css".text = ''
