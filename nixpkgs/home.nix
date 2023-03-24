@@ -1358,6 +1358,323 @@ in {
         }
       ];
     };
+    neovim = {
+      enable = true;
+      viAlias = true;
+      vimAlias = true;
+      vimdiffAlias = true;
+      extraConfig = ''
+        " use visual terminal bell
+        set vb
+
+        " line numbers
+        set relativenumber
+        set number
+
+        " Don't break words when wrapping lines
+        set linebreak
+
+        " make wrapped lines more obvious
+        let &showbreak="↳ "
+        set cpoptions+=n
+
+        " Make tabs, non-breaking spaces and trailing white space visible
+        set list
+        " Use a Box Drawings Light Quadruple Dash Vertical (0x250A) + Space to
+        " show a Tab, a Middle Dot (0x00B7) for trailing spaces, and the negation
+        " symbol (0x00AC) for non-breaking spaces
+        set listchars=tab:│\ ,trail:·,extends:→,precedes:←,nbsp:¬
+        " Use nicer window split separator (like tmux)
+        set fillchars+=vert:│
+
+        " Highlight the line I'm on
+        set cursorline
+
+        " Set cursor depending on mode
+        set guicursor=n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor
+
+        " Show the textwidth visually
+        set colorcolumn=+1,+2
+
+        " Highlight matching paired delimiter
+        set showmatch
+
+        " display incomplete commands
+        set showcmd
+
+        " Set comments to be italic
+        highlight Comment gui=italic cterm=italic
+        autocmd! ColorScheme * highlight Comment gui=italic cterm=italic
+
+        " Concealing
+        set conceallevel=1
+        set concealcursor=
+
+        " Powerline-style status- and tab/buffer-line
+        set showtabline=2 " Always display the tabline, even if there is only one tab
+        set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+
+        " Use undercurl for spelling error highlight
+        let &t_Cs = "\e[4:3m"
+        let &t_Ce = "\e[4:0m"
+        hi SpellBad gui=undercurl term=undercurl cterm=undercurl
+
+        " Set the leader needs to be done early, because any mappings that use
+        " <Leader> will use the value of <Leader> that was defined when they’re
+        " defined.
+        let mapleader="\<Space>"
+        let maplocalleader="-"
+
+        " recall newer command-line using current characters as search pattern
+        cnoremap <C-N> <Down>
+        " recall previous (older) command-line using current characters as search pattern
+        cnoremap <C-P> <Up>
+
+        " Let brace movement work even when braces aren’t at col 0
+        map [[ ?{<CR>w99[{
+        map ][ /}<CR>b99]}
+        map ]] j0[[%/{<CR>
+        map [] k$][%?}<CR>
+
+        " Don't use Ex mode, use Q for formatting
+        map Q gq
+
+        " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+        " so that you can undo CTRL-U after inserting a line break.
+        inoremap <C-U> <C-G>u<C-U>
+
+        " Write with root permissions
+        cmap w!! w !sudo tee > /dev/null %
+
+        " Enable mouse
+        set mouse=a
+
+        " set tabs to display as 2 spaces wide (might be overwritten by
+        " .editorconfig files)
+        set tabstop=2 softtabstop=2 shiftwidth=2 noexpandtab
+        set shiftround
+
+        " When wrap is off, horizontally scroll a decent amount.
+        set sidescroll=16
+
+        " check final line for Vim settings
+        set modelines=1
+
+        " ignore case sensitivity in searching
+        set ignorecase
+
+        " smart case sensitivity in searching
+        set smartcase
+
+        " better command line completion
+        set wildmode=longest,full
+        set fileignorecase
+        set wildignorecase
+
+        " Ingore backup files & git directories
+        set wildignore+=*~,.git
+
+        " Enable code folding
+        set foldenable
+        set foldlevelstart=10
+        set foldnestmax=10
+        set foldmethod=indent
+        set foldcolumn=2
+
+        " Switch buffers even if modified
+        set hidden
+
+        " better split window locations
+        set splitright
+        set splitbelow
+
+        " Stop backup files from littering all over the system
+        let myBackupDir = '${config.xdg.cacheHome}/vim/backup/'
+        call system('mkdir -p ' . myBackupDir)
+        let &backupdir = myBackupDir . ',' . &backupdir
+        " Keep backup files
+        set backup
+        " Do it in a way that is compatible with file-watchers
+        set backupcopy=yes
+
+        " Stop swap files from littering all over the system
+        let mySwapDir = '${config.xdg.cacheHome}/vim/swap/'
+        call system('mkdir -p ' . mySwapDir)
+        let &directory = mySwapDir . ',' . &directory
+
+        " Persistent undo
+        if has('persistent_undo')
+          let myUndoDir = '${config.xdg.cacheHome}/vim/undo/'
+          " Create dirs
+          call system('mkdir -p ' . myUndoDir)
+          let &undodir = myUndoDir
+          set undofile
+        endif
+
+        " Spell check & word completion
+        set spell spelllang=en_gb
+        set complete+=kspell
+
+        " Open file at last cursor position
+        augroup cursorpos
+          autocmd!
+          " When editing a file, always jump to the last known cursor position.
+          " Don't do it when the position is invalid or when inside an event
+          " handler (happens when dropping a file on gvim). Also don't do it
+          " when the mark is in the first line, that is the default position
+          " when opening a file.
+          autocmd BufReadPost *
+            \ if line("'\"") > 1 && line("'\"") <= line("$") |
+            \   exe "normal! g`\"" |
+            \ endif
+        augroup END
+
+        " Faster update for Git Gutter and CoC
+        set updatetime=300
+
+        " Faster macro execution
+        set lazyredraw
+
+        set shell=/bin/sh
+      '';
+      coc.enable = true;
+      plugins = with pkgs.vimPlugins; [
+        {
+          plugin = vim-gitgutter;
+          config = ''
+            let g:gitgutter_map_keys = 0
+            let g:gitgutter_sign_priority = 9
+          '';
+        }
+        {
+          plugin = nord-vim;
+          config = ''
+            colorscheme nord
+          '';
+        }
+        {
+          plugin = vim-airline;
+          config = ''
+            let g:airline_powerline_fonts = 1 " Use powerline glyphs
+            let g:airline#extensions#tabline#enabled = 1 " Use tabline
+            let g:airline#extensions#tabline#show_tabs = 1 " Always show tabline
+            let g:airline#extensions#tabline#show_buffers = 1 " Show buffers when no tabs
+            let g:airline#extensions#whitespace#mixed_indent_algo = 2 " Allow spaces after tabs for alignment
+            let g:airline#extensions#c_like_langs = ['c', 'cpp', 'cuda', 'go', 'javascript', 'javascript.jsx', 'ld', 'php']
+          '';
+        }
+        vim-airline-themes
+        vim-css-color
+        vim-repeat
+        vim-rsi
+        direnv-vim
+        vim-tmux-focus-events
+        matchit-zip
+        vim-unimpaired
+        vim-sensible
+        editorconfig-vim
+        fastfold
+        targets-vim
+        vim-commentary
+        vim-speeddating
+        vim-surround
+        {
+          plugin = ale;
+          config = ''
+            let g:ale_command_wrapper = 'env NODE_ENV=development'
+            let g:airline#extensions#ale#enabled = 1
+            let g:ale_sign_priority=30
+            let g:ale_sign_warning = "⚠️"
+            let g:ale_sign_error = "🚨"
+            let g:ale_echo_msg_error_str = "🚨"
+            let g:ale_echo_msg_warning_str = "⚠️"
+            let g:ale_echo_msg_format = '%severity%  %s [%linter%] %code%'
+            let g:ale_fix_on_save = 1
+            let javascript_fixers = ['prettier', 'importjs', 'eslint']
+            let css_fixers = ['prettier', 'stylelint']
+            let g:ale_fixers = {
+            	\ 'javascript': javascript_fixers,
+            	\ 'javascript.jsx': javascript_fixers,
+            	\ 'javascriptreact': javascript_fixers,
+            	\ 'typescript': javascript_fixers,
+            	\ 'typescript.jsx': javascript_fixers,
+            	\ 'typescriptreact': javascript_fixers,
+            	\ 'css': css_fixers,
+            	\ 'scss': css_fixers,
+            	\ 'json': ['prettier'],
+            	\ 'markdown': ['prettier'],
+            	\ 'yaml': ['prettier']
+            \}
+            let g:ale_javascript_eslint_suppress_eslintignore = 1
+            " the `flow` linter uses an old API; prefer `flow-language-server`
+            let g:ale_linters_ignore = ['flow']
+          '';
+        }
+        {
+          plugin = nerdtree;
+          config = ''
+            let g:NERDTreeShowHidden = 1
+            let g:NERDTreeMinimalUI = 1
+            nnoremap <F8> :NERDTreeToggle<CR>
+          '';
+        }
+        {
+          plugin = nerdtree-git-plugin;
+          config = ''
+            let g:NTPNames = ['.git*', 'package.json']
+            let g:NTPNamesDirs = ['.git']
+          '';
+        }
+        {
+          plugin = vim-rooter;
+          config = ''
+            let g:rooter_patterns = ['.git', '.git/', 'package.json']
+            let g:rooter_silent_chdir = 1
+          '';
+        }
+        {
+          plugin = ack-vim;
+          config = ''
+            if executable('ag')
+            	let g:ackprg = "ag --nogroup --nocolor --column --hidden"
+            	nnoremap <Leader>a :Ack! |
+            elseif executable('ack') || executable ('ack-grep')
+            	nnoremap <Leader>a :Ack! |
+            else
+            	nnoremap <Leader>a :grep |
+            endif
+          '';
+        }
+        vim-fugitive
+        {
+          plugin = delimitMate;
+          config = ''
+            let delimitMate_expand_space = 1
+            let delimitMate_expand_cr = 2
+            let delimitMate_balance_matchpairs = 1
+            let delimitMate_nesting_quotes = ['`']
+          '';
+        }
+        vim-tmux
+        vim-tridactyl
+        vim-polyglot
+        {
+          plugin = vim-devicons;
+          config = ''
+            let g:webdevicons_enable_nerdtree = 1
+            let g:webdevicons_conceal_nerdtree_brackets = 1
+            let g:WebDevIconsNerdTreeGitPluginForceVAlign = 1
+            let g:webdevicons_enable_ctrlp = 1
+            let g:webdevicons_enable_startify = 1
+            let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+            let g:DevIconsEnableFoldersOpenClose = 1
+            if exists("g:loaded_webdevicons")
+            	call webdevicons#refresh()
+            endif
+          '';
+        }
+      ];
+    };
     vscode = with pkgs; {
       enable = true;
       package = vscode-fhs;
@@ -3172,7 +3489,6 @@ in {
       websocat
       vim
       nodejs
-      neovim
       universal-ctags
       zip
       unzip
