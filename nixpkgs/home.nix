@@ -348,7 +348,6 @@ in {
           a11ycss
           auto-tab-discard
           browserpass
-          bypass-paywalls-clean
           canvasblocker
           clearurls
           cookies-txt
