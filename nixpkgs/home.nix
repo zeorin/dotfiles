@@ -2528,6 +2528,7 @@ in {
           })
           (mkFloating { window_type = "dialog"; })
           (mkFloating { window_role = "pop-up"; })
+          (mkFloating { window_role = "task_dialog"; })
           (mkFloating { window_role = "(?i)about"; })
           (mkFloating { window_role = "(?i)preferences"; })
           (mkSticky { title = "Picture-in-Picture"; })
