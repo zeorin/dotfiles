@@ -2728,6 +2728,16 @@ in {
           ;; of them.
           (setq org-clock-auto-clock-resolution nil)
 
+          ;; Invalidate Projectile cache when using Magit to check out different commits
+          ;; https://emacs.stackexchange.com/a/26272
+          (defun run-projectile-invalidate-cache (&rest _args)
+            ;; We ignore the args to `magit-checkout'.
+            (projectile-invalidate-cache nil))
+          (advice-add 'magit-checkout
+                      :after #'run-projectile-invalidate-cache)
+          (advice-add 'magit-branch-and-checkout ; This is `b c'.
+                      :after #'run-projectile-invalidate-cache)
+
           ;; Don't use language servers to auto-format
           (setq +format-with-lsp nil)
 
