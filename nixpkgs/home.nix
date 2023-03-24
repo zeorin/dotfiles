@@ -355,7 +355,6 @@ in {
           fediact
           mailvelope
           metamask
-          netflix-1080p
           octolinker
           octotree
           org-capture
