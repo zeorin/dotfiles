@@ -3018,18 +3018,6 @@ in {
         rev = "30a20dbc2799e4ab2f8c509fdadcd90aa9845b5c";
         sha256 = "0ghry3v05y31vgpwr2hc4gzn8s6sr6fvqh88fsnj9448lrim38f9";
       };
-      "jrln/jrln.yaml".text = ''
-        default_hour: 9
-        timeformat: "%Y-%m-%d %H:%M"
-        linewrap: 79
-        encrypt: false
-        editor: nvim
-        default_minute: 0,
-        highlight: true,
-        journals:
-          default: ${userDirs.documents}/Journal/journal.txt
-        tagsymbols: @
-      '';
       "flameshot/flameshot.ini" = {
         text = ''
           [General]
@@ -3469,7 +3457,6 @@ in {
       winetricks
       protontricks
       protonup
-      jrnl
       (writeShellScriptBin "nix-index-update" ''
         # https://github.com/Mic92/nix-index-database#ad-hoc-download
         filename="index-$(uname -m)-$(uname | tr A-Z a-z)"
