@@ -3446,6 +3446,9 @@ in {
           ${my-doom-emacs}/bin/emacsclient --no-wait --tty --alternate-editor="" --quiet "$@"
         fi
       '')
+      (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
+      (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
+      (nuspellWithDicts (with hunspellDicts; [ en_GB-large ]))
       webcamoid
       libnotify
       file
