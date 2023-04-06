@@ -10,6 +10,11 @@ let
       (emacsPackagesFor emacs-gtk).emacsWithPackages
       (ps: with ps; [ vterm all-the-icons ]);
     pathDeps = with pkgs; [
+      (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
+      (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
+      (nuspellWithDicts (with hunspellDicts; [ en_GB-large ]))
+      enchant
+      languagetool
       python3
       aspell
       binutils
@@ -2839,7 +2844,7 @@ in {
 
                  :checkers
                  (syntax +childframe) ; tasing you for every semicolon you forget
-                 (spell +flyspell) ; tasing you for misspelling mispelling
+                 (spell +enchant +flyspell +everywhere) ; tasing you for misspelling mispelling
                  grammar           ; tasing grammar mistake every you make
 
                  :tools
