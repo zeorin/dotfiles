@@ -39,6 +39,7 @@ let
       haskellPackages.brittany
       haskellPackages.hlint
       html-tidy
+      nodejs
       nodePackages.stylelint
       nodePackages.js-beautify
       nodePackages.typescript-language-server
@@ -3490,7 +3491,6 @@ in {
       wireshark
       websocat
       vim
-      nodejs
       universal-ctags
       zip
       unzip
