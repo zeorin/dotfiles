@@ -737,6 +737,9 @@ in {
         credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
         color.ui = true;
         push.default = "simple";
+        fetch.prune = true;
+        pull.rebase = true;
+        rebase.autoStash = true;
         advice = {
           statusHints = false;
           pushNonFastForward = false;
@@ -754,6 +757,7 @@ in {
         merge = {
           stat = true;
           tool = "nvimdiff";
+          autoStash = true;
         };
         mergetool.prompt = false;
         "mergetool \"nvimdiff\"".cmd = ''
@@ -804,31 +808,35 @@ in {
         p = "push";
         r = "rebase";
         s = "status";
-        u = "!git unstage";
+        u = "unstage";
         unstage = "reset HEAD --";
         last = "log -1 HEAD";
         stash-unapply = "!git stash show -p | git apply -R";
-        assume-unchanged = "!git ls-files -v | grep '^[[:lower:]]'";
+        assume = "update-index --assume-unchanged";
+        unassume = "update-index --no-assume-unchanged";
+        assumed =
+          "!git ls-files -v | ${pkgs.gnugrep}/bin/grep '^h' | cut -c 3-";
+        assume-all =
+          "!git status | ${pkgs.gawk}/bin/awk {'print $2'} | ${pkgs.findutils}/bin/xargs -r git assume";
+        unassume-all =
+          "!git assumed | ${pkgs.findutils}/bin/xargs -r git unassume";
         edit-dirty =
-          "!git status --porcelain | ${pkgs.gnused}/bin/sed s/^...// | xargs $VISUAL";
+          "!git status --porcelain | ${pkgs.gnused}/bin/sed s/^...// | ${pkgs.findutils}/bin/xargs -r $VISUAL";
         tracked-ignores = "!git ls-files | git check-ignore --no-index --stdin";
         # https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
-        rm-gone = ''
-          !git for-each-ref --format '%(refname:short) %(upstream:track)' | ${pkgs.gawk}/bin/awk '$2 == "[gone]" {print $1}' | ${pkgs.findutils}/bin/xargs -r git branch -D'';
+        branch-purge =
+          "!git for-each-ref --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' refs/heads | ${pkgs.findutils}/bin/xargs -r git branch -d";
         # https://stackoverflow.com/a/34467298
-        l = "!git lg";
-        lg = "!git lg1";
-        lg1 =
-          "!git lg1-specific --branches --decorate-refs-exclude=refs/remotes/*";
-        lg2 =
-          "!git lg2-specific --branches --decorate-refs-exclude=refs/remotes/*";
-        lg3 =
-          "!git lg3-specific --branches --decorate-refs-exclude=refs/remotes/*";
-        lg-all = "!git lg1-all";
-        lg1-all = "!git lg1-specific --all";
-        lg2-all = "!git lg2-specific --all";
-        lg3-all = "!git lg3-specific --all";
-        lg-specific = "!git lg1-specific";
+        l = "lg";
+        lg = "lg1";
+        lg1 = "lg1-specific --branches --decorate-refs-exclude=refs/remotes/*";
+        lg2 = "lg2-specific --branches --decorate-refs-exclude=refs/remotes/*";
+        lg3 = "lg3-specific --branches --decorate-refs-exclude=refs/remotes/*";
+        lg-all = "lg1-all";
+        lg1-all = "lg1-specific --all";
+        lg2-all = "lg2-specific --all";
+        lg3-all = "lg3-specific --all";
+        lg-specific = "lg1-specific";
         lg1-specific =
           "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
         lg2-specific =
@@ -836,8 +844,8 @@ in {
         lg3-specific =
           "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'";
         # https://docs.gitignore.io/use/command-line
-        ignore =
-          "!gi() { ${pkgs.curl}/bin/curl -sL https://www.gitignore.io/api/$@ 2>/dev/null ;}; gi";
+        ignore = ''
+          !f() { ${pkgs.curl}/bin/curl -sL "https://www.gitignore.io/api/$@" 2>/dev/null; }; f'';
       };
       ignores =
         [ "*~" "*.swp" "*.swo" ".DS_Store" "tags" "Session.vim" "/.vim" ];
