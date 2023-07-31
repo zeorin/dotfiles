@@ -283,6 +283,16 @@ in {
         '';
       in rec {
         inherit EDITOR VISUAL;
+        # Non-standard env var, found in https://github.com/facebook/react/pull/22649
+        EDITOR_URL = "editor://open?file={path}&line={line}";
+        # Non-standard env var, found in https://github.com/yyx990803/launch-editor
+        LAUNCH_EDITOR = pkgs.writeShellScript "launch-editor.sh" ''
+          filename=$1
+          line=$2
+          column=$3
+
+          ${my-doom-emacs}/bin/emacsclient +$line:$column "$filename"
+        '';
         SUDO_EDITOR = VISUAL;
         LESS = "-FiRx4";
         PAGER = "less ${LESS}";
@@ -3431,6 +3441,43 @@ in {
         '';
     };
     desktopEntries = {
+      editor-protocol = {
+        name = "editor protocol";
+        exec = "${
+            (pkgs.stdenv.mkDerivation rec {
+              pname = "open-editor.sh";
+              version = "2.10.2";
+              src = pkgs.fetchFromGitHub {
+                owner = "nette";
+                repo = "tracy";
+                rev = "v${version}";
+                sha256 = "sha256-4bif5m7q0R8TGD6M0kYu8Dfx0uoq6RFW+UE9OQRr6a0=";
+                sparseCheckout =
+                  [ "tools/open-in-editor/linux/open-editor.sh" ];
+              };
+              dontConfigure = true;
+              dontBuild = true;
+              patchPhase = ''
+                substituteInPlace tools/open-in-editor/linux/open-editor.sh \
+                  --replace "#editor='emacs" "editor='${my-doom-emacs}/bin/emacsclient"
+
+                chmod +x tools/open-in-editor/linux/open-editor.sh
+              '';
+              installPhase = ''
+                bindir="$out/bin"
+                install -d "$bindir"
+                install tools/open-in-editor/linux/open-editor.sh "$bindir"
+              '';
+              enableParallelBuilding = true;
+            })
+          }/bin/open-editor.sh %u";
+        icon = "emacs";
+        type = "Application";
+        terminal = false;
+        categories = [ "System" ];
+        mimeType = [ "x-scheme-handler/editor" ];
+        noDisplay = true;
+      };
       org-protocol = {
         name = "org-protocol";
         exec = ''
