@@ -236,9 +236,8 @@ let
 
 in {
   nixpkgs.overlays = [
-    (import (builtins.fetchTarball {
-      url = "https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz";
-    }))
+    (import (builtins.fetchTarball
+      "https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz"))
   ];
 
   imports = [
@@ -385,11 +384,9 @@ in {
     dircolors = {
       enable = true;
       extraConfig = builtins.readFile "${
-          pkgs.fetchFromGitHub {
-            owner = "arcticicestudio";
-            repo = "nord-dircolors";
-            rev = "v0.2.0";
-            sha256 = "1c9fa6dip266z6hfqd5nan5v6qjp6dg074lvk4rxisirm26djlzz";
+          builtins.fetchGit {
+            url = "https://github.com/nordtheme/dircolors";
+            ref = "refs/tags/v0.2.0";
           }
         }/src/dir_colors";
     };
@@ -592,12 +589,8 @@ in {
             user_pref("app.update.enabled", false);
           '';
           userChrome = let
-            firefox-csshacks = pkgs.fetchFromGitHub {
-              owner = "MrOtherGuy";
-              repo = "firefox-csshacks";
-              rev = "753c37d010836fc53dbab9d005663d52fe4f7930";
-              sha256 = "02wzb6l4vi04va41h76wiji3xq7ma6bs2ybbc5sp5lhsnqizis16";
-            };
+            firefox-csshacks = builtins.fetchGit
+              "https://github.com/MrOtherGuy/firefox-csshacks";
           in ''
             @import url('${firefox-csshacks}/chrome/hide_tabs_toolbar.css');
             @import url('${firefox-csshacks}/chrome/window_control_placeholder_support.css');
@@ -3103,11 +3096,9 @@ in {
           ${configHome}/doom-emacs/bin/doom --force sync
         ''}";
       };
-      emacs.source = pkgs.fetchFromGitHub {
-        owner = "plexus";
-        repo = "chemacs2";
+      emacs.source = builtins.fetchGit {
+        url = "https://github.com/plexus/chemacs2";
         rev = "30a20dbc2799e4ab2f8c509fdadcd90aa9845b5c";
-        sha256 = "0ghry3v05y31vgpwr2hc4gzn8s6sr6fvqh88fsnj9448lrim38f9";
       };
       "flameshot/flameshot.ini" = {
         text = ''
@@ -3864,35 +3855,23 @@ in {
     in [
       (mkAppleFont {
         name = "san-francisco-pro";
-        src = fetchurl {
-          url =
-            "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg";
-          sha256 = "o1Zis9kymOicTyDdTPGON2A5LNpDbgOD1XtyQOdxc0M=";
-        };
+        src = builtins.fetchurl
+          "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg";
       })
       (mkAppleFont {
         name = "san-francisco-compact";
-        src = fetchurl {
-          url =
-            "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg";
-          sha256 = "Ot/p5Wo84AibMjEjesdTDj/MpzYE1XNECsUH2aszR/o=";
-        };
+        src = builtins.fetchurl
+          "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg";
       })
       (mkAppleFont {
         name = "san-francisco-mono";
-        src = fetchurl {
-          url =
-            "https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg";
-          sha256 = "jnhTTmSy5J8MJotbsI8g5hxotgjvyDbccymjABwajYw=";
-        };
+        src = builtins.fetchurl
+          "https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg";
       })
       (mkAppleFont {
         name = "new-york";
-        src = fetchurl {
-          url =
-            "https://devimages-cdn.apple.com/design/resources/download/NY.dmg";
-          sha256 = "Rr0UpJa7kemczCqNn6b8HNtW6PiWO/Ez1LUh/WNk8S8=";
-        };
+        src = builtins.fetchurl
+          "https://devimages-cdn.apple.com/design/resources/download/NY.dmg";
       })
     ]) ++ [
 
