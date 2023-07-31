@@ -1888,11 +1888,18 @@ in {
         # stacked / tabbed windows
         "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
         "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
+        # GTK
         "_GTK_FRAME_EXTENTS@:c"
+        "class_g ~= 'xdg-desktop-portal' && _NET_FRAME_EXTENTS@:c && window_type = 'dialog'"
+        "class_g ~= 'xdg-desktop-portal' && window_type = 'menu'"
+        "_NET_FRAME_EXTENTS@:c && WM_WINDOW_ROLE@:s = 'Popup'"
+        # Mozilla fixes
+        "class_i = 'Firefox' && window_type = 'utility'"
+        "class_i = 'Firefox' && window_type = 'popup_menu'"
+        "class_i = 'Thunderbird' && window_type = 'utility'"
+        "class_i = 'Thunderbird' && window_type = 'popup_menu'"
         # notifications
         "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_NOTIFICATION'"
-        # Mozilla fixes
-        "(class_g *?= 'Firefox' || class_g *?= 'Thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
         # Zoom
         "name = 'cpt_frame_xcb_window'"
         "class_g *?= 'zoom' && name *?= 'meeting'"
@@ -1917,15 +1924,22 @@ in {
           # unknown windows
           "! name~=''"
           # shaped windows
-          "bounding_shaped && !rounded_corners"
+          "bounding_shaped"
           # hidden windows
           "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'"
           # stacked / tabbed windows
           "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
           "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
+          # GTK
           "_GTK_FRAME_EXTENTS@:c"
+          "class_g ~= 'xdg-desktop-portal' && _NET_FRAME_EXTENTS@:c && window_type = 'dialog'"
+          "class_g ~= 'xdg-desktop-portal' && window_type = 'menu'"
+          "_NET_FRAME_EXTENTS@:c && WM_WINDOW_ROLE@:s = 'Popup'"
           # Mozilla fixes
-          "(class_g *?= 'Firefox' || class_g *?= 'Thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
+          "class_i = 'Firefox' && window_type = 'utility'"
+          "class_i = 'Firefox' && window_type = 'popup_menu'"
+          "class_i = 'Thunderbird' && window_type = 'utility'"
+          "class_i = 'Thunderbird' && window_type = 'popup_menu'"
           # Zoom
           "name = 'cpt_frame_xcb_window'"
           "class_g *?= 'zoom' && name *?= 'meeting'"
