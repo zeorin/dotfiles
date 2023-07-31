@@ -1800,6 +1800,7 @@ in {
   };
 
   services = {
+    blueman-applet.enable = true;
     dunst = {
       enable = true;
       settings = {
