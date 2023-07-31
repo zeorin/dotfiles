@@ -298,6 +298,8 @@ in {
         SUDO_EDITOR = VISUAL;
         LESS = "-FiRx4";
         PAGER = "less ${LESS}";
+        # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
+        TERMINAL = "${terminal-emulator}";
 
         # Help some tools actually adhere to XDG Base Dirs
         CURL_HOME = "${configHome}/curl";
