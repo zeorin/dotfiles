@@ -8,7 +8,7 @@ let
   my-doom-emacs = let
     emacsPkg = with pkgs;
       (emacsPackagesFor emacs-gtk).emacsWithPackages
-      (ps: with ps; [ vterm all-the-icons ]);
+      (ps: with ps; [ vterm ]);
     pathDeps = with pkgs; [
       (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
       (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
@@ -3756,6 +3756,7 @@ in {
         '';
         enableParallelBuilding = true;
       })
+      emacs-all-the-icons-fonts
 
       # Apple Fonts
     ] ++ (let
