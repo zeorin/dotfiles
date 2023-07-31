@@ -3401,7 +3401,7 @@ in {
         " Don’t show modeindicator
         set modeindicator false
 
-        colorscheme zeorin
+        colorscheme base16-nord
 
         """"""""""""""""""
         " Misc settings
@@ -3433,24 +3433,33 @@ in {
           "typescriptlang\\.org/play"
         ]}
       '';
-      "tridactyl/themes/zeorin.css".text = ''
-        .TridactylOwnNamespace body {
-            top: 0;
-        }
+      "tridactyl/themes".source = pkgs.symlinkJoin {
+        name = "tridactyl-themes";
+        paths = [
+          (builtins.fetchGit "https://github.com/tridactyl/base16-tridactyl")
+          (pkgs.writeTextDir "zeorin.css" ''
+            /* Same as default theme, but move the tridactyl console to the top */
+            .TridactylOwnNamespace body {
+                top: 0;
+            }
 
-        #command-line-holder {
-            order: 1;
-        }
+            #command-line-holder {
+                order: 1;
+            }
 
-        #completions {
-            order: 2;
-            border-top: unset;
-            border-bottom: var(--tridactyl-cmplt-border-top);
-        }
+            #completions {
+                order: 2;
+                border-top: unset;
+                border-bottom: var(--tridactyl-cmplt-border-top);
+            }
 
-        #cmdline_iframe {
-            bottom: unset;
-            top: 0% !important;
+            #cmdline_iframe {
+                bottom: unset;
+                top: 0% !important;
+            }
+          '')
+        ];
+      };
         }
       '';
       "wget/wgetrc".text = ''
