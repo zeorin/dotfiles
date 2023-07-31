@@ -5,16 +5,41 @@ let
 
   myKey = "0x5E1C0971FE4F665A";
 
+  doomEmacsSource = builtins.fetchGit "https://github.com/hlissner/doom-emacs";
+
   my-doom-emacs = let
     emacsPkg = with pkgs;
-      (emacsPackagesFor emacs-gtk).emacsWithPackages
-      (ps: with ps; [ vterm ]);
+      (emacsPackagesFor emacs-gtk).emacsWithPackages (ps:
+        with ps; [
+          vterm
+          (lsp-mode.overrideAttrs (oldAttrs: {
+            LSP_USE_PLISTS = true;
+            src = (let
+              rev = builtins.readFile
+                (let regex = ''package! lsp-mode :pin "\(.*\)"'';
+                in runCommand "extract-lsp-mode-rev" { } ''
+                  cat ${doomEmacsSource}/modules/tools/lsp/packages.el \
+                    | grep '${regex}' -o \
+                    | sed 's/${regex}/\1/' \
+                    | tr -d "\n" \
+                    > $out
+                '');
+            in builtins.fetchTarball
+            "https://github.com/emacs-lsp/lsp-mode/archive/${rev}.tar.gz");
+            patches = [
+              (builtins.fetchurl
+                "https://patch-diff.githubusercontent.com/raw/emacs-lsp/lsp-mode/pull/4092.diff")
+            ];
+          }))
+        ]);
     pathDeps = with pkgs; [
       (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
       (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
       (nuspellWithDicts (with hunspellDicts; [ en_GB-large ]))
       enchant
       languagetool
+      ltex-ls
+      texlive.combined.scheme-medium
       python3
       aspell
       binutils
@@ -31,23 +56,58 @@ let
       pandoc
       gcc
       graphviz-nox
+      wordnet
       beancount
       beancount-language-server
       fava
+      haskell-language-server
       haskellPackages.hoogle
       haskellPackages.cabal-install
       haskellPackages.brittany
       haskellPackages.hlint
       html-tidy
       nodejs
+      nodePackages.bash-language-server
       nodePackages.stylelint
+      nodePackages.dockerfile-language-server-nodejs
       nodePackages.js-beautify
       nodePackages.typescript-language-server
-      nodePackages.vscode-css-languageserver-bin
-      nodePackages.vscode-html-languageserver-bin
+      nodePackages.typescript
+      (writeScriptBin "vscode-css-language-server" ''
+        #!${nodejs}/bin/node
+        require('${vscodium}/lib/vscode/resources/app/extensions/css-language-features/server/dist/node/cssServerMain.js')
+      '')
+      (writeScriptBin "vscode-html-language-server" ''
+        #!${nodejs}/bin/node
+        require('${vscodium}/lib/vscode/resources/app/extensions/html-language-features/server/dist/node/htmlServerMain.js')
+      '')
+      (writeScriptBin "vscode-json-language-server" ''
+        #!${nodejs}/bin/node
+        require('${vscodium}/lib/vscode/resources/app/extensions/json-language-features/server/dist/node/jsonServerMain.js')
+      '')
+      (writeScriptBin "vscode-markdown-language-server" ''
+        #!${nodejs}/bin/node
+        require('${vscodium}/lib/vscode/resources/app/extensions/markdown-language-features/server/dist/node/workerMain.js')
+      '')
+      nodePackages.yaml-language-server
+      nodePackages.unified-language-server
       nodePackages.prettier
       jq
       nixfmt
+      black
+      isort
+      pipenv
+      python3Packages.pytest
+      python3Packages.nose
+      python3Packages.pyflakes
+      python3Packages.python-lsp-server
+      python3Packages.grip
+      multimarkdown
+      xclip
+      xdotool
+      xorg.xwininfo
+      xorg.xprop
+      watchman
     ];
   in emacsPkg // (pkgs.symlinkJoin {
     name = "my-doom-emacs";
@@ -2606,7 +2666,7 @@ in {
         dump-header /dev/stderr
       '';
       doom-emacs = {
-        source = builtins.fetchGit "https://github.com/hlissner/doom-emacs";
+        source = doomEmacsSource;
         onChange = "${pkgs.writeShellScript "doom-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
@@ -2761,6 +2821,20 @@ in {
 
           (setq fancy-splash-image "${../backgrounds/doom.png}")
           ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
+        (setq lsp-eslint-server-command '("${pkgs.nodejs}/bin/node"
+                                          "${pkgs.vscode-extensions.dbaeumer.vscode-eslint}/share/vscode/extensions/dbaeumer.vscode-eslint/server/out/eslintServer.js"
+                                          "--stdio"))
+
+        (setq lsp-nix-nil-server-path "${pkgs.nil}/bin/nil")
+
+        ;; Disable invasive lsp-mode features
+        (after! lsp-mode
+          (setq lsp-enable-symbol-highlighting nil
+                lsp-enable-suggest-server-download nil
+                lsp-clients-typescript-prefer-use-project-ts-server t))
+        (after! lsp-ui
+          (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
+                lsp-ui-doc-enable nil))     ; redundant with K
       '';
       "doom/init.el" = {
         text = ''
@@ -2808,7 +2882,7 @@ in {
                  ophints           ; highlight the region an operation acts on
                  (popup +defaults)   ; tame sudden yet inevitable temporary windows
                  ;;tabs              ; a tab bar for Emacs
-                 treemacs          ; a project drawer, like neotree but cooler
+                 (treemacs +lsp)          ; a project drawer, like neotree but cooler
                  unicode           ; extended unicode support for various languages
                  vc-gutter         ; vcs diff in the fringe
                  vi-tilde-fringe   ; fringe tildes to mark beyond EOB
@@ -2852,7 +2926,7 @@ in {
                  ;;ansible
                  ;;debugger          ; FIXME stepping through code, to help you add bugs
                  direnv
-                 docker
+                 (docker +lsp)
                  editorconfig      ; let someone else argue about tabs vs spaces
                  ;;ein               ; tame Jupyter notebooks with emacs
                  (eval +overlay)     ; run code, run (also, repls)
@@ -2896,10 +2970,10 @@ in {
                  ;;fstar             ; (dependent) types and (monadic) effects and Z3
                  ;;gdscript          ; the language you waited for
                  ;;(go +lsp)         ; the hipster dialect
-                 (haskell +dante)  ; a language that's lazier than I am
+                 (haskell +lsp)  ; a language that's lazier than I am
                  ;;hy                ; readability of scheme w/ speed of python
                  ;;idris             ; a language you can depend on
-                 json              ; At least it ain't XML
+                 (json +lsp)              ; At least it ain't XML
                  ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
                  (javascript +lsp +tree-sitter)        ; all(hope(abandon(ye(who(enter(here))))))
                  ;;julia             ; a better, faster MATLAB
@@ -2919,7 +2993,7 @@ in {
                  ;;php               ; perl's insecure younger brother
                  ;;plantuml          ; diagrams for confusing people more
                  ;;purescript        ; javascript, but functional
-                 ;;python            ; beautiful is better than ugly
+                 (python +lsp)            ; beautiful is better than ugly
                  ;;qt                ; the 'cutest' gui framework ever
                  ;;racket            ; a DSL for DSLs
                  ;;raku              ; the artist formerly known as perl6
@@ -2929,13 +3003,13 @@ in {
                  ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
                  ;;scala             ; java, but good
                  ;;scheme            ; a fully conniving family of lisps
-                 sh                ; she sells {ba,z,fi}sh shells on the C xor
+                 (sh +fish +lsp)                ; she sells {ba,z,fi}sh shells on the C xor
                  ;;sml
                  ;;solidity          ; do you need a blockchain? No.
                  ;;swift             ; who asked for emoji variables?
                  ;;terra             ; Earth and Moon in alignment for performance.
                  (web +lsp)              ; the tubes
-                 yaml              ; JSON, but readable
+                 (yaml +lsp)              ; JSON, but readable
 
                  :email
                  ;;(mu4e +gmail)
@@ -3018,6 +3092,10 @@ in {
           (package! mermaid-mode)
 
           (package! csv-mode)
+
+          ;; `lsp-mode` is lagging behind `vscode-eslint`
+          ;; https://github.com/emacs-lsp/lsp-mode/issues/4091
+          (package! lsp-mode :built-in t)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
