@@ -332,6 +332,8 @@ in {
           hostname="$(${pkgs.hostname}/bin/hostname)"
           ${pkgs.pass}/bin/pass "$hostname/$USER" | head -n1
         '';
+
+        DASHT_DOCSETS_DIR = "${config.xdg.dataFile.docsets.source}";
       };
     activation = with config.xdg; {
       createXdgCacheAndDataDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -2886,6 +2888,12 @@ in {
                                   (+ x (/ width 2) (- (/ width 2)))
                                   (+ y (/ height 2))))))
         (atomic-chrome-start-server)
+
+        (setq dash-docs-docsets-path "${config.xdg.dataFile.docsets.source}")
+        (set-docsets! 'js2-mode "JavaScript" "NodeJS")
+        (set-docsets! 'rjsx-mode "JavaScript" "React")
+        (set-docsets! 'typescript-mode "JavaScript" "NodeJS")
+        (set-docsets! 'typescript-tsx-mode "JavaScript" "React")
       '';
       "doom/init.el" = {
         text = ''
@@ -3481,6 +3489,90 @@ in {
           ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
           ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
         '';
+      docsets.source = pkgs.symlinkJoin {
+        name = "docsets";
+        paths =
+          # https://kapeli.com/dash#docsets
+          map ({ name, sha256 }:
+            pkgs.fetchzip {
+              url = "https://kapeli.com/feeds/${name}.tgz";
+              inherit sha256;
+              stripRoot = false;
+            }) [
+              {
+                name = "CSS";
+                sha256 = "sha256-1FWZWKfDh4FLlF1EPIPpuXCkQYHRbMUSBS2P7KeNI0M=";
+              }
+              {
+                name = "Docker";
+                sha256 = "sha256-wyQagar+0VG72CX46xdW1tSiBcK1svtTrMUn1STpkks=";
+              }
+              {
+                name = "Emacs_Lisp";
+                sha256 = "sha256-GxGsT3xSvbjFNacwsew4xJk8rmv3kXvuEnCQeF8QFLY=";
+              }
+              {
+                name = "Emmet";
+                sha256 = "sha256-bTn7dJJ4fc+e4OzaWj4z0eeAZ7+wlutM3c2JTKU34QU=";
+              }
+              {
+                name = "Express";
+                sha256 = "sha256-E7+35AHVEG/wLyqRr7W+xbmdt0+n3VGm4wp57REPuhM=";
+              }
+              {
+                name = "ExtJS";
+                sha256 = "sha256-l8drgOXanSk1V8p5eoUCt8WInyIGfFH3XQE7AOYCcYs=";
+              }
+              {
+                name = "Font_Awesome";
+                sha256 = "sha256-pQi01pAmaJLaAIG4EdVerncVdAzTDmviUNVr81yNh9c=";
+              }
+              {
+                name = "Haskell";
+                sha256 = "sha256-ZSUWwrhqIT6T/aIL1gka64g0a2G4seuI8kfPBoSbaXA=";
+              }
+              {
+                name = "HTML";
+                sha256 = "sha256-vyQSffeLsNkdE2iqsvqmXpdc61KuXjrOtpAvjYbRxJc=";
+              }
+              {
+                name = "JavaScript";
+                sha256 = "sha256-40vNxbSmmUHZM04N1f08Ni39wdfTxkDXfKZsy2d24kc=";
+              }
+              {
+                name = "Lo-Dash";
+                sha256 = "sha256-irVO2nDTbqlLVBaqkTR5MfxHyuoDQda3dfXs64bcqS8=";
+              }
+              {
+                name = "Markdown";
+                sha256 = "sha256-WRjWe1frF9Ys68a1jVJPqZkzEWQNr5OGaHnWbBijRGc=";
+              }
+              {
+                name = "MySQL";
+                sha256 = "sha256-BrmCvM019s5tJjcmGNMG/JayJJAyQ74s1fJb6M3y53g=";
+              }
+              {
+                name = "Nginx";
+                sha256 = "sha256-7/LueWbyTAvwZa1wgLeXPtOsMxuiJTshN/dnBQIIDZ0=";
+              }
+              {
+                name = "NodeJS";
+                sha256 = "sha256-EzmYq3rK+9dfDN8tSmAg98lO3yN5iGo121N27BmmXiQ=";
+              }
+              {
+                name = "PostgreSQL";
+                sha256 = "sha256-gnTHNm3CCFwMHRKPwWCFbOKqfmjs3Nm0sBBIBNiaG8U=";
+              }
+              {
+                name = "Python_3";
+                sha256 = "sha256-mvnNfnhkXUh//8/3oZOS5x9M9llvkb661FteeH5oG0s=";
+              }
+              {
+                name = "React";
+                sha256 = "sha256-oGSms/Bi07bee19Lq8f/+2cAfb0/0D+c1YKErGZe4wM";
+              }
+            ];
+      };
     };
     desktopEntries = {
       editor-protocol = {
@@ -3805,6 +3897,7 @@ in {
       keybase
       comma
       zeal
+      dasht
 
       # For dark mode toggling
       xfce.xfconf
