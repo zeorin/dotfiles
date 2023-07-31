@@ -1013,6 +1013,10 @@ in {
       };
     };
     nix-index.enable = true;
+    obs-studio = {
+      enable = true;
+      plugins = with pkgs.obs-studio-plugins; [ obs-backgroundremoval ];
+    };
     password-store = {
       enable = true;
       package = pkgs.pass.withExtensions (exts:
