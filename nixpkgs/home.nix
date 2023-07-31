@@ -1340,7 +1340,7 @@ in {
         custom.direnv = {
           format = "[\\[direnv\\]]($style) ";
           style = "fg:yellow dimmed";
-          when = "env | grep -E '^DIRENV_FILE='";
+          when = "printenv DIRENV_FILE";
         };
       };
     };
