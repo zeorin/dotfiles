@@ -929,7 +929,7 @@ in {
     kitty = {
       enable = true;
       font = {
-        name = "Iosevka";
+        name = "Iosevka Nerd Font";
         size = 9;
       };
       keybindings = {
@@ -1164,7 +1164,7 @@ in {
           insert_pass="Control+n"
         '';
       };
-      font = "Iosevka 12";
+      font = "Iosevka Nerd Font 12";
       terminal = terminal-emulator;
       extraConfig = {
         show-icons = true;
@@ -1783,7 +1783,7 @@ in {
           separator_height = 4;
           frame_width = 0;
           separator_color = "#00000000";
-          font = "Iosevka 10";
+          font = "Iosevka Nerd Font 10";
           format = ''
             <b>%s</b>
             %b'';
@@ -1964,7 +1964,7 @@ in {
 
           font-0 = "Symbols Nerd Font:size=18;3";
           font-1 = "Symbols Nerd Font:size=10;2";
-          font-2 = "Iosevka:size=8;2";
+          font-2 = "Iosevka Nerd Font:size=8;2";
 
           tray-position = "right";
           tray-padding = 2;
@@ -2692,9 +2692,9 @@ in {
         ;;
         ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
         ;; font string. You generally only need these two:
-        (setq doom-font (font-spec :family "Iosevka" :size 12 :weight 'light)
+        (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
               doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13)
-              doom-big-font (font-spec :family "Iosevka" :size 18 :weight 'light))
+              doom-big-font (font-spec :family "Iosevka Nerd Font" :size 18 :weight 'light))
 
         ;; There are two ways to load a theme. Both assume the theme is installed and
         ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -3780,7 +3780,7 @@ in {
       league-of-moveable-type
 
       # Iosevka and friends
-      iosevka-bin
+      # iosevka-bin we use the `nerdfonts` version
       (iosevka-bin.override { variant = "aile"; })
       (iosevka-bin.override { variant = "etoile"; })
 
@@ -3795,19 +3795,13 @@ in {
 
       # Nerd Fonts but just the symbols
       # Set FontConfig to use it as a fallback for most monospaced fonts
-      (stdenv.mkDerivation {
-        pname = "symbols-nerd-font";
-        version = "2.2.0";
-        src = fetchFromGitHub {
-          owner = "ryanoasis";
-          repo = "nerd-fonts";
-          rev = "FontPatcher";
-          sha256 = "ORQUN4oMxgf9y1K0cQqgiREefk6edbvmRFPQ5G4uKwo=";
-          sparseCheckout = [
-            "10-nerd-font-symbols.conf"
-            "patched-fonts/NerdFontsSymbolsOnly"
-          ];
-        };
+      (nerdfonts.override { fonts = [ "Iosevka" "NerdFontsSymbolsOnly" ]; })
+      (stdenv.mkDerivation rec {
+        inherit (nerdfonts) version;
+        pname = "nerdfonts-fontconfig";
+        src = builtins.fetchurl
+          "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/10-nerd-font-symbols.conf";
+        dontUnpack = true;
         dontConfigure = true;
         dontBuild = true;
         installPhase = ''
@@ -3815,11 +3809,7 @@ in {
 
           fontconfigdir="$out/etc/fonts/conf.d"
           install -d "$fontconfigdir"
-          install 10-nerd-font-symbols.conf "$fontconfigdir"
-
-          fontdir="$out/share/fonts/truetype"
-          install -d "$fontdir"
-          install "patched-fonts/NerdFontsSymbolsOnly/complete/Symbols-2048-em Nerd Font Complete.ttf" "$fontdir"
+          install "$src" "$fontconfigdir/10-nerd-font-symbols.conf"
 
           runHook postInstall
         '';
