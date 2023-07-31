@@ -420,86 +420,102 @@ in {
         cfg.enableBrowserpass = true;
         cfg.enableTridactylNative = true;
       };
-      extensions = with pkgs.nur.repos.rycee.firefox-addons;
-        [
-          a11ycss
-          auto-tab-discard
-          browserpass
-          canvasblocker
-          clearurls
-          cookies-txt
-          darkreader
-          fediact
-          mailvelope
-          metamask
-          octolinker
-          octotree
-          org-capture
-          privacy-badger
-          react-devtools
-          reddit-enhancement-suite
-          reduxdevtools
-          refined-github
-          tab-session-manager
-          terms-of-service-didnt-read
-          tree-style-tab
-          tridactyl
-          ublock-origin
-          wappalyzer
-          wayback-machine
-        ] ++ [
-          pkgs.nur.repos.ethancedwards8.firefox-addons.enhancer-for-youtube
-          pkgs.nur.repos.pborzenkov.firefox-addons.wallabagger
-        ] ++ [
-          (buildFirefoxXpiAddon rec {
-            pname = "better_tweetdeck";
-            version = "4.7.2";
-            addonId = "BetterTweetDeckDev@erambert.me";
-            url =
-              "https://addons.mozilla.org/firefox/downloads/file/3891208/better_tweetdeck-${version}-fx.xpi";
-            sha256 = "1ckp7n2qjhwnzzdrsw50ahrcdsszcsgr6gsxamhf9p2dpfxhxiny";
-            meta = with lib; {
-              homepage = "https://better.tw/";
-              description =
-                "Improve your experience on TweetDeck web with emojis, thumbnails, and a lot of customization options to make TweetDeck even better for you.";
-              licence = licences.mit;
-              platforms = platforms.all;
-            };
-          })
-          (buildFirefoxXpiAddon rec {
-            pname = "cors-everywhere";
-            version = "18.11.13.2043";
-            addonId = "cors-everywhere@spenibus";
-            url =
-              "https://addons.mozilla.org/firefox/downloads/file/1148493/cors_everywhere-${version}-fx.xpi";
-            sha256 = "0kw89yjsw0dggdk8h238h7fzjpi7wm58gnnad8vpnax63xp90chj";
-            meta = with lib; {
-              homepage =
-                "https://github.com/spenibus/cors-everywhere-firefox-addon";
-              description =
-                "Bypass CORS restrictions by altering http responses.";
-              licence = licences.mit;
-              platforms = platforms.all;
-            };
-          })
-          (buildFirefoxXpiAddon rec {
-            pname = "redirect-amp-to-html";
-            version = "2.1.0";
-            addonId = "{569456be-2850-4f7e-b669-71e55140ee0a}";
-            url =
-              "https://addons.mozilla.org/firefox/downloads/file/3546077/redirect_amp_to_html-${version}-an+fx.xpi";
-            sha256 = "142plr60v7w4niwm5kpmaymmaqn319rwfwakh3ad6c1cg0r40bkn";
-            meta = with lib; {
-              homepage =
-                "https://www.daniel.priv.no/web-extensions/amp2html.html";
-              description =
-                "Automatically redirects AMP pages to the regular web page variant.";
-              licence = with licences; [ mit x11 ];
-              platforms = platforms.all;
-            };
-          })
-        ];
       profiles = let
+        extensions = with pkgs.nur.repos.rycee.firefox-addons;
+          [
+            a11ycss
+            auto-tab-discard
+            browserpass
+            canvasblocker
+            clearurls
+            cookies-txt
+            darkreader
+            fediact
+            ghosttext
+            mailvelope
+            metamask
+            octolinker
+            octotree
+            org-capture
+            privacy-badger
+            react-devtools
+            reddit-enhancement-suite
+            reduxdevtools
+            refined-github
+            tab-session-manager
+            terms-of-service-didnt-read
+            tree-style-tab
+            tridactyl
+            ublock-origin
+            wappalyzer
+            wayback-machine
+          ] ++ [
+            pkgs.nur.repos.ethancedwards8.firefox-addons.enhancer-for-youtube
+            pkgs.nur.repos.pborzenkov.firefox-addons.wallabagger
+          ] ++ [
+            (buildFirefoxXpiAddon rec {
+              pname = "better_tweetdeck";
+              version = "4.7.2";
+              addonId = "BetterTweetDeckDev@erambert.me";
+              url =
+                "https://addons.mozilla.org/firefox/downloads/file/3891208/better_tweetdeck-${version}-fx.xpi";
+              sha256 = "1ckp7n2qjhwnzzdrsw50ahrcdsszcsgr6gsxamhf9p2dpfxhxiny";
+              meta = with lib; {
+                homepage = "https://better.tw/";
+                description =
+                  "Improve your experience on TweetDeck web with emojis, thumbnails, and a lot of customization options to make TweetDeck even better for you.";
+                licence = licences.mit;
+                platforms = platforms.all;
+              };
+            })
+            (buildFirefoxXpiAddon rec {
+              pname = "chromelogger";
+              version = "2.0";
+              addonId = "chromelogger@burningmoth.com";
+              url =
+                "https://addons.mozilla.org/firefox/downloads/file/3453932/chromelogger-${version}.xpi";
+              sha256 = "sha256-a5heN/fYc1MPpicoAAfwjKtUhj6Nblh6v3YbybhNBJY=";
+              meta = with lib; {
+                homepage =
+                  "https://github.com/burningmoth/burningmoth-chromelogger-firefox";
+                description =
+                  "Parses and displays messages from X-ChromeLogger-Data and X-ChromePHP-Data headers in DevTools Web Console facilitating server-side debugging via the Chrome Logger protocol ( https://craig.is/writing/chrome-logger/ ).";
+                platforms = platforms.all;
+              };
+            })
+            (buildFirefoxXpiAddon rec {
+              pname = "cors-everywhere";
+              version = "18.11.13.2043";
+              addonId = "cors-everywhere@spenibus";
+              url =
+                "https://addons.mozilla.org/firefox/downloads/file/1148493/cors_everywhere-${version}-fx.xpi";
+              sha256 = "0kw89yjsw0dggdk8h238h7fzjpi7wm58gnnad8vpnax63xp90chj";
+              meta = with lib; {
+                homepage =
+                  "https://github.com/spenibus/cors-everywhere-firefox-addon";
+                description =
+                  "Bypass CORS restrictions by altering http responses.";
+                licence = licences.mit;
+                platforms = platforms.all;
+              };
+            })
+            (buildFirefoxXpiAddon rec {
+              pname = "redirect-amp-to-html";
+              version = "2.1.0";
+              addonId = "{569456be-2850-4f7e-b669-71e55140ee0a}";
+              url =
+                "https://addons.mozilla.org/firefox/downloads/file/3546077/redirect_amp_to_html-${version}-an+fx.xpi";
+              sha256 = "142plr60v7w4niwm5kpmaymmaqn319rwfwakh3ad6c1cg0r40bkn";
+              meta = with lib; {
+                homepage =
+                  "https://www.daniel.priv.no/web-extensions/amp2html.html";
+                description =
+                  "Automatically redirects AMP pages to the regular web page variant.";
+                licence = with licences; [ mit x11 ];
+                platforms = platforms.all;
+              };
+            })
+          ];
         commonSettings = {
           "browser.startup.page" = 3; # resume previous session
           "browser.startup.homepage" = "about:blank";
@@ -593,6 +609,7 @@ in {
         };
       in {
         personal = {
+          inherit extensions;
           id = 0;
           isDefault = true;
           settings = commonSettings // noNoiseSuppression // performanceSettings
@@ -618,6 +635,7 @@ in {
         };
         blank = { id = 1; };
         nightly = {
+          inherit extensions;
           id = 2;
           settings = commonSettings // noNoiseSuppression;
           extraConfig = ''
@@ -629,6 +647,7 @@ in {
           '';
         };
         beta = {
+          inherit extensions;
           id = 3;
           settings = commonSettings // noNoiseSuppression;
           extraConfig = ''
@@ -640,6 +659,7 @@ in {
           '';
         };
         esr = {
+          inherit extensions;
           id = 4;
           settings = commonSettings // noNoiseSuppression;
           extraConfig = ''
@@ -1977,7 +1997,7 @@ in {
     polybar = {
       enable = true;
       package = pkgs.polybar.override {
-        i3GapsSupport = true;
+        i3Support = true;
         mpdSupport = true;
       };
       settings = let superColors = colors;
@@ -3820,11 +3840,11 @@ in {
       httpie
       xdg-user-dirs
       # https://github.com/NixOS/nixpkgs/issues/189567
-      # wineWowPackages.stable
-      (import (builtins.fetchTarball {
-        url =
-          "https://github.com/NixOS/nixpkgs/archive/7342cdc70156522050ce813386f6e159ca749d82.tar.gz";
-      }) { }).wineWowPackages.stable
+      wineWowPackages.stable
+      # (import (builtins.fetchTarball {
+      #   url =
+      #     "https://github.com/NixOS/nixpkgs/archive/7342cdc70156522050ce813386f6e159ca749d82.tar.gz";
+      # }) { }).wineWowPackages.stable
       winetricks
       protontricks
       protonup
@@ -3885,7 +3905,7 @@ in {
       yubikey-manager-qt
       yubikey-personalization
       yubikey-personalization-gui
-      yubioath-desktop
+      yubioath-flutter
       pcmanfm
       lxmenu-data
       shared-mime-info
@@ -4064,7 +4084,20 @@ in {
 
       # Font collections
       google-fonts
-      league-of-moveable-type
+      (league-of-moveable-type.override {
+        fanwood = false;
+        goudy-bookletter-1911 = false;
+        knewave = false;
+        league-gothic = false;
+        league-script-number-one = false;
+        league-spartan = false;
+        linden-hill = false;
+        orbitron = false;
+        prociono = false;
+        raleway = false;
+        sniglet = false;
+        sorts-mill-goudy = false;
+      })
 
       # Iosevka and friends
       # iosevka-bin we use the `nerdfonts` version
