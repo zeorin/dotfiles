@@ -3349,6 +3349,104 @@ in {
           }
         "
       '';
+      "pipewire/pipewire.conf.d/10-source-rnnoise.conf" = {
+        text = ''
+          context.modules = [
+          {   name = libpipewire-module-filter-chain
+              args = {
+                  node.description = "Noise Cancelling Source"
+                  media.name = "Noise Cancelling Source"
+                  filter.graph = {
+                      nodes = [
+                          {
+                              type = ladspa
+                              name = rnnoise
+                              plugin = ${pkgs.rnnoise-plugin}/lib/ladspa/librnnoise_ladspa.so
+                              label = noise_suppressor_mono
+                              control = {
+                                  "VAD Threshold (%)" = 50.0
+                                  "VAD Grace Period (ms)" = 200
+                                  "Retroactive VAD Grace (ms)" = 0
+                              }
+                          }
+                      ]
+                  }
+                  capture.props = {
+                      node.name =  "effect_input.rnnoise"
+                      node.passive = true
+                      target.object = "alsa_input.usb-0c76_USB_PnP_Audio_Device-00.mono-fallback"
+                      audio.rate = 48000
+                  }
+                  playback.props = {
+                      node.name =  "effect_output.rnnoise"
+                      media.class = Audio/Source
+                      audio.rate = 48000
+                  }
+              }
+          }
+          ]
+        '';
+        onChange = "${pkgs.writeShellScript "restart pipewire.service" ''
+          ${pkgs.systemd}/bin/systemctl --user restart pipewire.service
+        ''}";
+      };
+      "pipewire/pipewire.conf.d/20-echo-cancellation.conf" = {
+        text = ''
+          context.module = [
+          {   name = libpipewire-module-echo-cancel
+              args = {
+                  library.name  = aec/libspa-aec-webrtc
+                  aec.args = {
+                      webrtc.extended_filter = true
+                      webrtc.delay_agnostic = true
+                      webrtc.high_pass_filter = true
+                      webrtc.noise_suppression = false
+                      webrtc.voice_detection = false
+                      webrtc.gain_control = false
+                      webrtc.experimental_agc = false
+                      webrtc.experimental_ns = false
+                  }
+                  node.latency = 1024/48000
+                  # monitor.mode = false
+                  # https://docs.pipewire.org/page_module_echo_cancel.html:
+                  #
+                  # .--------.     .---------.     .--------.     .----------.     .-------.
+                  # | source | --> | capture | --> |        | --> |  source  | --> |  app  |
+                  # '--------'     '---------'     | echo   |     '----------'     '-------'
+                  #                                | cancel |
+                  # .--------.     .---------.     |        |     .----------.     .--------.
+                  # |  app   | --> |  sink   | --> |        | --> | playback | --> |  sink  |
+                  # '--------'     '---------'     '--------'     '----------'     '--------'
+                  #
+                  capture.props = {
+                      # Cancel this sound out, should be un-cancelled mic input
+                      node.description = "Echo Cancel Capture"
+                      node.name = "echo_cancel.mic.input"
+                      target.object = "effect_input.rnnoise"
+                  }
+                  sink.props = {
+                      # Cancel sound out of this, should be set to system's default output so all apps' output will be cancelled
+                      node.description = "Echo Cancel Sink"
+                      node.name = "echo_cancel.playback.input"
+                  }
+                  source.props = {
+                      # Echo-cancelled mic input, should be set to system's default input so all apps' mic input will be cancelled
+                      node.description = "Echo Cancel Source"
+                      node.name = "echo_cancel.mic.output"
+                  }
+                  playback.props = {
+                      # Echo-cancelled sound output, this should be a hardware speaker, if left unassigned it intelligently chooses one
+                      node.description = "Echo Cancel Playback"
+                      node.name = "echo_cancel.playback.output"
+                  }
+              }
+          }
+          ]
+        '';
+        onChange = "${pkgs.writeShellScript "restart pipewire.service" ''
+          ${pkgs.systemd}/bin/systemctl --user restart pipewire.service
+        ''}";
+      };
       "readline/inputrc".text = ''
         $include /etc/inputrc
 
@@ -3547,6 +3645,12 @@ in {
           '')
         ];
       };
+      "wireplumber/bluetooth.lua.d/51-bluez-config.lua".text = ''
+        bluez_monitor.properties = {
+          ["bluez5.enable-sbc-xq"] = true,
+          ["bluez5.enable-msbc"] = true,
+          ["bluez5.enable-hw-volume"] = true,
+          ["bluez5.headset-roles"] = "[ hsp_hs hsp_ag hfp_hf hfp_ag ]"
         }
       '';
       "wget/wgetrc".text = ''
