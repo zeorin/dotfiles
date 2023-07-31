@@ -2653,6 +2653,21 @@ in {
         Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
       };
       picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
+      polkit-authentication-agent = {
+        Unit = {
+          Description = "Polkit authentication agent";
+          Documentation = "https://gitlab.freedesktop.org/polkit/polkit/";
+          Wants = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" ];
+        };
+        Service = {
+          Type = "simple";
+          ExecStart =
+            "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+          Restart = "on-failure";
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
       xfsettingsd = {
         Unit = {
           Description = "xfsettingsd";
@@ -3710,9 +3725,6 @@ in {
     ".xprofile".text = ''
       # Set up Xresources
       ${pkgs.xorg.xrdb}/bin/xrdb -load ${configHome}/X11/xresources
-
-      # Polkit agent
-      ${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent &
     '';
   };
 
