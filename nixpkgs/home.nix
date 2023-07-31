@@ -2778,9 +2778,7 @@ in {
         (setq projectile-project-search-path '(("~/Code/" . 2)))
 
         ;; Handle secrets with `pass`
-        (require 'password-store)
-        (setq auth-sources '(password-store))
-        (setq auth-source-pass-filename "${config.programs.password-store.settings.PASSWORD_STORE_DIR}")
+        ;;(setq auth-source-pass-filename "${config.programs.password-store.settings.PASSWORD_STORE_DIR}")
 
         ;; Here are some additional functions/macros that could help you configure Doom:
         ;;
@@ -3051,7 +3049,7 @@ in {
                  (lsp +peek)
                  (magit +forge)             ; a git porcelain for Emacs
                  ;;make              ; run make tasks from Emacs
-                 ;;pass              ; password manager for nerds
+                 (pass +auth)              ; password manager for nerds
                  ;;pdf               ; pdf enhancements
                  ;;prodigy           ; FIXME managing external services & code builders
                  rgb               ; creating color strings
