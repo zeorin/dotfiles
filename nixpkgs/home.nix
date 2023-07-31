@@ -112,7 +112,7 @@ let
   in emacsPkg // (pkgs.symlinkJoin {
     name = "my-doom-emacs";
     paths = [ emacsPkg ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
+    nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
     postBuild = ''
       wrapProgram $out/bin/emacs \
         --prefix PATH : ${lib.makeBinPath pathDeps} \
@@ -1844,7 +1844,7 @@ in {
       picomPkg // (symlinkJoin {
         name = "picom";
         paths = [ picomPkg ];
-        buildInputs = [ makeWrapper ];
+        buildInputs = [ makeBinaryWrapper ];
         postBuild = ''
           # Needed for the service EnvironmentFile to work
           wrapProgram $out/bin/picom \
