@@ -2905,6 +2905,24 @@ in {
                                   (+ y (/ height 2))))))
         (atomic-chrome-start-server)
 
+        ;; Use Tree Sitter wherever we can
+        (setq +tree-sitter-hl-enabled-modes t)
+        ;; Don't try to download or build the binary, Nix already has it
+        (setq tsc-dyn-get-from nil
+              tsc-dyn-dir "${my-doom-emacs.emacs.pkgs.tsc}/share/emacs/site-lisp/elpa/${my-doom-emacs.emacs.pkgs.tsc.name}")
+        ;; Nix has already built all the available grammars for us
+        (setq tree-sitter-load-path '("${
+          pkgs.runCommandLocal "tree-sitter-grammars-bundle" { } ''
+            mkdir -p $out
+            ${
+              lib.concatStringsSep "\n" (lib.mapAttrsToList (name: src:
+                "ln -s ${src}/parser $out/${
+                  (builtins.replaceStrings [ "tree-sitter-" ] [ "" ] name)
+                }.so") pkgs.tree-sitter.builtGrammars)
+            };
+          ''
+        }"))
+
         (setq dash-docs-docsets-path "${config.xdg.dataFile.docsets.source}")
         (set-docsets! 'js2-mode "JavaScript" "NodeJS")
         (set-docsets! 'rjsx-mode "JavaScript" "React")
@@ -3045,10 +3063,10 @@ in {
                  ;;fstar             ; (dependent) types and (monadic) effects and Z3
                  ;;gdscript          ; the language you waited for
                  ;;(go +lsp)         ; the hipster dialect
-                 (haskell +lsp)  ; a language that's lazier than I am
+                 (haskell +lsp +tree-sitter)  ; a language that's lazier than I am
                  ;;hy                ; readability of scheme w/ speed of python
                  ;;idris             ; a language you can depend on
-                 (json +lsp)              ; At least it ain't XML
+                 (json +lsp +tree-sitter)              ; At least it ain't XML
                  ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
                  (javascript +lsp +tree-sitter)        ; all(hope(abandon(ye(who(enter(here))))))
                  ;;julia             ; a better, faster MATLAB
@@ -3060,7 +3078,7 @@ in {
                  ;;lua               ; one-based indices? one-based indices
                  markdown          ; writing docs for people to ignore
                  ;;nim               ; python + lisp at the speed of c
-                 nix               ; I hereby declare "nix geht mehr!"
+                 (nix +tree-sitter)               ; I hereby declare "nix geht mehr!"
                  ;;ocaml             ; an objective camel
                  (org               ; organize your plain life in plain text
                   +pretty
@@ -3068,7 +3086,7 @@ in {
                  ;;php               ; perl's insecure younger brother
                  ;;plantuml          ; diagrams for confusing people more
                  ;;purescript        ; javascript, but functional
-                 (python +lsp)            ; beautiful is better than ugly
+                 (python +lsp +tree-sitter)            ; beautiful is better than ugly
                  ;;qt                ; the 'cutest' gui framework ever
                  ;;racket            ; a DSL for DSLs
                  ;;raku              ; the artist formerly known as perl6
@@ -3078,13 +3096,13 @@ in {
                  ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
                  ;;scala             ; java, but good
                  ;;scheme            ; a fully conniving family of lisps
-                 (sh +fish +lsp)                ; she sells {ba,z,fi}sh shells on the C xor
+                 (sh +fish +lsp +tree-sitter)                ; she sells {ba,z,fi}sh shells on the C xor
                  ;;sml
                  ;;solidity          ; do you need a blockchain? No.
                  ;;swift             ; who asked for emoji variables?
                  ;;terra             ; Earth and Moon in alignment for performance.
-                 (web +lsp)              ; the tubes
-                 (yaml +lsp)              ; JSON, but readable
+                 (web +lsp +tree-sitter)              ; the tubes
+                 (yaml +lsp +tree-sitter)              ; JSON, but readable
 
                  :email
                  ;;(mu4e +gmail)
