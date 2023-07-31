@@ -2771,6 +2771,9 @@ in {
                                      (concat org-roam-directory
                                              org-roam-dailies-directory)))
 
+        ;; Prevents some cases of Emacs flickering.
+        (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
+
         ;; This determines the style of line numbers in effect. If set to `nil', line
         ;; numbers are disabled. For relative line numbers, set this to `relative'.
         (setq display-line-numbers-type 'relative)
@@ -2806,6 +2809,22 @@ in {
         (map! :leader
               :desc "Reset font size"
               "0" #'text-scale-adjust)
+
+        ;; Tabs > spaces
+        (setq-default indent-tabs-mode t)
+
+        ;; An evil mode indicator is redundant with cursor shape
+        (advice-add #'doom-modeline-segment--modals :override #'ignore)
+
+        ;; Disable "package-cl is deprecated" warning
+        ;; https://discourse.doomemacs.org/t/warning-at-startup-package-cl-is-deprecated/60/5
+        (defadvice! fixed-do-after-load-evaluation (abs-file)
+          :override #'do-after-load-evaluation
+          (dolist (a-l-element after-load-alist)
+            (when (and (stringp (car a-l-element))
+                      (string-match-p (car a-l-element) abs-file))
+              (mapc #'funcall (cdr a-l-element))))
+          (run-hook-with-args 'after-load-functions abs-file))
 
         ;; Enable some more Evil keybindings for org-mode
         (after! evil-org
@@ -2906,6 +2925,18 @@ in {
         (require 'dap-node)
 
         (setq fancy-splash-image "${../backgrounds/doom.png}")
+        (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+
+        ;; Word-wrap
+        (add-hook 'visual-line-mode-hook #'+word-wrap-mode)
+        (add-to-list '+word-wrap-disabled-modes 'treemacs-mode)
+        (setq +word-wrap-extra-indent 'double
+              +word-wrap-fill-style 'auto
+              comment-auto-fill-only-comments t
+              fill-column 80)
+        (setq-default auto-fill-function 'do-auto-fill)
+        (add-hook 'text-mode-hook
+                  (lambda () (setq-local comment-auto-fill-only-comments nil)))
 
         ;; Emacs everywhere
         (after! emacs-everywhere
@@ -2944,6 +2975,11 @@ in {
           ''
         }"))
 
+        (setq company-minimum-prefix-length 2)
+        (setq company-idle-delay
+          (lambda () (if (company-in-string-or-comment) nil 0.3)))
+        (setq company-selection-wrap-around t)
+
         (setq dash-docs-docsets-path "${config.xdg.dataFile.docsets.source}")
         (set-docsets! 'js2-mode "JavaScript" "NodeJS")
         (set-docsets! 'rjsx-mode "JavaScript" "React")
@@ -2977,24 +3013,24 @@ in {
                  company           ; the ultimate code completion backend
                  ;;helm              ; the *other* search engine for love and life
                  ;;ido               ; the other *other* search engine...
-                 ivy               ; a search engine for love and life
+                 (ivy +childframe +fuzzy +icons +prescient)               ; a search engine for love and life
 
                  :ui
                  ;;deft              ; notational velocity for Emacs
                  doom              ; what makes DOOM look the way it does
                  doom-dashboard    ; a nifty splash screen for Emacs
-                 doom-quit         ; DOOM quit-message prompts when you quit Emacs
-                 ;;(emoji +unicode)  ; 🙂
+                 ;;doom-quit         ; DOOM quit-message prompts when you quit Emacs
+                 (emoji +unicode)  ; 🙂
                  hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
                  ;;hydra
                  indent-guides     ; highlighted indent columns
-                 ligatures         ; ligatures and symbols to make your code pretty again
+                 (ligatures +extra)         ; ligatures and symbols to make your code pretty again
                  minimap           ; show a map of the code on the side
                  modeline          ; snazzy, Atom-inspired modeline, plus API
                  nav-flash         ; blink cursor line after big motions
                  ;;neotree           ; a project drawer, like NERDTree for vim
                  ophints           ; highlight the region an operation acts on
-                 (popup +defaults)   ; tame sudden yet inevitable temporary windows
+                 (popup +defaults +all)   ; tame sudden yet inevitable temporary windows
                  ;;tabs              ; a tab bar for Emacs
                  (treemacs +lsp)          ; a project drawer, like neotree but cooler
                  unicode           ; extended unicode support for various languages
@@ -3010,19 +3046,19 @@ in {
                  fold              ; (nigh) universal code folding
                  (format +onsave)  ; automated prettiness
                  ;;god               ; run Emacs commands without modifier keys
-                 ;;lispy             ; vim for lisp, for people who don't like vim
+                 lispy             ; vim for lisp, for people who don't like vim
                  multiple-cursors  ; editing in many places at once
                  ;;objed             ; text object editing for the innocent
                  ;;parinfer          ; turn lisp into python, sort of
                  ;;rotate-text       ; cycle region at point between text candidates
                  snippets          ; my elves. They type so I don't have to
-                 ;;word-wrap         ; soft wrapping with language-aware indent
+                 word-wrap         ; soft wrapping with language-aware indent
 
                  :emacs
-                 dired             ; making dired pretty [functional]
+                 (dired +icons +ranger)             ; making dired pretty [functional]
                  electric          ; smarter, keyword-based electric-indent
-                 ;;ibuffer         ; interactive buffer management
-                 undo              ; persistent, smarter undo for your inevitable mistakes
+                 (ibuffer +icons)         ; interactive buffer management
+                 (undo +tree)              ; persistent, smarter undo for your inevitable mistakes
                  vc                ; version-control and Emacs, sitting in a tree
 
                  :term
@@ -3045,7 +3081,7 @@ in {
                  ;;ein               ; tame Jupyter notebooks with emacs
                  (eval +overlay)     ; run code, run (also, repls)
                  ;;gist              ; interacting with github gists
-                 lookup              ; navigate your code and its documentation
+                 (lookup +dictionary +docsets +offline)             ; navigate your code and its documentation
                  (lsp +peek)
                  (magit +forge)             ; a git porcelain for Emacs
                  ;;make              ; run make tasks from Emacs
@@ -3061,7 +3097,7 @@ in {
 
                  :os
                  (:if IS-MAC macos)  ; improve compatibility with macOS
-                 ;;tty               ; improve the terminal Emacs experience
+                 (tty +osc)              ; improve the terminal Emacs experience
 
                  :lang
                  ;;agda              ; types of types of types of types...
@@ -3097,7 +3133,7 @@ in {
                  ;;factor
                  ;;ledger            ; an accounting system in Emacs
                  ;;lua               ; one-based indices? one-based indices
-                 markdown          ; writing docs for people to ignore
+                 (markdown +grip)          ; writing docs for people to ignore
                  ;;nim               ; python + lisp at the speed of c
                  (nix +tree-sitter)               ; I hereby declare "nix geht mehr!"
                  ;;ocaml             ; an objective camel
@@ -3111,8 +3147,8 @@ in {
                  ;;qt                ; the 'cutest' gui framework ever
                  ;;racket            ; a DSL for DSLs
                  ;;raku              ; the artist formerly known as perl6
-                 ;;rest              ; Emacs as a REST client
-                 ;;rst               ; ReST in peace
+                 (rest +jq)              ; Emacs as a REST client
+                 rst               ; ReST in peace
                  ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
                  ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
                  ;;scala             ; java, but good
@@ -3216,7 +3252,7 @@ in {
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
-          ${configHome}/doom-emacs/bin/doom --force sync
+          ${configHome}/doom-emacs/bin/doom --force sync -u
         ''}";
       };
       emacs.source = builtins.fetchGit {
