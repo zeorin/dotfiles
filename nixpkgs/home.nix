@@ -2797,7 +2797,6 @@ in {
         ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
         ;; they are implemented.
 
-
         (map! :leader
               :desc "Increase font size"
               "+" #'text-scale-adjust)
@@ -2819,52 +2818,52 @@ in {
                                     todo
                                     heading)))
 
-          (use-package! org-super-agenda
-            :after org-agenda
-            :init
-            (require 'evil-org-agenda)
-            (setq org-super-agenda-groups '((:name "Today"
-                                                   :time-grid t
-                                                   :scheduled today)
-                                            (:name "Due today"
-                                                   :deadline today)
-                                            (:name "Important"
-                                                   :priority "A")
-                                            (:name "Overdue"
-                                                   :deadline past)
-                                            (:name "Due soon"
-                                                   :deadline future)))
-            :config
-            ;; https://github.com/alphapapa/org-super-agenda/issues/50#issuecomment-817432643
-            (setq org-super-agenda-header-map evil-org-agenda-mode-map)
-            (org-super-agenda-mode))
+        (use-package! org-super-agenda
+          :after org-agenda
+          :init
+          (require 'evil-org-agenda)
+          (setq org-super-agenda-groups '((:name "Today"
+                                                  :time-grid t
+                                                  :scheduled today)
+                                          (:name "Due today"
+                                                  :deadline today)
+                                          (:name "Important"
+                                                  :priority "A")
+                                          (:name "Overdue"
+                                                  :deadline past)
+                                          (:name "Due soon"
+                                                  :deadline future)))
+          :config
+          ;; https://github.com/alphapapa/org-super-agenda/issues/50#issuecomment-817432643
+          (setq org-super-agenda-header-map evil-org-agenda-mode-map)
+          (org-super-agenda-mode))
 
-          (add-to-list 'auto-mode-alist '("\\.mermaid\\'" . mermaid-mode))
-          (setq mermaid-output-format ".svg")
+        (add-to-list 'auto-mode-alist '("\\.mermaid\\'" . mermaid-mode))
+        (setq mermaid-output-format ".svg")
 
-          ;; Don't auto-resolve clocks, because all our org-roam files are also
-          ;; agenda files, auto-resolution takes forever as org has to open each
-          ;; of them.
-          (setq org-clock-auto-clock-resolution nil)
+        ;; Don't auto-resolve clocks, because all our org-roam files are also
+        ;; agenda files, auto-resolution takes forever as org has to open each
+        ;; of them.
+        (setq org-clock-auto-clock-resolution nil)
 
-          ;; Invalidate Projectile cache when using Magit to check out different commits
-          ;; https://emacs.stackexchange.com/a/26272
-          (defun run-projectile-invalidate-cache (&rest _args)
-            ;; We ignore the args to `magit-checkout'.
-            (projectile-invalidate-cache nil))
-          (advice-add 'magit-checkout
-                      :after #'run-projectile-invalidate-cache)
-          (advice-add 'magit-branch-and-checkout ; This is `b c'.
-                      :after #'run-projectile-invalidate-cache)
+        ;; Invalidate Projectile cache when using Magit to check out different commits
+        ;; https://emacs.stackexchange.com/a/26272
+        (defun run-projectile-invalidate-cache (&rest _args)
+          ;; We ignore the args to `magit-checkout'.
+          (projectile-invalidate-cache nil))
+        (advice-add 'magit-checkout
+                    :after #'run-projectile-invalidate-cache)
+        (advice-add 'magit-branch-and-checkout ; This is `b c'.
+                    :after #'run-projectile-invalidate-cache)
 
-          ;; Don't use language servers to auto-format
-          (setq +format-with-lsp nil)
+        ;; Don't use language servers to auto-format
+        (setq +format-with-lsp nil)
 
-          ;; LSP perf tweaks
-          ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-          (setq read-process-output-max (* 1024 1024)) ;; 1mb
-          (setq lsp-idle-delay 0.500)
-          (setq gc-cons-threshold 100000000) ;; 100mb
+        ;; LSP perf tweaks
+        ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+        (setq read-process-output-max (* 1024 1024)) ;; 1mb
+        (setq lsp-idle-delay 0.500)
+        (setq gc-cons-threshold 100000000) ;; 100mb
 
           ;; ts-ls bugfix, should be unnecessary for Emacs 29
           ;; https://github.com/emacs-lsp/lsp-mode/issues/2681#issuecomment-1214902146
@@ -2874,7 +2873,6 @@ in {
                           (replace-match ""))
                         (apply orig rest)))
 
-          (setq fancy-splash-image "${../backgrounds/doom.png}")
           ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
         (setq lsp-eslint-server-command '("${pkgs.nodejs}/bin/node"
                                           "${pkgs.vscode-extensions.dbaeumer.vscode-eslint}/share/vscode/extensions/dbaeumer.vscode-eslint/server/out/eslintServer.js"
@@ -2906,6 +2904,8 @@ in {
         (require 'dap-firefox)
         (require 'dap-chrome)
         (require 'dap-node)
+
+        (setq fancy-splash-image "${../backgrounds/doom.png}")
 
         ;; Emacs everywhere
         (after! emacs-everywhere
