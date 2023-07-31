@@ -3805,7 +3805,6 @@ in {
 
   nixpkgs.config = {
     allowUnfree = true;
-    joypixels.acceptLicense = true;
     packageOverrides = pkgs: {
       nur = import (builtins.fetchTarball
         "https://github.com/nix-community/NUR/archive/master.tar.gz") {
@@ -4031,11 +4030,11 @@ in {
 
       # Emoji
       # emojione
-      # twitter-color-emoji
+      twitter-color-emoji
       # twemoji-color-font
       # noto-fonts-emoji
       # noto-fonts-emoji-blob-bin
-      joypixels
+      # joypixels
 
       # Classic fonts
       eb-garamond
