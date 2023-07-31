@@ -3851,6 +3851,9 @@ in {
 
             runHook postInstall
           '';
+          preferLocalBuild = true;
+          allowSubstitutes = false;
+          meta.license = lib.licenses.unfree;
         };
     in [
       (mkAppleFont {
