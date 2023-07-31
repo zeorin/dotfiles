@@ -9,7 +9,7 @@ let
 
   my-doom-emacs = let
     emacsPkg = with pkgs;
-      (emacsPackagesFor emacs-gtk).emacsWithPackages (ps:
+      (emacsPackagesFor emacs29-gtk3).emacsWithPackages (ps:
         with ps; [
           vterm
           (lsp-mode.overrideAttrs (oldAttrs: {
@@ -2904,15 +2904,6 @@ in {
         (setq lsp-idle-delay 0.500)
         (setq gc-cons-threshold 100000000) ;; 100mb
 
-          ;; ts-ls bugfix, should be unnecessary for Emacs 29
-          ;; https://github.com/emacs-lsp/lsp-mode/issues/2681#issuecomment-1214902146
-          (advice-add 'json-parse-buffer :around
-                      (lambda (orig &rest rest)
-                        (while (re-search-forward "\\u0000" nil t)
-                          (replace-match ""))
-                        (apply orig rest)))
-
-          ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
         (setq lsp-eslint-server-command '("${pkgs.nodejs}/bin/node"
                                           "${pkgs.vscode-extensions.dbaeumer.vscode-eslint}/share/vscode/extensions/dbaeumer.vscode-eslint/server/out/eslintServer.js"
                                           "--stdio"))
@@ -2946,6 +2937,7 @@ in {
 
         (setq fancy-splash-image "${../backgrounds/doom.png}")
         (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
+        (add-to-list 'default-frame-alist '(alpha-background . 95))
 
         ;; Word-wrap
         (add-hook 'visual-line-mode-hook #'+word-wrap-mode)
