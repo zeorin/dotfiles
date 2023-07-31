@@ -2323,6 +2323,8 @@ in {
 
         # Programs
         "super + p" = "${pkgs.rofi-pass}/bin/rofi-pass";
+        "super + e" =
+          "${config.programs.emacs.package}/bin/emacsclient –eval '(emacs-everywhere)'";
 
         # Audio controls
         "XF86AudioRaiseVolume" =
@@ -2583,6 +2585,7 @@ in {
             criteria = { class = ".*"; };
             command = "border pixel 0";
           }
+          (mkFloating { class = "^emacs-everywhere$"; })
           (mkFloating { class = "^Tor Browser$"; })
           (mkFloating { class = "^gnome-calculator$"; })
           (mkFloating { class = "^feh$"; })
@@ -2864,6 +2867,25 @@ in {
         (require 'dap-firefox)
         (require 'dap-chrome)
         (require 'dap-node)
+
+        ;; Emacs everywhere
+        (after! emacs-everywhere
+          (setq emacs-everywhere-frame-name-format "emacs-everywhere")
+
+          ;; The modeline is not useful to me in the popup window. It looks much nicer
+          ;; to hide it.
+          (remove-hook 'emacs-everywhere-init-hooks #'hide-mode-line-mode)
+
+          ;; Semi-center it over the target window, rather than at the cursor position
+          ;; (which could be anywhere).
+          (defadvice! center-emacs-everywhere-in-origin-window (frame window-info)
+            :override #'emacs-everywhere-set-frame-position
+            (cl-destructuring-bind (x y width height)
+                (emacs-everywhere-window-geometry window-info)
+              (set-frame-position frame
+                                  (+ x (/ width 2) (- (/ width 2)))
+                                  (+ y (/ height 2))))))
+        (atomic-chrome-start-server)
       '';
       "doom/init.el" = {
         text = ''
@@ -3048,7 +3070,7 @@ in {
                  :app
                  ;;calendar
                  ;;emms
-                 ;;everywhere        ; *leave* Emacs!? You must be joking
+                 everywhere        ; *leave* Emacs!? You must be joking
                  ;;irc               ; how neckbeards socialize
                  ;;(rss +org)        ; emacs as an RSS reader
                  ;;twitter           ; twitter client https://twitter.com/vnought
@@ -3121,6 +3143,8 @@ in {
           (package! mermaid-mode)
 
           (package! csv-mode)
+
+          (package! atomic-chrome)
 
           ;; `lsp-mode` is lagging behind `vscode-eslint`
           ;; https://github.com/emacs-lsp/lsp-mode/issues/4091
