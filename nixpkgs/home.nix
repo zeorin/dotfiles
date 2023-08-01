@@ -2314,15 +2314,7 @@ in {
         "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
 
         # Toggle dark mode
-        "super + shift + d" = "${pkgs.writeShellScript "toggle-dark-mode.sh" ''
-          dark_mode_on=$( [ "$(${pkgs.xfce.xfconf}/bin/xfconf-query -c xsettings -p /Net/ThemeName)" = "Nordic" ]; echo $? )
-
-          if [ $dark_mode_on = 0 ]; then
-            ${config.xdg.dataHome}/light-mode.d/gtk-theme.sh
-          else
-            ${config.xdg.dataHome}/dark-mode.d/gtk-theme.sh
-          fi
-        ''}";
+        "super + shift + d" = "${pkgs.darkman}/bin/darkman toggle";
 
         # Transparency controls
         "super + Home" = "${pkgs.picom}/bin/picom-trans --current --delete";
@@ -2756,7 +2748,7 @@ in {
         ;; There are two ways to load a theme. Both assume the theme is installed and
         ;; available. You can either set `doom-theme' or manually load a theme with the
         ;; `load-theme' function. This is the default:
-        (setq doom-theme 'doom-nord)
+        ;;(setq doom-theme 'doom-nord)
 
         ;; If you use `org' and don't want your org files in the default location below,
         ;; change `org-directory'. It must be set before org loads!
@@ -2795,6 +2787,25 @@ in {
         ;;
         ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
         ;; they are implemented.
+
+        (use-package! darkman
+                      :diminish darkman-mode
+                      :custom
+                      (darkman-themes '(:light doom-nord-light
+                                        :dark doom-nord))
+                      :config
+                      (defadvice darkman-set (before no-theme-stacking activate)
+                        "Disable the previous theme before loading a new one."
+                        (mapc #'disable-theme custom-enabled-themes))
+                      (if (daemonp)
+                          (progn
+                            (add-hook 'server-after-make-frame-hook #'darkman-mode)
+                            (advice-add 'darkman-mode
+                                        :after
+                                        (lambda ()
+                                          (remove-hook 'server-after-make-frame-hook
+                                                      #'darkman-mode))))
+                          (add-hook! 'after-init-hook (darkman-mode))))
 
         (map! :leader
               :desc "Increase font size"
@@ -3224,6 +3235,8 @@ in {
           ;(unpin! pinned-package another-pinned-package)
           ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
           ;(unpin! t)
+
+          (package! darkman)
 
           (package! org-super-agenda)
 
@@ -3655,19 +3668,39 @@ in {
         *.color15: ${colors.nord6}
       '';
     };
-    dataFile = with config.xdg; {
-      "dark-mode.d/gtk-theme.sh".source =
-        pkgs.writeShellScript "set-dark-theme.sh" ''
-          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Nordic"
-          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
-          ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
-        '';
-      "light-mode.d/gtk-theme.sh".source =
-        pkgs.writeShellScript "set-light-theme.sh" ''
-          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Nordic-Polar"
-          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
-          ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
-        '';
+    dataFile = {
+      "dark-mode.d".source = "${
+          pkgs.symlinkJoin {
+            name = "dark-mode.d";
+            paths = lib.attrsets.mapAttrsToList pkgs.writeShellScriptBin {
+              "desktop-notification.sh" = ''
+                ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
+              '';
+              "gtk-theme.sh" = ''
+                ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc-Dark"
+                ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc-Dark'"
+                ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
+                ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
+              '';
+            };
+          }
+        }/bin";
+      "light-mode.d".source = "${
+          pkgs.symlinkJoin {
+            name = "dark-mode.d";
+            paths = lib.attrsets.mapAttrsToList pkgs.writeShellScriptBin {
+              "desktop-notification.sh" = ''
+                ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
+              '';
+              "gtk-theme.sh" = ''
+                ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc"
+                ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc'"
+                ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+                ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
+              '';
+            };
+          }
+        }/bin";
       docsets.source = pkgs.symlinkJoin {
         name = "docsets";
         paths =
@@ -3874,6 +3907,7 @@ in {
 
   home.packages = with pkgs;
     [
+      darkman
       my-doom-emacs
       (writeShellScriptBin "edit.sh" ''
         if [ -n "$INSIDE_EMACS" ]; then
