@@ -4178,7 +4178,7 @@ in {
         inherit (nerdfonts) version;
         pname = "nerdfonts-fontconfig";
         src = builtins.fetchurl
-          "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/10-nerd-font-symbols.conf";
+          "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/v${nerdfonts.version}/10-nerd-font-symbols.conf";
         dontUnpack = true;
         dontConfigure = true;
         dontBuild = true;
