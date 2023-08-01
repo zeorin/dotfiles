@@ -240,6 +240,11 @@ in {
   nixpkgs.overlays = [
     (import (builtins.fetchTarball
       "https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz"))
+    (final: prev:
+      (import "${
+          (builtins.fetchTarball
+            "https://github.com/thiagokokada/nix-alien/archive/master.tar.gz")
+        }/overlay.nix") { inherit final prev; })
   ];
 
   imports = [
@@ -3907,6 +3912,7 @@ in {
 
   home.packages = with pkgs;
     [
+      nix-alien
       darkman
       my-doom-emacs
       (writeShellScriptBin "edit.sh" ''
