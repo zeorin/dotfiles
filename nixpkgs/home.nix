@@ -3532,6 +3532,10 @@ in {
         bind gD composite tabduplicate | tabdetach
         bind T composite tabduplicate
 
+        " Better search bindings
+        bind s fillcmdline tabopen search
+        bind S fillcmdline open search
+
         " Override some FF defaults to equivalent Tridactyl command line
         bind <C-t> fillcmdline tabopen
         bind <C-l> fillcmdline open
