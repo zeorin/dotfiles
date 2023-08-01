@@ -4004,7 +4004,7 @@ in {
           pkg = (latest."${name}-bin".override {
             cfg.enableBrowserpass = true;
             cfg.enableTridactylNative = true;
-          }).overrideAttrs (old: rec {
+          }).overrideAttrs (oldAttrs: {
             desktopItem = makeDesktopItem {
               inherit name desktopName;
               exec = "${name} %U";
@@ -4174,7 +4174,7 @@ in {
       # Nerd Fonts but just the symbols
       # Set FontConfig to use it as a fallback for most monospaced fonts
       (nerdfonts.override { fonts = [ "Iosevka" "NerdFontsSymbolsOnly" ]; })
-      (stdenv.mkDerivation rec {
+      (stdenv.mkDerivation {
         inherit (nerdfonts) version;
         pname = "nerdfonts-fontconfig";
         src = builtins.fetchurl
