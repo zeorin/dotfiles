@@ -2899,8 +2899,12 @@ in {
         (setq lsp-eslint-server-command '("${pkgs.nodejs}/bin/node"
                                           "${pkgs.vscode-extensions.dbaeumer.vscode-eslint}/share/vscode/extensions/dbaeumer.vscode-eslint/server/out/eslintServer.js"
                                           "--stdio"))
-
-        (setq lsp-nix-nil-server-path "${pkgs.nil}/bin/nil")
+        (use-package! lsp-nix
+                      :after (lsp-mode)
+                      :custom
+                      (lsp-nix-nil-server-path "${pkgs.nil}/bin/nil"))
+        (add-hook! nix-mode
+                   (lsp-deferred))
 
         ;; Disable invasive lsp-mode features
         (after! lsp-mode
