@@ -346,7 +346,7 @@ in {
         done
 
         # Data dirs
-        for dir in bash go pass stack wineprefixes picom; do
+        for dir in bash go pass stack wineprefixes; do
           $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
             ${dataHome}/$dir
         done
@@ -1881,19 +1881,6 @@ in {
     password-store-sync.enable = true;
     picom = {
       enable = true;
-      package = let picomPkg = pkgs.picom;
-      in with pkgs;
-      picomPkg // (symlinkJoin {
-        name = "picom";
-        paths = [ picomPkg ];
-        buildInputs = [ makeBinaryWrapper ];
-        postBuild = ''
-          # Needed for the service EnvironmentFile to work
-          wrapProgram $out/bin/picom \
-            --add-flags \''${ARG_0:+\"\$ARG_0\"} \
-            --add-flags \''${ARG_1:+\"\$ARG_1\"}
-        '';
-      });
       backend = "glx";
       fade = true;
       fadeDelta = 3;
@@ -2326,16 +2313,6 @@ in {
         "super + m" = "${pkgs.dunst}/bin/dunstctl action 0";
         "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
 
-        # Toggle grayscale
-        "super + shift + g" = "${pkgs.writeShellScript "toggle-grayscale.sh" ''
-          if [ -f ${config.xdg.dataHome}/picom/env ]; then
-            rm ${config.xdg.dataHome}/picom/env
-          else
-            ln -s ${config.xdg.configHome}/picom/env-grayscale ${config.xdg.dataHome}/picom/env
-          fi
-          ${pkgs.systemd}/bin/systemctl --user restart picom.service
-        ''}";
-
         # Toggle dark mode
         "super + shift + d" = "${pkgs.writeShellScript "toggle-dark-mode.sh" ''
           dark_mode_on=$( [ "$(${pkgs.xfce.xfconf}/bin/xfconf-query -c xsettings -p /Net/ThemeName)" = "Nordic" ]; echo $? )
@@ -2672,7 +2649,6 @@ in {
         Install.WantedBy = [ "default.target" ];
         Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
       };
-      picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
       polkit-authentication-agent = {
         Unit = {
           Description = "Polkit authentication agent";
@@ -3335,19 +3311,6 @@ in {
         init-license=LGPL-3.0
         prefix=${dataHome}/npm
         cache=${cacheHome}/npm
-      '';
-      "picom/env-grayscale".text = ''
-        ARG_0="--glx-fshader-win"
-        ARG_1="
-          uniform sampler2D tex;
-          uniform float opacity;
-          void main() {
-              vec4 color = texture2D(tex, gl_TexCoord[0].xy);
-              gl_FragColor = vec4(
-                  vec3(0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) * opacity,
-                  color.a * opacity);
-          }
-        "
       '';
       "pipewire/pipewire.conf.d/10-source-rnnoise.conf" = {
         text = ''
