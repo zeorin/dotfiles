@@ -17,7 +17,7 @@ let
             src = (let
               rev = lib.strings.fileContents
                 (let regex = ''package! lsp-mode :pin "\(.*\)"'';
-                in runCommand "extract-lsp-mode-rev" { } ''
+                in runCommandLocal "extract-lsp-mode-rev" { } ''
                   cat ${doomEmacsSource}/modules/tools/lsp/packages.el \
                     | grep '${regex}' -o \
                     | sed 's/${regex}/\1/' \
