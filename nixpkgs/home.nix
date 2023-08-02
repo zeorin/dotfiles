@@ -3,8 +3,15 @@
 let
   unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 
-  writeShellScriptDir = path: text:
+  writeScriptDir = path: text:
+    pkgs.writeTextFile {
+      inherit text;
+      name = builtins.baseNameOf path;
+      executable = true;
+      destination = "/${path}";
+    };
 
+  writeShellScriptDir = path: text:
     pkgs.writeTextFile {
       name = builtins.baseNameOf path;
       executable = true;
@@ -725,6 +732,99 @@ in {
           description = "Create a directory and change into it";
           body = "mkdir -p $argv[1] && cd $argv[1]";
         };
+        fish_nord_theme = {
+          description = "Set fish's colours";
+          argumentNames = [ "variant" ];
+          body = ''
+            # Inspired by https://github.com/ericvw/dotfiles/blob/main/fish/.config/fish/conf.d/nordtheme.fish
+
+            argparse --max-args=1 -- $argv
+            or return
+
+            set -q variant; or set -l variant dark
+
+            set -l nord0 2e3440
+            set -l nord1 3b4252
+            set -l nord2 434c5e
+            set -l nord3 4c566a
+            set -l nord4 d8dee9
+            set -l nord5 e5e9f0
+            set -l nord6 eceff4
+            set -l nord7 8fbcbb
+            set -l nord8 88c0d0
+            set -l nord9 81a1c1
+            set -l nord10 5e81ac
+            set -l nord11 bf616a
+            set -l nord12 d08770
+            set -l nord13 ebcb8b
+            set -l nord14 a3be8c
+            set -l nord15 b48ead
+
+            if test $variant = dark
+              set -U fish_color_normal normal
+              set -U fish_color_command $nord8
+              set -U fish_color_keyword $nord9
+              set -U fish_color_quote $nord14
+              set -U fish_color_redirection $nord15 --bold
+              set -U fish_color_end $nord9
+              set -U fish_color_error $nord11
+              set -U fish_color_param $nord4
+              set -U fish_color_valid_path --underline
+              set -U fish_color_option $nord7
+              set -U fish_color_comment $nord3 --italics
+              set -U fish_color_selection $nord4 --bold --background=$nord2
+              set -U fish_color_operator $nord9
+              set -U fish_color_escape $nord13
+              set -U fish_color_autosuggestion $nord3
+              set -U fish_color_cwd $nord10
+              set -U fish_color_cwd_root $nord11
+              set -U fish_color_user $nord14
+              set -U fish_color_host $nord14
+              set -U fish_color_host_remote $nord13
+              set -U fish_color_status $nord11
+              set -U fish_color_cancel --reverse
+              set -U fish_color_search_match --bold --background=$nord2
+              set -U fish_color_history_current $nord5 --bold
+              set -U fish_pager_color_progress $nord1 --background=$nord12
+              set -U fish_pager_color_completion $nord5
+              set -U fish_pager_color_prefix normal --bold --underline
+              set -U fish_pager_color_description $nord13 --italics
+              set -U fish_pager_color_selected_background --background=$nord2
+            else if test $variant = light
+              set -U fish_color_normal normal
+              set -U fish_color_command $nord2
+              set -U fish_color_keyword $nord7
+              set -U fish_color_quote $nord14
+              set -U fish_color_redirection $nord15 --bold
+              set -U fish_color_end $nord7
+              set -U fish_color_error $nord11
+              set -U fish_color_param $nord10
+              set -U fish_color_valid_path --underline
+              set -U fish_color_option $nord9
+              set -U fish_color_comment $nord4 --italics
+              set -U fish_color_selection $nord2 --bold --background=$nord4
+              set -U fish_color_operator $nord7
+              set -U fish_color_escape $nord13
+              set -U fish_color_autosuggestion $nord4
+              set -U fish_color_cwd $nord8
+              set -U fish_color_cwd_root $nord11
+              set -U fish_color_user $nord14
+              set -U fish_color_host $nord14
+              set -U fish_color_host_remote $nord13
+              set -U fish_color_status $nord11
+              set -U fish_color_cancel --reverse
+              set -U fish_color_search_match --bold --background=$nord4
+              set -U fish_color_history_current $nord1 --bold
+              set -U fish_pager_color_progress $nord5 --background=$nord12
+              set -U fish_pager_color_completion $nord1
+              set -U fish_pager_color_prefix normal --bold --underline
+              set -U fish_pager_color_description $nord13 --italics
+              set -U fish_pager_color_selected_background --background=$nord4
+            else
+              echo "Unknown variant: $variant"
+            end
+          '';
+        };
       };
       interactiveShellInit = ''
         # Clear greeting message
@@ -739,6 +839,8 @@ in {
         set fish_cursor_insert line
         set fish_cursor_replace_one underscore
         set fish_vi_force_cursor true
+
+        fish_nord_theme (${pkgs.darkman}/bin/darkman get)
 
         # Notify for long-running commands
         function ntfy_on_duration --on-event fish_prompt
@@ -3954,7 +4056,12 @@ in {
               '';
               "kitty-theme.sh" =
                 ''${config.programs.kitty.package.passthru.set-theme} "Nord"'';
-            });
+            }) ++ [
+              (writeScriptDir "fish-theme.fish" ''
+                #!${config.programs.fish.package}/bin/fish
+                fish_nord_theme dark
+              '')
+            ];
             postBuild = ''
               files=("$out"/*)
               mkdir "$out/${name}"
@@ -3974,7 +4081,12 @@ in {
               '';
               "kitty-theme.sh" = ''
                 ${config.programs.kitty.package.passthru.set-theme} "Nord light"'';
-            });
+            }) ++ [
+              (writeScriptDir "fish-theme.fish" ''
+                #!${config.programs.fish.package}/bin/fish
+                fish_nord_theme light
+              '')
+            ];
             postBuild = ''
               files=("$out"/*)
               mkdir "$out/${name}"
