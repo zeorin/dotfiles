@@ -3,6 +3,21 @@
 let
   unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 
+  writeShellScriptDir = path: text:
+
+    pkgs.writeTextFile {
+      name = builtins.baseNameOf path;
+      executable = true;
+      destination = "/${path}";
+      text = ''
+        #!${pkgs.runtimeShell}
+        ${text}
+      '';
+      checkPhase = ''
+        ${pkgs.stdenv.shellDryRun} "$target"
+      '';
+    };
+
   myKey = "0x5E1C0971FE4F665A";
 
   doomEmacsSource = builtins.fetchGit "https://github.com/hlissner/doom-emacs";
@@ -3665,38 +3680,6 @@ in {
       '';
     };
     dataFile = {
-      "dark-mode.d".source = "${
-          pkgs.symlinkJoin {
-            name = "dark-mode.d";
-            paths = lib.attrsets.mapAttrsToList pkgs.writeShellScriptBin {
-              "desktop-notification.sh" = ''
-                ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
-              '';
-              "gtk-theme.sh" = ''
-                ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc-Dark"
-                ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc-Dark'"
-                ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
-                ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
-              '';
-            };
-          }
-        }/bin";
-      "light-mode.d".source = "${
-          pkgs.symlinkJoin {
-            name = "dark-mode.d";
-            paths = lib.attrsets.mapAttrsToList pkgs.writeShellScriptBin {
-              "desktop-notification.sh" = ''
-                ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
-              '';
-              "gtk-theme.sh" = ''
-                ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc"
-                ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc'"
-                ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
-                ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
-              '';
-            };
-          }
-        }/bin";
       docsets.source = pkgs.symlinkJoin {
         name = "docsets";
         paths =
@@ -3905,6 +3888,52 @@ in {
     [
       nix-alien
       darkman
+      (symlinkJoin {
+        name = "darkman-scripts";
+        paths = [
+          (symlinkJoin rec {
+            name = "dark-mode.d";
+            paths = (lib.attrsets.mapAttrsToList writeShellScriptDir {
+              "desktop-notification.sh" = ''
+                ${libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
+              '';
+              "gtk-theme.sh" = ''
+                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc-Dark"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc-Dark'"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
+              '';
+            });
+            postBuild = ''
+              files=("$out"/*)
+              mkdir "$out/${name}"
+              mv "''${files[@]}" "$out/${name}"
+            '';
+          }).out
+          (symlinkJoin rec {
+            name = "light-mode.d";
+            paths = (lib.attrsets.mapAttrsToList writeShellScriptDir {
+              "desktop-notification.sh" = ''
+                ${libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
+              '';
+              "gtk-theme.sh" = ''
+                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc'"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+              '';
+            });
+            postBuild = ''
+              files=("$out"/*)
+              mkdir "$out/${name}"
+              mv "''${files[@]}" "$out/${name}"
+            '';
+          }).out
+        ];
+        postBuild = ''
+          files=("$out"/*)
+          mkdir "$out/share"
+          mv "''${files[@]}" "$out/share"
+        '';
+      })
       my-doom-emacs
       (writeShellScriptBin "edit.sh" ''
         if [ -n "$INSIDE_EMACS" ]; then
