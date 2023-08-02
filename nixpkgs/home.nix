@@ -999,24 +999,6 @@ in {
         window_padding_width = "12";
         initial_window_width = "108c";
         initial_window_height = "32c";
-        # https://github.com/ryanoasis/nerd-fonts/wiki/Glyph-Sets-and-Code-Points#overview
-        symbol_map = "${
-            lib.strings.concatStringsSep "," [
-              "U+23FB-U+23FE,U+2B58" # IEC Power Symbols
-              "U+E000-U+E00A" # Pomicons
-              "U+E0A0-U+E0A2,U+E0B0-U+E0B3" # Powerline
-              "U+E0A3,U+E0B4-U+E0C8,U+E0CA,U+E0CC-U+E0D4" # Powerline Extra
-              "U+E200-U+E2A9" # Font Awesome Extension
-              "U+2665,U+26A1,U+F400-U+F4A8,U+F4A9" # Octicons
-              "U+E300-U+E3EB" # Weather Icons
-              "U+E5FA-U+E631" # Seti-UI + Custom
-              "U+E700-U+E7C5" # Devicons
-              "U+EA60-U+EBEB" # Codicons
-              "U+F000-U+F2E0" # Font Awesome
-              "U+F300-U+F32D" # Font Logos
-              "U+F500-U+FD46" # Material Design
-            ]
-          } Symbols Nerd Font";
       };
     };
     less = {
