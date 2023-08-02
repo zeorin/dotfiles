@@ -2399,7 +2399,8 @@ in {
           }
           # https://github.com/nix-community/home-manager/issues/213#issuecomment-366962925
           {
-            command = "${pkgs.systemd}/bin/systemctl --user restart polybar";
+            command =
+              "${pkgs.systemd}/bin/systemctl --user restart polybar.service";
             always = true;
             notification = false;
           }
