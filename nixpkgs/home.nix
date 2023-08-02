@@ -15,13 +15,12 @@ let
           (lsp-mode.overrideAttrs (oldAttrs: {
             LSP_USE_PLISTS = true;
             src = (let
-              rev = builtins.readFile
+              rev = lib.strings.fileContents
                 (let regex = ''package! lsp-mode :pin "\(.*\)"'';
                 in runCommand "extract-lsp-mode-rev" { } ''
                   cat ${doomEmacsSource}/modules/tools/lsp/packages.el \
                     | grep '${regex}' -o \
                     | sed 's/${regex}/\1/' \
-                    | tr -d "\n" \
                     > $out
                 '');
             in builtins.fetchTarball
