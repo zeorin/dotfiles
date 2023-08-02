@@ -991,6 +991,12 @@ in {
     };
     kitty = {
       enable = true;
+      package = let kitty = pkgs.kitty;
+      in lib.attrsets.recursiveUpdate kitty {
+        passthru.set-theme = pkgs.writeShellScript "kitty-set-theme.sh" ''
+          ${config.programs.kitty.package}/bin/kitty +kitten themes --reload-in=all --config-file-name="theme.conf" "$@"
+        '';
+      };
       font = {
         name = "Iosevka Nerd Font";
         size = 9;
@@ -1015,6 +1021,9 @@ in {
         initial_window_width = "108c";
         initial_window_height = "32c";
       };
+      extraConfig = ''
+        include theme.conf
+      '';
     };
     less = {
       enable = true;
@@ -3324,6 +3333,47 @@ in {
           ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
         ''}";
       };
+      "kitty/themes/Nord light.conf".text = ''
+        # From: https://github.com/ayamir/nord-and-light/blob/master/.config/kitty/polar.conf
+        foreground            #2E3440
+        background            #D8DEE9
+        selection_foreground  #FFFACD
+        selection_background  #000000
+        url_color             #81A1C1
+        cursor                #0087BD
+
+        # black
+        color0   #3B4252
+        color8   #4C566A
+
+        # red
+        color1   #BF616A
+        color9   #BF616A
+
+        # green
+        color2   #A3BE8C
+        color10  #A3BE8C
+
+        # yellow
+        color3   #EBCB8B
+        color11  #EBCB8B
+
+        # blue
+        color4  #81A1C1
+        color12 #81A1C1
+
+        # magenta
+        color5   #B48EAD
+        color13  #B48EAD
+
+        # cyan
+        color6   #88C0D0
+        color14  #8FBCBB
+
+        # white
+        color7   #E5E9F0
+        color15  #ECEFF4
+      '';
       "npm/npmrc".text = ''
         init-author-name=Xandor Schiefer
         init-author-email=me@xandor.co.za
@@ -3902,6 +3952,8 @@ in {
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc-Dark'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
               '';
+              "kitty-theme.sh" =
+                ''${config.programs.kitty.package.passthru.set-theme} "Nord"'';
             });
             postBuild = ''
               files=("$out"/*)
@@ -3920,6 +3972,8 @@ in {
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
               '';
+              "kitty-theme.sh" = ''
+                ${config.programs.kitty.package.passthru.set-theme} "Nord light"'';
             });
             postBuild = ''
               files=("$out"/*)
