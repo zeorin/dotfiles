@@ -2603,6 +2603,7 @@ in {
             class = "^Steam$";
             title = "^Steam Guard";
           })
+          (mkFloating { class = "(?i)protonvpn"; })
           (mkFloating { window_type = "dialog"; })
           (mkFloating { window_role = "pop-up"; })
           (mkFloating { window_role = "task_dialog"; })
