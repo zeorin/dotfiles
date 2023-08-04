@@ -4262,14 +4262,24 @@ in {
   };
 
   gtk = {
+    enable = true;
     theme = {
-      package = pkgs.nordic;
-      name = "Nordic-Polar";
+      package = pkgs.arc-theme;
+      name = "Arc";
     };
     iconTheme = {
       package = pkgs.la-capitaine-icon-theme;
-      name = "La Capitaine";
+      name = "la-capitaine-icon-theme";
     };
+    cursorTheme = {
+      package = pkgs.capitaine-cursors-themed;
+      name = "Capitaine Cursors (Nord)";
+    };
+    font = {
+      name = "SF Pro Text Semibold";
+      size = 10;
+    };
+    gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
   };
 
   qt = {
@@ -4393,12 +4403,6 @@ in {
         wget -q -N https://github.com/Mic92/nix-index-database/releases/latest/download/$filename
         ln -f $filename files
       '')
-      capitaine-cursors
-      la-capitaine-icon-theme
-      nordic
-      zafiro-icons
-      gtk_engines
-      gtk-engine-murrine
       wget
       wireshark
       websocat
@@ -4415,7 +4419,6 @@ in {
       bc
       feh
       lxappearance
-      xorg.xcursorthemes
       protonvpn-gui
       protonvpn-cli
       thunderbird
