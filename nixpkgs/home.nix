@@ -3627,10 +3627,7 @@ in {
           ${configHome}/doom-emacs/bin/doom --force sync -u
         ''}";
       };
-      emacs.source = builtins.fetchGit {
-        url = "https://github.com/plexus/chemacs2";
-        rev = "30a20dbc2799e4ab2f8c509fdadcd90aa9845b5c";
-      };
+      emacs.source = builtins.fetchGit "https://github.com/plexus/chemacs2";
       "flameshot/flameshot.ini" = {
         text = ''
           [General]
@@ -4221,7 +4218,7 @@ in {
       };
       my-emacs = {
         name = "My Emacs";
-        exec = "${pkgs.emacs-gtk}/bin/emacs --with-profile default";
+        exec = "${pkgs.emacs29-gtk3}/bin/emacs --with-profile default";
         icon = "emacs";
         type = "Application";
         terminal = false;
@@ -4330,7 +4327,7 @@ in {
               mkdir "$out/${name}"
               mv "''${files[@]}" "$out/${name}"
             '';
-          }).out
+          }).outPath
           (symlinkJoin rec {
             name = "light-mode.d";
             paths = (lib.attrsets.mapAttrsToList writeShellScriptDir {
@@ -4355,7 +4352,7 @@ in {
               mkdir "$out/${name}"
               mv "''${files[@]}" "$out/${name}"
             '';
-          }).out
+          }).outPath
         ];
         postBuild = ''
           files=("$out"/*)
