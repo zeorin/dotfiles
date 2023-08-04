@@ -2108,99 +2108,287 @@ in {
           foreground-alt = colors.nord10;
           primary = colors.nord9;
           secondary = colors.nord10;
-          alert = colors.nord12;
+          danger = colors.nord11;
+          urgent = colors.nord12;
+          alert = colors.nord13;
+          success = colors.nord14;
         };
+        pulseaudio-control = with pkgs;
+          stdenv.mkDerivation {
+            name = "pulseaudio-control";
+            src = builtins.fetchGit
+              "https://github.com/marioortizmanero/polybar-pulseaudio-control";
+            buildInputs =
+              [ bash pulseaudio libnotify gnugrep gawk gnused coreutils ];
+            nativeBuildInputs = [ makeWrapper ];
+            installPhase = ''
+              mkdir -p $out/bin
+              mv pulseaudio-control.bash $out/bin/pulseaudio-control
+              wrapProgram $out/bin/pulseaudio-control \
+                --prefix PATH : ${
+                  lib.makeBinPath [
+                    bash
+                    pulseaudio
+                    libnotify
+                    gnugrep
+                    gawk
+                    gnused
+                    coreutils
+                  ]
+                }
+            '';
+          };
       in {
         settings = { screenchange-reload = true; };
         "bar/top" = {
           inherit (colors) background foreground;
           monitor = "\${env:MONITOR:}";
+          monitor-strict = true;
+          monitor-exact = true;
           dpi = 0;
-          width = 1920;
-          height = 24;
+          width = "100%";
+          height = "${toString (24.0 / 1080 * 100)}%";
+          screenchange-reload = true;
+
+          compositing-background = "source";
+          compositing-foreground = "over";
+          compositing-overline = "over";
+          compositing-underline = "over";
+          compositing-border = "over";
 
           modules-left = "i3 title";
           # modules-center = "yubikey mpd";
           modules-center = "yubikey";
-          modules-right = "pipewire-simple xkeyboard battery date";
+          modules-right =
+            "audio-input audio-output xkeyboard battery date tray-arrow";
 
-          font-0 = "Symbols Nerd Font:size=18;3";
-          font-1 = "Symbols Nerd Font:size=10;2";
-          font-2 = "Iosevka Nerd Font:size=8;2";
+          fixed-center = true;
 
-          tray-position = "right";
-          tray-padding = 2;
-          tray-maxsize = 18;
+          # For symbols
+          font-0 = "Symbols Nerd Font Mono:size=10;2";
+          # For Powerline glyphs
+          font-1 = "Symbols Nerd Font Mono:size=18;3";
+          # If it's not a symbol, it falls back to this
+          font-2 = "Iosevka:size=8;2";
+
+          format-foreground = colors.foreground;
+          format-background = colors.background;
+
+          tray-position = "\${env:TRAY_POSITION:}";
+          tray-background = colors.nord3;
           tray-foreground = colors.nord4;
-          tray-background = colors.background;
-          tray-prefix = "";
-          tray-prefix-font = 1;
-          tray-prefix-foreground = colors.nord3;
-          tray-prefix-background = colors.nord0;
+          tray-padding = 2;
+        };
+        "powerline/right-arrow" = {
+          type = "custom/text";
+          content-background = "\${self.background-next}";
+          content-foreground = "\${self.background}";
+          content = "";
+          content-font = 2;
+        };
+        "powerline/right-separator" = {
+          type = "custom/text";
+          content-foreground = "\${self.separator}";
+          content = "";
+          content-font = 2;
+        };
+        "powerline/left-arrow" = {
+          type = "custom/text";
+          content-background = "\${self.background-next}";
+          content-foreground = "\${self.background}";
+          content = "";
+          content-font = 2;
+        };
+        "powerline/left-separator" = {
+          type = "custom/text";
+          content-foreground = "\${self.separator}";
+          content = "";
+          content-font = 2;
+        };
+        "powerline/left-section" = {
+          format-suffix-foreground = "\${self.background}";
+          format-suffix-background = "\${self.background-next}";
+          format-suffix = "";
+          format-suffix-font = 2;
+          format-volume-suffix-foreground = "\${self.background}";
+          format-volume-suffix-background = "\${self.background-next}";
+          format-volume-suffix = "";
+          format-volume-suffix-font = 2;
+          format-muted-suffix-foreground = "\${self.background}";
+          format-muted-suffix-background = "\${self.background-next}";
+          format-muted-suffix = "";
+          format-muted-suffix-font = 2;
+          format-mounted-suffix-foreground = "\${self.background}";
+          format-mounted-suffix-background = "\${self.background-next}";
+          format-mounted-suffix = "";
+          format-mounted-suffix-font = 2;
+          format-unmounted-suffix-foreground = "\${self.background}";
+          format-unmounted-suffix-background = "\${self.background-next}";
+          format-unmounted-suffix = "";
+          format-unmounted-suffix-font = 2;
+          format-connected-suffix-foreground = "\${self.background}";
+          format-connected-suffix-background = "\${self.background-next}";
+          format-connected-suffix = "";
+          format-connected-suffix-font = 2;
+          format-disconnected-suffix-foreground = "\${self.background}";
+          format-disconnected-suffix-background = "\${self.background-next}";
+          format-disconnected-suffix = "";
+          format-disconnected-suffix-font = 2;
+          content-suffix-foreground = "\${self.background}";
+          content-suffix-background = "\${self.background-next}";
+          content-suffix = "";
+          content-suffix-font = 2;
+        };
+        "powerline/left-section-separator" = {
+          format-prefix-foreground = "\${self.separator}";
+          format-prefix-background = "\${self.background}";
+          format-prefix = "";
+          format-prefix-font = 2;
+          format-volume-prefix-foreground = "\${self.separator}";
+          format-volume-prefix-background = "\${self.background}";
+          format-volume-prefix = "";
+          format-volume-prefix-font = 2;
+          format-muted-prefix-foreground = "\${self.background}";
+          format-muted-prefix-background = "\${self.separator}";
+          format-muted-prefix = "";
+          format-muted-prefix-font = 2;
+          format-mounted-prefix-foreground = "\${self.separator}";
+          format-mounted-prefix-background = "\${self.background}";
+          format-mounted-prefix = "";
+          format-mounted-prefix-font = 2;
+          format-unmounted-prefix-foreground = "\${self.separator}";
+          format-unmounted-prefix-background = "\${self.background}";
+          format-unmounted-prefix = "";
+          format-unmounted-prefix-font = 2;
+          format-connected-prefix-foreground = "\${self.separator}";
+          format-connected-prefix-background = "\${self.background}";
+          format-connected-prefix = "";
+          format-connected-prefix-font = 2;
+          format-disconnected-prefix-foreground = "\${self.separator}";
+          format-disconnected-prefix-background = "\${self.background}";
+          format-disconnected-prefix = "";
+          format-disconnected-prefix-font = 2;
+          content-prefix-foreground = "\${self.separator}";
+          content-prefix-background = "\${self.background}";
+          content-prefix = "";
+          content-prefix-font = 2;
+        };
+        "powerline/right-section" = {
+          format-prefix-foreground = "\${self.background}";
+          format-prefix-background = "\${self.background-next}";
+          format-prefix = "";
+          format-prefix-font = 2;
+          format-volume-prefix-foreground = "\${self.background}";
+          format-volume-prefix-background = "\${self.background-next}";
+          format-volume-prefix = "";
+          format-volume-prefix-font = 2;
+          format-muted-prefix-foreground = "\${self.background}";
+          format-muted-prefix-background = "\${self.background-next}";
+          format-muted-prefix = "";
+          format-muted-prefix-font = 2;
+          format-mounted-prefix-foreground = "\${self.background}";
+          format-mounted-prefix-background = "\${self.background-next}";
+          format-mounted-prefix = "";
+          format-mounted-prefix-font = 2;
+          format-unmounted-prefix-foreground = "\${self.background}";
+          format-unmounted-prefix-background = "\${self.background-next}";
+          format-unmounted-prefix = "";
+          format-unmounted-prefix-font = 2;
+          format-connected-prefix-foreground = "\${self.background}";
+          format-connected-prefix-background = "\${self.background-next}";
+          format-connected-prefix = "";
+          format-connected-prefix-font = 2;
+          format-disconnected-prefix-foreground = "\${self.background}";
+          format-disconnected-prefix-background = "\${self.background-next}";
+          format-disconnected-prefix = "";
+          format-disconnected-prefix-font = 2;
+          content-prefix-foreground = "\${self.background}";
+          content-prefix-background = "\${self.background-next}";
+          content-prefix = "";
+          content-prefix-font = 2;
+        };
+        "powerline/right-section-separator" = {
+          format-suffix-foreground = "\${self.separator}";
+          format-suffix-background = "\${self.background}";
+          format-suffix = "";
+          format-suffix-font = 2;
+          format-volume-suffix-foreground = "\${self.separator}";
+          format-volume-suffix-background = "\${self.background}";
+          format-volume-suffix = "";
+          format-volume-suffix-font = 2;
+          format-muted-suffix-foreground = "\${self.background}";
+          format-muted-suffix-background = "\${self.separator}";
+          format-muted-suffix = "";
+          format-muted-suffix-font = 2;
+          format-mounted-suffix-foreground = "\${self.separator}";
+          format-mounted-suffix-background = "\${self.background}";
+          format-mounted-suffix = "";
+          format-mounted-suffix-font = 2;
+          format-unmounted-suffix-foreground = "\${self.separator}";
+          format-unmounted-suffix-background = "\${self.background}";
+          format-unmounted-suffix = "";
+          format-unmounted-suffix-font = 2;
+          format-connected-suffix-foreground = "\${self.separator}";
+          format-connected-suffix-background = "\${self.background}";
+          format-connected-suffix = "";
+          format-connected-suffix-font = 2;
+          format-disconnected-suffix-foreground = "\${self.separator}";
+          format-disconnected-suffix-background = "\${self.background}";
+          format-disconnected-suffix = "";
+          format-disconnected-suffix-font = 2;
+          content-suffix-foreground = "\${self.separator}";
+          content-suffix-background = "\${self.background}";
+          content-suffix = "";
+          content-suffix-font = 2;
         };
         "module/i3" = {
+          "inherit" = "powerline/left-section";
           type = "internal/i3";
           strip-wsnumbers = true;
-          format = "<label-state><label-mode>";
-          format-foreground = colors.nord0;
-          format-background = colors.nord3;
-          format-padding-left = 1;
-          format-prefix = ''" "'';
-          format-suffix = "";
-          format-suffix-font = 1;
-          format-suffix-foreground = colors.nord3;
-          format-suffix-background = colors.nord1;
+          pin-workspaces = true;
+          show-urgent = true;
           index-sort = true;
           enable-scroll = false;
           wrapping-scroll = false;
 
+          format = "<label-mode> <label-state>";
+          format-foreground = colors.nord0;
+          format-background = colors.nord3;
+          format-prefix = "  ";
+          format-prefix-background = colors.nord3;
+          background = colors.nord3;
+          background-next = colors.nord1;
+
+          label-mode-foreground = colors.alert;
           label-mode-padding = 1;
-          label-mode-font = 2;
-          label-mode-foreground = colors.nord6;
-          label-mode-background = "\${self.format-background}";
+
+          label-separator = "​"; # zero-width space
+          label-separator-padding = "6px";
 
           # unfocused = Inactive workspace on any monitor
           label-unfocused = "%name%";
-          label-unfocused-font = 2;
-          label-unfocused-foreground = "\${self.format-foreground}";
-          label-unfocused-background = "\${self.format-background}";
-          label-unfocused-padding = 1;
 
           # focused = Active workspace on focused monitor
           label-focused = "%name%";
-          label-focused-font = 2;
           label-focused-foreground = colors.nord6;
-          label-focused-background = "\${self.format-background}";
-          label-focused-padding = 1;
 
           # visible = Active workspace on unfocused monitor
           label-visible = "%name%";
-          label-visible-font = 2;
-          label-visible-foreground = colors.nord10;
-          label-visible-background = "\${self.format-background}";
-          label-visible-padding = 1;
 
           # urgent = Workspace with urgency hint set
           label-urgent = "%name%";
-          label-urgent-font = 2;
-          label-urgent-foreground = colors.nord13;
-          label-urgent-background = "\${self.format-background}";
-          label-urgent-padding = 1;
+          label-urgent-foreground = colors.urgent;
         };
         "module/title" = {
+          "inherit" = "powerline/left-section";
           type = "internal/xwindow";
+          format-foreground = colors.nord4;
           format-background = colors.nord1;
-          format-suffix = "";
-          format-suffix-font = 1;
-          format-suffix-foreground = colors.nord1;
-          format-suffix-background = colors.background;
+          background = colors.nord1;
+          background-next = colors.nord0;
           # Prepend a zero-width space to keep rendering
           # the suffix even on an empty workspace
-          label = "​%title:0:50:…%";
-          label-foreground = colors.nord4;
-          label-background = "\${self.format-background}";
-          label-padding = 1;
-          label-font = 3;
+          label = " %title:0:120:…% ";
         };
         "module/mpd" = {
           type = "internal/mpd";
@@ -2235,10 +2423,8 @@ in {
 
           label-song-maxlen = 50;
           label-song-ellipsis = true;
-          label-song-font = 3;
           label-song-foreground = colors.nord4;
 
-          label-time-font = 3;
           label-time-foreground = colors.nord4;
 
           bar-progress-width = 30;
@@ -2248,68 +2434,6 @@ in {
           bar-progress-fill-foreground = colors.nord4;
           bar-progress-empty = "─";
           bar-progress-empty-foreground = colors.nord3;
-        };
-        "module/xkeyboard" = {
-          type = "internal/xkeyboard";
-          blacklist-0 = "num lock";
-
-          format-prefix = " ";
-          format-prefix-foreground = colors.foreground-alt;
-          format-prefix-underline = colors.secondary;
-
-          label-layout = "%name%";
-          label-layout-font = 3;
-          label-layout-underline = colors.secondary;
-
-          label-indicator-padding = 2;
-          label-indicator-margin = 1;
-          label-indicator-background = colors.secondary;
-          label-indicator-underline = colors.secondary;
-        };
-        "module/date" = {
-          type = "internal/date";
-          interval = 1;
-
-          date = "";
-          date-alt = " %Y-%m-%d";
-
-          time = "%H:%M";
-          time-alt = "%H:%M:%S";
-
-          format-prefix = "|";
-          format-prefix-foreground = colors.foreground-alt;
-          format-underline = colors.nord10;
-
-          label = "%date% %time%";
-          label-font = 3;
-        };
-        "module/battery" = {
-          type = "internal/battery";
-          battery = "BAT0";
-          adapter = "ADP1";
-          full-at = "98";
-          label-font = 3;
-
-          format-charging = "<animation-charging> <label-charging>";
-          format-charging-underline = colors.nord13;
-
-          format-discharging = "<ramp-capacity> <label-discharging>";
-          format-discharging-underline = "\${self.format-charging-underline}";
-
-          format-full-prefix = " ";
-          format-full-prefix-foreground = colors.foreground-alt;
-          format-full-underline = "\${self.format-charging-underline}";
-
-          ramp-capacity-0 = "";
-          ramp-capacity-1 = "";
-          ramp-capacity-2 = "";
-          ramp-capacity-foreground = colors.foreground-alt;
-
-          animation-charging-0 = "";
-          animation-charging-1 = "";
-          animation-charging-2 = "";
-          animation-charging-foreground = colors.foreground-alt;
-          animation-charging-framerate = 750;
         };
         "module/yubikey" = let
           indicator-script =
@@ -2322,66 +2446,150 @@ in {
           type = "custom/script";
           exec = indicator-script;
           tail = true;
-          format-background = colors.alert;
+          format-background = colors.urgent;
           format-foreground = colors.background;
-          label-font = 2;
           format-prefix = "";
-          format-prefix-font = 1;
-          format-prefix-foreground = colors.alert;
+          format-prefix-font = 2;
+          format-prefix-foreground = colors.urgent;
           format-prefix-background = colors.background;
           format-suffix = "";
-          format-suffix-font = 1;
-          format-suffix-foreground = colors.alert;
+          format-suffix-font = 2;
+          format-suffix-foreground = colors.urgent;
           format-suffix-background = colors.background;
         };
-        "module/pipewire-simple" = let
-          pipewire-simple = pkgs.writeShellScript "pipewire-simple.sh" ''
-            getDefaultSink() {
-                defaultSink=$(${pkgs.pulseaudio}/bin/pactl info | ${pkgs.gawk}/bin/awk -F : '/Default Sink:/{print $2}')
-                description=$(${pkgs.pulseaudio}/bin/pactl list sinks | ${pkgs.gnused}/bin/sed -n "/''${defaultSink}/,/Description/p; /Description/q" | ${pkgs.gnused}/bin/sed -n 's/^.*Description: \(.*\)$/\1/p')
-                echo "''${description}"
-            }
-
-            getDefaultSource() {
-                defaultSource=$(${pkgs.pulseaudio}/bin/pactl info | ${pkgs.gawk}/bin/awk -F : '/Default Source:/{print $2}')
-                description=$(${pkgs.pulseaudio}/bin/pactl list sources | ${pkgs.gnused}/bin/sed -n "/''${defaultSource}/,/Description/p; /Description/q" | ${pkgs.gnused}/bin/sed -n 's/^.*Description: \(.*\)$/\1/p')
-                echo "''${description}"
-            }
-
-            VOLUME=$(${pkgs.pamixer}/bin/pamixer --get-volume-human)
-            SINK=$(getDefaultSink)
-            SOURCE=$(getDefaultSource)
-
-            case $1 in
-                "--up")
-                    ${pkgs.pamixer}/bin/pamixer --increase 5
-                    ;;
-                "--down")
-                    ${pkgs.pamixer}/bin/pamixer --decrease 5
-                    ;;
-                "--mute")
-                    ${pkgs.pamixer}/bin/pamixer --toggle-mute
-                    ;;
-                *)
-                    echo "Source: ''${SOURCE} | Sink: ''${VOLUME} ''${SINK}"
-            esac
-          '';
-        in {
+        "module/audio-input" = {
+          "inherit" = "powerline/right-section-separator";
+          format-foreground = colors.nord4;
+          format-background = colors.nord1;
+          format-prefix = "";
+          format-prefix-font = 2;
+          format-prefix-foreground = colors.nord1;
+          format-prefix-background = colors.nord0;
+          background = colors.nord1;
+          separator = colors.nord0;
           type = "custom/script";
-          label = "%output%";
-          label-font = 3;
-          interval = 2;
+          tail = true;
+          exec = ''
+            ${pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "" --icon-muted "" --color-muted ${
+              lib.strings.removePrefix "#" colors.nord3
+            } --node-blacklist "*.monitor" listen'';
           click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-          click-left = "${pipewire-simple} --mute &";
-          scroll-up = "${pipewire-simple} --up &";
-          scroll-down = "${pipewire-simple} --down &";
-          exec = pipewire-simple;
+          click-left =
+            "${pulseaudio-control}/bin/pulseaudio-control --node-type input togmute";
+          click-middle =
+            "${pulseaudio-control}/bin/pulseaudio-control --node-type input next-node";
+          scroll-up =
+            "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 up";
+          scroll-down =
+            "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 down";
+        };
+        "module/audio-output" = {
+          "inherit" = "powerline/right-section-separator";
+          format-foreground = colors.nord4;
+          format-background = colors.nord1;
+          background = colors.nord1;
+          separator = colors.nord0;
+          type = "custom/script";
+          tail = true;
+          exec = ''
+            ${pulseaudio-control}/bin/pulseaudio-control --icons-volume " , " --icon-muted " " --color-muted ${
+              lib.strings.removePrefix "#" colors.nord3
+            } --node-nicknames-from "device.description" listen'';
+          click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
+          click-left = "${pulseaudio-control}/bin/pulseaudio-control togmute";
+          click-middle = ''
+            ${pulseaudio-control}/bin/pulseaudio-control --node-blacklist "alsa_output.pci-0000_01_00.1.hdmi-stereo-extra2" next-node'';
+          scroll-up =
+            "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 up";
+          scroll-down =
+            "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 down";
+        };
+        "module/xkeyboard" = {
+          "inherit" = "powerline/right-section-separator";
+          format-foreground = colors.nord4;
+          format-background = colors.nord1;
+          background = colors.nord1;
+          separator = colors.nord0;
+
+          type = "internal/xkeyboard";
+
+          label-layout = " 󰌓 %icon%";
+          layout-icon-0 = "us;programmer Dvorak;DVP";
+          layout-icon-1 = "us;US;US";
+
+          indicator-icon-default = "";
+          indicator-icon-0 = "caps lock;;󰌎";
+          indicator-icon-1 = "scroll lock;;󱅜";
+          indicator-icon-2 = "num lock;;󰎠";
+
+          label-indicator-on = "%icon%";
+          label-indicator-off = "";
+        };
+        "module/battery" = {
+          "inherit" = "powerline/right-section-separator";
+          format-foreground = colors.nord4;
+          format-background = colors.nord1;
+          background = colors.nord1;
+          separator = colors.nord0;
+
+          type = "internal/battery";
+          battery = "BAT0";
+          adapter = "ADP1";
+          full-at = "98";
+
+          format-charging = "<animation-charging> <label-charging>";
+          format-charging-underline = colors.nord13;
+
+          format-discharging = "<ramp-capacity> <label-discharging>";
+          format-discharging-underline = "\${self.format-charging-underline}";
+
+          format-full-prefix = "󰁹 ";
+          format-full-prefix-foreground = colors.foreground-alt;
+          format-full-underline = "\${self.format-charging-underline}";
+
+          ramp-capacity-0 = "󱊡";
+          ramp-capacity-1 = "󱊢";
+          ramp-capacity-2 = "󱊣";
+          ramp-capacity-foreground = colors.foreground-alt;
+
+          animation-charging-0 = "󱊤";
+          animation-charging-1 = "󱊥";
+          animation-charging-2 = "󱊦";
+          animation-charging-foreground = colors.foreground-alt;
+          animation-charging-framerate = 750;
+        };
+        "module/date" = {
+          "inherit" = "powerline/right-section-separator";
+          format-foreground = colors.nord4;
+          format-background = colors.nord1;
+          background = colors.nord1;
+          separator = colors.nord0;
+          format-suffix = "";
+
+          type = "internal/date";
+          interval = 1;
+
+          date = "";
+          date-alt = " %Y-%m-%d";
+
+          time = "%H:%M";
+          time-alt = "%H:%M:%S";
+
+          label = "%date% %time%";
+        };
+        "module/tray-arrow" = {
+          "inherit" = "powerline/left-arrow";
+          background = colors.nord3;
+          background-next = colors.nord1;
         };
       };
       script = ''
-        # Launch bar on each monitor
-        for m in $(polybar --list-monitors | ${pkgs.coreutils}/bin/cut -d":" -f1); do
-          MONITOR=$m polybar --reload top &
+        # Launch bar on each monitor, tray on primary
+        polybar --list-monitors | while IFS=$'\n' read line; do
+          monitor=$(echo $line | ${pkgs.coreutils}/bin/cut -d':' -f1)
+          primary=$(echo $line | ${pkgs.coreutils}/bin/cut -d' ' -f3)
+          tray_position=$([ -n "$primary" ] && echo "right" || echo "none")
+          MONITOR=$monitor TRAY_POSITION=$tray_position polybar --reload top &
         done
       '';
     };
@@ -2523,11 +2731,32 @@ in {
             command = "${pkgs.dex}/bin/dex --autostart --environment i3";
             notification = false;
           }
-          # https://github.com/nix-community/home-manager/issues/213#issuecomment-366962925
           {
-            command =
-              "${pkgs.systemd}/bin/systemctl --user restart polybar.service";
-            always = true;
+            command = "${pkgs.writeShellScript "i3-session-start.sh" ''
+              ${pkgs.systemd}/bin/systemctl --user set-environment I3SOCK=$(${config.xsession.windowManager.i3.package}/bin/i3 --get-socketpath)
+              ${pkgs.systemd}/bin/systemctl --user start graphical-session-i3.target
+            ''}";
+            notification = false;
+          }
+          {
+            command = let
+              on-exit = pkgs.writeShellScript "i3-session-exit.sh" ''
+                ${pkgs.systemd}/bin/systemctl --user stop graphical-session-i3.target
+              '';
+            in "${pkgs.writeScript "i3-on-exit.py" ''
+              #!${pkgs.python3.withPackages (ps: with ps; [ i3ipc ])}/bin/python
+              from subprocess import Popen
+              from i3ipc.aio import Connection, Event
+
+              def on_exit(i3, e):
+                  Popen(['${on-exit}'])
+
+              await i3 = Connection().connect()
+
+              i3.on(Event.SHUTDOWN_EXIT, on_exit)
+
+              await i3.main()
+            ''}";
             notification = false;
           }
         ];
@@ -2770,6 +2999,11 @@ in {
         };
         Install.WantedBy = [ "graphical-session.target" ];
       };
+      # https://github.com/nix-community/home-manager/issues/213#issuecomment-829743999
+      polybar = {
+        Unit.After = [ "graphical-session-i3.target" ];
+        Install.WantedBy = lib.mkForce [ "graphical-session-i3.target" ];
+      };
       xfsettingsd = {
         Unit = {
           Description = "xfsettingsd";
@@ -2795,6 +3029,15 @@ in {
           ExecStart =
             "${pkgs.yubikey-touch-detector}/bin/yubikey-touch-detector --libnotify";
           Restart = "on-abort";
+        };
+      };
+    };
+    targets = {
+      graphical-session-i3 = {
+        Unit = {
+          Description = "i3 X session";
+          BindsTo = [ "graphical-session.target" ];
+          Requisite = [ "graphical-session.target" ];
         };
       };
     };
