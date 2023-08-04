@@ -3098,9 +3098,9 @@ in {
         ;;
         ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
         ;; font string. You generally only need these two:
-        (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
+        (setq doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 12 :weight 'light)
               doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13)
-              doom-big-font (font-spec :family "Iosevka Nerd Font" :size 18 :weight 'light))
+              doom-big-font (font-spec :family "Iosevka Nerd Font Mono" :size 18 :weight 'light))
 
         ;; There are two ways to load a theme. Both assume the theme is installed and
         ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -3144,6 +3144,12 @@ in {
         ;;
         ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
         ;; they are implemented.
+
+        (use-package! all-the-icons-nerd-fonts
+                      :after all-the-icons
+                      :demand t
+                      :config
+                      (all-the-icons-nerd-fonts-prefer))
 
         (use-package! darkman
                       :diminish darkman-mode
@@ -3604,6 +3610,10 @@ in {
           (package! mermaid-mode)
 
           (package! csv-mode)
+
+          (package! all-the-icons-nerd-fonts
+                    :recipe
+                    (:host github :repo "mohkale/all-the-icons-nerd-fonts"))
 
           (package! atomic-chrome)
 
@@ -4627,7 +4637,7 @@ in {
       })
 
       # Iosevka and friends
-      # iosevka-bin we use the `nerdfonts` version
+      iosevka
       (iosevka-bin.override { variant = "aile"; })
       (iosevka-bin.override { variant = "etoile"; })
 
@@ -4640,9 +4650,14 @@ in {
       # mononoki
       # fantasque-sans-mono
 
-      # Nerd Fonts but just the symbols
-      # Set FontConfig to use it as a fallback for most monospaced fonts
-      (nerdfonts.override { fonts = [ "Iosevka" "NerdFontsSymbolsOnly" ]; })
+      # Nerd Fonts
+      (nerdfonts.override { fonts = [ "Iosevka" ]; })
+      # Set FontConfig to use the symbols only font as a fallback for most
+      # monospaced fonts, this gives us the symbols even for fonts that we
+      # didn't install Nerd Fonts versions of. The Symbols may not be perfectly
+      # suited to that font (the patched fonts usually have adjustments to the
+      # Symbols specificically for that font), but it's better than nothing.
+      (nerdfonts.override { fonts = [ "NerdFontsSymbolsOnly" ]; })
       (stdenv.mkDerivation {
         inherit (nerdfonts) version;
         pname = "nerdfonts-fontconfig";
