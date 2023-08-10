@@ -2103,15 +2103,10 @@ in {
       in let
         colors = superColors // {
           background = colors.nord0;
-          background-alt = colors.nord1;
           foreground = colors.nord9;
           foreground-alt = colors.nord10;
-          primary = colors.nord9;
-          secondary = colors.nord10;
-          danger = colors.nord11;
           urgent = colors.nord12;
           alert = colors.nord13;
-          success = colors.nord14;
         };
         pulseaudio-control = with pkgs;
           stdenv.mkDerivation {
@@ -2138,23 +2133,26 @@ in {
                 }
             '';
           };
+        mkAlpha = str: "#cc${lib.strings.removePrefix "#" str}";
       in {
-        settings = { screenchange-reload = true; };
+        settings = {
+          screenchange-reload = true;
+          # https://www.cairographics.org/manual/cairo-cairo-t.html#cairo-operator-t
+          compositing-background = "source";
+          compositing-foreground = "source";
+          compositing-overline = "over";
+          compositing-underline = "over";
+          compositing-border = "over";
+        };
         "bar/top" = {
-          inherit (colors) background foreground;
+          inherit (colors) foreground;
+          background = "${mkAlpha colors.background}";
           monitor = "\${env:MONITOR:}";
           monitor-strict = true;
           monitor-exact = true;
           dpi = 0;
           width = "100%";
           height = "${toString (24.0 / 1080 * 100)}%";
-          screenchange-reload = true;
-
-          compositing-background = "source";
-          compositing-foreground = "over";
-          compositing-overline = "over";
-          compositing-underline = "over";
-          compositing-border = "over";
 
           modules-left = "i3 title";
           # modules-center = "yubikey mpd";
@@ -2172,7 +2170,7 @@ in {
           font-2 = "Iosevka:size=8;2";
 
           format-foreground = colors.foreground;
-          format-background = colors.background;
+          format-background = "${mkAlpha colors.background}";
 
           tray-position = "\${env:TRAY_POSITION:}";
           tray-background = colors.nord3;
@@ -2353,11 +2351,11 @@ in {
 
           format = "<label-mode> <label-state>";
           format-foreground = colors.nord0;
-          format-background = colors.nord3;
+          format-background = "${mkAlpha colors.nord3}";
           format-prefix = "  ";
-          format-prefix-background = colors.nord3;
-          background = colors.nord3;
-          background-next = colors.nord1;
+          format-prefix-background = "${mkAlpha colors.nord3}";
+          background = "${mkAlpha colors.nord3}";
+          background-next = "${mkAlpha colors.nord1}";
 
           label-mode-foreground = colors.alert;
           label-mode-padding = 1;
@@ -2383,12 +2381,13 @@ in {
           "inherit" = "powerline/left-section";
           type = "internal/xwindow";
           format-foreground = colors.nord4;
-          format-background = colors.nord1;
-          background = colors.nord1;
-          background-next = colors.nord0;
+          format-background = "${mkAlpha colors.nord1}";
+          background = "${mkAlpha colors.nord1}";
+          background-next = "${mkAlpha colors.nord0}";
           # Prepend a zero-width space to keep rendering
           # the suffix even on an empty workspace
           label = " %title:0:120:…% ";
+          label-empty = " ";
         };
         "module/mpd" = {
           type = "internal/mpd";
@@ -2447,32 +2446,32 @@ in {
           exec = indicator-script;
           tail = true;
           format-background = colors.urgent;
-          format-foreground = colors.background;
+          format-foreground = "${mkAlpha colors.background}";
           format-prefix = "";
           format-prefix-font = 2;
           format-prefix-foreground = colors.urgent;
-          format-prefix-background = colors.background;
+          format-prefix-background = "${mkAlpha colors.background}";
           format-suffix = "";
           format-suffix-font = 2;
           format-suffix-foreground = colors.urgent;
-          format-suffix-background = colors.background;
+          format-suffix-background = "${mkAlpha colors.background}";
         };
         "module/audio-input" = {
           "inherit" = "powerline/right-section-separator";
           format-foreground = colors.nord4;
-          format-background = colors.nord1;
+          format-background = "${mkAlpha colors.nord1}";
           format-prefix = "";
           format-prefix-font = 2;
-          format-prefix-foreground = colors.nord1;
-          format-prefix-background = colors.nord0;
-          background = colors.nord1;
-          separator = colors.nord0;
+          format-prefix-foreground = "${mkAlpha colors.nord1}";
+          format-prefix-background = "${mkAlpha colors.nord0}";
+          background = "${mkAlpha colors.nord1}";
+          separator = "${mkAlpha colors.nord0}";
           type = "custom/script";
           tail = true;
           exec = ''
             ${pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "" --icon-muted "" --color-muted ${
               lib.strings.removePrefix "#" colors.nord3
-            } --node-blacklist "*.monitor" listen'';
+            } --node-blacklist "*.monitor" --notifications listen'';
           click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
           click-left =
             "${pulseaudio-control}/bin/pulseaudio-control --node-type input togmute";
@@ -2486,15 +2485,15 @@ in {
         "module/audio-output" = {
           "inherit" = "powerline/right-section-separator";
           format-foreground = colors.nord4;
-          format-background = colors.nord1;
-          background = colors.nord1;
-          separator = colors.nord0;
+          format-background = "${mkAlpha colors.nord1}";
+          background = "${mkAlpha colors.nord1}";
+          separator = "${mkAlpha colors.nord0}";
           type = "custom/script";
           tail = true;
           exec = ''
             ${pulseaudio-control}/bin/pulseaudio-control --icons-volume " , " --icon-muted " " --color-muted ${
               lib.strings.removePrefix "#" colors.nord3
-            } --node-nicknames-from "device.description" listen'';
+            } --node-nicknames-from "device.description" --notifications listen'';
           click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
           click-left = "${pulseaudio-control}/bin/pulseaudio-control togmute";
           click-middle = ''
@@ -2507,9 +2506,9 @@ in {
         "module/xkeyboard" = {
           "inherit" = "powerline/right-section-separator";
           format-foreground = colors.nord4;
-          format-background = colors.nord1;
-          background = colors.nord1;
-          separator = colors.nord0;
+          format-background = "${mkAlpha colors.nord1}";
+          background = "${mkAlpha colors.nord1}";
+          separator = "${mkAlpha colors.nord0}";
 
           type = "internal/xkeyboard";
 
@@ -2528,9 +2527,9 @@ in {
         "module/battery" = {
           "inherit" = "powerline/right-section-separator";
           format-foreground = colors.nord4;
-          format-background = colors.nord1;
-          background = colors.nord1;
-          separator = colors.nord0;
+          format-background = "${mkAlpha colors.nord1}";
+          background = "${mkAlpha colors.nord1}";
+          separator = "${mkAlpha colors.nord0}";
 
           type = "internal/battery";
           battery = "BAT0";
@@ -2538,14 +2537,11 @@ in {
           full-at = "98";
 
           format-charging = "<animation-charging> <label-charging>";
-          format-charging-underline = colors.nord13;
 
           format-discharging = "<ramp-capacity> <label-discharging>";
-          format-discharging-underline = "\${self.format-charging-underline}";
 
           format-full-prefix = "󰁹 ";
           format-full-prefix-foreground = colors.foreground-alt;
-          format-full-underline = "\${self.format-charging-underline}";
 
           ramp-capacity-0 = "󱊡";
           ramp-capacity-1 = "󱊢";
@@ -2561,9 +2557,9 @@ in {
         "module/date" = {
           "inherit" = "powerline/right-section-separator";
           format-foreground = colors.nord4;
-          format-background = colors.nord1;
-          background = colors.nord1;
-          separator = colors.nord0;
+          format-background = "${mkAlpha colors.nord1}";
+          background = "${mkAlpha colors.nord1}";
+          separator = "${mkAlpha colors.nord0}";
           format-suffix = "";
 
           type = "internal/date";
@@ -2580,7 +2576,7 @@ in {
         "module/tray-arrow" = {
           "inherit" = "powerline/left-arrow";
           background = colors.nord3;
-          background-next = colors.nord1;
+          background-next = "${mkAlpha colors.nord1}";
         };
       };
       script = ''
