@@ -2762,8 +2762,8 @@ in {
       in {
         bars = [ ];
         gaps = {
-          inner = 0;
-          outer = 0;
+          inner = 10;
+          outer = 5;
         };
         fonts = {
           names = [ "DejaVu Sans Mono" ];
@@ -2938,7 +2938,7 @@ in {
             "Escape" = "mode default";
           };
           "${mode-gaps}" = {
-            "o" = ''mode "${mode-gaps-inner}"'';
+            "o" = ''mode "${mode-gaps-outer}"'';
             "i" = ''mode "${mode-gaps-inner}"'';
             "Return" = "mode default";
             "Escape" = "mode default";
