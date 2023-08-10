@@ -257,8 +257,19 @@ let
   };
   terminal-emulator = "${config.programs.kitty.package}/bin/kitty";
 
+  nixosConfig = let
+    pkgs = import <nixpkgs> {
+      config = { };
+      overlays = [ ];
+    };
+  in (import "/etc/nixos/configuration.nix" {
+    inherit pkgs;
+    inherit (pkgs) lib;
+    config = { };
+  });
+
 in {
-  nixpkgs.overlays = [
+  nixpkgs.overlays = nixosConfig.nixpkgs.overlays ++ [
     (import (builtins.fetchTarball
       "https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz"))
     (final: prev:
@@ -267,6 +278,43 @@ in {
             "https://github.com/thiagokokada/nix-alien/archive/master.tar.gz")
         }/overlay.nix") { inherit final prev; })
   ];
+
+  nixpkgs.config = nixosConfig.nixpkgs.config // {
+    allowUnfreePredicate = (pkg:
+      (nixosConfig.nixpkgs.config.allowUnfreePredicate pkg)
+      || (builtins.elem (lib.getName pkg) [
+        "corefonts"
+        "vista-fonts"
+        "xkcd-font"
+        "san-francisco-pro"
+        "san-francisco-compact"
+        "san-francisco-mono"
+        "new-york"
+        "symbola"
+        "spotify"
+        "google-chrome"
+        "google-chrome-beta"
+        "google-chrome-dev"
+        "enhancer-for-youtube"
+        "slack"
+        "discord"
+        "skypeforlinux"
+        "zoom"
+        "code"
+        "vscode"
+        "vscode-extension-ms-vscode-remote-remote-ssh"
+        "cudatoolkit"
+        "cudatoolkit-11-cudnn"
+        "cudatoolkit-11.8-tensorrt"
+      ]));
+    packageOverrides = pkgs:
+      (nixosConfig.nixpkgs.config.packageOverrides pkgs) // {
+        nur = import (builtins.fetchTarball
+          "https://github.com/nix-community/NUR/archive/master.tar.gz") {
+            inherit pkgs;
+          };
+      };
+  };
 
   imports = [
     "${
@@ -4281,16 +4329,6 @@ in {
   };
 
   fonts.fontconfig.enable = true;
-
-  nixpkgs.config = {
-    allowUnfree = true;
-    packageOverrides = pkgs: {
-      nur = import (builtins.fetchTarball
-        "https://github.com/nix-community/NUR/archive/master.tar.gz") {
-          inherit pkgs;
-        };
-    };
-  };
 
   home.packages = with pkgs;
     [
