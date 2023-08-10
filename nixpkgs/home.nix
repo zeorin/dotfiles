@@ -1160,7 +1160,7 @@ in {
       };
       theme = "Nord";
       settings = {
-        background_opacity = "0.95";
+        background_opacity = "0.85";
         clear_all_shortcuts = true;
         scrollback_lines = 0;
         url_style = "none";
@@ -1988,7 +1988,7 @@ in {
           follow = "keyboard";
           width = "(0, 500)";
           height = 100;
-          offset = "0x24";
+          offset = "24x48";
           separator_height = 4;
           frame_width = 0;
           separator_color = "#00000000";
@@ -2066,10 +2066,7 @@ in {
         "class_g ~= 'xdg-desktop-portal' && window_type = 'menu'"
         "_NET_FRAME_EXTENTS@:c && WM_WINDOW_ROLE@:s = 'Popup'"
         # Mozilla fixes
-        "class_i = 'Firefox' && window_type = 'utility'"
-        "class_i = 'Firefox' && window_type = 'popup_menu'"
-        "class_i = 'Thunderbird' && window_type = 'utility'"
-        "class_i = 'Thunderbird' && window_type = 'popup_menu'"
+        "(class_g *?= 'firefox' || class_g = 'thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
         # notifications
         "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_NOTIFICATION'"
         # Zoom
@@ -2092,11 +2089,12 @@ in {
           method = "dual_kawase";
           strength = 5;
         };
+        corner-radius = 8;
+        rounded-corners-exclude =
+          [ "window_type = 'dock'" "window_type = 'desktop'" ];
         blur-background-exclude = [
-          # unknown windows
-          "! name~=''"
           # shaped windows
-          "bounding_shaped"
+          "bounding_shaped && !rounded_corners"
           # hidden windows
           "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'"
           # stacked / tabbed windows
@@ -2108,10 +2106,7 @@ in {
           "class_g ~= 'xdg-desktop-portal' && window_type = 'menu'"
           "_NET_FRAME_EXTENTS@:c && WM_WINDOW_ROLE@:s = 'Popup'"
           # Mozilla fixes
-          "class_i = 'Firefox' && window_type = 'utility'"
-          "class_i = 'Firefox' && window_type = 'popup_menu'"
-          "class_i = 'Thunderbird' && window_type = 'utility'"
-          "class_i = 'Thunderbird' && window_type = 'popup_menu'"
+          "(class_g *?= 'firefox' || class_g = 'thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
           # Zoom
           "name = 'cpt_frame_xcb_window'"
           "class_g *?= 'zoom' && name *?= 'meeting'"
@@ -2134,11 +2129,22 @@ in {
           "role = 'browser' && name ^= 'Meet -'"
         ];
         detect-rounded-corners = true;
-        # corner-radius = 10;
-        # rounded-corners-exclude = [
-        #   # notifications
-        #   "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_DOCK'",
-        # ];
+        win-types = {
+          tooltip = {
+            fade = true;
+            shadow = true;
+            opacity = 0.8;
+            focus = true;
+            full-shadow = false;
+          };
+          dock = {
+            shadow = false;
+            clip-shadow-above = true;
+          };
+          dnd = { shadow = false; };
+          popup_menu = { opacity = 0.9; };
+          dropdown_menu = { opacity = 0.9; };
+        };
       };
     };
     polybar = {
@@ -3335,7 +3341,7 @@ in {
 
         (setq fancy-splash-image "${../backgrounds/doom.png}")
         (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-        (add-to-list 'default-frame-alist '(alpha-background . 95))
+        (add-to-list 'default-frame-alist '(alpha-background . 85))
 
         ;; Word-wrap
         (add-hook 'visual-line-mode-hook #'+word-wrap-mode)
