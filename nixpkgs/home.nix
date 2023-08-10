@@ -29,7 +29,7 @@ let
 
   doomEmacsSource = builtins.fetchGit "https://github.com/hlissner/doom-emacs";
 
-  my-doom-emacs = let
+  my-emacs = let
     emacsPkg = with pkgs;
       (emacsPackagesFor emacs29-gtk3).emacsWithPackages (ps:
         with ps; [
@@ -133,7 +133,7 @@ let
       watchman
     ];
   in emacsPkg // (pkgs.symlinkJoin {
-    name = "my-doom-emacs";
+    name = "my-emacs";
     paths = [ emacsPkg ];
     nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
     postBuild = ''
@@ -294,17 +294,17 @@ in {
       let
         EDITOR = pkgs.writeShellScript "EDITOR.sh" ''
           if [ -n "$INSIDE_EMACS" ]; then
-            ${my-doom-emacs}/bin/emacsclient --quiet "$@"
+            ${my-emacs}/bin/emacsclient --quiet "$@"
           else
-            ${my-doom-emacs}/bin/emacsclient --tty --alternate-editor="" --quiet "$@"
+            ${my-emacs}/bin/emacsclient --tty --alternate-editor="" --quiet "$@"
           fi
         '';
         VISUAL = pkgs.writeShellScript "VISUAL.sh" ''
           if [ -n "$INSIDE_EMACS" ]; then
-            ${my-doom-emacs}/bin/emacsclient --quiet "$@"
+            ${my-emacs}/bin/emacsclient --quiet "$@"
           elif [ "$SSH_TTY$DISPLAY" = "''${DISPLAY#*:[1-9][0-9]}" ]; then
             # If we're not connected via SSH and the DISPLAY is less than 10
-            ${my-doom-emacs}/bin/emacsclient --create-frame --alternate-editor="" --quiet "$@"
+            ${my-emacs}/bin/emacsclient --create-frame --alternate-editor="" --quiet "$@"
           else
             ${EDITOR} "$@"
           fi
@@ -319,7 +319,7 @@ in {
           line=$2
           column=$3
 
-          ${my-doom-emacs}/bin/emacsclient +$line:$column "$filename"
+          ${my-emacs}/bin/emacsclient +$line:$column "$filename"
         '';
         SUDO_EDITOR = VISUAL;
         LESS = "-FiRx4";
@@ -862,7 +862,7 @@ in {
 
         # https://github.com/akermu/emacs-libvterm
         if test -n "$INSIDE_EMACS"
-          source ${my-doom-emacs.emacs.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${my-doom-emacs.emacs.pkgs.vterm.version}/etc/emacs-vterm.fish
+          source ${my-emacs.emacs.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${my-emacs.emacs.pkgs.vterm.version}/etc/emacs-vterm.fish
         end
       '';
     };
@@ -1975,7 +1975,7 @@ in {
     };
     emacs = {
       enable = true;
-      package = my-doom-emacs;
+      package = my-emacs;
       client.enable = true;
     };
     flameshot.enable = true;
@@ -3323,7 +3323,7 @@ in {
         (setq +tree-sitter-hl-enabled-modes t)
         ;; Don't try to download or build the binary, Nix already has it
         (setq tsc-dyn-get-from nil
-              tsc-dyn-dir "${my-doom-emacs.emacs.pkgs.tsc}/share/emacs/site-lisp/elpa/${my-doom-emacs.emacs.pkgs.tsc.name}")
+              tsc-dyn-dir "${my-emacs.emacs.pkgs.tsc}/share/emacs/site-lisp/elpa/${my-emacs.emacs.pkgs.tsc.name}")
         ;; Nix has already built all the available grammars for us
         (setq tree-sitter-load-path '("${
           pkgs.runCommandLocal "tree-sitter-grammars-bundle" { } ''
@@ -4182,7 +4182,7 @@ in {
               dontBuild = true;
               patchPhase = ''
                 substituteInPlace tools/open-in-editor/linux/open-editor.sh \
-                  --replace "#editor='emacs" "editor='${my-doom-emacs}/bin/emacsclient"
+                  --replace "#editor='emacs" "editor='${my-emacs}/bin/emacsclient"
 
                 chmod +x tools/open-in-editor/linux/open-editor.sh
               '';
@@ -4204,7 +4204,7 @@ in {
       org-protocol = {
         name = "org-protocol";
         exec = ''
-          ${my-doom-emacs}/bin/emacsclient --create-frame --alternate-editor="" %u'';
+          ${my-emacs}/bin/emacsclient --create-frame --alternate-editor="" %u'';
         icon = "emacs";
         type = "Application";
         terminal = false;
@@ -4366,15 +4366,15 @@ in {
           mv "''${files[@]}" "$out/share"
         '';
       })
-      my-doom-emacs
+      my-emacs
       (writeShellScriptBin "edit.sh" ''
         if [ -n "$INSIDE_EMACS" ]; then
-          ${my-doom-emacs}/bin/emacsclient --no-wait --quiet "$@"
+          ${my-emacs}/bin/emacsclient --no-wait --quiet "$@"
         elif [ "$SSH_TTY$DISPLAY" = "''${DISPLAY#*:[1-9][0-9]}" ]; then
           # If we're not connected via SSH and the DISPLAY is less than 10
-          ${my-doom-emacs}/bin/emacsclient --no-wait --create-frame --alternate-editor="" --quiet "$@"
+          ${my-emacs}/bin/emacsclient --no-wait --create-frame --alternate-editor="" --quiet "$@"
         else
-          ${my-doom-emacs}/bin/emacsclient --no-wait --tty --alternate-editor="" --quiet "$@"
+          ${my-emacs}/bin/emacsclient --no-wait --tty --alternate-editor="" --quiet "$@"
         fi
       '')
       (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
