@@ -4361,6 +4361,11 @@ in {
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc-Dark'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
               '';
+              "cursor-theme.sh" = ''
+                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord)"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'Capitaine Cursors (Nord)'"
+                ${xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
+              '';
               "desktop-background.sh" = ''
                 ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
                   ../backgrounds/martian-terrain-dark.jpg
@@ -4390,6 +4395,11 @@ in {
                 ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+              '';
+              "cursor-theme.sh" = ''
+                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord) - White"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'Capitaine Cursors (Nord) - White'"
+                ${xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
               '';
               "desktop-background.sh" = ''
                 ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
