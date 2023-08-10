@@ -2738,7 +2738,7 @@ in {
 
   xsession = {
     enable = true;
-    initExtra = let backgroundImage = ../backgrounds/martian-terrain-light.jpg;
+    initExtra = let backgroundImage = ./backgrounds/martian-terrain-light.jpg;
     in "${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${backgroundImage} &";
     windowManager.i3 = {
       enable = true;
@@ -3346,7 +3346,7 @@ in {
         (require 'dap-chrome)
         (require 'dap-node)
 
-        (setq fancy-splash-image "${../backgrounds/doom.png}")
+        (setq fancy-splash-image "${./backgrounds/doom.png}")
         (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
         (add-to-list 'default-frame-alist '(alpha-background . 85))
 
@@ -4372,7 +4372,7 @@ in {
               '';
               "desktop-background.sh" = ''
                 ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
-                  ../backgrounds/martian-terrain-dark.jpg
+                  ./backgrounds/martian-terrain-dark.jpg
                 }
               '';
               "kitty-theme.sh" =
@@ -4411,7 +4411,7 @@ in {
               '';
               "desktop-background.sh" = ''
                 ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
-                  ../backgrounds/martian-terrain-light.jpg
+                  ./backgrounds/martian-terrain-light.jpg
                 }
               '';
               "kitty-theme.sh" = ''
