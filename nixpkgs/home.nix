@@ -4318,12 +4318,12 @@ in {
   gtk = {
     enable = true;
     theme = {
-      package = pkgs.arc-theme;
-      name = "Arc";
+      package = pkgs.qogir-theme;
+      name = "Qogir-Light";
     };
     iconTheme = {
-      package = pkgs.la-capitaine-icon-theme;
-      name = "la-capitaine-icon-theme";
+      package = pkgs.qogir-icon-theme;
+      name = "Qogir";
     };
     cursorTheme = {
       package = pkgs.capitaine-cursors-themed;
@@ -4357,9 +4357,13 @@ in {
                 ${libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
               '';
               "gtk-theme.sh" = ''
-                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc-Dark"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc-Dark'"
+                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Dark"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Dark'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
+              '';
+              "icon-theme.sh" = ''
+                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir-dark"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'Qogir-dark'"
               '';
               "cursor-theme.sh" = ''
                 ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord)"
@@ -4392,9 +4396,13 @@ in {
                 ${libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
               '';
               "gtk-theme.sh" = ''
-                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc'"
+                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Light"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Light'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+              '';
+              "icon-theme.sh" = ''
+                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir"
+                ${dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'Qogir'"
               '';
               "cursor-theme.sh" = ''
                 ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord) - White"
