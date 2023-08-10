@@ -2684,7 +2684,7 @@ in {
 
   xsession = {
     enable = true;
-    initExtra = let backgroundImage = ../backgrounds/martian-terrain.jpg;
+    initExtra = let backgroundImage = ../backgrounds/martian-terrain-light.jpg;
     in "${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${backgroundImage} &";
     windowManager.i3 = {
       enable = true;
@@ -4310,6 +4310,11 @@ in {
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc-Dark'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
               '';
+              "desktop-background.sh" = ''
+                ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
+                  ../backgrounds/martian-terrain-dark.jpg
+                }
+              '';
               "kitty-theme.sh" =
                 ''${config.programs.kitty.package.passthru.set-theme} "Nord"'';
             }) ++ [
@@ -4334,6 +4339,11 @@ in {
                 ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Arc"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Arc'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+              '';
+              "desktop-background.sh" = ''
+                ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
+                  ../backgrounds/martian-terrain-light.jpg
+                }
               '';
               "kitty-theme.sh" = ''
                 ${config.programs.kitty.package.passthru.set-theme} "Nord light"'';
