@@ -2705,7 +2705,7 @@ in {
 
         # Programs
         "super + p" = "${pkgs.rofi-pass}/bin/rofi-pass";
-        "super + e" =
+        "super + shift + e" =
           "${config.programs.emacs.package}/bin/emacsclient –eval '(emacs-everywhere)'";
 
         # Audio controls
