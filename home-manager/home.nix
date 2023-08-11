@@ -4296,6 +4296,7 @@ in {
                 ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Dark"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Dark'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
+                ${dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
               '';
               "icon-theme.sh" = ''
                 ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir-dark"
@@ -4335,6 +4336,7 @@ in {
                 ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Light"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Light'"
                 ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+                ${dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
               '';
               "icon-theme.sh" = ''
                 ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir"
