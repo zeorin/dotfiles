@@ -86,7 +86,7 @@ let
       haskell-language-server
       haskellPackages.hoogle
       haskellPackages.cabal-install
-      haskellPackages.brittany
+      haskellPackages.ormolu
       haskellPackages.hlint
       html-tidy
       nodejs
