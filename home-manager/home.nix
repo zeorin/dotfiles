@@ -2187,6 +2187,27 @@ in {
                 }
             '';
           };
+        mkFormats = let
+          formats = [
+            "content"
+            "format"
+            "format-volume"
+            "format-muted"
+            "format-mounted"
+            "format-unmounted"
+            "format-connected"
+            "format-disconnected"
+            "format-charging"
+            "format-discharging"
+            "format-full"
+            "format-low"
+          ];
+        in attrset:
+        lib.lists.foldr (format: acc:
+          acc // (lib.attrsets.mapAttrs' (name: value: {
+            inherit value;
+            name = "${format}-${name}";
+          }) attrset)) { } formats;
         mkAlpha = str: "#cc${lib.strings.removePrefix "#" str}";
       in {
         settings = {
@@ -2231,170 +2252,68 @@ in {
           tray-foreground = colors.nord4;
           tray-padding = 2;
         };
-        "powerline/right-arrow" = {
+        "powerline/right-facing-arrow" = {
           type = "custom/text";
-          content-background = "\${self.background-next}";
-          content-foreground = "\${self.background}";
           content = "";
           content-font = 2;
+          content-foreground = "\${self.background}";
+          content-background = "\${self.background-next}";
         };
-        "powerline/right-separator" = {
+        "powerline/right-facing-separator" = {
           type = "custom/text";
-          content-foreground = "\${self.separator}";
           content = "";
           content-font = 2;
+          content-foreground = "\${self.separator}";
+          content-background = "\${self.background}";
         };
-        "powerline/left-arrow" = {
+        "powerline/left-facing-arrow" = {
           type = "custom/text";
-          content-background = "\${self.background-next}";
-          content-foreground = "\${self.background}";
           content = "";
           content-font = 2;
+          content-foreground = "\${self.background}";
+          content-background = "\${self.background-next}";
         };
-        "powerline/left-separator" = {
+        "powerline/left-facing-separator" = {
           type = "custom/text";
-          content-foreground = "\${self.separator}";
           content = "";
           content-font = 2;
+          content-foreground = "\${self.separator}";
+          content-background = "\${self.background}";
         };
-        "powerline/left-section" = {
-          format-suffix-foreground = "\${self.background}";
-          format-suffix-background = "\${self.background-next}";
-          format-suffix = "";
-          format-suffix-font = 2;
-          format-volume-suffix-foreground = "\${self.background}";
-          format-volume-suffix-background = "\${self.background-next}";
-          format-volume-suffix = "";
-          format-volume-suffix-font = 2;
-          format-muted-suffix-foreground = "\${self.background}";
-          format-muted-suffix-background = "\${self.background-next}";
-          format-muted-suffix = "";
-          format-muted-suffix-font = 2;
-          format-mounted-suffix-foreground = "\${self.background}";
-          format-mounted-suffix-background = "\${self.background-next}";
-          format-mounted-suffix = "";
-          format-mounted-suffix-font = 2;
-          format-unmounted-suffix-foreground = "\${self.background}";
-          format-unmounted-suffix-background = "\${self.background-next}";
-          format-unmounted-suffix = "";
-          format-unmounted-suffix-font = 2;
-          format-connected-suffix-foreground = "\${self.background}";
-          format-connected-suffix-background = "\${self.background-next}";
-          format-connected-suffix = "";
-          format-connected-suffix-font = 2;
-          format-disconnected-suffix-foreground = "\${self.background}";
-          format-disconnected-suffix-background = "\${self.background-next}";
-          format-disconnected-suffix = "";
-          format-disconnected-suffix-font = 2;
-          content-suffix-foreground = "\${self.background}";
-          content-suffix-background = "\${self.background-next}";
-          content-suffix = "";
-          content-suffix-font = 2;
+        "powerline/left-section-arrow" = mkFormats {
+          suffix = "\${powerline/right-facing-arrow.content}";
+          suffix-font = "\${powerline/right-facing-arrow.content-font}";
+          suffix-foreground =
+            "\${self.background}";
+          suffix-background =
+            "\${self.background-next}";
         };
-        "powerline/left-section-separator" = {
-          format-prefix-foreground = "\${self.separator}";
-          format-prefix-background = "\${self.background}";
-          format-prefix = "";
-          format-prefix-font = 2;
-          format-volume-prefix-foreground = "\${self.separator}";
-          format-volume-prefix-background = "\${self.background}";
-          format-volume-prefix = "";
-          format-volume-prefix-font = 2;
-          format-muted-prefix-foreground = "\${self.background}";
-          format-muted-prefix-background = "\${self.separator}";
-          format-muted-prefix = "";
-          format-muted-prefix-font = 2;
-          format-mounted-prefix-foreground = "\${self.separator}";
-          format-mounted-prefix-background = "\${self.background}";
-          format-mounted-prefix = "";
-          format-mounted-prefix-font = 2;
-          format-unmounted-prefix-foreground = "\${self.separator}";
-          format-unmounted-prefix-background = "\${self.background}";
-          format-unmounted-prefix = "";
-          format-unmounted-prefix-font = 2;
-          format-connected-prefix-foreground = "\${self.separator}";
-          format-connected-prefix-background = "\${self.background}";
-          format-connected-prefix = "";
-          format-connected-prefix-font = 2;
-          format-disconnected-prefix-foreground = "\${self.separator}";
-          format-disconnected-prefix-background = "\${self.background}";
-          format-disconnected-prefix = "";
-          format-disconnected-prefix-font = 2;
-          content-prefix-foreground = "\${self.separator}";
-          content-prefix-background = "\${self.background}";
-          content-prefix = "";
-          content-prefix-font = 2;
+        "powerline/left-section-separator" = mkFormats {
+          prefix = "\${powerline/right-facing-separator.content}";
+          prefix-font = "\${powerline/right-facing-separator.content-font}";
+          prefix-foreground =
+            "\${self.separator}";
+          prefix-background =
+            "\${self.background}";
         };
-        "powerline/right-section" = {
-          format-prefix-foreground = "\${self.background}";
-          format-prefix-background = "\${self.background-next}";
-          format-prefix = "";
-          format-prefix-font = 2;
-          format-volume-prefix-foreground = "\${self.background}";
-          format-volume-prefix-background = "\${self.background-next}";
-          format-volume-prefix = "";
-          format-volume-prefix-font = 2;
-          format-muted-prefix-foreground = "\${self.background}";
-          format-muted-prefix-background = "\${self.background-next}";
-          format-muted-prefix = "";
-          format-muted-prefix-font = 2;
-          format-mounted-prefix-foreground = "\${self.background}";
-          format-mounted-prefix-background = "\${self.background-next}";
-          format-mounted-prefix = "";
-          format-mounted-prefix-font = 2;
-          format-unmounted-prefix-foreground = "\${self.background}";
-          format-unmounted-prefix-background = "\${self.background-next}";
-          format-unmounted-prefix = "";
-          format-unmounted-prefix-font = 2;
-          format-connected-prefix-foreground = "\${self.background}";
-          format-connected-prefix-background = "\${self.background-next}";
-          format-connected-prefix = "";
-          format-connected-prefix-font = 2;
-          format-disconnected-prefix-foreground = "\${self.background}";
-          format-disconnected-prefix-background = "\${self.background-next}";
-          format-disconnected-prefix = "";
-          format-disconnected-prefix-font = 2;
-          content-prefix-foreground = "\${self.background}";
-          content-prefix-background = "\${self.background-next}";
-          content-prefix = "";
-          content-prefix-font = 2;
+        "powerline/right-section-arrow" = mkFormats {
+          prefix = "\${powerline/left-facing-arrow.content}";
+          prefix-font = "\${powerline/left-facing-arrow.content-font}";
+          prefix-foreground =
+            "\${self.background}";
+          prefix-background =
+            "\${self.background-next}";
         };
-        "powerline/right-section-separator" = {
-          format-suffix-foreground = "\${self.separator}";
-          format-suffix-background = "\${self.background}";
-          format-suffix = "";
-          format-suffix-font = 2;
-          format-volume-suffix-foreground = "\${self.separator}";
-          format-volume-suffix-background = "\${self.background}";
-          format-volume-suffix = "";
-          format-volume-suffix-font = 2;
-          format-muted-suffix-foreground = "\${self.background}";
-          format-muted-suffix-background = "\${self.separator}";
-          format-muted-suffix = "";
-          format-muted-suffix-font = 2;
-          format-mounted-suffix-foreground = "\${self.separator}";
-          format-mounted-suffix-background = "\${self.background}";
-          format-mounted-suffix = "";
-          format-mounted-suffix-font = 2;
-          format-unmounted-suffix-foreground = "\${self.separator}";
-          format-unmounted-suffix-background = "\${self.background}";
-          format-unmounted-suffix = "";
-          format-unmounted-suffix-font = 2;
-          format-connected-suffix-foreground = "\${self.separator}";
-          format-connected-suffix-background = "\${self.background}";
-          format-connected-suffix = "";
-          format-connected-suffix-font = 2;
-          format-disconnected-suffix-foreground = "\${self.separator}";
-          format-disconnected-suffix-background = "\${self.background}";
-          format-disconnected-suffix = "";
-          format-disconnected-suffix-font = 2;
-          content-suffix-foreground = "\${self.separator}";
-          content-suffix-background = "\${self.background}";
-          content-suffix = "";
-          content-suffix-font = 2;
+        "powerline/right-section-separator" = mkFormats {
+          suffix = "\${powerline/left-facing-separator.content}";
+          suffix-font = "\${powerline/left-facing-separator.content-font}";
+          suffix-foreground =
+            "\${self.separator}";
+          suffix-background =
+            "\${self.background}";
         };
         "module/i3" = {
-          "inherit" = "powerline/left-section";
+          "inherit" = "powerline/left-section-arrow";
           type = "internal/i3";
           strip-wsnumbers = true;
           pin-workspaces = true;
@@ -2415,7 +2334,7 @@ in {
           label-mode-padding = 1;
 
           label-separator = "​"; # zero-width space
-          label-separator-padding = "6px";
+          label-separator-padding = 1;
 
           # unfocused = Inactive workspace on any monitor
           label-unfocused = "%name%";
@@ -2432,7 +2351,7 @@ in {
           label-urgent-foreground = colors.urgent;
         };
         "module/title" = {
-          "inherit" = "powerline/left-section";
+          "inherit" = "powerline/left-section-arrow";
           type = "internal/xwindow";
           format-foreground = colors.nord4;
           format-background = "${mkAlpha colors.nord1}";
@@ -2501,12 +2420,12 @@ in {
           tail = true;
           format-background = colors.urgent;
           format-foreground = "${mkAlpha colors.background}";
-          format-prefix = "";
-          format-prefix-font = 2;
+          format-prefix = "\${powerline/left-facing-arrow.content}";
+          format-prefix-font = "\${powerline/left-facing-arrow.content-font}";
           format-prefix-foreground = colors.urgent;
           format-prefix-background = "${mkAlpha colors.background}";
-          format-suffix = "";
-          format-suffix-font = 2;
+          format-suffix = "\${powerline/right-facing-arrow.content}";
+          format-suffix-font = "\${powerline/right-facing-arrow.content-font}";
           format-suffix-foreground = colors.urgent;
           format-suffix-background = "${mkAlpha colors.background}";
         };
@@ -2514,8 +2433,8 @@ in {
           "inherit" = "powerline/right-section-separator";
           format-foreground = colors.nord4;
           format-background = "${mkAlpha colors.nord1}";
-          format-prefix = "";
-          format-prefix-font = 2;
+          format-prefix = "\${powerline/left-facing-arrow.content}";
+          format-prefix-font = "\${powerline/left-facing-arrow.content-font}";
           format-prefix-foreground = "${mkAlpha colors.nord1}";
           format-prefix-background = "${mkAlpha colors.nord0}";
           background = "${mkAlpha colors.nord1}";
@@ -2588,33 +2507,58 @@ in {
           type = "internal/battery";
           battery = "BAT0";
           adapter = "ADP1";
-          full-at = "98";
 
           format-charging = "<animation-charging> <label-charging>";
+          format-charging-foreground = colors.nord4;
+          format-charging-background = "${mkAlpha colors.nord1}";
 
-          format-discharging = "<ramp-capacity> <label-discharging>";
+          format-discharging = "<animation-discharging> <label-discharging>";
+          format-discharging-foreground = colors.nord4;
+          format-discharging-background = "${mkAlpha colors.nord1}";
 
-          format-full-prefix = "󰁹 ";
-          format-full-prefix-foreground = colors.foreground-alt;
+          format-full = "<ramp-capacity> <label-full>";
+          format-full-foreground = colors.nord4;
+          format-full-background = "${mkAlpha colors.nord1}";
 
-          ramp-capacity-0 = "󱊡";
-          ramp-capacity-1 = "󱊢";
-          ramp-capacity-2 = "󱊣";
-          ramp-capacity-foreground = colors.foreground-alt;
+          low-at = 15;
+          format-low = "<animation-low> <label-low>";
+          format-low-foreground = colors.urgent;
+          format-low-background = "${mkAlpha colors.nord1}";
 
-          animation-charging-0 = "󱊤";
-          animation-charging-1 = "󱊥";
-          animation-charging-2 = "󱊦";
-          animation-charging-foreground = colors.foreground-alt;
+          ramp-capacity-0 = " ";
+          ramp-capacity-1 = " ";
+          ramp-capacity-2 = " ";
+          ramp-capacity-3 = " ";
+          ramp-capacity-4 = " ";
+
+          animation-charging-0 = " ";
+          animation-charging-1 = " ";
+          animation-charging-2 = " ";
+          animation-charging-3 = " ";
+          animation-charging-4 = " ";
           animation-charging-framerate = 750;
+
+          animation-discharging-0 = " ";
+          animation-discharging-1 = " ";
+          animation-discharging-2 = " ";
+          animation-discharging-3 = " ";
+          animation-discharging-4 = " ";
+          animation-discharging-framerate = 500;
+
+          animation-low-0 = " ";
+          animation-low-1 = " ";
+          animation-low-framerate = 200;
+
         };
         "module/date" = {
           "inherit" = "powerline/right-section-separator";
+          format = "󱑃 <label>";
           format-foreground = colors.nord4;
           format-background = "${mkAlpha colors.nord1}";
+          format-prefix = " ";
+          format-suffix = "";
           background = "${mkAlpha colors.nord1}";
           separator = "${mkAlpha colors.nord0}";
-          format-suffix = "";
 
           type = "internal/date";
           interval = 1;
@@ -2625,10 +2569,10 @@ in {
           time = "%H:%M";
           time-alt = "%H:%M:%S";
 
-          label = "%date% %time%";
+          label = "%time%%date%";
         };
         "module/tray-arrow" = {
-          "inherit" = "powerline/left-arrow";
+          "inherit" = "powerline/left-facing-arrow";
           background = colors.nord3;
           background-next = "${mkAlpha colors.nord1}";
         };
