@@ -4151,15 +4151,15 @@ in {
             }) [
               {
                 name = "CSS";
-                sha256 = "sha256-1FWZWKfDh4FLlF1EPIPpuXCkQYHRbMUSBS2P7KeNI0M=";
+                sha256 = "sha256-duWxBJYZ0fYzWlhJYuDlaGnA4DT3vGJimZwxBSeIteU=";
               }
               {
                 name = "Docker";
-                sha256 = "sha256-wyQagar+0VG72CX46xdW1tSiBcK1svtTrMUn1STpkks=";
+                sha256 = "sha256-vA21arM2Mb+NKiPSJB/B/geyRhFPO1U69CwQM2rhhUI=";
               }
               {
                 name = "Emacs_Lisp";
-                sha256 = "sha256-GxGsT3xSvbjFNacwsew4xJk8rmv3kXvuEnCQeF8QFLY=";
+                sha256 = "sha256-mJivy4pnrti6I/rv61qSQYqL55BP0J3q0hxo9bU3v6o=";
               }
               {
                 name = "Emmet";
@@ -4175,19 +4175,19 @@ in {
               }
               {
                 name = "Font_Awesome";
-                sha256 = "sha256-pQi01pAmaJLaAIG4EdVerncVdAzTDmviUNVr81yNh9c=";
+                sha256 = "sha256-LlsY2eqYKvKlIg0OiewOneqBY8c42viumXZ3a9pP+Bg=";
               }
               {
                 name = "Haskell";
-                sha256 = "sha256-ZSUWwrhqIT6T/aIL1gka64g0a2G4seuI8kfPBoSbaXA=";
+                sha256 = "sha256-uScbfz90SxbAWcEE0RVgXadq2IhNrsi9eEMzkNjQGIk=";
               }
               {
                 name = "HTML";
-                sha256 = "sha256-vyQSffeLsNkdE2iqsvqmXpdc61KuXjrOtpAvjYbRxJc=";
+                sha256 = "sha256-mJivy4pnrti6I/rv61qSQYqL55BP0J3q0hxo9bU3v6o=";
               }
               {
                 name = "JavaScript";
-                sha256 = "sha256-40vNxbSmmUHZM04N1f08Ni39wdfTxkDXfKZsy2d24kc=";
+                sha256 = "sha256-uScbfz90SxbAWcEE0RVgXadq2IhNrsi9eEMzkNjQGIk=";
               }
               {
                 name = "Lo-Dash";
@@ -4203,11 +4203,11 @@ in {
               }
               {
                 name = "Nginx";
-                sha256 = "sha256-7/LueWbyTAvwZa1wgLeXPtOsMxuiJTshN/dnBQIIDZ0=";
+                sha256 = "sha256-T6F1UaZAaXLW2fEyJQ5i0v4Oklf2j4eoWOjdAW3e5gs=";
               }
               {
                 name = "NodeJS";
-                sha256 = "sha256-EzmYq3rK+9dfDN8tSmAg98lO3yN5iGo121N27BmmXiQ=";
+                sha256 = "sha256-GdjSUeQi3MU6KmcWPBa3TdjE2Y2gLnA2UJd8Byj/Qyw=";
               }
               {
                 name = "PostgreSQL";
@@ -4215,7 +4215,7 @@ in {
               }
               {
                 name = "Python_3";
-                sha256 = "sha256-mvnNfnhkXUh//8/3oZOS5x9M9llvkb661FteeH5oG0s=";
+                sha256 = "sha256-f7uMXVIVFJDJzKbi82KrILMQaGOJjsGzJabBC6/Oavk=";
               }
               {
                 name = "React";
