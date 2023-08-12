@@ -2283,34 +2283,26 @@ in {
         "powerline/left-section-arrow" = mkFormats {
           suffix = "\${powerline/right-facing-arrow.content}";
           suffix-font = "\${powerline/right-facing-arrow.content-font}";
-          suffix-foreground =
-            "\${self.background}";
-          suffix-background =
-            "\${self.background-next}";
+          suffix-foreground = "\${self.background}";
+          suffix-background = "\${self.background-next}";
         };
         "powerline/left-section-separator" = mkFormats {
           prefix = "\${powerline/right-facing-separator.content}";
           prefix-font = "\${powerline/right-facing-separator.content-font}";
-          prefix-foreground =
-            "\${self.separator}";
-          prefix-background =
-            "\${self.background}";
+          prefix-foreground = "\${self.separator}";
+          prefix-background = "\${self.background}";
         };
         "powerline/right-section-arrow" = mkFormats {
           prefix = "\${powerline/left-facing-arrow.content}";
           prefix-font = "\${powerline/left-facing-arrow.content-font}";
-          prefix-foreground =
-            "\${self.background}";
-          prefix-background =
-            "\${self.background-next}";
+          prefix-foreground = "\${self.background}";
+          prefix-background = "\${self.background-next}";
         };
         "powerline/right-section-separator" = mkFormats {
           suffix = "\${powerline/left-facing-separator.content}";
           suffix-font = "\${powerline/left-facing-separator.content-font}";
-          suffix-foreground =
-            "\${self.separator}";
-          suffix-background =
-            "\${self.background}";
+          suffix-foreground = "\${self.separator}";
+          suffix-background = "\${self.background}";
         };
         "module/i3" = {
           "inherit" = "powerline/left-section-arrow";
@@ -2442,8 +2434,8 @@ in {
           type = "custom/script";
           tail = true;
           exec = ''
-            ${pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "" --icon-muted "" --color-muted ${
-              lib.strings.removePrefix "#" colors.nord3
+            ${pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "󰍬" --icon-muted "󰍭" --color-muted ${
+              lib.strings.removePrefix "#" colors.nord0
             } --node-blacklist "*.monitor" --notifications listen'';
           click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
           click-left =
@@ -2464,13 +2456,13 @@ in {
           type = "custom/script";
           tail = true;
           exec = ''
-            ${pulseaudio-control}/bin/pulseaudio-control --icons-volume " , " --icon-muted " " --color-muted ${
-              lib.strings.removePrefix "#" colors.nord3
+            ${pulseaudio-control}/bin/pulseaudio-control --icons-volume "󰕿 ,󰖀 ,󰕾 " --icon-muted "󰖁 " --color-muted ${
+              lib.strings.removePrefix "#" colors.nord0
             } --node-nicknames-from "device.description" --notifications listen'';
           click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
           click-left = "${pulseaudio-control}/bin/pulseaudio-control togmute";
-          click-middle = ''
-            ${pulseaudio-control}/bin/pulseaudio-control --node-blacklist "alsa_output.pci-0000_01_00.1.hdmi-stereo-extra2" next-node'';
+          click-middle =
+            "${pulseaudio-control}/bin/pulseaudio-control next-node";
           scroll-up =
             "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 up";
           scroll-down =
