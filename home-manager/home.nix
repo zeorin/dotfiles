@@ -47,7 +47,7 @@ let
                 '');
             in builtins.fetchTarball
             "https://github.com/emacs-lsp/lsp-mode/archive/${rev}.tar.gz");
-            patches = [
+            patches = oldAttrs.patches or [ ] ++ [
               (builtins.fetchurl
                 "https://patch-diff.githubusercontent.com/raw/emacs-lsp/lsp-mode/pull/4092.diff")
             ];
@@ -3259,6 +3259,7 @@ in {
 
         ;; Disable invasive lsp-mode features
         (after! lsp-mode
+          (require 'lsp-mode-autoloads)
           (setq lsp-enable-symbol-highlighting nil
                 lsp-enable-suggest-server-download nil
                 lsp-clients-typescript-prefer-use-project-ts-server t))
