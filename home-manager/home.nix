@@ -699,12 +699,9 @@ in {
             firefox-csshacks = builtins.fetchGit
               "https://github.com/MrOtherGuy/firefox-csshacks";
           in ''
-            @import url('${firefox-csshacks}/chrome/hide_tabs_toolbar.css');
             @import url('${firefox-csshacks}/chrome/window_control_placeholder_support.css');
+            @import url('${firefox-csshacks}/chrome/hide_tabs_toolbar.css');
             @import url('${firefox-csshacks}/chrome/autohide_toolbox.css');
-
-            /* autohide_toolbox.css: If tabs toolbar is hidden with hide_tabs_toolbar.css */
-            #titlebar { margin-bottom: -9px; }
           '';
         };
         blank = { id = 1; };
