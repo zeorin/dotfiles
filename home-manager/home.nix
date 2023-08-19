@@ -3254,15 +3254,10 @@ in {
         (add-hook! nix-mode
                    (lsp-deferred))
 
-        ;; Disable invasive lsp-mode features
         (after! lsp-mode
           (require 'lsp-mode-autoloads)
-          (setq lsp-enable-symbol-highlighting nil
-                lsp-enable-suggest-server-download nil
+          (setq lsp-enable-suggest-server-download nil
                 lsp-clients-typescript-prefer-use-project-ts-server t))
-        (after! lsp-ui
-          (setq lsp-ui-sideline-enable nil  ; no more useful than flycheck
-                lsp-ui-doc-enable nil))     ; redundant with K
 
         ;; Debug Adapter Protocol
         (setq dap-firefox-debug-path "${pkgs.vscode-extensions.firefox-devtools.vscode-firefox-debug}/share/vscode/extensions/firefox-devtools.vscode-firefox-debug"
