@@ -31,28 +31,8 @@ let
 
   my-emacs = let
     emacsPkg = with pkgs;
-      (emacsPackagesFor emacs29-gtk3).emacsWithPackages (ps:
-        with ps; [
-          vterm
-          (lsp-mode.overrideAttrs (oldAttrs: {
-            LSP_USE_PLISTS = true;
-            src = (let
-              rev = lib.strings.fileContents
-                (let regex = ''package! lsp-mode :pin "\(.*\)"'';
-                in runCommandLocal "extract-lsp-mode-rev" { } ''
-                  cat ${doomEmacsSource}/modules/tools/lsp/packages.el \
-                    | grep '${regex}' -o \
-                    | sed 's/${regex}/\1/' \
-                    > $out
-                '');
-            in builtins.fetchTarball
-            "https://github.com/emacs-lsp/lsp-mode/archive/${rev}.tar.gz");
-            patches = oldAttrs.patches or [ ] ++ [
-              (builtins.fetchurl
-                "https://patch-diff.githubusercontent.com/raw/emacs-lsp/lsp-mode/pull/4092.diff")
-            ];
-          }))
-        ]);
+      (emacsPackagesFor emacs29-gtk3).emacsWithPackages
+      (ps: with ps; [ vterm ]);
     pathDeps = with pkgs; [
       (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
       (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
@@ -3257,7 +3237,6 @@ in {
                    (lsp-deferred))
 
         (after! lsp-mode
-          (require 'lsp-mode-autoloads)
           (setq lsp-enable-suggest-server-download nil
                 lsp-clients-typescript-prefer-use-project-ts-server t))
 
@@ -3604,10 +3583,6 @@ in {
                     (:host github :repo "mohkale/all-the-icons-nerd-fonts"))
 
           (package! atomic-chrome)
-
-          ;; `lsp-mode` is lagging behind `vscode-eslint`
-          ;; https://github.com/emacs-lsp/lsp-mode/issues/4091
-          (package! lsp-mode :built-in t)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
