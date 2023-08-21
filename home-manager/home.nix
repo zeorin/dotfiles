@@ -295,6 +295,8 @@ in {
         "google-chrome"
         "google-chrome-beta"
         "google-chrome-dev"
+        "netflix-via-google-chrome"
+        "netflix-icon"
         "enhancer-for-youtube"
         "slack"
         "discord"
@@ -4536,6 +4538,7 @@ in {
       google-chrome
       google-chrome-beta
       google-chrome-dev
+      netflix
       tor-browser-bundle-bin
       virt-manager
       qemu
