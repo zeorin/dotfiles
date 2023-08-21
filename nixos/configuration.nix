@@ -126,8 +126,10 @@ in {
   environment.etc."X11/xorg.conf.d/90-nvidia-i2c.conf".source =
     "${pkgs.ddcutil}/share/ddcutil/data/90-nvidia-i2c.conf";
 
-  environment.systemPackages = with pkgs;
-    [ config.boot.kernelPackages.v4l2loopback ];
+  environment.systemPackages = with pkgs; [
+    config.boot.kernelPackages.v4l2loopback
+    virtiofsd
+  ];
 
   powerManagement.enable = true;
   services.upower.enable = true;
