@@ -3791,8 +3791,22 @@ in {
           }
           ]
         '';
-        onChange = "${pkgs.writeShellScript "restart pipewire.service" ''
+        onChange = "${pkgs.writeShellScript "restart-pipewire.service" ''
           ${pkgs.systemd}/bin/systemctl --user restart pipewire.service
+        ''}";
+      };
+      "pipewire/pipewire-pulse.conf.d/40-upmix.conf" = {
+        text = ''
+          stream.properties = {
+              channelmix.upmix      = true
+              channelmix.upmix-method = psd
+              channelmix.lfe-cutoff = 150
+              channelmix.fc-cutoff  = 12000
+              channelmix.rear-delay = 12.0
+          }
+        '';
+        onChange = "${pkgs.writeShellScript "restart-pipewire-pulse.service" ''
+          ${pkgs.systemd}/bin/systemctl --user restart pipewire-pulse.service
         ''}";
       };
       "readline/inputrc".text = ''
