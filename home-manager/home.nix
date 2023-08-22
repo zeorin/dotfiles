@@ -433,11 +433,13 @@ in {
   ];
 
   nixpkgs.config = nixosConfig.nixpkgs.config // {
+    joypixels.acceptLicense = true;
     allowUnfreePredicate = (pkg:
       (nixosConfig.nixpkgs.config.allowUnfreePredicate pkg)
       || (builtins.elem (lib.getName pkg) [
         "corefonts"
         "vista-fonts"
+        "joypixels"
         "xkcd-font"
         "san-francisco-pro"
         "san-francisco-compact"
@@ -1326,6 +1328,19 @@ in {
       };
       extraConfig = ''
         include theme.conf
+
+        # symbol_map ${
+          lib.strings.fileContents
+          (pkgs.runCommandLocal "emoji-variation-codepoints.sh" { } ''
+            readarray -t codepoints < <(cat ${
+              pkgs.fetchurl {
+                url =
+                  "https://unicode.org/Public/emoji/12.1/emoji-variation-sequences.txt";
+                sha256 = "16dbc3jc14jj0yi3q9vgs4n4jwvzx66kn07p8fhrsdkpi11db3jc";
+              }
+            } | sed -e '/\(^$\)\|\(^#\)/d' | cut -d' ' -f 1 | uniq | sed -e 's/\(.*\)/U+\1/'); IFS=","; echo "''${codepoints[*]}" > $out
+          '')
+        } JoyPixels
       '';
     };
     less = {
@@ -4740,11 +4755,11 @@ in {
 
       # Emoji
       # emojione
-      twitter-color-emoji
+      # twitter-color-emoji
       # twemoji-color-font
       # noto-fonts-emoji
       # noto-fonts-emoji-blob-bin
-      # joypixels
+      joypixels
 
       # Classic fonts
       eb-garamond
