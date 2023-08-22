@@ -491,6 +491,8 @@ in {
       9090
       # Samba
       5357
+      # Syncthing
+      22000
     ];
     firewall.allowedUDPPorts = [
       # Printing
@@ -499,6 +501,9 @@ in {
       9090
       # Samba
       3702
+      # Syncthing
+      21027
+      22000
     ];
     firewall.trustedInterfaces = [ "wt_backend" ];
   };

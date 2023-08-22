@@ -2643,6 +2643,10 @@ in {
           "${pkgs.brightnessctl}/bin/brightnessctl set 5%-";
       };
     };
+    syncthing = {
+      enable = true;
+      tray.enable = true;
+    };
     vscode-server.enable = true;
     unclutter = {
       enable = true;
