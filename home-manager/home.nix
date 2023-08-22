@@ -4458,6 +4458,7 @@ in {
 
   home.packages = with pkgs;
     [
+      asciinema
       nix-alien
       darkman
       (symlinkJoin {
