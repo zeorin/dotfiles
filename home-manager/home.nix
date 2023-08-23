@@ -4781,7 +4781,7 @@ in {
       # emojione
       # twitter-color-emoji
       # twemoji-color-font
-      # noto-fonts-emoji
+      noto-fonts-emoji
       # noto-fonts-emoji-blob-bin
       joypixels
 
@@ -4831,7 +4831,22 @@ in {
       gyre-fonts
 
       # Font collections
-      google-fonts
+      ((google-fonts.overrideAttrs (oldAttrs: {
+        nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ perl ];
+        installPhase = (oldAttrs.installPhase or "") + ''
+          skip=("NotoColorEmoji")
+
+          readarray -t fonts < <(find . -name '*.ttf' -exec basename '{}' \; | perl -pe 's/(.+?)[[.-].*/\1/g' | sort | uniq)
+
+          for font in "''${fonts[@]}"; do
+            [[ "_''${skip[*]}_" =~ _''${font}_ ]] && continue
+            find . -name "''${font}*.ttf" -exec install -m 444 -Dt $dest '{}' +
+          done
+        '';
+      })).override {
+        # Don't install fonts in the original `installPhase`
+        fonts = [ "__NO_FONT__" ];
+      })
       (league-of-moveable-type.override {
         fanwood = false;
         goudy-bookletter-1911 = false;
@@ -4867,7 +4882,7 @@ in {
       # monospaced fonts, this gives us the symbols even for fonts that we
       # didn't install Nerd Fonts versions of. The Symbols may not be perfectly
       # suited to that font (the patched fonts usually have adjustments to the
-      # Symbols specificically for that font), but it's better than nothing.
+      # Symbols specifically for that font), but it's better than nothing.
       (nerdfonts.override { fonts = [ "NerdFontsSymbolsOnly" ]; })
       (stdenv.mkDerivation {
         inherit (nerdfonts) version;
