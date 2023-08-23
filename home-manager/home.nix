@@ -1330,17 +1330,40 @@ in {
         include theme.conf
 
         # symbol_map ${
-          lib.strings.fileContents
-          (pkgs.runCommandLocal "emoji-variation-codepoints.sh" { } ''
-            readarray -t codepoints < <(cat ${
-              pkgs.fetchurl {
-                url =
-                  "https://unicode.org/Public/emoji/12.1/emoji-variation-sequences.txt";
-                sha256 = "16dbc3jc14jj0yi3q9vgs4n4jwvzx66kn07p8fhrsdkpi11db3jc";
-              }
-            } | sed -e '/\(^$\)\|\(^#\)/d' | cut -d' ' -f 1 | uniq | sed -e 's/\(.*\)/U+\1/'); IFS=","; echo "''${codepoints[*]}" > $out
-          '')
-        } JoyPixels
+          with builtins;
+          with lib;
+          with strings;
+          trivial.pipe (fileContents (toString (pkgs.fetchurl {
+            url =
+              "https://www.unicode.org/Public/15.0.0/ucd/emoji/emoji-variation-sequences.txt";
+            sha256 = "067i7h9ndy84fc6c5iw2qnpy1svn6h7w2zj01i41r9f4302n66kk";
+          }))) [
+            (splitString "\n")
+            (filter
+              (line: (stringLength line) > 0 && (substring 0 1 line) != "#"))
+            (map (line: elemAt (splitString " " line) 0))
+            lists.unique
+            (filter (codepoint:
+              !(elem codepoint [
+                "0023" # #
+                "002A" # *
+                "0030" # 0
+                "0031" # 1
+                "0032" # 2
+                "0033" # 3
+                "0034" # 4
+                "0035" # 5
+                "0036" # 6
+                "0037" # 7
+                "0038" # 8
+                "0039" # 9
+                # "00A9" # ©
+                # "00AE" # ®
+                # "2122" # ™
+              ])))
+            (concatMapStringsSep "," (codepoint: "U+${codepoint}"))
+          ]
+        } Noto Color Emoji
       '';
     };
     less = {
