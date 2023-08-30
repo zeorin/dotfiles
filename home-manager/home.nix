@@ -1161,8 +1161,16 @@ in {
         a = "add";
         b = "branch";
         # Use commitizen if it’s installed, otherwise just use `git commit`
-        c = ''
-          !f() { if command -v git-cz >/dev/null 2>&1; then git-cz "$@"; else git commit "$@"; fi; }; f'';
+        c = lib.strings.removeSuffix "\n" ''
+          !f() {
+            if command -v git-cz >/dev/null 2>&1; then
+              git-cz "$@"
+            else
+              git commit "$@"
+            fi
+          }
+          f
+        '';
         co = "checkout";
         d = "diff";
         p = "push";
@@ -1171,21 +1179,42 @@ in {
         u = "unstage";
         unstage = "reset HEAD --";
         last = "log -1 HEAD";
-        stash-unapply = "!git stash show -p | git apply -R";
+        stash-unapply = lib.strings.removeSuffix "\n" ''
+          !git stash show -p |
+            git apply -R
+        '';
         assume = "update-index --assume-unchanged";
         unassume = "update-index --no-assume-unchanged";
-        assumed =
-          "!git ls-files -v | ${pkgs.gnugrep}/bin/grep '^h' | cut -c 3-";
-        assume-all =
-          "!git status | ${pkgs.gawk}/bin/awk {'print $2'} | ${pkgs.findutils}/bin/xargs -r git assume";
-        unassume-all =
-          "!git assumed | ${pkgs.findutils}/bin/xargs -r git unassume";
-        edit-dirty =
-          "!git status --porcelain | ${pkgs.gnused}/bin/sed s/^...// | ${pkgs.findutils}/bin/xargs -r $VISUAL";
-        tracked-ignores = "!git ls-files | git check-ignore --no-index --stdin";
+        assumed = lib.strings.removeSuffix "\n" ''
+          !git ls-files -v |
+            ${pkgs.gnugrep}/bin/grep '^h' |
+            cut -c 3-
+        '';
+        assume-all = lib.strings.removeSuffix "\n" ''
+          !git status |
+            ${pkgs.gawk}/bin/awk {'print $2'} |
+            ${pkgs.findutils}/bin/xargs -r git assume
+        '';
+        unassume-all = lib.strings.removeSuffix "\n" ''
+          !git assumed |
+            ${pkgs.findutils}/bin/xargs -r git unassume
+        '';
+        edit-dirty = lib.strings.removeSuffix "\n" ''
+          !git status --porcelain |
+            ${pkgs.gnused}/bin/sed s/^...// |
+            ${pkgs.findutils}/bin/xargs -r $VISUAL
+        '';
+        tracked-ignores = lib.strings.removeSuffix "\n" ''
+          !git ls-files |
+            git check-ignore --no-index --stdin
+        '';
         # https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
-        branch-purge =
-          "!git for-each-ref --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' refs/heads | ${pkgs.findutils}/bin/xargs -r git branch -d";
+        branch-purge = lib.strings.removeSuffix "\n" ''
+          !git for-each-ref \
+            --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' \
+            refs/heads |
+            ${pkgs.findutils}/bin/xargs -r git branch -d
+        '';
         # https://stackoverflow.com/a/34467298
         l = "lg";
         lg = "lg1";
@@ -1204,8 +1233,12 @@ in {
         lg3-specific =
           "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'";
         # https://docs.gitignore.io/use/command-line
-        ignore = ''
-          !f() { ${pkgs.curl}/bin/curl -sL "https://www.gitignore.io/api/$@" 2>/dev/null; }; f'';
+        ignore-boilerplate = lib.strings.removeSuffix "\n" ''
+          !f() {
+            ${pkgs.curl}/bin/curl -sL "https://www.gitignore.io/api/$@" 2>/dev/null;
+          }
+          f
+        '';
       };
       ignores =
         [ "*~" "*.swp" "*.swo" ".DS_Store" "tags" "Session.vim" "/.vim" ];
