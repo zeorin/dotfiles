@@ -1215,6 +1215,240 @@ in {
             refs/heads |
             ${pkgs.findutils}/bin/xargs -r git branch -d
         '';
+      } // (let
+        git-ignore = "!${
+            pkgs.writeShellScript "git-ignore.sh" ''
+              # Unofficial Bash strict mode
+              set -euo pipefail
+
+              # Execute from the correct directory
+              cd "$GIT_PREFIX"
+
+              # What were we invoked as?
+              subcommand=ignore # ignore | exclude
+
+              # Utility functions
+              usage() {
+                  cat <<EOF
+                  Usage: git $subcommand [-h|--help] [-n|--dry-run]
+                      [-r|--relative] [-a|--absolute]
+                      [-c|--current] [-t|--toplevel] [-e|--exclude] [-g|--global]
+                      [--] <pattern>...
+
+                  Add the patterns to a gitignore(5) file, and remove any currently tracked
+                  files that match from the index. Does not delete the actual files from the
+                  disk, and does not commit the changes; their removal from the index is
+                  staged.
+
+                  -h, --help
+                      Display this help text and exit.
+
+                  -n, --dry-run
+                      Don't take any actions, instead print representation of actions to
+                      stdout.
+
+                  -r, --relative
+                      Patterns are interpreted relative to the current directory.
+                      This is the default behaviour.
+
+                  -a, --absolute
+                      Patterns are interpreted relative to the root of the worktree. Implies
+                      --toplevel if --exclude or --global are not supplied.
+
+                  -c, --current
+                      Add the patterns to a gitignore file in the current directory.$([ "$subcommand" = ignore ] && printf "\n        This is the default behaviour.")
+
+                  -t, --toplevel
+                      Add the patterns to a gitignore file at the top level of the worktree.
+
+                  -e, --exclude
+                      Add the patterns to \$GIT_DIR/info/exclude.$([ "$subcommand" = exclude ] && printf "\n        This is the default behaviour.")
+
+                  -g, --global
+                      Add the patterns to core.excludesFile (~/.config/git/ignore if not
+                      explicitly set).
+
+              EOF
+              }
+              die() {
+                echo "$@" >&2
+                exit 1
+              }
+
+              # Parse arguments
+              args=$(
+                getopt --options neagtcrh? \
+                    --longoptions subcommand:,dry-run,exclude,absolute,global,toplevel,top-level,current,relative,help \
+                    --name "$(basename "$0")" \
+                    -- "$@"
+              )
+              if [ $? != 0 ]; then die "Terminating..."; fi
+              eval set -- "$args"
+
+              # Gather info
+              global_excludes_filename="$(git config --global --get --default="''${XDG_CONFIG_HOME:="$HOME/.config"}/git/ignore" core.excludesFile)"
+              git_dir="$(git rev-parse --path-format=absolute --git-dir | sed -e "s#/\$##g")"
+              toplevel="$(git rev-parse --path-format=absolute --show-toplevel | sed -e "s#/\$##g")"
+              prefix="$(git rev-parse --show-prefix | sed -e "s#/\$##g")"
+              cwd="$(pwd)"
+
+              # Defaults
+              exclude_file=current # current | toplevel | exclude | global
+              absolute=false # false | true
+              dry_run=false # false | true
+
+              # Set options
+              while true; do
+                case "$1" in
+                  --subcommand)
+                    subcommand="$2"
+                    shift 2
+                    ;;
+                  -n | --dry-run)
+                    dry_run=true
+                    shift
+                    ;;
+                  -e | --exclude)
+                    exclude_file=exclude
+                    shift
+                    ;;
+                  -a | --absolute)
+                    absolute=true
+                    shift
+                    ;;
+                  -g | --global)
+                    exclude_file=global
+                    shift
+                    ;;
+                  -t | --toplevel | --top-level)
+                    exclude_file=toplevel
+                    shift
+                    ;;
+                  -c | --current)
+                    exclude_file=current
+                    shift
+                    ;;
+                  -r | --relative)
+                    absolute=false
+                    shift
+                    ;;
+                  -h | --help)
+                    usage
+                    exit 0
+                    ;;
+                  --)
+                    shift
+                    break
+                    ;;
+                  *)
+                    die "Internal error!"
+                    ;;
+                esac
+              done
+
+              # Exit if called without patterns
+              [ $# = 0 ] && (usage; exit 1)
+
+              # Set exclude_file if called as exclude
+              [ "$subcommand" = exclude ] && exclude_file=exclude
+
+              # Set exclude_pattern_scope
+              # exclude_pattern_scope is prepended to each pattern the user gives us
+              case "$absolute" in
+                true)
+                  # --toplevel is implied if --exclude or --global are not provided when
+                  # --absolute is
+                  [ "$exclude_file" != exclude ] && [ "$exclude_file" != global ] && exclude_file=toplevel
+                  exclude_pattern_scope=""
+                  prefix=""
+                  ;;
+                false)
+                  exclude_pattern_scope="$(
+                    if [ "$exclude_file" = "current" ]; then
+                      echo ""
+                    else
+                      echo "$prefix"
+                    fi
+                  )"
+                  ;;
+                *)
+                  die "Unknown \$absolute value $absolute!"
+                  ;;
+              esac
+
+              # Set excludes_filepath
+              case "$exclude_file" in
+                current)
+                  excludes_filepath="$cwd/.gitignore"
+                  ;;
+                toplevel)
+                  excludes_filepath="$toplevel/.gitignore"
+                  ;;
+                exclude)
+                  excludes_filepath="$git_dir/info/exclude"
+                  ;;
+                global)
+                  excludes_filepath="$global_excludes_filename"
+                  ;;
+                *)
+                  die "Unknown \$exclude_file value $exclude_file!"
+                  ;;
+              esac
+
+              declare -a scoped_exclude_patterns
+              declare -a exclude_patterns
+
+              for pattern in "$@"; do
+                # Prepend the scope to the user's patterns
+                scoped_exclude_patterns+=("$(
+                  if [ -z "$exclude_pattern_scope" ]; then
+                    echo "$pattern"
+                  elif [[ "$pattern" == /* ]]; then
+                    echo "$exclude_pattern_scope$pattern"
+                  else
+                    echo "$exclude_pattern_scope/**/$pattern"
+                  fi
+                )")
+
+                # When matching currently tracked files against the user's provided patterns,
+                # the patterns we provide to git-ls-files must be relative to the root of the
+                # work tree, thus they might be different from what we actually put in the
+                # excludes file
+                exclude_patterns+=("$(
+                  if [ -z "$prefix" ]; then
+                    echo "$pattern"
+                  elif [[ "$pattern" == /* ]]; then
+                    echo "$prefix$pattern"
+                  else
+                    echo "$prefix/**/$pattern"
+                  fi
+                )")
+              done
+
+              if $dry_run; then
+                # Print pretty paths
+                echo "cat <<EOF >>$([ "$exclude_file" != global ] && realpath --relative-to "$cwd" "$excludes_filepath" || echo "''${excludes_filepath/#"$HOME"/\~}")"
+                printf "%s\n" "''${scoped_exclude_patterns[@]}"
+                echo "EOF"
+                tmp="$(mktemp)"
+                printf "%s\n" "''${exclude_patterns[@]}" >>"$tmp"
+                git ls-files --cached --ignored --exclude-from="$tmp" -- "$toplevel" |
+                  xargs printf "git rm --cached '%s'\n"
+                rm "$tmp"
+              else
+                printf "%s\n" "''${scoped_exclude_patterns[@]}" >>"$excludes_filepath"
+                tmp="$(mktemp)"
+                printf "%s\n" "''${exclude_patterns[@]}" >>"$tmp"
+                git ls-files --cached --ignored --exclude-from="$tmp" -- "$toplevel" |
+                  xargs git rm --cached -- &>/dev/null
+                rm "$tmp"
+              fi
+            ''
+          }";
+      in {
+        ignore = "${git-ignore} --subcommand ignore";
+        exclude = "${git-ignore} --subcommand exclude";
+      }) // {
         # https://stackoverflow.com/a/34467298
         l = "lg";
         lg = "lg1";
