@@ -1191,13 +1191,29 @@ in {
             cut -c 3-
         '';
         assume-all = lib.strings.removeSuffix "\n" ''
-          !git status |
+          !git status --porcelain |
             ${pkgs.gawk}/bin/awk {'print $2'} |
             ${pkgs.findutils}/bin/xargs -r git assume
         '';
         unassume-all = lib.strings.removeSuffix "\n" ''
           !git assumed |
             ${pkgs.findutils}/bin/xargs -r git unassume
+        '';
+        skip = "update-index --skip-worktree";
+        unskip = "update-index --no-skip-worktree";
+        skipped = lib.strings.removeSuffix "\n" ''
+          !git ls-files -t |
+            ${pkgs.gnugrep}/bin/grep '^S' |
+            cut -c 3-
+        '';
+        skip-all = lib.strings.removeSuffix "\n" ''
+          !git status --porcelain |
+            ${pkgs.gawk}/bin/awk {'print $2'} |
+            ${pkgs.findutils}/bin/xargs -r git skip
+        '';
+        unskip-all = lib.strings.removeSuffix "\n" ''
+          !git skipped |
+            ${pkgs.findutils}/bin/xargs -r git unskip
         '';
         edit-dirty = lib.strings.removeSuffix "\n" ''
           !git status --porcelain |
