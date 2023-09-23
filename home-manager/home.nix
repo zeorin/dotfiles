@@ -1099,7 +1099,10 @@ in {
         push.default = "current";
         fetch.prune = true;
         pull.rebase = true;
-        rebase.autoStash = true;
+        rebase = {
+          autoStash = true;
+          updateRefs = true;
+        };
         advice = {
           statusHints = false;
           pushNonFastForward = false;
