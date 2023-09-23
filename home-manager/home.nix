@@ -2587,6 +2587,7 @@ in {
           # Zoom
           "name = 'cpt_frame_xcb_window'"
           "class_g *?= 'zoom' && name *?= 'meeting'"
+          "class_g = 'Peek'"
         ];
         mark-wmwin-focused = true;
         mark-ovredir-focused = true;
@@ -5011,6 +5012,7 @@ in {
       }))
       dfu-programmer
       vial
+      peek
     ] ++ (let
       mkFirefox = { name, desktopName, profileName }:
         let
