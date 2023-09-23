@@ -32,7 +32,7 @@ let
   my-emacs = let
     emacsPkg = with pkgs;
       (emacsPackagesFor emacs29-gtk3).emacsWithPackages
-      (ps: with ps; [ vterm ]);
+      (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
     pathDeps = with pkgs; [
       (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
       (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
@@ -3794,18 +3794,6 @@ in {
         ;; Don't try to download or build the binary, Nix already has it
         (setq tsc-dyn-get-from nil
               tsc-dyn-dir "${my-emacs.emacs.pkgs.tsc}/share/emacs/site-lisp/elpa/${my-emacs.emacs.pkgs.tsc.name}")
-        ;; Nix has already built all the available grammars for us
-        (setq tree-sitter-load-path '("${
-          pkgs.runCommandLocal "tree-sitter-grammars-bundle" { } ''
-            mkdir -p $out
-            ${
-              lib.concatStringsSep "\n" (lib.mapAttrsToList (name: src:
-                "ln -s ${src}/parser $out/${
-                  (builtins.replaceStrings [ "tree-sitter-" ] [ "" ] name)
-                }.so") pkgs.tree-sitter.builtGrammars)
-            };
-          ''
-        }"))
 
         (setq company-minimum-prefix-length 2)
         (setq company-idle-delay
@@ -3817,6 +3805,54 @@ in {
         (set-docsets! 'rjsx-mode "JavaScript" "React")
         (set-docsets! 'typescript-mode "JavaScript" "NodeJS")
         (set-docsets! 'typescript-tsx-mode "JavaScript" "React")
+
+        (use-package! treesit-auto
+          :config
+          (setq auto-mode-alist (delete '("\\.tsx\\'" . typescript-tsx-mode) auto-mode-alist))
+          (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+          (set-formatter!
+             'prettier-typescript-ts
+             '("prettier" "--parser" "typescript")
+             :modes '(typescript-ts-mode tsx-ts-mode))
+          (setq-hook! '(typescript-ts-mode-hook tsx-ts-mode-hook) +format-with 'prettier-typescript-ts)
+          (add-hook! '(typescript-ts-mode-hook tsx-ts-mode-hook) #'lsp!)
+          (set-formatter!
+             'prettier-javascript-ts
+             '("prettier" "--parser" "babel")
+             :modes '(javascript-ts-mode))
+          (setq-hook! '(javascript-ts-mode-hook) +format-with 'prettier-javascript-ts)
+          (add-hook! '(javascript-ts-mode-hook) #'lsp!)
+          (defun treesit-auto-for-each (fn)
+            (cl-loop for recipe in treesit-auto-recipe-list
+              do
+              (let ((from (treesit-auto-recipe-remap recipe))
+              (to (treesit-auto-recipe-ts-mode recipe)))
+                (funcall fn from to))))
+          (defun treesit-auto-get-mode-hook-symbol (mode)
+            (intern (concat (symbol-name mode) "-hook")))
+          (defvar treesit-auto-run-original-hooks t)
+          (defvar treesit-auto-hook-copy-blacklist '((rust-mode . rust-ts-mode)))
+          (treesit-auto-for-each
+           (lambda (from to)
+             (let ((targets (if (listp from) from (list from))))
+               (cl-loop for from in targets
+                        do
+                        (letrec ((to-hook (treesit-auto-get-mode-hook-symbol to))
+                                 (from-hook (treesit-auto-get-mode-hook-symbol from))
+                                 (treesit-auto-hook-name
+                                  (intern
+                                   (concat "treesit-auto-run-"
+                                           (symbol-name from-hook)
+                                           "-for-" (symbol-name to)))))
+                          (defalias treesit-auto-hook-name
+                            `(lambda ()
+                               (when (and treesit-auto-run-original-hooks
+                                          (boundp ',from-hook)
+                                          (not (memq '(,from . ,to) treesit-auto-hook-copy-blacklist)))
+                                 (message "Running hooks from %s for %s" ',from-hook ',to)
+                                 (apply 'run-hooks ,from-hook))))
+                          (add-hook to-hook treesit-auto-hook-name))))))
+          (global-treesit-auto-mode))
       '';
       "doom/init.el" = {
         text = ''
@@ -4082,6 +4118,8 @@ in {
                     (:host github :repo "mohkale/all-the-icons-nerd-fonts"))
 
           (package! atomic-chrome)
+
+          (package! treesit-auto)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
