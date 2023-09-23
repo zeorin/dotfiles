@@ -630,8 +630,6 @@ in {
   services.avahi.publish.enable = true;
   services.avahi.publish.userServices = true;
 
-  services.flatpak.enable = true;
-
   services.logiops = {
     enable = true;
     extraConfig = ''
