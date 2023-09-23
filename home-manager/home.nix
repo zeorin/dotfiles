@@ -1096,7 +1096,7 @@ in {
         init.defaultBranch = "main";
         credential.helper = "${pkgs.pass-git-helper}/bin/pass-git-helper";
         color.ui = true;
-        push.default = "simple";
+        push.default = "current";
         fetch.prune = true;
         pull.rebase = true;
         rebase.autoStash = true;
