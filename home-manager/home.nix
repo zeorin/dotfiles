@@ -3144,7 +3144,10 @@ in {
     };
     syncthing = {
       enable = true;
-      tray.enable = true;
+      tray = {
+        enable = true;
+        command = "syncthingtray --wait";
+      };
     };
     vscode-server.enable = true;
     unclutter = {
