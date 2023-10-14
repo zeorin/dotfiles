@@ -433,6 +433,10 @@ in {
   ];
 
   nixpkgs.config = nixosConfig.nixpkgs.config // {
+    firefox = {
+      enableBrowserpass = true;
+      enableTridactylNative = true;
+    };
     joypixels.acceptLicense = true;
     allowUnfreePredicate = (pkg:
       (nixosConfig.nixpkgs.config.allowUnfreePredicate pkg)
@@ -648,10 +652,7 @@ in {
     };
     firefox = {
       enable = true;
-      package = pkgs.latest.firefox-bin.override {
-        cfg.enableBrowserpass = true;
-        cfg.enableTridactylNative = true;
-      };
+      package = pkgs.latest.firefox-bin;
       profiles = let
         extensions = with pkgs.nur.repos.rycee.firefox-addons;
           [
@@ -5017,32 +5018,14 @@ in {
       vial
       peek
     ] ++ (let
-      mkFirefox = { name, desktopName, profileName }:
+      mkFirefox = { package, name, desktopName, profileName }:
         let
-          pkg = (latest."${name}-bin".override {
-            cfg.enableBrowserpass = true;
-            cfg.enableTridactylNative = true;
-          }).overrideAttrs (oldAttrs: {
-            desktopItem = makeDesktopItem {
-              inherit name desktopName;
-              exec = "${name} %U";
-              icon = name;
-              comment = "";
-              genericName = "Web Browser";
-              categories = [ "Network" "WebBrowser" ];
-              mimeTypes = [
-                "text/html"
-                "text/xml"
-                "application/xhtml+xml"
-                "application/vnd.mozilla.xul+xml"
-                "x-scheme-handler/http"
-                "x-scheme-handler/https"
-                "x-scheme-handler/ftp"
-              ];
-            };
+          pkg = package.overrideAttrs (oldAttrs: {
+            desktopItem =
+              oldAttrs.desktopItem.override { inherit name desktopName; };
           });
           wrapped = pkgs.writeShellScriptBin name ''
-            exec ${pkg}/bin/firefox --no-remote -P ${profileName} "''${@}"
+            exec ${pkg}/bin/${name} --no-remote -P ${profileName} "''${@}"
           '';
         in pkgs.symlinkJoin {
           inherit name;
@@ -5050,16 +5033,19 @@ in {
         };
     in [
       (mkFirefox {
+        package = latest.firefox-nightly-bin;
         name = "firefox-nightly";
         desktopName = "Firefox Nightly";
         profileName = "nightly";
       })
       (mkFirefox {
+        package = latest.firefox-beta-bin;
         name = "firefox-beta";
         desktopName = "Firefox Beta";
         profileName = "beta";
       })
       (mkFirefox {
+        package = latest.firefox-esr-bin;
         name = "firefox-esr";
         desktopName = "Firefox ESR";
         profileName = "esr";
