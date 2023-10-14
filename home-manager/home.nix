@@ -683,7 +683,6 @@ in {
             tree-style-tab
             tridactyl
             ublock-origin
-            wappalyzer
             wayback-machine
           ] ++ [
             pkgs.nur.repos.ethancedwards8.firefox-addons.enhancer-for-youtube
