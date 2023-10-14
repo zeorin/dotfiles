@@ -3867,6 +3867,8 @@ in {
                                  (apply 'run-hooks ,from-hook))))
                           (add-hook to-hook treesit-auto-hook-name))))))
           (global-treesit-auto-mode))
+
+          (setq Man-notify-method 'pushy)
       '';
       "doom/init.el" = {
         text = ''
