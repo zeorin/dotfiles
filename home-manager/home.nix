@@ -3199,8 +3199,11 @@ in {
         terminal = terminal-emulator;
         menu = ''
           "${pkgs.rofi}/bin/rofi -dpi 0 -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
-        focus.followMouse = false;
-        focus.newWindow = "urgent";
+        focus = {
+          followMouse = false;
+          newWindow = "urgent";
+          wrapping = "workspace";
+        };
         startup = [
           {
             command = "${pkgs.dex}/bin/dex --autostart --environment i3";
