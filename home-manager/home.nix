@@ -5004,6 +5004,7 @@ in {
       (nuspellWithDicts (with hunspellDicts; [ en_GB-large ]))
       webcamoid
       kdenlive
+      blender
       libnotify
       file
       tree
