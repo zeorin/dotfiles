@@ -5003,6 +5003,7 @@ in {
       (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
       (nuspellWithDicts (with hunspellDicts; [ en_GB-large ]))
       webcamoid
+      kdenlive
       libnotify
       file
       tree
