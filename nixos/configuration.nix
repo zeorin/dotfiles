@@ -45,7 +45,7 @@ in {
       };
     };
 
-    kernelPackages = pkgs.linuxPackages_xanmod;
+    kernelPackages = unstable.linuxPackages_zen;
     extraModulePackages = with config.boot.kernelPackages; [
       # exfat-nofuse
       # akvcam
@@ -274,7 +274,7 @@ in {
       "libcufft"
       "libnpp"
     ];
-  nixpkgs.config.packageOverrides = pkgs: rec {
+  nixpkgs.config.packageOverrides = pkgs: {
     slock = (let
       configFile =
         pkgs.writeText "config.h" (builtins.readFile ./slock-config.h);
