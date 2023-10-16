@@ -866,7 +866,16 @@ in {
             @import url('${firefox-csshacks}/chrome/autohide_toolbox.css');
           '';
         };
-        blank = { id = 1; };
+        blank = {
+          id = 1;
+          extraConfig = ''
+            // http://kb.mozillazine.org/About:config_entries
+
+            // Given that we're managing updates declaratively, we don't want to auto-update
+            user_pref("extensions.update.enabled", false);
+            user_pref("app.update.enabled", false);
+          '';
+        };
         nightly = {
           inherit extensions;
           id = 2;
