@@ -824,10 +824,11 @@ in {
           # Disable preSkeletonUI on startup
           "browser.startup.preXulSkeletonUI" = false;
           # Process count (more is faster, but uses more memory)
-          # "dom.ipc.processCount" = 8; # default
+          "dom.ipc.processCount" = 8; # default
           # "dom.ipc.processCount" = 16;
-          "dom.ipc.processCount" = -1; # as many as FF wants
-          "network.http.max-persistent-connections-per-server" = 10; # default 6
+          # "dom.ipc.processCount" = -1; # as many as FF wants
+          "network.http.max-persistent-connections-per-server" = 6; # default
+          # "network.http.max-persistent-connections-per-server" = 10;
         };
         enableUserChrome = {
           "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
