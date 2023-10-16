@@ -2590,6 +2590,10 @@ in {
           # stacked / tabbed windows
           "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
           "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
+          # i3 borders
+          "class_g = 'i3-frame'"
+          # Polybar tray
+          "class_g = 'Polybar' && class_i = 'tray'"
           # GTK
           "_GTK_FRAME_EXTENTS@:c"
           "class_g ~= 'xdg-desktop-portal' && _NET_FRAME_EXTENTS@:c && window_type = 'dialog'"
@@ -3403,10 +3407,10 @@ in {
         };
         assigns = {
           "${workspace2}" = [{
-            class = "^Firefox$";
-            window_role = "(?i)^((?!dialog).)+$";
+            class = "^firefox";
+            instance = "^Navigator$";
           }];
-          "${workspace9}" = [{ class = "^Thunderbird$"; }];
+          "${workspace9}" = [{ class = "^thunderbird$"; }];
           "${workspace10}" = [
             { class = "^TelegramDesktop$"; }
             { class = "^Slack$"; }
@@ -5117,11 +5121,13 @@ in {
       mkFirefox = { package, name, desktopName, profileName }:
         let
           pkg = package.overrideAttrs (oldAttrs: {
-            desktopItem =
-              oldAttrs.desktopItem.override { inherit name desktopName; };
+            desktopItem = oldAttrs.desktopItem.override {
+              inherit name desktopName;
+              startupWMClass = name;
+            };
           });
           wrapped = pkgs.writeShellScriptBin name ''
-            exec ${pkg}/bin/${name} --no-remote -P ${profileName} "''${@}"
+            exec ${pkg}/bin/${name} -P "${profileName}" --class "${name}" "''${@}"
           '';
         in pkgs.symlinkJoin {
           inherit name;
