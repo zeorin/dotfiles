@@ -678,6 +678,7 @@ in {
             reddit-enhancement-suite
             reduxdevtools
             refined-github
+            sponsorblock
             tab-session-manager
             terms-of-service-didnt-read
             tree-style-tab
