@@ -4980,6 +4980,20 @@ in {
           mv "''${files[@]}" "$out/share"
         '';
       })
+      (symlinkJoin {
+        name = "xdg-autostart-entries";
+        paths = builtins.map makeDesktopItem [{
+          name = "tailscale-systray";
+          desktopName = "tailscale-systray";
+          exec = "${tailscale-systray}/bin/tailscale-systray";
+        }];
+        postBuild = ''
+          files=("$out/share/applications"/*.desktop)
+          mkdir -p "$out/etc/xdg/autostart"
+          mv "''${files[@]}" "$out/etc/xdg/autostart"
+          rm -rf "$out/share"
+        '';
+      })
       my-emacs
       (writeShellScriptBin "edit.sh" ''
         if [ -n "$INSIDE_EMACS" ]; then
@@ -5034,6 +5048,7 @@ in {
       bc
       feh
       lxappearance
+      tailscale-systray
       protonvpn-gui
       protonvpn-cli
       thunderbird

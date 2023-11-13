@@ -213,7 +213,13 @@ in {
     hostName = "guru";
 
     # Easy network config
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+      insertNameservers = [
+        # Tailscale
+        "100.100.100.100"
+      ];
+    };
 
     # Enable IPv6
     enableIPv6 = true;
@@ -548,6 +554,8 @@ in {
       };
     };
   };
+
+  services.tailscale.enable = true;
 
   # i2c
   hardware.i2c.enable = true;
