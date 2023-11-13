@@ -32,6 +32,8 @@ in {
       configurationLimit = 10;
     };
 
+    plymouth.enable = true;
+
     initrd.luks.devices = {
       cryptkey = {
         device = "/dev/disk/by-uuid/6b17a213-6987-4a8e-b609-5243f6ba1467";
@@ -45,6 +47,7 @@ in {
       };
     };
 
+    kernelParams = [ "quiet" "udev.log_level=3" ];
     kernelPackages = unstable.linuxPackages_zen;
     extraModulePackages = with config.boot.kernelPackages; [
       # exfat-nofuse
