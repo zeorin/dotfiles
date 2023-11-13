@@ -3785,17 +3785,6 @@ in {
         (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
         (add-to-list 'default-frame-alist '(alpha-background . 85))
 
-        ;; Word-wrap
-        (add-hook 'visual-line-mode-hook #'+word-wrap-mode)
-        (add-to-list '+word-wrap-disabled-modes 'treemacs-mode)
-        (setq +word-wrap-extra-indent 'double
-              +word-wrap-fill-style 'auto
-              comment-auto-fill-only-comments t
-              fill-column 80)
-        (setq-default auto-fill-function 'do-auto-fill)
-        (add-hook 'text-mode-hook
-                  (lambda () (setq-local comment-auto-fill-only-comments nil)))
-
         ;; Emacs everywhere
         (after! emacs-everywhere
           (setq emacs-everywhere-frame-name-format "emacs-everywhere")
