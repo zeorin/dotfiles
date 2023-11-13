@@ -720,6 +720,21 @@ in {
               };
             })
             (buildFirefoxXpiAddon rec {
+              pname = "chromelogger";
+              version = "3.9.0";
+              addonId = "containerise@kinte.sh";
+              url =
+                "https://addons.mozilla.org/firefox/downloads/file/3674090/containerise-${version}.xpi";
+              sha256 = "sha256-GXSrCpz66CW8jk1D7+LtEYo8k0ibeOF1xNWe4el04C0=";
+              meta = with lib; {
+                homepage = "https://github.com/kintesh/containerise";
+                description =
+                  "Automatically open websites in a dedicated container. Simply add rules to map domain or subdomain to your container.";
+                licence = licences.mit;
+                platforms = platforms.all;
+              };
+            })
+            (buildFirefoxXpiAddon rec {
               pname = "cors-everywhere";
               version = "18.11.13.2043";
               addonId = "cors-everywhere@spenibus";
