@@ -840,7 +840,6 @@ in {
         };
         enableUserChrome = {
           "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-          "browser.autofocus" = false;
         };
         saneNewTab = {
           # Don't open links in new tabs, except when it makes sense
@@ -4533,14 +4532,8 @@ in {
         " Defaults to 300ms
         set hintdelay 100
 
-        " Don't autofocus!
-        set allowautofocus false
-
         " Disable Tridactyl on certain websites
-        ${lib.strings.concatMapStrings (url: ''
-          blacklistadd ${url}
-          seturl ${url} allowautofocus true
-        '') [
+        ${lib.strings.concatMapStrings (url: "blacklistadd ${url}") [
           "monkeytype\\.com"
           "codepen\\.io"
           "codesandbox\\.io"
