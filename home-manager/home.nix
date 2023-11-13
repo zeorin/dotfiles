@@ -3,14 +3,6 @@
 let
   unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 
-  writeScriptDir = path: text:
-    pkgs.writeTextFile {
-      inherit text;
-      name = builtins.baseNameOf path;
-      executable = true;
-      destination = "/${path}";
-    };
-
   writeShellScriptDir = path: text:
     pkgs.writeTextFile {
       name = builtins.baseNameOf path;
@@ -1082,7 +1074,7 @@ in {
         set fish_cursor_replace_one underscore
         set fish_vi_force_cursor true
 
-        fish_nord_theme (${pkgs.darkman}/bin/darkman get)
+        fish_nord_theme dark
 
         # Notify for long-running commands
         function ntfy_on_duration --on-event fish_prompt
@@ -3630,7 +3622,7 @@ in {
         ;; There are two ways to load a theme. Both assume the theme is installed and
         ;; available. You can either set `doom-theme' or manually load a theme with the
         ;; `load-theme' function. This is the default:
-        ;;(setq doom-theme 'doom-nord)
+        (setq doom-theme 'doom-nord)
 
         ;; If you use `org' and don't want your org files in the default location below,
         ;; change `org-directory'. It must be set before org loads!
@@ -3675,25 +3667,6 @@ in {
                       :demand t
                       :config
                       (all-the-icons-nerd-fonts-prefer))
-
-        (use-package! darkman
-                      :diminish darkman-mode
-                      :custom
-                      (darkman-themes '(:light doom-nord-light
-                                        :dark doom-nord))
-                      :config
-                      (defadvice darkman-set (before no-theme-stacking activate)
-                        "Disable the previous theme before loading a new one."
-                        (mapc #'disable-theme custom-enabled-themes))
-                      (if (daemonp)
-                          (progn
-                            (add-hook 'server-after-make-frame-hook #'darkman-mode)
-                            (advice-add 'darkman-mode
-                                        :after
-                                        (lambda ()
-                                          (remove-hook 'server-after-make-frame-hook
-                                                      #'darkman-mode))))
-                          (add-hook! 'after-init-hook (darkman-mode))))
 
         (map! :leader
               :desc "Increase font size"
@@ -4160,8 +4133,6 @@ in {
           ;(unpin! pinned-package another-pinned-package)
           ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
           ;(unpin! t)
-
-          (package! darkman)
 
           (package! org-super-agenda)
 
@@ -4980,14 +4951,7 @@ in {
                   ./backgrounds/martian-terrain-dark.jpg
                 }
               '';
-              "kitty-theme.sh" =
-                ''${config.programs.kitty.package.passthru.set-theme} "Nord"'';
-            }) ++ [
-              (writeScriptDir "fish-theme.fish" ''
-                #!${config.programs.fish.package}/bin/fish
-                fish_nord_theme dark
-              '')
-            ];
+            });
             postBuild = ''
               files=("$out"/*)
               mkdir "$out/${name}"
@@ -5020,14 +4984,7 @@ in {
                   ./backgrounds/martian-terrain-light.jpg
                 }
               '';
-              "kitty-theme.sh" = ''
-                ${config.programs.kitty.package.passthru.set-theme} "Nord light"'';
-            }) ++ [
-              (writeScriptDir "fish-theme.fish" ''
-                #!${config.programs.fish.package}/bin/fish
-                fish_nord_theme light
-              '')
-            ];
+            });
             postBuild = ''
               files=("$out"/*)
               mkdir "$out/${name}"
