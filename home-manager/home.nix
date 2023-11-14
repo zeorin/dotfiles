@@ -4521,6 +4521,11 @@ in {
         " Defaults to 300ms
         set hintdelay 100
 
+        " Fix clobbering of Tridactyl command line iframe
+        " https://github.com/tridactyl/tridactyl/issues/4807
+        autocmd DocStart .* js tri.cmdlineIframe = document.getElementById('cmdline_iframe')
+        autocmd DocLoad .* js requestAnimationFrame(function reattachCmdlineIframe() { !document.documentElement.contains(tri.cmdlineIframe) && document.documentElement.insertBefore(tri.cmdlineIframe, document.documentElement.firstElementChild); requestAnimationFrame(reattachCmdlineIframe) })
+
         " Disable Tridactyl on certain websites
         ${lib.strings.concatMapStrings (url: "blacklistadd ${url}") [
           "monkeytype\\.com"
