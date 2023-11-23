@@ -3825,17 +3825,9 @@ in {
           :config
           (setq auto-mode-alist (delete '("\\.tsx\\'" . typescript-tsx-mode) auto-mode-alist))
           (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
-          (set-formatter!
-             'prettier-typescript-ts
-             '("prettier" "--parser" "typescript")
-             :modes '(typescript-ts-mode tsx-ts-mode))
-          (setq-hook! '(typescript-ts-mode-hook tsx-ts-mode-hook) +format-with 'prettier-typescript-ts)
+          (setq-hook! '(typescript-ts-mode-hook tsx-ts-mode-hook) +format-with 'prettier-typescript)
           (add-hook! '(typescript-ts-mode-hook tsx-ts-mode-hook) #'lsp!)
-          (set-formatter!
-             'prettier-javascript-ts
-             '("prettier" "--parser" "babel")
-             :modes '(javascript-ts-mode))
-          (setq-hook! '(javascript-ts-mode-hook) +format-with 'prettier-javascript-ts)
+          (setq-hook! '(javascript-ts-mode-hook) +format-with 'prettier-javascript)
           (add-hook! '(javascript-ts-mode-hook) #'lsp!)
           (defun treesit-auto-for-each (fn)
             (cl-loop for recipe in treesit-auto-recipe-list
