@@ -4189,9 +4189,7 @@ in {
 
           (package! csv-mode)
 
-          (package! all-the-icons-nerd-fonts
-                    :recipe
-                    (:host github :repo "mohkale/all-the-icons-nerd-fonts"))
+          (package! all-the-icons-nerd-fonts)
 
           (package! atomic-chrome)
 
