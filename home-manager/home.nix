@@ -3623,17 +3623,86 @@ in {
         ;; `load-theme' function. This is the default:
         (setq doom-theme 'doom-nord)
 
+        ;; Boris Buliga - Task management with org-roam Vol. 5: Dynamic and fast agenda
+        ;; https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
+        (use-package! vulpea
+          :after org-roam
+          :hook ((org-roam-db-autosync-mode . vulpea-db-autosync-enable)))
+
+        (after! org (add-to-list 'org-tags-exclude-from-inheritance "project"))
+
+        (defun vulpea-project-p ()
+          "Return non-nil if current buffer has any todo entry.
+
+          TODO entries marked as done are ignored, meaning the this
+          function returns nil if current buffer contains only completed
+          tasks."
+            (org-element-map
+                (org-element-parse-buffer 'headline)
+                'headline
+              (lambda (h)
+                (eq (org-element-property :todo-type h)
+                    'todo))
+              nil 'first-match))
+
+        (add-hook 'find-file-hook #'vulpea-project-update-tag)
+        (add-hook 'before-save-hook #'vulpea-project-update-tag)
+
+        (defun vulpea-project-update-tag ()
+              "Update PROJECT tag in the current buffer."
+              (when (and (not (active-minibuffer-window))
+                        (vulpea-buffer-p))
+                (save-excursion
+                  (goto-char (point-min))
+                  (let* ((tags (vulpea-buffer-tags-get))
+                        (original-tags tags))
+                    (if (vulpea-project-p)
+                        (setq tags (cons "project" tags))
+                      (setq tags (remove "project" tags)))
+
+                    ;; cleanup duplicates
+                    (setq tags (seq-uniq tags))
+
+                    ;; update tags if changed
+                    (when (or (seq-difference tags original-tags)
+                              (seq-difference original-tags tags))
+                      (apply #'vulpea-buffer-tags-set tags))))))
+
+        (defun vulpea-buffer-p ()
+          "Return non-nil if the currently visited buffer is a note."
+          (and buffer-file-name
+              (string-prefix-p
+                (expand-file-name (file-name-as-directory org-roam-directory))
+                (file-name-directory buffer-file-name))))
+
+        (defun vulpea-project-files ()
+          "Return a list of note files containing 'project' tag." ;
+          (seq-uniq
+          (seq-map
+            #'car
+            (org-roam-db-query
+            [:select [nodes:file]
+              :from tags
+              :left-join nodes
+              :on (= tags:node-id nodes:id)
+              :where (like tag (quote "%\"project\"%"))]))))
+                ;; Prevents some cases of Emacs flickering.
+                (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
+
+        (defun vulpea-agenda-files-update (&rest _)
+          "Update the value of `org-agenda-files'."
+          (setq org-agenda-files (vulpea-project-files)))
+
+        (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
+        (advice-add 'org-todo-list :before #'vulpea-agenda-files-update)
+
         ;; If you use `org' and don't want your org files in the default location below,
         ;; change `org-directory'. It must be set before org loads!
         (setq org-directory "~/Documents/notes/"
               org-roam-directory org-directory
-              org-roam-dailies-directory "journal/"
-              org-agenda-files (list org-roam-directory
-                                     (concat org-roam-directory
-                                             org-roam-dailies-directory)))
+              org-roam-dailies-directory "journal/")
 
-        ;; Prevents some cases of Emacs flickering.
-        (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
+        (after! org-roam (setq org-agenda-files (vulpea-project-files)))
 
         ;; This determines the style of line numbers in effect. If set to `nil', line
         ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -4127,6 +4196,8 @@ in {
           (package! atomic-chrome)
 
           (package! treesit-auto)
+
+          (package! vulpea)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
