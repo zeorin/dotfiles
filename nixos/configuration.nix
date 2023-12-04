@@ -68,10 +68,6 @@ in {
     supportedFilesystems = [ "ntfs" ];
   };
   services.udev.packages = with pkgs; [
-    (runCommand "45-ddcutil-i2c.rules" { } ''
-      mkdir -p $out/etc/udev/rules.d
-      ln -s ${ddcutil}/share/ddcutil/data/45-ddcutil-i2c.rules $out/etc/udev/rules.d
-    '')
     (runCommand "99-ddcci.rules" { } ''
       mkdir -p $out/etc/udev/rules.d
       ln -s ${
@@ -604,7 +600,7 @@ in {
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = "23.11"; # Did you read the comment?
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -789,7 +785,7 @@ in {
   # Move this to home-manager when ready: https://github.com/nix-community/home-manager/issues/1167
   xdg.portal = {
     enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
+    configPackages = with pkgs; [ xdg-desktop-portal-gtk ];
   };
 
   # Enable nix ld

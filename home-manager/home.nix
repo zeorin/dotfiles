@@ -425,10 +425,6 @@ in {
   ];
 
   nixpkgs.config = nixosConfig.nixpkgs.config // {
-    firefox = {
-      enableBrowserpass = true;
-      enableTridactylNative = true;
-    };
     joypixels.acceptLicense = true;
     allowUnfreePredicate = (pkg:
       (nixosConfig.nixpkgs.config.allowUnfreePredicate pkg)
@@ -444,8 +440,6 @@ in {
         "symbola"
         "spotify"
         "google-chrome"
-        "google-chrome-beta"
-        "google-chrome-dev"
         "netflix-via-google-chrome"
         "netflix-icon"
         "enhancer-for-youtube"
@@ -589,7 +583,8 @@ in {
       '';
     };
     shellAliases =
-      (nomAliases { inherit (pkgs) nix nixos-rebuild home-manager; }) // {
+      # (nomAliases { inherit (pkgs) nix nixos-rebuild home-manager; }) // {
+      {
         g = "git";
         e = "edit.sh";
         m = "neomutt";
@@ -647,7 +642,9 @@ in {
     };
     firefox = {
       enable = true;
-      package = pkgs.latest.firefox-bin;
+      package = pkgs.latest.firefox-bin.override {
+        nativeMessagingHosts = with pkgs; [ tridactyl-native ];
+      };
       profiles = let
         extensions = with pkgs.nur.repos.rycee.firefox-addons;
           [
@@ -2534,6 +2531,15 @@ in {
       client.enable = true;
     };
     flameshot.enable = true;
+    git-sync = {
+      enable = true;
+      repositories = {
+        password-store = {
+          path = config.programs.password-store.settings.PASSWORD_STORE_DIR;
+          uri = "git+ssh://git@git.xandor.co.za:zeorin/password-store.git";
+        };
+      };
+    };
     gpg-agent = {
       enable = true;
       enableSshSupport = true;
@@ -2545,7 +2551,6 @@ in {
     };
     network-manager-applet.enable = true;
     nextcloud-client.enable = true;
-    password-store-sync.enable = true;
     picom = {
       enable = true;
       backend = "glx";
@@ -3437,52 +3442,56 @@ in {
             { class = "^Ferdium$"; }
           ];
         };
-        window.border = 0;
-        window.hideEdgeBorders = "both";
-        window.commands = let
-          mkCommand = command: criteria: { inherit command criteria; };
-          mkFloating = mkCommand "floating enable";
-          mkSticky = mkCommand "sticky enable";
-        in [
-          {
-            criteria = { class = ".*"; };
-            command = "border pixel 0";
-          }
-          (mkFloating { class = "^emacs-everywhere$"; })
-          (mkFloating { class = "^Tor Browser$"; })
-          (mkFloating { class = "^gnome-calculator$"; })
-          (mkFloating { class = "^feh$"; })
-          (mkFloating { class = "^Sxiv$"; })
-          (mkFloating {
-            class = "^Thunderbird$";
-            instance = "^Calendar$";
-          })
-          (mkFloating {
-            class = "^Steam$";
-            instance = "Steam Guard";
-          })
-          (mkFloating { class = "^(?i)zoom$"; })
-          (mkFloating { class = "(?i)blueman-manager"; })
-          (mkFloating {
-            class = "^Steam$";
-            title = "^Steam Guard";
-          })
-          (mkFloating { class = "(?i)protonvpn"; })
-          (mkFloating { title = "Preferences$"; })
-          (mkFloating { window_role = "About"; })
-          (mkFloating { window_role = "Preferences"; })
-          (mkFloating { window_role = "Organizer"; })
-          (mkFloating { window_role = "bubble"; })
-          (mkFloating { window_role = "page-info"; })
-          (mkFloating { window_role = "pop-up"; })
-          (mkFloating { window_role = "task_dialog"; })
-          (mkFloating { window_role = "toolbox"; })
-          (mkFloating { window_role = "webconsole"; })
-          (mkFloating { window_type = "dialog"; })
-          (mkFloating { window_type = "menu"; })
-          (mkSticky { title = "Picture-in-Picture"; })
-          (mkSticky { title = "AlarmWindow"; })
-        ];
+        floating.titlebar = false;
+        window = {
+          border = 0;
+          hideEdgeBorders = "both";
+          titlebar = false;
+          commands = let
+            mkCommand = command: criteria: { inherit command criteria; };
+            mkFloating = mkCommand "floating enable";
+            mkSticky = mkCommand "sticky enable";
+          in [
+            {
+              criteria = { class = ".*"; };
+              command = "border pixel 0";
+            }
+            (mkFloating { class = "^emacs-everywhere$"; })
+            (mkFloating { class = "^Tor Browser$"; })
+            (mkFloating { class = "^gnome-calculator$"; })
+            (mkFloating { class = "^feh$"; })
+            (mkFloating { class = "^Sxiv$"; })
+            (mkFloating {
+              class = "^Thunderbird$";
+              instance = "^Calendar$";
+            })
+            (mkFloating {
+              class = "^Steam$";
+              instance = "Steam Guard";
+            })
+            (mkFloating { class = "^(?i)zoom$"; })
+            (mkFloating { class = "(?i)blueman-manager"; })
+            (mkFloating {
+              class = "^Steam$";
+              title = "^Steam Guard";
+            })
+            (mkFloating { class = "(?i)protonvpn"; })
+            (mkFloating { title = "Preferences$"; })
+            (mkFloating { window_role = "About"; })
+            (mkFloating { window_role = "Preferences"; })
+            (mkFloating { window_role = "Organizer"; })
+            (mkFloating { window_role = "bubble"; })
+            (mkFloating { window_role = "page-info"; })
+            (mkFloating { window_role = "pop-up"; })
+            (mkFloating { window_role = "task_dialog"; })
+            (mkFloating { window_role = "toolbox"; })
+            (mkFloating { window_role = "webconsole"; })
+            (mkFloating { window_type = "dialog"; })
+            (mkFloating { window_type = "menu"; })
+            (mkSticky { title = "Picture-in-Picture"; })
+            (mkSticky { title = "AlarmWindow"; })
+          ];
+        };
       };
       extraConfig = ''
         popup_during_fullscreen leave_fullscreen
@@ -5179,7 +5188,9 @@ in {
     ] ++ (let
       mkFirefox = { package, name, desktopName, profileName }:
         let
-          pkg = package.overrideAttrs (oldAttrs: {
+          pkg = (package.override {
+            nativeMessagingHosts = with pkgs; [ tridactyl-native ];
+          }).overrideAttrs (oldAttrs: {
             desktopItem = oldAttrs.desktopItem.override {
               inherit name desktopName;
               startupWMClass = name;
@@ -5214,8 +5225,6 @@ in {
     ]) ++ [
       ungoogled-chromium
       google-chrome
-      google-chrome-beta
-      google-chrome-dev
       netflix
       tor-browser-bundle-bin
       virt-manager
@@ -5455,6 +5464,6 @@ in {
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "21.05";
+  home.stateVersion = "23.11";
 }
 # vim: set foldmethod=indent foldcolumn=4 shiftwidth=2 tabstop=2 expandtab:
