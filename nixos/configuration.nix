@@ -487,30 +487,44 @@ in {
 
   networking = {
     iproute2.enable = true;
-    firewall.allowPing = true;
-    # Open ports in the firewall.
-    firewall.allowedTCPPorts = [
-      # Printing
-      631
-      # Calibre wireless
-      9090
-      # Samba
-      5357
-      # Syncthing
-      22000
-    ];
-    firewall.allowedUDPPorts = [
-      # Printing
-      631
-      # Calibre wireless
-      9090
-      # Samba
-      3702
-      # Syncthing
-      21027
-      22000
-    ];
-    firewall.trustedInterfaces = [ "wt_backend" ];
+    firewall = {
+      allowPing = true;
+      allowedTCPPorts = [
+        # Printing
+        631
+        # Calibre wireless
+        9090
+        # Samba
+        5357
+        # Syncthing
+        22000
+      ];
+      allowedTCPPortRanges = [
+        # KDEConnect
+        {
+          from = 1714;
+          to = 1764;
+        }
+      ];
+      allowedUDPPorts = [
+        # Printing
+        631
+        # Calibre wireless
+        9090
+        # Samba
+        3702
+        # Syncthing
+        21027
+        22000
+      ];
+      allowedUDPPortRanges = [
+        # KDEConnect
+        {
+          from = 1714;
+          to = 1764;
+        }
+      ];
+    };
   };
   services.samba-wsdd.enable = true;
   services.samba = {

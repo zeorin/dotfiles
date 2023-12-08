@@ -662,6 +662,7 @@ in {
             octolinker
             octotree
             org-capture
+            plasma-integration
             privacy-badger
             react-devtools
             reddit-enhancement-suite
@@ -2548,6 +2549,10 @@ in {
       maxCacheTtl = 0;
       defaultCacheTtlSsh = 0;
       maxCacheTtlSsh = 0;
+    };
+    kdeconnect = {
+      enable = true;
+      indicator = true;
     };
     network-manager-applet.enable = true;
     nextcloud-client.enable = true;
@@ -4927,6 +4932,8 @@ in {
     '';
     ".mozilla/native-messaging-hosts/tridactyl.json".source =
       "${pkgs.tridactyl-native}/lib/mozilla/native-messaging-hosts/tridactyl.json";
+    ".mozilla/native-messaging-hosts/org.kde.plasma.browser_integration.json".source =
+      "${pkgs.plasma5Packages.plasma-browser-integration}/lib/mozilla/native-messaging-hosts/org.kde.plasma.browser_integration.json";
     ".my.cnf".text = ''
       [client]
       user = root
