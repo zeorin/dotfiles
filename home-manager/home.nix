@@ -1140,6 +1140,7 @@ in {
           stat = true;
           tool = "nvimdiff";
           autoStash = true;
+          conflictStyle = "zdiff3";
         };
         mergetool.prompt = false;
         "mergetool \"nvimdiff\"".cmd = ''
