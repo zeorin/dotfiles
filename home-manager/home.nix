@@ -642,9 +642,7 @@ in {
     };
     firefox = {
       enable = true;
-      package = pkgs.latest.firefox-bin.override {
-        nativeMessagingHosts = with pkgs; [ tridactyl-native ];
-      };
+      package = pkgs.latest.firefox-bin;
       profiles = let
         extensions = with pkgs.nur.repos.rycee.firefox-addons;
           [
@@ -5195,9 +5193,7 @@ in {
     ] ++ (let
       mkFirefox = { package, name, desktopName, profileName }:
         let
-          pkg = (package.override {
-            nativeMessagingHosts = with pkgs; [ tridactyl-native ];
-          }).overrideAttrs (oldAttrs: {
+          pkg = package.overrideAttrs (oldAttrs: {
             desktopItem = oldAttrs.desktopItem.override {
               inherit name desktopName;
               startupWMClass = name;
