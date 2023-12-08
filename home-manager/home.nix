@@ -26,15 +26,8 @@ let
       (emacsPackagesFor emacs29-gtk3).emacsWithPackages
       (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
     pathDeps = with pkgs; [
-      (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
-      (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
-      (nuspellWithDicts (with hunspellDicts; [ en_GB-large ]))
-      enchant
-      languagetool
-      ltex-ls
       texlive.combined.scheme-medium
       python3
-      aspell
       binutils
       (ripgrep.override { withPCRE2 = true; })
       fd
@@ -3504,6 +3497,53 @@ in {
 
   systemd.user = {
     services = {
+      languagetool = let settingsFormat = pkgs.formats.javaProperties { };
+      in {
+        Unit = {
+          Description = "LanguageTool HTTP server";
+          After = [ "network.target" ];
+        };
+        Install.WantedBy = [ "multi-user.target" ];
+        Service.ExecStart = ''
+          ${pkgs.languagetool}/bin/languagetool-http-server \
+            --port 8081 \
+            --allow-origin '*' \
+            --config ${
+              settingsFormat.generate "languagetool.cfg" {
+                cacheSize = "1000";
+                pipelineCaching = "true";
+                pipelinePrewarming = "true";
+                # https://dev.languagetool.org/finding-errors-using-n-gram-data
+                languageModel = "${pkgs.linkFarm "languagetool-languageModel" [
+                  {
+                    name = "en";
+                    path = pkgs.fetchzip {
+                      url =
+                        "https://languagetool.org/download/ngram-data/ngrams-en-20150817.zip";
+                      sha256 =
+                        "1hgjilpgdzbs9kgksq1jl0f6y8ff76mn6vlicc1d8zj943l2cxmz";
+                    };
+                  }
+                  {
+                    name = "nl";
+                    path = pkgs.fetchzip {
+                      url =
+                        "https://languagetool.org/download/ngram-data/ngrams-nl-20181229.zip";
+                      sha256 =
+                        "sha256-bHOEdb2R7UYvXjqL7MT4yy3++hNMVwnG7TJvvd3Feg8=";
+                    };
+                  }
+                ]}";
+                fasttextBinary = pkgs.fetchurl {
+                  url =
+                    "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin";
+                  sha256 =
+                    "sha256-fmnsVFG8JhzHhE5J5HkqhdfwnAZ4nsgA/EpErsNidk4=";
+                };
+              }
+            }
+        '';
+      };
       mpris-proxy = {
         Unit = {
           Description = "Forward bluetooth media controls to MPRIS";
@@ -3943,6 +3983,19 @@ in {
           (global-treesit-auto-mode))
 
           (setq Man-notify-method 'pushy)
+
+          (setq ispell-dictionary "en_GB")
+
+          (use-package! langtool
+            :config
+            (setq langtool-java-user-arguments '("-Dfile.encoding=UTF-8")
+                  langtool-http-server-host "localhost"
+                  langtool-http-server-port 8081
+                  langtool-mother-tongue "en"
+                  langtool-default-language "en-GB"))
+
+          (use-package! langtool-popup
+            :after langtool)
       '';
       "doom/init.el" = {
         text = ''
@@ -4027,7 +4080,7 @@ in {
 
                  :checkers
                  (syntax +childframe) ; tasing you for every semicolon you forget
-                 (spell +enchant +flyspell +everywhere) ; tasing you for misspelling mispelling
+                 (spell +enchant) ; tasing you for misspelling mispelling
                  grammar           ; tasing grammar mistake every you make
 
                  :tools
@@ -4208,6 +4261,8 @@ in {
           (package! treesit-auto)
 
           (package! vulpea)
+
+          (package! langtool-popup)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
@@ -5085,8 +5140,10 @@ in {
         fi
       '')
       (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
-      (hunspellWithDicts (with hunspellDicts; [ en_GB-large ]))
-      (nuspellWithDicts (with hunspellDicts; [ en_GB-large ]))
+      (hunspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
+      (nuspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
+      enchant
+      languagetool
       webcamoid
       kdenlive
       blender
