@@ -3992,20 +3992,20 @@ in {
         (set-docsets! 'typescript-mode "JavaScript" "NodeJS")
         (set-docsets! 'typescript-tsx-mode "JavaScript" "React")
 
-          (setq Man-notify-method 'pushy)
+        (setq Man-notify-method 'pushy)
 
-          (setq ispell-dictionary "en_GB")
+        (setq ispell-dictionary "en_GB")
 
-          (use-package! langtool
-            :config
-            (setq langtool-java-user-arguments '("-Dfile.encoding=UTF-8")
-                  langtool-http-server-host "localhost"
-                  langtool-http-server-port 8081
-                  langtool-mother-tongue "en"
-                  langtool-default-language "en-GB"))
+        (use-package! langtool
+          :config
+          (setq langtool-java-user-arguments '("-Dfile.encoding=UTF-8")
+                langtool-http-server-host "localhost"
+                langtool-http-server-port 8081
+                langtool-mother-tongue "en"
+                langtool-default-language "en-GB"))
 
-          (use-package! langtool-popup
-            :after langtool)
+        (use-package! langtool-popup
+          :after langtool)
       '';
       "doom/init.el" = {
         text = ''
