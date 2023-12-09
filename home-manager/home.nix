@@ -35,6 +35,7 @@ let
       imagemagick
       zstd
       shfmt
+      maim
       shellcheck
       sqlite
       editorconfig-core-c
@@ -4162,6 +4163,9 @@ in {
                  ;;ocaml             ; an objective camel
                  (org               ; organize your plain life in plain text
                   +pretty
+                  +dragndrop
+                  +pandoc
+                  +pomodoro
                   +roam2)
                  ;;php               ; perl's insecure younger brother
                  ;;plantuml          ; diagrams for confusing people more
