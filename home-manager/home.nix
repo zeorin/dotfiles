@@ -3658,29 +3658,82 @@ in {
         ;; Place your private configuration here! Remember, you do not need to run 'doom
         ;; sync' after modifying this file!
 
+
         ;; Some functionality uses this to identify you, e.g. GPG configuration, email
-        ;; clients, file templates and snippets.
+        ;; clients, file templates and snippets. It is optional.
         (setq user-full-name "Xandor Schiefer"
               user-mail-address "me@xandor.co.za")
 
-        ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
-        ;; are the three important ones:
+        ;; Doom exposes five (optional) variables for controlling fonts in Doom:
         ;;
-        ;; + `doom-font'
-        ;; + `doom-variable-pitch-font'
-        ;; + `doom-big-font' -- used for `doom-big-font-mode'; use this for
+        ;; - `doom-font' -- the primary font to use
+        ;; - `doom-variable-pitch-font' -- a non-monospace font (where applicable)
+        ;; - `doom-big-font' -- used for `doom-big-font-mode'; use this for
         ;;   presentations or streaming.
+        ;; - `doom-symbol-font' -- for symbols
+        ;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
         ;;
-        ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
-        ;; font string. You generally only need these two:
-        (setq doom-font (font-spec :family "Iosevka Nerd Font Mono" :size 12 :weight 'light)
-              doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 13)
-              doom-big-font (font-spec :family "Iosevka Nerd Font Mono" :size 18 :weight 'light))
+        ;; See 'C-h v doom-font' for documentation and more examples of what they
+        ;; accept. For example:
+        ;;
+        (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
+              doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 12 :weight 'light)
+              doom-big-font (font-spec :size 18)
+              doom-symbol-font (font-spec :family "Symbols Nerd Font" :size 12)
+              doom-serif-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light))
+        ;;
+        ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
+        ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
+        ;; refresh your font settings. If Emacs still can't find your font, it likely
+        ;; wasn't installed correctly. Font issues are rarely Doom issues!
 
         ;; There are two ways to load a theme. Both assume the theme is installed and
         ;; available. You can either set `doom-theme' or manually load a theme with the
         ;; `load-theme' function. This is the default:
         (setq doom-theme 'doom-nord)
+
+        ;; This determines the style of line numbers in effect. If set to `nil', line
+        ;; numbers are disabled. For relative line numbers, set this to `relative'.
+        (setq display-line-numbers-type 'relative)
+
+        ;; If you use `org' and don't want your org files in the default location below,
+        ;; change `org-directory'. It must be set before org loads!
+        (setq org-directory "~/Documents/notes/"
+              org-roam-directory org-directory
+              org-roam-dailies-directory "journal/")
+
+
+        ;; Whenever you reconfigure a package, make sure to wrap your config in an
+        ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
+        ;;
+        ;;   (after! PACKAGE
+        ;;     (setq x y))
+        ;;
+        ;; The exceptions to this rule:
+        ;;
+        ;;   - Setting file/directory variables (like `org-directory')
+        ;;   - Setting variables which explicitly tell you to set them before their
+        ;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
+        ;;   - Setting doom variables (which start with 'doom-' or '+').
+        ;;
+        ;; Here are some additional functions/macros that will help you configure Doom.
+        ;;
+        ;; - `load!' for loading external *.el files relative to this one
+        ;; - `use-package!' for configuring packages
+        ;; - `after!' for running code after a package has loaded
+        ;; - `add-load-path!' for adding directories to the `load-path', relative to
+        ;;   this file. Emacs searches the `load-path' when you load packages with
+        ;;   `require' or `use-package'.
+        ;; - `map!' for binding new keys
+        ;;
+        ;; To get information about any of these functions/macros, move the cursor over
+        ;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+        ;; This will open documentation for it, including demos of how they are used.
+        ;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
+        ;; etc).
+        ;;
+        ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+        ;; they are implemented.
 
         ;; Boris Buliga - Task management with org-roam Vol. 5: Dynamic and fast agenda
         ;; https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
@@ -3755,17 +3808,7 @@ in {
         (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
         (advice-add 'org-todo-list :before #'vulpea-agenda-files-update)
 
-        ;; If you use `org' and don't want your org files in the default location below,
-        ;; change `org-directory'. It must be set before org loads!
-        (setq org-directory "~/Documents/notes/"
-              org-roam-directory org-directory
-              org-roam-dailies-directory "journal/")
-
         (after! org-roam (setq org-agenda-files (vulpea-project-files)))
-
-        ;; This determines the style of line numbers in effect. If set to `nil', line
-        ;; numbers are disabled. For relative line numbers, set this to `relative'.
-        (setq display-line-numbers-type 'relative)
 
         (setq projectile-project-search-path '(("~/Code/" . 2)))
 
@@ -4012,8 +4055,8 @@ in {
           ;; in. Remember to run 'doom sync' after modifying it!
 
           ;; NOTE Press 'SPC h d h' (or 'C-h d h' for non-vim users) to access Doom's
-          ;;      documentation. There you'll find a "Module Index" link where you'll find
-          ;;      a comprehensive list of Doom's modules and what flags they support.
+          ;;      documentation. There you'll find a link to Doom's Module Index where all
+          ;;      of our modules are listed, including what flags they support.
 
           ;; NOTE Move your cursor over a module's name (or its flags) and press 'K' (or
           ;;      'C-c c k' for non-vim users) to view its documentation. This works on
@@ -4023,6 +4066,7 @@ in {
           ;;      directory (for easy access to its source code).
 
           (doom! :input
+                 ;;bidi              ; (tfel ot) thgir etirw uoy gnipleh
                  ;;chinese
                  ;;japanese
                  ;;layout            ; auie,ctsrnm is the superior home row
@@ -4032,6 +4076,7 @@ in {
                  ;;helm              ; the *other* search engine for love and life
                  ;;ido               ; the other *other* search engine...
                  (ivy +childframe +icons +prescient)               ; a search engine for love and life
+                 ;;vertico           ; the search engine of the future
 
                  :ui
                  ;;deft              ; notational velocity for Emacs
@@ -4096,6 +4141,8 @@ in {
                  direnv
                  (docker +lsp)
                  editorconfig      ; let someone else argue about tabs vs spaces
+                 ;;biblio            ; Writes a PhD for you (citation needed)
+                 ;;collab            ; buffers with friends
                  ;;ein               ; tame Jupyter notebooks with emacs
                  (eval +overlay)     ; run code, run (also, repls)
                  ;;gist              ; interacting with github gists
@@ -4110,8 +4157,8 @@ in {
                  ;;taskrunner        ; taskrunner for all your projects
                  ;;terraform         ; infrastructure as code
                  ;;tmux              ; an API for interacting with tmux
+                 tree-sitter       ; syntax and parsing, sitting in a tree...
                  ;;upload            ; map local to remote projects via ssh/ftp
-                 tree-sitter       ; better syntax highlighting and structural text objects
 
                  :os
                  (:if IS-MAC macos)  ; improve compatibility with macOS
@@ -4120,7 +4167,7 @@ in {
                  :lang
                  ;;agda              ; types of types of types of types...
                  (beancount +lsp)    ; Mind the GAAP
-                 ;;cc                ; C/C++/Obj-C madness
+                 ;;(cc +lsp)         ; C > C++ == 1
                  ;;clojure           ; java with a lisp
                  ;;common-lisp       ; if you've seen one lisp, you've seen them all
                  ;;coq               ; proofs-as-programs
@@ -4128,28 +4175,31 @@ in {
                  ;;csharp            ; unity, .NET, and mono shenanigans
                  ;;data              ; config/data formats
                  ;;(dart +flutter)   ; paint ui and not much else
+                 ;;dhall
                  ;;elixir            ; erlang done right
                  ;;elm               ; care for a cup of TEA?
                  emacs-lisp        ; drown in parentheses
                  ;;erlang            ; an elegant language for a more civilized age
                  ;;ess               ; emacs speaks statistics
+                 ;;factor
                  ;;faust             ; dsp, but you get to keep your soul
+                 ;;fortran           ; in FORTRAN, GOD is REAL (unless declared INTEGER)
                  ;;fsharp            ; ML stands for Microsoft's Language
                  ;;fstar             ; (dependent) types and (monadic) effects and Z3
                  ;;gdscript          ; the language you waited for
                  ;;(go +lsp)         ; the hipster dialect
                  (haskell +lsp +tree-sitter)  ; a language that's lazier than I am
+                 ;;(graphql +lsp)    ; Give queries a REST
                  ;;hy                ; readability of scheme w/ speed of python
                  ;;idris             ; a language you can depend on
                  (json +lsp +tree-sitter)              ; At least it ain't XML
-                 ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
+                 ;;(java +lsp)       ; the poster child for carpal tunnel syndrome
                  (javascript +lsp +tree-sitter)        ; all(hope(abandon(ye(who(enter(here))))))
                  ;;julia             ; a better, faster MATLAB
                  ;;kotlin            ; a better, slicker Java(Script)
                  ;;latex             ; writing papers in Emacs has never been so fun
-                 ;;lean
-                 ;;factor
-                 ;;ledger            ; an accounting system in Emacs
+                 ;;lean              ; for folks with too much to prove
+                 ;;ledger            ; be audit you can be
                  ;;lua               ; one-based indices? one-based indices
                  (markdown +grip)          ; writing docs for people to ignore
                  ;;nim               ; python + lisp at the speed of c
@@ -4168,9 +4218,9 @@ in {
                  (rest +jq)              ; Emacs as a REST client
                  rst               ; ReST in peace
                  ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-                 ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+                 ;;(rust +lsp)       ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
                  ;;scala             ; java, but good
-                 ;;scheme            ; a fully conniving family of lisps
+                 ;;(scheme +guile)   ; a fully conniving family of lisps
                  (sh +fish +lsp +tree-sitter)                ; she sells {ba,z,fi}sh shells on the C xor
                  ;;sml
                  ;;solidity          ; do you need a blockchain? No.
@@ -4178,16 +4228,17 @@ in {
                  ;;terra             ; Earth and Moon in alignment for performance.
                  (web +lsp +tree-sitter)              ; the tubes
                  (yaml +lsp +tree-sitter)              ; JSON, but readable
+                 ;;zig               ; C, but simpler
 
                  :email
-                 ;;(mu4e +gmail)
+                 ;;(mu4e +org +gmail)
                  ;;notmuch
                  ;;(wanderlust +gmail)
 
                  :app
                  ;;calendar
                  ;;emms
-                 everywhere        ; *leave* Emacs!? You must be joking
+                 ;;everywhere        ; *leave* Emacs!? You must be joking
                  ;;irc               ; how neckbeards socialize
                  ;;(rss +org)        ; emacs as an RSS reader
                  ;;twitter           ; twitter client https://twitter.com/vnought
@@ -4213,47 +4264,48 @@ in {
 
 
           ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
-          ;(package! some-package)
+          ;; (package! some-package)
 
           ;; To install a package directly from a remote git repo, you must specify a
           ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
-          ;; https://github.com/raxod502/straight.el#the-recipe-format
-          ;(package! another-package
-          ;  :recipe (:host github :repo "username/repo"))
+          ;; https://github.com/radian-software/straight.el#the-recipe-format
+          ;; (package! another-package
+          ;;   :recipe (:host github :repo "username/repo"))
 
           ;; If the package you are trying to install does not contain a PACKAGENAME.el
           ;; file, or is located in a subdirectory of the repo, you'll need to specify
           ;; `:files' in the `:recipe':
-          ;(package! this-package
-          ;  :recipe (:host github :repo "username/repo"
-          ;           :files ("some-file.el" "src/lisp/*.el")))
+          ;; (package! this-package
+          ;;   :recipe (:host github :repo "username/repo"
+          ;;            :files ("some-file.el" "src/lisp/*.el")))
 
           ;; If you'd like to disable a package included with Doom, you can do so here
           ;; with the `:disable' property:
-          ;(package! builtin-package :disable t)
+          ;; (package! builtin-package :disable t)
 
           ;; You can override the recipe of a built in package without having to specify
           ;; all the properties for `:recipe'. These will inherit the rest of its recipe
           ;; from Doom or MELPA/ELPA/Emacsmirror:
-          ;(package! builtin-package :recipe (:nonrecursive t))
-          ;(package! builtin-package-2 :recipe (:repo "myfork/package"))
+          ;; (package! builtin-package :recipe (:nonrecursive t))
+          ;; (package! builtin-package-2 :recipe (:repo "myfork/package"))
 
           ;; Specify a `:branch' to install a package from a particular branch or tag.
           ;; This is required for some packages whose default branch isn't 'master' (which
-          ;; our package manager can't deal with; see raxod502/straight.el#279)
-          ;(package! builtin-package :recipe (:branch "develop"))
+          ;; our package manager can't deal with; see radian-software/straight.el#279)
+          ;; (package! builtin-package :recipe (:branch "develop"))
 
           ;; Use `:pin' to specify a particular commit to install.
-          ;(package! builtin-package :pin "1a2b3c4d5e")
+          ;; (package! builtin-package :pin "1a2b3c4d5e")
 
 
           ;; Doom's packages are pinned to a specific commit and updated from release to
           ;; release. The `unpin!' macro allows you to unpin single packages...
-          ;(unpin! pinned-package)
+          ;; (unpin! pinned-package)
           ;; ...or multiple packages
-          ;(unpin! pinned-package another-pinned-package)
+          ;; (unpin! pinned-package another-pinned-package)
           ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
-          ;(unpin! t)
+          ;; (unpin! t)
+
 
           (package! org-super-agenda)
 
