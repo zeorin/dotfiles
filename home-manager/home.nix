@@ -3845,6 +3845,13 @@ in {
               :desc "Reset font size"
               "0" #'text-scale-adjust)
 
+        (map! (:map +tree-sitter-outer-text-objects-map
+              "f" (evil-textobj-tree-sitter-get-textobj "call.inner")
+              "F" (evil-textobj-tree-sitter-get-textobj "function.inner"))
+              (:map +tree-sitter-inner-text-objects-map
+              "f" (evil-textobj-tree-sitter-get-textobj "call.inner")
+              "F" (evil-textobj-tree-sitter-get-textobj "function.inner")))
+
         ;; Tabs > spaces
         (setq-default indent-tabs-mode t)
 
@@ -3988,46 +3995,6 @@ in {
         (set-docsets! 'rjsx-mode "JavaScript" "React")
         (set-docsets! 'typescript-mode "JavaScript" "NodeJS")
         (set-docsets! 'typescript-tsx-mode "JavaScript" "React")
-
-        (use-package! treesit-auto
-          :config
-          (setq auto-mode-alist (delete '("\\.tsx\\'" . typescript-tsx-mode) auto-mode-alist))
-          (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
-          (setq-hook! '(typescript-ts-mode-hook tsx-ts-mode-hook) +format-with 'prettier-typescript)
-          (add-hook! '(typescript-ts-mode-hook tsx-ts-mode-hook) #'lsp!)
-          (setq-hook! '(javascript-ts-mode-hook) +format-with 'prettier-javascript)
-          (add-hook! '(javascript-ts-mode-hook) #'lsp!)
-          (defun treesit-auto-for-each (fn)
-            (cl-loop for recipe in treesit-auto-recipe-list
-              do
-              (let ((from (treesit-auto-recipe-remap recipe))
-              (to (treesit-auto-recipe-ts-mode recipe)))
-                (funcall fn from to))))
-          (defun treesit-auto-get-mode-hook-symbol (mode)
-            (intern (concat (symbol-name mode) "-hook")))
-          (defvar treesit-auto-run-original-hooks t)
-          (defvar treesit-auto-hook-copy-blacklist '((rust-mode . rust-ts-mode)))
-          (treesit-auto-for-each
-           (lambda (from to)
-             (let ((targets (if (listp from) from (list from))))
-               (cl-loop for from in targets
-                        do
-                        (letrec ((to-hook (treesit-auto-get-mode-hook-symbol to))
-                                 (from-hook (treesit-auto-get-mode-hook-symbol from))
-                                 (treesit-auto-hook-name
-                                  (intern
-                                   (concat "treesit-auto-run-"
-                                           (symbol-name from-hook)
-                                           "-for-" (symbol-name to)))))
-                          (defalias treesit-auto-hook-name
-                            `(lambda ()
-                               (when (and treesit-auto-run-original-hooks
-                                          (boundp ',from-hook)
-                                          (not (memq '(,from . ,to) treesit-auto-hook-copy-blacklist)))
-                                 (message "Running hooks from %s for %s" ',from-hook ',to)
-                                 (apply 'run-hooks ,from-hook))))
-                          (add-hook to-hook treesit-auto-hook-name))))))
-          (global-treesit-auto-mode))
 
           (setq Man-notify-method 'pushy)
 
@@ -4313,8 +4280,6 @@ in {
           (package! all-the-icons-nerd-fonts)
 
           (package! atomic-chrome)
-
-          (package! treesit-auto)
 
           (package! vulpea)
 
