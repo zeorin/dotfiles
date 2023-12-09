@@ -4210,6 +4210,7 @@ in {
                  (default +bindings +smartparens))
         '';
         onChange = "${pkgs.writeShellScript "doom-config-init-change" ''
+          export PATH="${my-emacs}/bin:$PATH"
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
           ${configHome}/doom-emacs/bin/doom --force sync
@@ -4282,6 +4283,7 @@ in {
           (package! langtool-popup)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
+          export PATH="${my-emacs}/bin:$PATH"
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
           ${configHome}/doom-emacs/bin/doom --force sync -u
