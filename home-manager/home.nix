@@ -26,6 +26,9 @@ let
       (emacsPackagesFor emacs29-gtk3).emacsWithPackages
       (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
     pathDeps = with pkgs; [
+      dockfmt
+      libxml2.bin
+      rstfmt
       texlive.combined.scheme-medium
       python3
       binutils
