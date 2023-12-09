@@ -1613,7 +1613,7 @@ in {
         '';
       };
       font = {
-        name = "Iosevka Nerd Font";
+        name = "Iosevka NF Light";
         size = 9;
       };
       keybindings = {
