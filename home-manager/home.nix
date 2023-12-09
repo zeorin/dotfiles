@@ -48,11 +48,6 @@ let
       beancount
       beancount-language-server
       fava
-      haskell-language-server
-      haskellPackages.hoogle
-      haskellPackages.cabal-install
-      haskellPackages.ormolu
-      haskellPackages.hlint
       html-tidy
       nodejs
       nodePackages.bash-language-server
@@ -4056,7 +4051,7 @@ in {
                  (popup +defaults +all)   ; tame sudden yet inevitable temporary windows
                  ;;tabs              ; a tab bar for Emacs
                  (treemacs +lsp)          ; a project drawer, like neotree but cooler
-                 unicode           ; extended unicode support for various languages
+                 ;;unicode           ; extended unicode support for various languages
                  vc-gutter         ; vcs diff in the fringe
                  vi-tilde-fringe   ; fringe tildes to mark beyond EOB
                  ;;window-select     ; visually switch windows
@@ -4069,16 +4064,16 @@ in {
                  fold              ; (nigh) universal code folding
                  (format +onsave)  ; automated prettiness
                  ;;god               ; run Emacs commands without modifier keys
-                 lispy             ; vim for lisp, for people who don't like vim
-                 multiple-cursors  ; editing in many places at once
+                 ;;lispy             ; vim for lisp, for people who don't like vim
+                 ;;multiple-cursors  ; editing in many places at once
                  ;;objed             ; text object editing for the innocent
                  ;;parinfer          ; turn lisp into python, sort of
                  ;;rotate-text       ; cycle region at point between text candidates
                  snippets          ; my elves. They type so I don't have to
-                 word-wrap         ; soft wrapping with language-aware indent
+                 ;;word-wrap         ; soft wrapping with language-aware indent
 
                  :emacs
-                 (dired +icons +ranger)             ; making dired pretty [functional]
+                 (dired +icons)             ; making dired pretty [functional]
                  electric          ; smarter, keyword-based electric-indent
                  (ibuffer +icons)         ; interactive buffer management
                  (undo +tree)              ; persistent, smarter undo for your inevitable mistakes
@@ -4148,7 +4143,7 @@ in {
                  ;;fstar             ; (dependent) types and (monadic) effects and Z3
                  ;;gdscript          ; the language you waited for
                  ;;(go +lsp)         ; the hipster dialect
-                 (haskell +lsp +tree-sitter)  ; a language that's lazier than I am
+                 ;;(haskell +lsp +tree-sitter)  ; a language that's lazier than I am
                  ;;(graphql +lsp)    ; Give queries a REST
                  ;;hy                ; readability of scheme w/ speed of python
                  ;;idris             ; a language you can depend on
@@ -4791,10 +4786,6 @@ in {
               {
                 name = "Font_Awesome";
                 sha256 = "sha256-LlsY2eqYKvKlIg0OiewOneqBY8c42viumXZ3a9pP+Bg=";
-              }
-              {
-                name = "Haskell";
-                sha256 = "sha256-uScbfz90SxbAWcEE0RVgXadq2IhNrsi9eEMzkNjQGIk=";
               }
               {
                 name = "HTML";
