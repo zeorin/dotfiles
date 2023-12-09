@@ -82,6 +82,8 @@ let
       nodePackages.prettier
       jq
       nixfmt
+      nil
+      rnix-lsp
       black
       isort
       pipenv
@@ -3929,12 +3931,6 @@ in {
         (setq lsp-eslint-server-command '("${pkgs.nodejs}/bin/node"
                                           "${pkgs.vscode-extensions.dbaeumer.vscode-eslint}/share/vscode/extensions/dbaeumer.vscode-eslint/server/out/eslintServer.js"
                                           "--stdio"))
-        (use-package! lsp-nix
-                      :after (lsp-mode)
-                      :custom
-                      (lsp-nix-nil-server-path "${pkgs.nil}/bin/nil"))
-        (add-hook! nix-mode
-                   (lsp-deferred))
 
         (after! lsp-mode
           (setq lsp-enable-suggest-server-download nil
@@ -4051,8 +4047,8 @@ in {
                  hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
                  ;;hydra
                  indent-guides     ; highlighted indent columns
-                 (ligatures +extra)         ; ligatures and symbols to make your code pretty again
-                 minimap           ; show a map of the code on the side
+                 ;;(ligatures +extra)         ; ligatures and symbols to make your code pretty again
+                 ;;minimap           ; show a map of the code on the side
                  modeline          ; snazzy, Atom-inspired modeline, plus API
                  nav-flash         ; blink cursor line after big motions
                  ;;neotree           ; a project drawer, like NERDTree for vim
@@ -4167,7 +4163,7 @@ in {
                  ;;lua               ; one-based indices? one-based indices
                  (markdown +grip)          ; writing docs for people to ignore
                  ;;nim               ; python + lisp at the speed of c
-                 (nix +tree-sitter)               ; I hereby declare "nix geht mehr!"
+                 (nix +lsp +tree-sitter)               ; I hereby declare "nix geht mehr!"
                  ;;ocaml             ; an objective camel
                  (org               ; organize your plain life in plain text
                   +pretty
