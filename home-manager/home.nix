@@ -3681,7 +3681,8 @@ in {
               doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 12 :weight 'light)
               doom-big-font (font-spec :size 18)
               doom-symbol-font (font-spec :family "Symbols Nerd Font" :size 12)
-              doom-serif-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light))
+              doom-serif-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
+              nerd-icons-font-family "Iosevka NF Light")
         ;;
         ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
         ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -3837,7 +3838,6 @@ in {
 
         (use-package! all-the-icons-nerd-fonts
                       :after all-the-icons
-                      :demand t
                       :config
                       (all-the-icons-nerd-fonts-prefer))
 
