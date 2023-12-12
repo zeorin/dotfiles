@@ -3953,7 +3953,7 @@ in {
 
         (setq fancy-splash-image "${./backgrounds/doom.png}")
         (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
-        (add-to-list 'default-frame-alist '(alpha-background . 85))
+        (add-to-list 'default-frame-alist '(alpha-background . 95))
 
         ;; Emacs everywhere
         (after! emacs-everywhere
