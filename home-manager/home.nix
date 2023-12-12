@@ -3736,6 +3736,11 @@ in {
         ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
         ;; they are implemented.
 
+        ;; Fish shell compat
+        (setq shell-file-name (executable-find "bash"))
+        (setq-default vterm-shell (executable-find "fish"))
+        (setq-default explicit-shell-file-name (executable-find "fish"))
+
         ;; Boris Buliga - Task management with org-roam Vol. 5: Dynamic and fast agenda
         ;; https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
         (use-package! vulpea
