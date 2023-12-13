@@ -1629,7 +1629,7 @@ in {
       };
       theme = "Nord";
       settings = {
-        background_opacity = "0.85";
+        background_opacity = "0.95";
         clear_all_shortcuts = true;
         scrollback_lines = 0;
         url_style = "none";
