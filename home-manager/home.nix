@@ -5048,15 +5048,53 @@ in {
 
   xresources = {
     path = "${config.xdg.configHome}/X11/xresources";
-    properties = {
-      "Xft.autohint" = 0;
-      "Xft.lcdfilter" = "lcddefault";
-      "Xft.hintstyle" = "hintslight";
-      "Xft.hinting" = 1;
-      "Xft.antialias" = 1;
-      "Xft.rgba" = "rgb";
-      "Xft.dpi" = 96;
-    };
+    properties = with lib.attrsets;
+      {
+        # fontconfig
+        "Xft.autohint" = 0;
+        "Xft.lcdfilter" = "lcddefault";
+        "Xft.hintstyle" = "hintslight";
+        "Xft.hinting" = 1;
+        "Xft.antialias" = 1;
+        "Xft.rgba" = "rgb";
+        "Xft.dpi" = 96;
+      }
+      # xterm
+      // (mapAttrs' (name: value: nameValuePair "XTerm.${name}" value) ({
+        termName = "xterm-256color";
+        buffered = true;
+        bufferedFPS = 60;
+        ttyModes = "erase ^?";
+      } // (mapAttrs' (name: value: nameValuePair "vt100.${name}" value) {
+        backarrowKey = false;
+        locale = false;
+        utf8 = true;
+        internalBorder = 11;
+        visualbell = true;
+        bellIsUrgent = true;
+        fullscreen = "never";
+        metaSendsEscape = true;
+        alternateScroll = true;
+        scrollTtyOutput = false;
+        boldColors = false;
+        faceName = "Iosevka NFM Light";
+        faceSize = 10;
+        faceSize1 = 6;
+        faceSize2 = 8;
+        faceSize3 = 10;
+        faceSize4 = 14;
+        faceSize5 = 18;
+        translations = ''
+          #override \
+            Ctrl <Key> minus: smaller-vt-font() \n\
+            Ctrl <Key> plus: larger-vt-font() \n\
+            Ctrl <Key> 0: set-vt-font(d) \n\
+            Shift <KeyPress> Insert: insert-selection(CLIPBOARD) \n\
+            Ctrl Shift <Key>V:    insert-selection(CLIPBOARD) \n\
+            Ctrl Shift <Key>C:    copy-selection(CLIPBOARD) \n\
+            Ctrl <Btn1Up>: exec-formatted("${pkgs.xdg-utils}/bin/xdg-open '%t'", PRIMARY)
+        '';
+      })));
     extraConfig = ''
       #include "${
         pkgs.fetchFromGitHub {
