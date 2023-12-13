@@ -5018,7 +5018,7 @@ in {
     };
   };
 
-  home.file = with config.xdg; {
+  home.file = {
     ".editrc".text = ''
       bind -v
     '';
