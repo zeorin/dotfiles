@@ -26,6 +26,7 @@ let
       (emacsPackagesFor emacs29).emacsWithPackages
       (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
     pathDeps = with pkgs; [
+      git
       dockfmt
       libxml2.bin
       rstfmt
