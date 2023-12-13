@@ -4784,41 +4784,6 @@ in {
       "wget/wgetrc".text = ''
         hsts-file = ${cacheHome}/wget-hsts
       '';
-      "X11/xresources".text = ''
-        Xft.autohint: 0
-        Xft.lcdfilter: lcddefault
-        Xft.hintstyle: hintslight
-        Xft.hinting: 1
-        Xft.antialias: 1
-        Xft.rgba: rgb
-        Xft.dpi: 96
-
-        ! Nord
-        ! https://github.com/arcticicestudio/nord-xresources/blob/develop/src/nord
-
-        *.foreground:   ${colors.nord4}
-        *.background:   ${colors.nord0}
-        *.cursorColor:  ${colors.nord4}
-        *fading: 35
-        *fadeColor: ${colors.nord3}
-
-        *.color0: ${colors.nord1}
-        *.color1: ${colors.nord11}
-        *.color2: ${colors.nord14}
-        *.color3: ${colors.nord13}
-        *.color4: ${colors.nord9}
-        *.color5: ${colors.nord15}
-        *.color6: ${colors.nord8}
-        *.color7: ${colors.nord5}
-        *.color8: ${colors.nord3}
-        *.color9: ${colors.nord11}
-        *.color10: ${colors.nord14}
-        *.color11: ${colors.nord13}
-        *.color12: ${colors.nord9}
-        *.color13: ${colors.nord15}
-        *.color14: ${colors.nord7}
-        *.color15: ${colors.nord6}
-      '';
     };
     dataFile = {
       docsets.source = pkgs.symlinkJoin {
@@ -5079,9 +5044,28 @@ in {
       pager = "${pkgs.ccze}/bin/ccze -A | ${pkgs.less}/bin/less -RSFXin"
       prompt="\n[\d] "
     '';
-    ".xprofile".text = ''
-      # Set up Xresources
-      ${pkgs.xorg.xrdb}/bin/xrdb -load ${configHome}/X11/xresources
+  };
+
+  xresources = {
+    path = "${config.xdg.configHome}/X11/xresources";
+    properties = {
+      "Xft.autohint" = 0;
+      "Xft.lcdfilter" = "lcddefault";
+      "Xft.hintstyle" = "hintslight";
+      "Xft.hinting" = 1;
+      "Xft.antialias" = 1;
+      "Xft.rgba" = "rgb";
+      "Xft.dpi" = 96;
+    };
+    extraConfig = ''
+      #include "${
+        pkgs.fetchFromGitHub {
+          owner = "nordtheme";
+          repo = "xresources";
+          rev = "2e4d108bcf044d28469e098979bf6294329813fc";
+          sha256 = "sha256-+f3ROQ2/2mh8wmMx0aGP1V0ZZTJH4sr0zyGGO/yLKss=";
+        }
+      }/src/nord"
     '';
   };
 
