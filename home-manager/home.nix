@@ -2896,7 +2896,7 @@ in {
           enable-scroll = false;
           wrapping-scroll = false;
 
-          format = "<label-mode> <label-state>";
+          format = "<label-mode> <label-state> ";
           format-foreground = colors.nord0;
           format-background = "${mkAlpha colors.nord3}";
           format-prefix = "  ";
