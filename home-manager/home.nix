@@ -2443,6 +2443,24 @@ in {
         }
       ];
     };
+    urxvt = {
+      enable = true;
+      fonts = [ "xft:Iosevka NFM Light:size=11" ];
+      keybindings = {
+        "Shift-Control-C" = "eval:selection_to_clipboard";
+        "Shift-Control-V" = "eval:paste_clipboard";
+      };
+      scroll.bar.enable = false;
+      extraConfig = {
+        internalBorder = 11;
+        scrollWithBuffer = true;
+        secondaryScreen = 1;
+        secondaryScroll = 0;
+        letterSpace = -1;
+        iso14755 = false;
+        iso14755_52 = false;
+      };
+    };
     vscode = with pkgs; {
       enable = true;
       package = vscode-fhs;
