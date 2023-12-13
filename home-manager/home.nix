@@ -2485,6 +2485,66 @@ in {
 
   services = {
     blueman-applet.enable = true;
+    darkman = {
+      enable = true;
+      settings = {
+        lat = -26.2;
+        lng = 28.0;
+        usegeoclue = true;
+        dbusserver = true;
+        portal = true;
+      };
+      darkModeScripts = {
+        notify = ''
+          ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
+        '';
+        gtk-theme = ''
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Dark"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Dark'"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
+          ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
+        '';
+        icon-theme = ''
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir-dark"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'Qogir-dark'"
+        '';
+        cursor-theme = ''
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord)"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'Capitaine Cursors (Nord)'"
+          ${pkgs.xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
+        '';
+        desktop-background = ''
+          ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
+            ./backgrounds/martian-terrain-dark.jpg
+          }
+        '';
+      };
+      lightModeScripts = {
+        notify = ''
+          ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
+        '';
+        gtk-theme = ''
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Light"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Light'"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+          ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
+        '';
+        icon-theme = ''
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'Qogir'"
+        '';
+        cursor-theme = ''
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord) - White"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'Capitaine Cursors (Nord) - White'"
+          ${pkgs.xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
+        '';
+        desktop-background = ''
+          ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
+            ./backgrounds/martian-terrain-light.jpg
+          }
+        '';
+      };
+    };
     dunst = {
       enable = true;
       settings = {
@@ -5057,83 +5117,6 @@ in {
     [
       asciinema
       nix-alien
-      darkman
-      (symlinkJoin {
-        name = "darkman-scripts";
-        paths = [
-          (symlinkJoin rec {
-            name = "dark-mode.d";
-            paths = (lib.attrsets.mapAttrsToList writeShellScriptDir {
-              "desktop-notification.sh" = ''
-                ${libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
-              '';
-              "gtk-theme.sh" = ''
-                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Dark"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Dark'"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
-                ${dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
-              '';
-              "icon-theme.sh" = ''
-                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir-dark"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'Qogir-dark'"
-              '';
-              "cursor-theme.sh" = ''
-                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord)"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'Capitaine Cursors (Nord)'"
-                ${xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
-              '';
-              "desktop-background.sh" = ''
-                ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
-                  ./backgrounds/martian-terrain-dark.jpg
-                }
-              '';
-            });
-            postBuild = ''
-              files=("$out"/*)
-              mkdir "$out/${name}"
-              mv "''${files[@]}" "$out/${name}"
-            '';
-          }).outPath
-          (symlinkJoin rec {
-            name = "light-mode.d";
-            paths = (lib.attrsets.mapAttrsToList writeShellScriptDir {
-              "desktop-notification.sh" = ''
-                ${libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
-              '';
-              "gtk-theme.sh" = ''
-                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Light"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Light'"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
-                ${dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
-              '';
-              "icon-theme.sh" = ''
-                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'Qogir'"
-              '';
-              "cursor-theme.sh" = ''
-                ${xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord) - White"
-                ${dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'Capitaine Cursors (Nord) - White'"
-                ${xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
-              '';
-              "desktop-background.sh" = ''
-                ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
-                  ./backgrounds/martian-terrain-light.jpg
-                }
-              '';
-            });
-            postBuild = ''
-              files=("$out"/*)
-              mkdir "$out/${name}"
-              mv "''${files[@]}" "$out/${name}"
-            '';
-          }).outPath
-        ];
-        postBuild = ''
-          files=("$out"/*)
-          mkdir "$out/share"
-          mv "''${files[@]}" "$out/share"
-        '';
-      })
       (symlinkJoin {
         name = "xdg-autostart-entries";
         paths = builtins.map makeDesktopItem [{
