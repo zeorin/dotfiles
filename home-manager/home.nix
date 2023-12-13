@@ -23,7 +23,7 @@ let
 
   my-emacs = let
     emacsPkg = with pkgs;
-      (emacsPackagesFor emacs29-gtk3).emacsWithPackages
+      (emacsPackagesFor emacs29).emacsWithPackages
       (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
     pathDeps = with pkgs; [
       dockfmt
