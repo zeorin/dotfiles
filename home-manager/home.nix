@@ -3722,6 +3722,7 @@ in {
       doom-emacs = {
         source = doomEmacsSource;
         onChange = "${pkgs.writeShellScript "doom-change" ''
+          export PATH="${my-emacs}/bin:$PATH"
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
           if [ ! -d "$DOOMLOCALDIR" ]; then
