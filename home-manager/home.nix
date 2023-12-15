@@ -3715,14 +3715,14 @@ in {
       doom-emacs = {
         source = doomEmacsSource;
         onChange = "${pkgs.writeShellScript "doom-change" ''
-          export PATH="${my-emacs}/bin:$PATH"
+          export PATH="${configHome}/doom-emacs/bin/:${my-emacs}/bin:$PATH"
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
           if [ ! -d "$DOOMLOCALDIR" ]; then
-            ${configHome}/doom-emacs/bin/doom --force install
+            doom --force install
           else
-            ${configHome}/doom-emacs/bin/doom --force clean
-            ${configHome}/doom-emacs/bin/doom --force sync -u
+            doom --force clean
+            doom --force sync -u
           fi
         ''}";
       };
@@ -4288,10 +4288,10 @@ in {
                  (default +bindings +smartparens))
         '';
         onChange = "${pkgs.writeShellScript "doom-config-init-change" ''
-          export PATH="${my-emacs}/bin:$PATH"
+          export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
-          ${configHome}/doom-emacs/bin/doom --force sync
+          doom --force sync
         ''}";
       };
       "doom/packages.el" = {
@@ -4361,10 +4361,10 @@ in {
           (package! langtool-popup)
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
-          export PATH="${my-emacs}/bin:$PATH"
+          export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
           export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
           export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
-          ${configHome}/doom-emacs/bin/doom --force sync -u
+          doom --force sync -u
         ''}";
       };
       emacs.source = builtins.fetchGit "https://github.com/plexus/chemacs2";
