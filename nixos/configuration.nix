@@ -9,6 +9,7 @@ let unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 in {
   imports = [
     <nixos-hardware/common/cpu/intel>
+    <home-manager/nixos>
     ./hardware-configuration.nix
     ./cachix.nix
     ./logiops.nix
@@ -484,6 +485,7 @@ in {
     extraGroups = [ "wheel" "networkmanager" "docker" "adbusers" "libvirtd" ];
   };
   users.groups.zeorin = { };
+  home-manager.users.zeorin = import ../home-manager/home.nix;
 
   networking = {
     iproute2.enable = true;

@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, config, lib, ... }@moduleArgs:
 
 let
   unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
@@ -397,19 +397,19 @@ let
         ++ (builtins.attrValues pkgs);
     });
 
-  nixosConfig = let
+  osConfig = moduleArgs.osConfig or (let
     pkgs = import <nixpkgs> {
       config = { };
       overlays = [ ];
     };
-  in (import "/etc/nixos/configuration.nix" {
+  in (import ../nixos/configuration.nix {
     inherit pkgs;
     inherit (pkgs) lib;
     config = { };
-  });
+  }));
 
 in {
-  nixpkgs.overlays = nixosConfig.nixpkgs.overlays ++ [
+  nixpkgs.overlays = osConfig.nixpkgs.overlays ++ [
     (import (builtins.fetchTarball
       "https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz"))
     (final: prev:
@@ -419,10 +419,10 @@ in {
         }/overlay.nix") { inherit final prev; })
   ];
 
-  nixpkgs.config = nixosConfig.nixpkgs.config // {
+  nixpkgs.config = osConfig.nixpkgs.config // {
     joypixels.acceptLicense = true;
     allowUnfreePredicate = (pkg:
-      (nixosConfig.nixpkgs.config.allowUnfreePredicate pkg)
+      (osConfig.nixpkgs.config.allowUnfreePredicate pkg)
       || (builtins.elem (lib.getName pkg) [
         "corefonts"
         "vista-fonts"
@@ -450,7 +450,7 @@ in {
         "cudatoolkit-11.8-tensorrt"
       ]));
     packageOverrides = pkgs:
-      (nixosConfig.nixpkgs.config.packageOverrides pkgs) // {
+      (osConfig.nixpkgs.config.packageOverrides pkgs) // {
         nur = import (builtins.fetchTarball
           "https://github.com/nix-community/NUR/archive/master.tar.gz") {
             inherit pkgs;
