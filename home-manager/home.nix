@@ -3590,7 +3590,7 @@ in {
           Description = "LanguageTool HTTP server";
           After = [ "network.target" ];
         };
-        Install.WantedBy = [ "multi-user.target" ];
+        Install.WantedBy = [ "default.target" ];
         Service.ExecStart = ''
           ${pkgs.languagetool}/bin/languagetool-http-server \
             --port 8081 \
