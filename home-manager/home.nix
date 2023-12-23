@@ -3104,7 +3104,7 @@ in {
           format-charging-foreground = colors.nord4;
           format-charging-background = "${mkAlpha colors.nord1}";
 
-          format-discharging = "<animation-discharging> <label-discharging>";
+          format-discharging = "<ramp-capacity> <label-discharging>";
           format-discharging-foreground = colors.nord4;
           format-discharging-background = "${mkAlpha colors.nord1}";
 
@@ -3129,13 +3129,6 @@ in {
           animation-charging-3 = " ";
           animation-charging-4 = " ";
           animation-charging-framerate = 750;
-
-          animation-discharging-0 = " ";
-          animation-discharging-1 = " ";
-          animation-discharging-2 = " ";
-          animation-discharging-3 = " ";
-          animation-discharging-4 = " ";
-          animation-discharging-framerate = 500;
 
           animation-low-0 = " ";
           animation-low-1 = " ";
