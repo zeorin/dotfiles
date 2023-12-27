@@ -3752,7 +3752,7 @@ in {
         ;;
         (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
               doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 12 :weight 'light)
-              doom-big-font (font-spec :size 18)
+              doom-big-font (font-spec :family "Iosevka Nerd Font" :size 18 :weight 'light)
               doom-symbol-font (font-spec :family "Symbols Nerd Font" :size 12)
               doom-serif-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
               nerd-icons-font-family "Iosevka NF Light")
