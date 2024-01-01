@@ -31,6 +31,7 @@ in {
       device = "nodev";
       efiSupport = true;
       configurationLimit = 10;
+      memtest86.enable = true;
     };
 
     plymouth.enable = true;
