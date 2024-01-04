@@ -5197,8 +5197,7 @@ in {
       curl
       httpie
       xdg-user-dirs
-      # https://github.com/NixOS/nixpkgs/issues/189567
-      wineWowPackages.stable
+      wineWowPackages.stableFull
       winetricks
       protontricks
       protonup
