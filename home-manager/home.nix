@@ -811,6 +811,10 @@ in {
           "widget.use-xdg-desktop-portal.settings" = 1;
           "widget.use-xdg-desktop-portal.location" = 1;
           "widget.use-xdg-desktop-portal.open-uri" = 1;
+          # Gluten-free
+          "cookiebanners.bannerClicking.enabled" = true;
+          "cookiebanners.service.mode" = 2;
+          "cookiebanners.service.mode.privateBrowsing" = 2;
         };
         noNoiseSuppression = {
           "media.getusermedia.aec_enabled" = false;
