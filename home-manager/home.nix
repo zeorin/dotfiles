@@ -583,7 +583,6 @@ in {
         g = "git";
         e = "edit.sh";
         m = "neomutt";
-        h = "home-manager";
         o = "xdg-open";
         s = "systemctl";
         t = "tail -f";
