@@ -133,7 +133,7 @@ let
   };
 
   scripts = {
-    isSshSession = pkgs.writeShellScript "is-ssh-session.sh" ''
+    isSshSession = pkgs.writeShellScript "is-ssh-session" ''
       if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ] || [ -n "$SSH_CONNECTION" ]; then
         exit 0
       else
@@ -144,7 +144,7 @@ let
       exit 1
     '';
     tmux = {
-      addTmuxTerminfo = pkgs.writeShellScript "add-tmux-terminfo.sh" ''
+      addTmuxTerminfo = pkgs.writeShellScript "add-tmux-terminfo" ''
         cat <<EOF|${pkgs.ncurses}/bin/tic -x -
         tmux|tmux terminal multiplexer,
           ritm=\E[23m, rmso=\E[27m, sitm=\E[3m, smso=\E[7m, Ms@,
@@ -154,7 +154,7 @@ let
           use=xterm+256setaf, use=tmux,
         EOF
       '';
-      sessionChooser = pkgs.writeShellScript "tmux-session-chooser.sh" ''
+      sessionChooser = pkgs.writeShellScript "tmux-session-chooser" ''
         if [ -z "$TMUX" ] && \
           [ -z "$EMACS" ] && \
           [ -z "$VIM" ] && \
@@ -482,14 +482,14 @@ in {
     sessionPath = [ "${config.xdg.configHome}/doom-emacs/bin" ];
     sessionVariables = with config.xdg;
       let
-        EDITOR = pkgs.writeShellScript "EDITOR.sh" ''
+        EDITOR = pkgs.writeShellScript "editor" ''
           if [ -n "$INSIDE_EMACS" ]; then
             ${my-emacs}/bin/emacsclient --quiet "$@"
           else
             ${my-emacs}/bin/emacsclient --tty --alternate-editor="" --quiet "$@"
           fi
         '';
-        VISUAL = pkgs.writeShellScript "VISUAL.sh" ''
+        VISUAL = pkgs.writeShellScript "visual" ''
           if [ -n "$INSIDE_EMACS" ]; then
             ${my-emacs}/bin/emacsclient --quiet "$@"
           elif [ "$SSH_TTY$DISPLAY" = "''${DISPLAY#*:[1-9][0-9]}" ]; then
@@ -504,7 +504,7 @@ in {
         # Non-standard env var, found in https://github.com/facebook/react/pull/22649
         EDITOR_URL = "editor://{path}:{line}";
         # Non-standard env var, found in https://github.com/yyx990803/launch-editor
-        LAUNCH_EDITOR = pkgs.writeShellScript "launch-editor.sh" ''
+        LAUNCH_EDITOR = pkgs.writeShellScript "launch-editor" ''
           file="$1"
           line="$2"
           column="$3"
@@ -544,12 +544,12 @@ in {
         # is found / no key is unlocked
         # Use `pass` to input SSH passwords
         SSH_ASKPASS_REQUIRE = "force";
-        SSH_ASKPASS = pkgs.writeShellScript "ssh-askpass-pass.sh" ''
+        SSH_ASKPASS = pkgs.writeShellScript "ssh-askpass-pass" ''
           key="$(echo "$1" | sed -e "s/^.*\/\(.*[^']\)'\{0,1\}:.*$/\1/")"
           ${pkgs.pass}/bin/pass "ssh/$key" | head -n1
         '';
         # Use `pass` to input the sudo password
-        SUDO_ASKPASS = pkgs.writeShellScript "sudo-askpass-pass.sh" ''
+        SUDO_ASKPASS = pkgs.writeShellScript "sudo-askpass-pass" ''
           hostname="$(${pkgs.hostname}/bin/hostname)"
           ${pkgs.pass}/bin/pass "$hostname/$USER" | head -n1
         '';
@@ -1268,7 +1268,7 @@ in {
         '';
       } // (let
         git-ignore = "!${
-            pkgs.writeShellScript "git-ignore.sh" ''
+            pkgs.writeShellScript "git-ignore" ''
               # Unofficial Bash strict mode
               set -euo pipefail
 
@@ -1616,7 +1616,7 @@ in {
       enable = true;
       package = let kitty = pkgs.kitty;
       in lib.attrsets.recursiveUpdate kitty {
-        passthru.set-theme = pkgs.writeShellScript "kitty-set-theme.sh" ''
+        passthru.set-theme = pkgs.writeShellScript "kitty-set-theme" ''
           ${config.programs.kitty.package}/bin/kitty +kitten themes --reload-in=all --config-file-name="theme.conf" "$@"
         '';
       };
@@ -3004,12 +3004,11 @@ in {
           bar-progress-empty-foreground = colors.nord3;
         };
         "module/yubikey" = let
-          indicator-script =
-            pkgs.writeShellScript "yubikey-indicator-script.sh" ''
-              ${pkgs.nmap}/bin/ncat --unixsock $XDG_RUNTIME_DIR/yubikey-touch-detector.socket | while read -n5 message; do
-                [[ $message = *1 ]] && echo "                " || echo ""
-              done
-            '';
+          indicator-script = pkgs.writeShellScript "yubikey-indicator" ''
+            ${pkgs.nmap}/bin/ncat --unixsock $XDG_RUNTIME_DIR/yubikey-touch-detector.socket | while read -n5 message; do
+              [[ $message = *1 ]] && echo "                " || echo ""
+            done
+          '';
         in {
           type = "custom/script";
           exec = indicator-script;
@@ -3325,7 +3324,7 @@ in {
             notification = false;
           }
           {
-            command = "${pkgs.writeShellScript "i3-session-start.sh" ''
+            command = "${pkgs.writeShellScript "i3-session-start" ''
               ${pkgs.systemd}/bin/systemctl --user set-environment I3SOCK=$(${config.xsession.windowManager.i3.package}/bin/i3 --get-socketpath)
               ${pkgs.systemd}/bin/systemctl --user start graphical-session-i3.target
             ''}";
@@ -3333,7 +3332,7 @@ in {
           }
           {
             command = let
-              on-exit = pkgs.writeShellScript "i3-session-exit.sh" ''
+              on-exit = pkgs.writeShellScript "i3-session-exit" ''
                 ${pkgs.systemd}/bin/systemctl --user stop graphical-session-i3.target
               '';
             in "${pkgs.writeScript "i3-on-exit.py" ''
@@ -4889,7 +4888,7 @@ in {
         name = "file:// scheme handler";
         comment = "Open file in editor";
         exec = "${
-            pkgs.writeShellScript "file-scheme-handler.sh" ''
+            pkgs.writeShellScript "file-scheme-handler" ''
               uri="$1"
               ${pkgs.xdg-utils}/bin/xdg-open "''${1//file:\/\//editor://}"
             ''
@@ -4904,7 +4903,7 @@ in {
         name = "editor:// scheme handler";
         comment = "Open file in editor";
         exec = "${
-            pkgs.writeShellScript "editor-scheme-handler.sh" ''
+            pkgs.writeShellScript "editor-scheme-handler" ''
               ${pkgs.xdg-utils}/bin/xdg-open "''${1//editor:\/\//emacs://}"
             ''
           } %u";
@@ -4918,9 +4917,7 @@ in {
         name = "emacs:// scheme handler";
         comment = "Open file in Emacs";
         exec = "${
-            pkgs.writeShellScript "emacs-scheme-handler.sh" ''
-              #!/usr/bin/env bash
-
+            pkgs.writeShellScript "emacs-scheme-handler" ''
               # Unofficial Bash strict mode
               set -euo pipefail
 
@@ -5171,7 +5168,7 @@ in {
         '';
       })
       my-emacs
-      (writeShellScriptBin "edit.sh" ''
+      (writeShellScriptBin "edit" ''
         if [ -n "$INSIDE_EMACS" ]; then
           ${my-emacs}/bin/emacsclient --no-wait --quiet "$@"
         elif [ "$SSH_TTY$DISPLAY" = "''${DISPLAY#*:[1-9][0-9]}" ]; then

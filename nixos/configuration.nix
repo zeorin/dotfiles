@@ -94,7 +94,7 @@ in {
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${
-            pkgs.writeShellScript "attach-ddcci.sh" ''
+            pkgs.writeShellScript "attach-ddcci" ''
               echo "Trying to attach ddcci to $1"
               success=0
               i=0
@@ -155,8 +155,8 @@ in {
     IdleAction=suspend-then-hibernate
     IdleActionSec=1h
   '';
-  environment.etc."systemd/system-sleep/post-hibernate-pkill-slock.sh".source =
-    pkgs.writeShellScript "post-hibernate-pkill-slock.sh" ''
+  environment.etc."systemd/system-sleep/post-hibernate-pkill-slock".source =
+    pkgs.writeShellScript "post-hibernate-pkill-slock" ''
       if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
         ${pkgs.procps}/bin/pkill slock
       fi
@@ -662,7 +662,7 @@ in {
   # might not be because it's run as root for OOM killer protection
   programs.slock.enable = true;
   programs.xss-lock = let
-    dim-screen = pkgs.writeShellScript "dim-screen.sh" ''
+    dim-screen = pkgs.writeShellScript "dim-screen" ''
       min_brightness=0
 
       # 60 FPS baby!
