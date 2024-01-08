@@ -8,7 +8,7 @@ let unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 
 in {
   imports = [
-    <nixos-hardware/common/cpu/intel>
+    <nixos-hardware/common/cpu/intel/cpu-only.nix>
     <home-manager/nixos>
     ./hardware-configuration.nix
     ./cachix.nix
@@ -138,6 +138,8 @@ in {
   services.tlp = {
     enable = true;
     settings = {
+      CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
       NMI_WATCHDOG = 0;
       SOUND_POWER_SAVE_ON_AC = 0;
       USB_BLACKLIST_PHONE = 1;
