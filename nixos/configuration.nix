@@ -9,6 +9,7 @@ let unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 in {
   imports = [
     <nixos-hardware/common/cpu/intel/cpu-only.nix>
+    <nixos-hardware/common/gpu/nvidia>
     <home-manager/nixos>
     ./hardware-configuration.nix
     ./cachix.nix
@@ -324,9 +325,6 @@ in {
   services.xserver = {
     enable = true;
 
-    # NVIDIA drivers
-    videoDrivers = [ "nvidia" ];
-
     serverFlagsSection = ''
       Option "StandbyTime"  "5"
       Option "SuspendTime"  "5"
@@ -566,12 +564,12 @@ in {
   services.blueman.enable = true;
 
   # Accelerated Video Playback
-  hardware.opengl.enable = true;
-  hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-    powerManagement.enable = true;
-    modesetting.enable = true;
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
   };
+  hardware.nvidia.modesetting.enable = true;
   # nixpkgs.config.cudaSupport = true;
   nixpkgs.config.cudaCapabilities = [ "5.2" ];
   nixpkgs.config.cudaForwardCompat = false;
