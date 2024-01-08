@@ -5015,19 +5015,6 @@ in {
         terminal = false;
         categories = [ "System" ];
       };
-      spotify-firefox-kiosk = {
-        name = "Spotify Firefox Kiosk";
-        exec =
-          "${config.programs.firefox.package}/bin/firefox -P spotify-kiosk --class spotify-kiosk --kiosk %U";
-        icon = "spotify-client";
-        genericName = "Music Player";
-        categories = [ "Audio" "Music" "Player" "AudioVideo" ];
-        type = "Application";
-        terminal = false;
-        startupNotify = true;
-        mimeType = [ "x-scheme-handler/spotify" ];
-        settings = { StartupWMClass = "spotify-kiosk"; };
-      };
     };
   };
 
