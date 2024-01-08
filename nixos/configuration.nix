@@ -49,7 +49,7 @@ in {
       };
     };
 
-    kernelParams = [ "quiet" "udev.log_level=3" ];
+    kernelParams = [ "quiet" "udev.log_level=3" "libata.noacpi=1" ];
     kernelPackages = unstable.linuxPackages_zen;
     extraModulePackages = with config.boot.kernelPackages; [
       # exfat-nofuse
