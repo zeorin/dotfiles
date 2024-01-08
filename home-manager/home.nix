@@ -486,19 +486,10 @@ in {
           if [ -n "$INSIDE_EMACS" ]; then
             ${my-emacs}/bin/emacsclient --quiet "$@"
           else
-            ${my-emacs}/bin/emacsclient --tty --alternate-editor="" --quiet "$@"
-          fi
-        '';
-        VISUAL = pkgs.writeShellScript "visual" ''
-          if [ -n "$INSIDE_EMACS" ]; then
-            ${my-emacs}/bin/emacsclient --quiet "$@"
-          elif [ "$SSH_TTY$DISPLAY" = "''${DISPLAY#*:[1-9][0-9]}" ]; then
-            # If we're not connected via SSH and the DISPLAY is less than 10
             ${my-emacs}/bin/emacsclient --create-frame --alternate-editor="" --quiet "$@"
-          else
-            ${EDITOR} "$@"
           fi
         '';
+        VISUAL = EDITOR;
       in rec {
         inherit EDITOR VISUAL;
         # Non-standard env var, found in https://github.com/facebook/react/pull/22649
@@ -514,7 +505,7 @@ in {
           [ -n "$column" ] && command="$command:$column"
           eval $command
         '';
-        SUDO_EDITOR = VISUAL;
+        SUDO_EDITOR = EDITOR;
         LESS = "-FiRx4";
         PAGER = "less ${LESS}";
         # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
@@ -581,7 +572,7 @@ in {
       # (nomAliases { inherit (pkgs) nix nixos-rebuild home-manager; }) // {
       {
         g = "git";
-        e = "edit.sh";
+        e = toString config.home.sessionVariables.EDITOR;
         m = "neomutt";
         o = "xdg-open";
         s = "systemctl";
@@ -1252,7 +1243,7 @@ in {
         edit-dirty = lib.strings.removeSuffix "\n" ''
           !git status --porcelain |
             ${pkgs.gnused}/bin/sed s/^...// |
-            ${pkgs.findutils}/bin/xargs -r $VISUAL
+            ${pkgs.findutils}/bin/xargs -r "$EDITOR"
         '';
         tracked-ignores = lib.strings.removeSuffix "\n" ''
           !git ls-files |
@@ -1830,7 +1821,7 @@ in {
 
           ## Programs to be used
           # Editor
-          EDITOR='${config.home.sessionVariables.VISUAL}'
+          EDITOR='${config.home.sessionVariables.EDITOR}'
 
           # Browser
           BROWSER='${pkgs.xdg-utils}/bin/xdg-open'
