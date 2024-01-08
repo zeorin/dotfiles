@@ -5138,6 +5138,7 @@ in {
 
   home.packages = with pkgs;
     [
+      brightnessctl
       asciinema
       nix-alien
       (symlinkJoin {
