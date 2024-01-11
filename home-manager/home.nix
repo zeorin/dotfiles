@@ -1154,16 +1154,6 @@ in {
         };
         log.abbrevCommit = true;
       };
-      includes = [
-        {
-          path = "~/Code/WyzeTalk/.gitconfig";
-          condition = "gitdir:~/Code/WyzeTalk/";
-        }
-        {
-          path = "~/Code/NectaTech/.gitconfig";
-          condition = "gitdir:~/Code/NectaTech/";
-        }
-      ];
       signing = {
         key = myKey;
         signByDefault = true;
