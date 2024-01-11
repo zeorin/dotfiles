@@ -1971,48 +1971,7 @@ in {
       '';
       includes = [ "config_local" ];
     };
-    starship = {
-      enable = true;
-      settings = {
-        aws.symbol = " ";
-        azure.symbol = "ﴃ ";
-        c.symbol = " ";
-        container.symbol = " ";
-        dart.symbol = " ";
-        docker_context.symbol = " ";
-        dotnet.symbol = " ";
-        elixir.symbol = " ";
-        elm.symbol = " ";
-        gcloud.symbol = " ";
-        git_branch.symbol = " ";
-        git_commit.tag_symbol = " ";
-        golang.symbol = " ";
-        haskell.symbol = " ";
-        # hostname.ssh_symbol = " ";
-        hg_branch.symbol = " ";
-        java.symbol = " ";
-        jobs.symbol = " ";
-        julia.symbol = " ";
-        lua.symbol = " ";
-        memory_usage.symbol = " ";
-        nim.symbol = " ";
-        nix_shell.symbol = " ";
-        nodejs.symbol = " ";
-        package.symbol = " ";
-        perl.symbol = " ";
-        php.symbol = " ";
-        python.symbol = " ";
-        ruby.symbol = " ";
-        rust.symbol = " ";
-        scala.symbol = " ";
-        swift.symbol = " ";
-        custom.direnv = {
-          format = "[\\[direnv\\]]($style) ";
-          style = "fg:yellow dimmed";
-          when = "printenv DIRENV_FILE";
-        };
-      };
-    };
+    starship.enable = true;
     tmux = {
       enable = true;
       baseIndex = 1;
@@ -4626,6 +4585,10 @@ in {
             "\C-n": history-search-forward
         $endif
       '';
+      "starship.toml".source = pkgs.fetchurl {
+        url = "https://starship.rs/presets/toml/nerd-font-symbols.toml";
+        hash = "sha256-BVe5JMSIa3CoY2Wf9pvcF1EUtDVCWCLhW3IyKuwfHug=";
+      };
       "todo/config".text = ''
         export TODO_DIR="${userDirs.documents}/todo"
         export TODO_FILE="$TODO_DIR/todo.txt"
