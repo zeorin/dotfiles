@@ -4071,6 +4071,9 @@ in {
 
         (use-package! langtool-popup
           :after langtool)
+
+        (use-package! evil-little-word
+          :after evil)
       '';
       "doom/init.el" = {
         text = ''
@@ -4348,6 +4351,10 @@ in {
           (package! vulpea)
 
           (package! langtool-popup)
+
+          (package! evil-little-word
+            :recipe (:host github :repo "tarao/evil-plugins"
+                     :files ("evil-little-word.el")))
         '';
         onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
           export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
