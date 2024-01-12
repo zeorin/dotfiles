@@ -754,11 +754,11 @@ in {
     configPackages = with pkgs; [ xdg-desktop-portal-gtk ];
   };
 
-  # Enable nix ld
+  # Compatibility for binaries
+  services.envfs.enable = true;
   programs.nix-ld.enable = true;
+  # https://github.com/Mic92/dotfiles/blob/main/nixos/modules/nix-ld.nix
   programs.nix-ld.libraries = with pkgs; [
-    stdenv.cc.cc
-    fuse3
     alsa-lib
     at-spi2-atk
     at-spi2-core
@@ -770,26 +770,31 @@ in {
     expat
     fontconfig
     freetype
+    fuse3
     gdk-pixbuf
     glib
     gtk3
+    icu
     libGL
     libappindicator-gtk3
     libdrm
+    libglvnd
     libnotify
     libpulseaudio
-    libuuid
+    libunwind
     libusb1
-    xorg.libxcb
+    libuuid
     libxkbcommon
+    libxml2
     mesa
     nspr
     nss
+    openssl
     pango
     pipewire
+    stdenv.cc.cc
     systemd
-    icu
-    openssl
+    vulkan-loader
     xorg.libX11
     xorg.libXScrnSaver
     xorg.libXcomposite
@@ -801,6 +806,7 @@ in {
     xorg.libXrandr
     xorg.libXrender
     xorg.libXtst
+    xorg.libxcb
     xorg.libxkbfile
     xorg.libxshmfence
     zlib
