@@ -751,7 +751,10 @@ in {
   # Move this to home-manager when ready: https://github.com/nix-community/home-manager/issues/1167
   xdg.portal = {
     enable = true;
+    xdgOpenUsePortal = true;
+    extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
     configPackages = with pkgs; [ xdg-desktop-portal-gtk ];
+    config = { common = { default = [ "gtk" ]; }; };
   };
 
   # Compatibility for binaries
