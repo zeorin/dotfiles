@@ -221,6 +221,29 @@ let
         executable = true;
       };
     };
+    setDesktopBackground = pkgs.writeShellScript "set-desktop-background" ''
+      color_scheme="$(${pkgs.darkman}/bin/darkman get)"
+
+      if [ -f "${config.xdg.dataHome}/picom/env" ]; then
+        source "${config.xdg.dataHome}/picom/env"
+      fi
+
+      if [ "$PICOM_SHADER" = "grayscale" ]; then
+        color_scheme="''${color_scheme}-gray"
+      fi
+
+      if [ "$color_scheme" = "light" ]; then
+        background_image="${./backgrounds/martian-terrain-light.jpg}"
+      elif [ "$color_scheme" = "light-gray" ]; then
+        background_image="${./backgrounds/martian-terrain-light-gray.jpg}"
+      elif [ "$color_scheme" = "dark" ]; then
+        background_image="${./backgrounds/martian-terrain-dark.jpg}"
+      elif [ "$color_scheme" = "dark-gray" ]; then
+        background_image="${./backgrounds/martian-terrain-dark-gray.jpg}"
+      fi
+
+      ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill "$background_image"
+    '';
   };
   terminal-emulator = "${config.programs.kitty.package}/bin/kitty";
 
@@ -556,7 +579,7 @@ in {
         done
 
         # Data dirs
-        for dir in bash go pass stack wineprefixes; do
+        for dir in bash go pass stack wineprefixes picom; do
           $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
             ${dataHome}/$dir
         done
@@ -2476,9 +2499,7 @@ in {
           ${pkgs.xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
         '';
         desktop-background = ''
-          ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
-            ./backgrounds/martian-terrain-dark.jpg
-          }
+          ${scripts.setDesktopBackground}
         '';
       };
       lightModeScripts = {
@@ -2501,9 +2522,7 @@ in {
           ${pkgs.xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
         '';
         desktop-background = ''
-          ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${
-            ./backgrounds/martian-terrain-light.jpg
-          }
+          ${scripts.setDesktopBackground}
         '';
       };
     };
@@ -2579,6 +2598,42 @@ in {
     nextcloud-client.enable = true;
     picom = {
       enable = true;
+      package = pkgs.symlinkJoin {
+        name = "picom";
+        paths = [
+          (pkgs.writeShellScriptBin "picom" (let
+            grayscale-glsl = pkgs.writeText "grayscale.glsl" ''
+              #version 330
+
+              in vec2 texcoord;
+              uniform sampler2D tex;
+              uniform float opacity;
+
+              vec4 default_post_processing(vec4 c);
+
+              vec4 window_shader() {
+                vec2 texsize = textureSize(tex, 0);
+                vec4 color = texture2D(tex, texcoord / texsize, 0);
+
+                color = vec4(vec3(0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) * opacity, color.a * opacity);
+
+                return default_post_processing(color);
+              }
+            '';
+          in ''
+            if [ "$PICOM_SHADER" = "grayscale" ]; then
+              "${pkgs.picom}/bin/picom" \
+                --window-shader-fg="${grayscale-glsl}" \
+                "$@"
+            else
+              "${pkgs.picom}/bin/picom" "$@"
+            fi
+          ''))
+          pkgs.picom
+        ];
+      } // {
+        inherit (pkgs.picom) meta;
+      };
       backend = "glx";
       fade = true;
       fadeDelta = 3;
@@ -3154,6 +3209,19 @@ in {
         "super + m" = "${pkgs.dunst}/bin/dunstctl action 0";
         "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
 
+        # Toggle grayscale
+        "super + shift + g" = "${pkgs.writeShellScript "toggle-grayscale" ''
+          if [ -f ${config.xdg.dataHome}/picom/env ]; then
+            rm ${config.xdg.dataHome}/picom/env
+            ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to colour mode"
+          else
+            ln -s ${config.xdg.configHome}/picom/env-grayscale ${config.xdg.dataHome}/picom/env
+            ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to grayscale mode"
+          fi
+          ${scripts.setDesktopBackground}
+          ${pkgs.systemd}/bin/systemctl --user restart picom.service
+        ''}";
+
         # Toggle dark mode
         "super + shift + d" = "${pkgs.darkman}/bin/darkman toggle";
 
@@ -3216,8 +3284,9 @@ in {
 
   xsession = {
     enable = true;
-    initExtra = let backgroundImage = ./backgrounds/martian-terrain-light.jpg;
-    in "${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill ${backgroundImage} &";
+    initExtra = ''
+      ${scripts.setDesktopBackground} &
+    '';
     windowManager.i3 = {
       enable = true;
       package = pkgs.i3-gaps;
@@ -3574,6 +3643,7 @@ in {
         Install.WantedBy = [ "default.target" ];
         Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
       };
+      picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
       polkit-authentication-agent = {
         Unit = {
           Description = "Polkit authentication agent";
@@ -4418,6 +4488,9 @@ in {
         init-license=LGPL-3.0
         prefix=${dataHome}/npm
         cache=${cacheHome}/npm
+      '';
+      "picom/env-grayscale".text = ''
+        PICOM_SHADER="grayscale"
       '';
       "pipewire/pipewire.conf.d/10-source-rnnoise.conf" = {
         text = ''
