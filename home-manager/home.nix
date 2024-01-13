@@ -2693,8 +2693,6 @@ in {
           "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
           # i3 borders
           "class_g = 'i3-frame'"
-          # Polybar tray
-          "class_g = 'Polybar' && class_i = 'tray'"
           # GTK
           "_GTK_FRAME_EXTENTS@:c"
           "class_g ~= 'xdg-desktop-portal' && _NET_FRAME_EXTENTS@:c && window_type = 'dialog'"
@@ -2785,18 +2783,17 @@ in {
           };
         mkFormats = let
           formats = [
-            "content"
             "format"
-            "format-volume"
-            "format-muted"
-            "format-mounted"
-            "format-unmounted"
-            "format-connected"
-            "format-disconnected"
-            "format-charging"
-            "format-discharging"
-            "format-full"
-            "format-low"
+            # "format-volume"
+            # "format-muted"
+            # "format-mounted"
+            # "format-unmounted"
+            # "format-connected"
+            # "format-disconnected"
+            # "format-charging"
+            # "format-discharging"
+            # "format-full"
+            # "format-low"
           ];
         in attrset:
         lib.lists.foldr (format: acc:
@@ -2814,6 +2811,7 @@ in {
           compositing-overline = "over";
           compositing-underline = "over";
           compositing-border = "over";
+          pseudo-transparency = false;
         };
         "bar/top" = {
           inherit (colors) foreground;
@@ -2824,12 +2822,10 @@ in {
           dpi = 0;
           width = "100%";
           height = "${toString (24.0 / 1080 * 100)}%";
-
-          modules-left = "i3 title";
-          # modules-center = "yubikey mpd";
-          modules-center = "yubikey";
-          modules-right =
-            "audio-input audio-output xkeyboard battery date tray-arrow";
+          enable-struts = true;
+          double-click-interval = 150;
+          override-redirect = false;
+          wm-restack = "i3";
 
           fixed-center = true;
 
@@ -2843,60 +2839,65 @@ in {
           format-foreground = colors.foreground;
           format-background = "${mkAlpha colors.background}";
 
-          tray-position = "\${env:TRAY_POSITION:}";
-          tray-background = colors.nord3;
-          tray-foreground = colors.nord4;
-          tray-padding = 2;
+          modules-left = "i3 title";
+          # modules-center = "yubikey mpd";
+          modules-center = "yubikey";
+          modules-right = "audio-input audio-output xkeyboard battery date";
+        };
+        "bar/top-primary" = {
+          "inherit" = "bar/top";
+          modules-right =
+            "audio-input audio-output xkeyboard battery date tray";
         };
         "powerline/right-facing-arrow" = {
           type = "custom/text";
-          content = "";
-          content-font = 2;
-          content-foreground = "\${self.background}";
-          content-background = "\${self.background-next}";
+          label = "";
+          label-font = 2;
+          label-foreground = "\${self.background}";
+          label-background = "\${self.background-next}";
         };
         "powerline/right-facing-separator" = {
           type = "custom/text";
-          content = "";
-          content-font = 2;
-          content-foreground = "\${self.separator}";
-          content-background = "\${self.background}";
+          label = "";
+          label-font = 2;
+          label-foreground = "\${self.separator}";
+          label-background = "\${self.background}";
         };
         "powerline/left-facing-arrow" = {
           type = "custom/text";
-          content = "";
-          content-font = 2;
-          content-foreground = "\${self.background}";
-          content-background = "\${self.background-next}";
+          label = "";
+          label-font = 2;
+          label-foreground = "\${self.background}";
+          label-background = "\${self.background-next}";
         };
         "powerline/left-facing-separator" = {
           type = "custom/text";
-          content = "";
-          content-font = 2;
-          content-foreground = "\${self.separator}";
-          content-background = "\${self.background}";
+          label = "";
+          label-font = 2;
+          label-foreground = "\${self.separator}";
+          label-background = "\${self.background}";
         };
         "powerline/left-section-arrow" = mkFormats {
-          suffix = "\${powerline/right-facing-arrow.content}";
-          suffix-font = "\${powerline/right-facing-arrow.content-font}";
+          suffix = "\${powerline/right-facing-arrow.label}";
+          suffix-font = "\${powerline/right-facing-arrow.label-font}";
           suffix-foreground = "\${self.background}";
           suffix-background = "\${self.background-next}";
         };
         "powerline/left-section-separator" = mkFormats {
-          prefix = "\${powerline/right-facing-separator.content}";
-          prefix-font = "\${powerline/right-facing-separator.content-font}";
+          prefix = "\${powerline/right-facing-separator.label}";
+          prefix-font = "\${powerline/right-facing-separator.label-font}";
           prefix-foreground = "\${self.separator}";
           prefix-background = "\${self.background}";
         };
         "powerline/right-section-arrow" = mkFormats {
-          prefix = "\${powerline/left-facing-arrow.content}";
-          prefix-font = "\${powerline/left-facing-arrow.content-font}";
+          prefix = "\${powerline/left-facing-arrow.label}";
+          prefix-font = "\${powerline/left-facing-arrow.label-font}";
           prefix-foreground = "\${self.background}";
           prefix-background = "\${self.background-next}";
         };
         "powerline/right-section-separator" = mkFormats {
-          suffix = "\${powerline/left-facing-separator.content}";
-          suffix-font = "\${powerline/left-facing-separator.content-font}";
+          suffix = "\${powerline/left-facing-separator.label}";
+          suffix-font = "\${powerline/left-facing-separator.label-font}";
           suffix-foreground = "\${self.separator}";
           suffix-background = "\${self.background}";
         };
@@ -3007,12 +3008,12 @@ in {
           tail = true;
           format-background = colors.urgent;
           format-foreground = "${mkAlpha colors.background}";
-          format-prefix = "\${powerline/left-facing-arrow.content}";
-          format-prefix-font = "\${powerline/left-facing-arrow.content-font}";
+          format-prefix = "\${powerline/left-facing-arrow.label}";
+          format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
           format-prefix-foreground = colors.urgent;
           format-prefix-background = "${mkAlpha colors.background}";
-          format-suffix = "\${powerline/right-facing-arrow.content}";
-          format-suffix-font = "\${powerline/right-facing-arrow.content-font}";
+          format-suffix = "\${powerline/right-facing-arrow.label}";
+          format-suffix-font = "\${powerline/right-facing-arrow.label-font}";
           format-suffix-foreground = colors.urgent;
           format-suffix-background = "${mkAlpha colors.background}";
         };
@@ -3020,8 +3021,8 @@ in {
           "inherit" = "powerline/right-section-separator";
           format-foreground = colors.nord4;
           format-background = "${mkAlpha colors.nord1}";
-          format-prefix = "\${powerline/left-facing-arrow.content}";
-          format-prefix-font = "\${powerline/left-facing-arrow.content-font}";
+          format-prefix = "\${powerline/left-facing-arrow.label}";
+          format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
           format-prefix-foreground = "${mkAlpha colors.nord1}";
           format-prefix-background = "${mkAlpha colors.nord0}";
           background = "${mkAlpha colors.nord1}";
@@ -3151,10 +3152,19 @@ in {
 
           label = "%time%%date%";
         };
-        "module/tray-arrow" = {
-          "inherit" = "powerline/left-facing-arrow";
-          background = colors.nord3;
+        "module/tray" = {
+          "inherit" = "powerline/right-section-arrow";
+          background = "${mkAlpha colors.nord3}";
           background-next = "${mkAlpha colors.nord1}";
+          format-foreground = colors.nord0;
+          format-background = "${mkAlpha colors.nord3}";
+          label-tray-padding = "8px";
+
+          type = "internal/tray";
+
+          tray-background = "${mkAlpha colors.nord3}";
+          tray-foreground = colors.nord4;
+          tray-padding = 2;
         };
       };
       script = ''
@@ -3163,7 +3173,7 @@ in {
           monitor=$(echo $line | ${pkgs.coreutils}/bin/cut -d':' -f1)
           primary=$(echo $line | ${pkgs.coreutils}/bin/cut -d' ' -f3)
           tray_position=$([ -n "$primary" ] && echo "right" || echo "none")
-          MONITOR=$monitor TRAY_POSITION=$tray_position polybar --reload top &
+          MONITOR=$monitor polybar --reload "top''${primary:+"-primary"}" &
         done
       '';
     };
@@ -3338,18 +3348,18 @@ in {
           }
           {
             command = let
-              on-exit = pkgs.writeShellScript "i3-session-exit" ''
+              i3-session-exit = pkgs.writeShellScript "i3-session-exit" ''
                 ${pkgs.systemd}/bin/systemctl --user stop graphical-session-i3.target
               '';
-            in "${pkgs.writeScript "i3-on-exit.py" ''
+            in "${pkgs.writeScript "i3-on-exit" ''
               #!${pkgs.python3.withPackages (ps: with ps; [ i3ipc ])}/bin/python
               from subprocess import Popen
               from i3ipc.aio import Connection, Event
 
               def on_exit(i3, e):
-                  Popen(['${on-exit}'])
+                  Popen(['${i3-session-exit}'])
 
-              await i3 = Connection().connect()
+              i3 = await Connection().connect()
 
               i3.on(Event.SHUTDOWN_EXIT, on_exit)
 
