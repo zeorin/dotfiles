@@ -2538,9 +2538,7 @@ in {
           frame_width = 0;
           separator_color = "#00000000";
           font = "Iosevka Nerd Font 10";
-          format = ''
-            <b>%s</b>
-            %b'';
+          format = "<b>%s</b>\\n%b";
           vertical_alignment = "top";
           show_age_threshold = "5m";
           icon_position = "left";
@@ -2553,7 +2551,6 @@ in {
           mouse_right_click = "do_action";
           fullscreen = "pushback";
           timeout = "30s";
-          startup_notification = false;
           markup = "full";
           foreground = colors.nord6;
         };
