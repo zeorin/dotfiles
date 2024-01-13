@@ -2594,6 +2594,7 @@ in {
       enable = true;
       indicator = true;
     };
+    mpris-proxy.enable = true;
     network-manager-applet.enable = true;
     nextcloud-client.enable = true;
     picom = {
@@ -3634,14 +3635,6 @@ in {
               }
             }
         '';
-      };
-      mpris-proxy = {
-        Unit = {
-          Description = "Forward bluetooth media controls to MPRIS";
-          After = [ "network.target" "sound.target" ];
-        };
-        Install.WantedBy = [ "default.target" ];
-        Service.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
       };
       picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
       polkit-authentication-agent = {
