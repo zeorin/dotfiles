@@ -25,8 +25,29 @@ let
     emacsPkg = with pkgs;
       (emacsPackagesFor emacs29).emacsWithPackages
       (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
+    emacsLspBooster = pkgs.rustPlatform.buildRustPackage rec {
+      pname = "emacs-lsp-booster";
+      version = "0.1.1";
+      src = pkgs.fetchFromGitHub {
+        owner = "blahgeek";
+        repo = "emacs-lsp-booster";
+        rev = "v${version}";
+        hash = "sha256-0roQxzQrxcmS2RHQPguBRL76xSErf2hVjuJEyFr5MeM=";
+      };
+
+      cargoHash = "sha256-quqhAMKsZorYKFByy2bojGgYR2Ps959Rg/TP8SnwbqM=";
+      doCheck = false;
+
+      meta = {
+        description = "Emacs LSP performance booster";
+        homepage = "https://github.com/blahgeek/emacs-lsp-booster";
+        license = lib.licenses.mit;
+        maintainers = [ lib.maintainers.acowley ];
+      };
+    };
     pathDeps = with pkgs; [
       git
+      emacsLspBooster
       dockfmt
       libxml2.bin
       rstfmt
@@ -4018,7 +4039,34 @@ in {
 
         (after! lsp-mode
           (setq lsp-enable-suggest-server-download nil
-                lsp-clients-typescript-prefer-use-project-ts-server t))
+                lsp-clients-typescript-prefer-use-project-ts-server t)
+          (defun lsp-booster--advice-json-parse (old-fn &rest args)
+            "Try to parse bytecode instead of json."
+            (or
+            (when (equal (following-char) ?#)
+              (let ((bytecode (read (current-buffer))))
+                (when (byte-code-function-p bytecode)
+                  (funcall bytecode))))
+            (apply old-fn args)))
+          (advice-add (if (progn (require 'json)
+                                (fboundp 'json-parse-buffer))
+                          'json-parse-buffer
+                        'json-read)
+                      :around
+                      #'lsp-booster--advice-json-parse)
+          (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+            "Prepend emacs-lsp-booster command to lsp CMD."
+            (let ((orig-result (funcall old-fn cmd test?)))
+              (if (and (not test?)                             ;; for check lsp-server-present?
+                      (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+                      lsp-use-plists
+                      (not (functionp 'json-rpc-connection))  ;; native json-rpc
+                      (executable-find "emacs-lsp-booster"))
+                  (progn
+                    (message "Using emacs-lsp-booster for %s!" orig-result)
+                    (cons "emacs-lsp-booster" orig-result))
+                orig-result)))
+          (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 
         ;; Debug Adapter Protocol
         (setq dap-firefox-debug-path "${pkgs.vscode-extensions.firefox-devtools.vscode-firefox-debug}/share/vscode/extensions/firefox-devtools.vscode-firefox-debug"
