@@ -86,7 +86,6 @@ in {
         ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
     '')
     pkgs.vial
-    pkgs.qmk-udev-rules
   ];
   systemd.services = {
     "ddcci@" = {
@@ -557,6 +556,8 @@ in {
   };
 
   services.tailscale.enable = true;
+
+  hardware.keyboard.qmk.enable = true;
 
   # i2c
   hardware.i2c.enable = true;
