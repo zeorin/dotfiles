@@ -597,8 +597,6 @@ in {
 
   # Automount USB
   services.gvfs.enable = true;
-  services.udisks2.enable = true;
-  services.devmon.enable = true;
 
   # Thumbnail previews for file managers
   services.tumbler.enable = true;
