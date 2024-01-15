@@ -70,21 +70,23 @@ in {
     '';
     supportedFilesystems = [ "ntfs" ];
   };
-  services.udev.packages = with pkgs; [
-    (runCommand "99-ddcci.rules" { } ''
-      mkdir -p $out/etc/udev/rules.d
-      ln -s ${
-        writeText "99-ddcci.rules" ''
-          SUBSYSTEM=="i2c-dev", ACTION=="add", \
-            ATTR{name}=="NVIDIA i2c adapter*", \
-            TAG+="ddcci", \
-            TAG+="systemd", \
-            ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
-        ''
-      } $out/etc/udev/rules.d/99-ddcci.rules
+  services.udev.packages = let
+    mkUdevRules = (name: text:
+      (pkgs.writeTextFile {
+        inherit name;
+        text = lib.strings.stringAsChars (x: if x == "\n" then " " else x) text;
+        destination = "/etc/udev/rules.d/${name}";
+      }));
+  in [
+    (mkUdevRules "99-ddcci.rules" ''
+      SUBSYSTEM=="i2c-dev", ACTION=="add",
+        ATTR{name}=="NVIDIA i2c adapter*",
+        TAG+="ddcci",
+        TAG+="systemd",
+        ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
     '')
-    qmk-udev-rules
-    vial
+    pkgs.vial
+    pkgs.qmk-udev-rules
   ];
   systemd.services = {
     "ddcci@" = {
@@ -112,7 +114,7 @@ in {
         Restart = "no";
       };
     };
-    "v4l2loopback-test-card" = {
+    v4l2loopback-test-card = {
       description = "OBS Camera test card, shown on timeout";
       after = [ "graphical.target" ];
       before = [ "shutdown.target" ];
