@@ -343,14 +343,6 @@ in {
       Option "DPI" "96 x 96"
     '';
 
-    # extraConfig = ''
-    #   # Workaround for Slack Desktop bug: wake lock after playing any media
-    #   # https://unix.stackexchange.com/a/707430
-    #   Section "Extensions"
-    #     Option "MIT-SCREEN-SAVER" "Disable"
-    #   EndSection
-    # '';
-
     # Configure keymap in X11
     layout = "us,us";
     xkbVariant = "dvp,";
