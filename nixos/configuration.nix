@@ -85,6 +85,12 @@ in {
         TAG+="systemd",
         ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
     '')
+    # https://github.com/NixOS/nixpkgs/issues/226346
+    # (mkUdevRules "99-keyd.rules" ''
+    #   SUBSYSTEM=="input", ACTION=="add",
+    #     ATTR{name}!="keyd virtual*",
+    #     RUN+="${pkgs.systemd}/bin/systemctl try-restart keyd.service"
+    # '')
     pkgs.vial
   ];
   systemd.services = {
@@ -348,8 +354,7 @@ in {
     # Configure keymap in X11
     layout = "us,us";
     xkbVariant = "dvp,";
-    xkbOptions =
-      "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
+    xkbOptions = "grp:alt_space_toggle,grp_led:scroll,terminate:ctrl_alt_bksp";
 
     libinput = {
       enable = true;
@@ -384,66 +389,44 @@ in {
   };
 
   # Rebind some keys
-  services.interception-tools = with pkgs.interception-tools-plugins; {
+  services.keyd = {
     enable = true;
-    plugins = [ dual-function-keys ];
-    udevmonConfig = ''
-      - CMD: ${pkgs.interception-tools}/bin/mux -c dual-function-keys
-      - JOB: ${pkgs.interception-tools}/bin/mux -i dual-function-keys | ${dual-function-keys}/bin/dual-function-keys -c ${
-        pkgs.writeText "dual-function-keys.yaml" ''
-          TIMING:
-            DOUBLE_TAP_MILLISEC: 0
-          MAPPINGS:
-            # Space bar as right alt when held
-            - KEY: KEY_SPACE
-              TAP: KEY_SPACE
-              HOLD: KEY_RIGHTALT
-              HOLD_START: BEFORE_CONSUME
-            # Caps lock as right ctrl when held, esc when tapped
-            - KEY: KEY_CAPSLOCK
-              TAP: KEY_ESC
-              HOLD: KEY_LEFTCTRL
-              HOLD_START: BEFORE_CONSUME
-            # Enter as right ctrl when held
-            - KEY: KEY_ENTER
-              TAP: KEY_ENTER
-              HOLD: KEY_RIGHTCTRL
-              HOLD_START: BEFORE_CONSUME
-            # Right alt as right meta/super when held, compose when tapped
-            - KEY: KEY_RIGHTALT
-              TAP: KEY_COMPOSE
-              HOLD: KEY_RIGHTMETA
-              HOLD_START: BEFORE_CONSUME
-        ''
-      } | ${pkgs.interception-tools}/bin/uinput -c ${
-        pkgs.writeText "keyboard-mouse.yaml" ''
-          NAME: USB Keyboard Mouse
-          PRODUCT: 321
-          VENDOR: 1241
-          BUSTYPE: BUS_USB
-          DRIVER_VERSION: 65537
-          EVENTS:
-            EV_SYN: [SYN_REPORT, SYN_CONFIG, SYN_MT_REPORT, SYN_DROPPED]
-            EV_KEY: [KEY_ESC, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MINUS, KEY_EQUAL, KEY_BACKSPACE, KEY_TAB, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_LEFTBRACE, KEY_RIGHTBRACE, KEY_ENTER, KEY_LEFTCTRL, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H, KEY_J, KEY_K, KEY_L, KEY_SEMICOLON, KEY_APOSTROPHE, KEY_GRAVE, KEY_LEFTSHIFT, KEY_BACKSLASH, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B, KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_RIGHTSHIFT, KEY_KPASTERISK, KEY_LEFTALT, KEY_SPACE, KEY_CAPSLOCK, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_NUMLOCK, KEY_SCROLLLOCK, KEY_KP7, KEY_KP8, KEY_KP9, KEY_KPMINUS, KEY_KP4, KEY_KP5, KEY_KP6, KEY_KPPLUS, KEY_KP1, KEY_KP2, KEY_KP3, KEY_KP0, KEY_KPDOT, KEY_ZENKAKUHANKAKU, KEY_102ND, KEY_F11, KEY_F12, KEY_RO, KEY_KATAKANA, KEY_HIRAGANA, KEY_HENKAN, KEY_KATAKANAHIRAGANA, KEY_MUHENKAN, KEY_KPJPCOMMA, KEY_KPENTER, KEY_RIGHTCTRL, KEY_KPSLASH, KEY_SYSRQ, KEY_RIGHTALT, KEY_HOME, KEY_UP, KEY_PAGEUP, KEY_LEFT, KEY_RIGHT, KEY_END, KEY_DOWN, KEY_PAGEDOWN, KEY_INSERT, KEY_DELETE, KEY_MUTE, KEY_VOLUMEDOWN, KEY_VOLUMEUP, KEY_POWER, KEY_KPEQUAL, KEY_PAUSE, KEY_KPCOMMA, KEY_HANGEUL, KEY_HANJA, KEY_YEN, KEY_LEFTMETA, KEY_RIGHTMETA, KEY_COMPOSE, KEY_STOP, KEY_AGAIN, KEY_PROPS, KEY_UNDO, KEY_FRONT, KEY_COPY, KEY_OPEN, KEY_PASTE, KEY_FIND, KEY_CUT, KEY_HELP, KEY_KPLEFTPAREN, KEY_KPRIGHTPAREN, KEY_F13, KEY_F14, KEY_F15, KEY_F16, KEY_F17, KEY_F18, KEY_F19, KEY_F20, KEY_F21, KEY_F22, KEY_F23, KEY_F24, KEY_UNKNOWN, BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE, BTN_EXTRA]
-            EV_REL: [REL_X, REL_Y, REL_WHEEL, REL_WHEEL_HI_RES, REL_HWHEEL]
-            EV_MSC: [MSC_SCAN]
-            EV_REP:
-              REP_DELAY: 250
-              REP_PERIOD: 33
-        ''
-      }
-      - JOB: ${pkgs.interception-tools}/bin/intercept -g $DEVNODE | ${pkgs.interception-tools}/bin/mux -o dual-function-keys
-        DEVICE:
-          NAME: .*[Kk]eyboard.*
-          LINK: .*-event-kbd
-          EVENTS:
-            EV_KEY: [KEY_CAPSLOCK, KEY_ENTER, KEY_SPACE, KEY_RIGHTALT]
-      - JOB: ${pkgs.interception-tools}/bin/intercept -g $DEVNODE | ${pkgs.interception-tools}/bin/mux -o dual-function-keys
-        DEVICE:
-          EVENTS:
-            EV_KEY: [BTN_LEFT, BTN_TOUCH]
-            EV_REL: [REL_WHEEL, REL_WHEEL_HI_RES]
-    '';
+    keyboards.default = {
+      ids = [ "*" ];
+      settings = {
+        main = {
+          capslock = "overload(control, esc)";
+          enter = "overload(control, enter)";
+          space = "overload(alt, space)";
+          rightalt = "overload(meta, compose)";
+          leftcontrol = "overload(nav, toggle(nav))";
+          rightcontrol = "overload(nav, toggle(nav))";
+        };
+        nav = {
+          # Like wasd, but aligned with home row
+          e = "up";
+          s = "left";
+          d = "down";
+          f = "right";
+
+          # Same thing, but for right hand
+          i = "up";
+          j = "left";
+          k = "down";
+          l = "right";
+
+          # hjkl on the Dvorak layout
+          c = "down";
+          v = "up";
+          # j = "left"; # already bound, luckily to the same key
+          p = "right";
+        };
+        shift = {
+          leftshift = "capslock";
+          rightshift = "capslock";
+        };
+      };
+    };
   };
 
   # Enable sound.
