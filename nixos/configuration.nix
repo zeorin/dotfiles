@@ -9,7 +9,7 @@ let unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 in {
   imports = [
     <nixos-hardware/common/cpu/intel/cpu-only.nix>
-    <nixos-hardware/common/gpu/nvidia>
+    <nixos-hardware/common/gpu/amd>
     <home-manager/nixos>
     ./hardware-configuration.nix
     ./cachix.nix
@@ -367,7 +367,7 @@ in {
       '';
       # https://github.com/NixOS/nixpkgs/issues/30796#issuecomment-615680290
       setupCommands =
-        "${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --auto --output DP-3 --auto --right-of HDMI-0 --primary";
+        "${pkgs.xorg.xrandr}/bin/xrandr --output DP-2 --auto --output DP-1 --auto --right-of DP-2 --primary";
       # We need to create at least one session for auto login to work
       session = [{
         name = "xsession";
@@ -547,10 +547,6 @@ in {
     driSupport = true;
     driSupport32Bit = true;
   };
-  hardware.nvidia.modesetting.enable = true;
-  # nixpkgs.config.cudaSupport = true;
-  nixpkgs.config.cudaCapabilities = [ "5.2" ];
-  nixpkgs.config.cudaForwardCompat = false;
 
   virtualisation.docker.enable = true;
   virtualisation.libvirtd.enable = true;
