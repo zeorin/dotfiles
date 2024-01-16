@@ -222,9 +222,8 @@ in {
     # here.  Per-interface useDHCP will be mandatory in the future, so this
     # generated config replicates the default behaviour.
     useDHCP = false;
-    interfaces.enp6s0.useDHCP = true;
-
-    interfaces.enp6s0.wakeOnLan.enable = true;
+    interfaces.enp3s0.useDHCP = true;
+    interfaces.enp3s0.wakeOnLan.enable = true;
   };
 
   # Select internationalisation properties.
