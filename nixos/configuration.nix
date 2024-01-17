@@ -352,6 +352,14 @@ in {
       };
     };
 
+    xrandrHeads = [
+      "DP-1"
+      {
+        output = "DP-2";
+        primary = true;
+      }
+    ];
+
     displayManager = {
       # Log in automatically
       autoLogin.user = "zeorin";
@@ -362,8 +370,6 @@ in {
         }/bin/dbus-update-activation-environment --systemd --all
       '';
       # https://github.com/NixOS/nixpkgs/issues/30796#issuecomment-615680290
-      setupCommands =
-        "${pkgs.xorg.xrandr}/bin/xrandr --output DP-2 --auto --output DP-1 --auto --right-of DP-2 --primary";
       # We need to create at least one session for auto login to work
       session = [{
         name = "xsession";
