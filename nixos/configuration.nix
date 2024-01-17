@@ -330,6 +330,10 @@ in {
 
     videoDrivers = [ "ati" ];
 
+    deviceSection = ''
+      Option "SWCursor"
+    '';
+
     serverFlagsSection = ''
       Option "StandbyTime"  "5"
       Option "SuspendTime"  "5"
