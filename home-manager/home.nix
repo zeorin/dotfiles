@@ -2617,7 +2617,8 @@ in {
     nextcloud-client.enable = true;
     picom = {
       enable = true;
-      package = pkgs.symlinkJoin {
+      package = let picomPkg = pkgs.picom-next;
+      in pkgs.symlinkJoin {
         name = "picom";
         paths = [
           (pkgs.writeShellScriptBin "picom" (let
@@ -2641,11 +2642,11 @@ in {
             '';
           in ''
             if [ "$PICOM_SHADER" = "grayscale" ]; then
-              "${pkgs.picom}/bin/picom" \
+              "${picomPkg}/bin/picom" \
                 --window-shader-fg="${grayscale-glsl}" \
                 "$@"
             else
-              "${pkgs.picom}/bin/picom" "$@"
+              "${picomPkg}/bin/picom" "$@"
             fi
           ''))
           pkgs.picom
