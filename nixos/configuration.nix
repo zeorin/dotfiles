@@ -350,12 +350,9 @@ in {
     xkbVariant = "dvp,";
     xkbOptions = "grp:alt_space_toggle,grp_led:scroll,terminate:ctrl_alt_bksp";
 
-    libinput = {
-      enable = true;
-      mouse = {
-        accelProfile = "adaptive";
-        accelSpeed = "1";
-      };
+    libinput.touchpad = {
+      disableWhileTyping = true;
+      naturalScrolling = true;
     };
 
     xrandrHeads = [
