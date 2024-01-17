@@ -390,15 +390,19 @@ in {
     keyboards.default = {
       ids = [ "*" ];
       settings = {
+        global.layer_indicator = 1;
         main = {
           capslock = "overload(control, esc)";
           enter = "overload(control, enter)";
           space = "overload(alt, space)";
           rightalt = "overload(meta, compose)";
-          leftcontrol = "overload(nav, toggle(nav))";
-          rightcontrol = "overload(nav, toggle(nav))";
+          leftcontrol = "overload(nav, oneshot(nav))";
+          rightcontrol = "overload(nav, oneshot(nav))";
         };
         nav = {
+          leftcontrol = "toggle(nav)";
+          rightcontrol = "toggle(nav)";
+
           # Like wasd, but aligned with home row
           e = "up";
           s = "left";
