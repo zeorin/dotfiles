@@ -341,10 +341,6 @@ in {
       Option "BlankTime"    "5"
     '';
 
-    screenSection = ''
-      Option "DPI" "96 x 96"
-    '';
-
     # Configure keymap in X11
     layout = "us,us";
     xkbVariant = "dvp,";
