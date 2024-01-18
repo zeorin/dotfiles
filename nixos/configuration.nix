@@ -25,14 +25,20 @@ in {
   };
 
   boot = {
-    # Use the systemd-boot EFI boot loader.
-    loader.efi.canTouchEfiVariables = true;
-    loader.grub = {
+    loader = {
+      # Use the systemd-boot EFI boot loader.
+      efi.canTouchEfiVariables = true;
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 10;
+        memtest86.enable = true;
+        memtest86.entryFilename = "z-memtest86.conf";
+      };
+    };
+
+    uvesafb = {
       enable = true;
-      device = "nodev";
-      efiSupport = true;
-      configurationLimit = 10;
-      memtest86.enable = true;
+      gfx-mode = "1920x1080-32";
     };
 
     plymouth.enable = true;
@@ -184,6 +190,8 @@ in {
   boot.initrd.availableKernelModules = [ "r8169" ];
 
   fileSystems."/".options = [ "noatime" "nodiratime" "discard" ];
+
+  fileSystems."/boot".options = [ "uid=0" "gid=0" "fmask=0077" "dmask=0077" ];
 
   fileSystems."/data" = {
     device = "/dev/disk/by-uuid/6ee6e25c-fe6f-4c50-b7fb-985260cf8ca9";
