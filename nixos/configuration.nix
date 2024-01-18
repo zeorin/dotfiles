@@ -8,8 +8,11 @@ let unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 
 in {
   imports = [
-    <nixos-hardware/common/cpu/intel/cpu-only.nix>
-    <nixos-hardware/common/gpu/amd>
+    <nixos-hardware/common/pc>
+    <nixos-hardware/common/pc/hdd>
+    <nixos-hardware/common/pc/ssd>
+    <nixos-hardware/common/cpu/intel>
+    <nixos-hardware/common/cpu/intel/sandy-bridge>
     <home-manager/nixos>
     ./hardware-configuration.nix
     ./cachix.nix
