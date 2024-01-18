@@ -461,6 +461,21 @@ in {
           (builtins.fetchTarball
             "https://github.com/thiagokokada/nix-alien/archive/master.tar.gz")
         }/overlay.nix") { inherit final prev; })
+    (final: prev: {
+      fcitx5-with-addons = prev.fcitx5-with-addons.overrideAttrs (oldAttrs: {
+        postBuild = ''
+          ${oldAttrs.postBuild or ""}
+          # Don't install bundled phrases
+          rm $out/share/fcitx5/data/quickphrase.d/*.mb
+          # Don't install desktop files
+          desktop=share/applications/org.fcitx.Fcitx5.desktop
+          autostart=etc/xdg/autostart/org.fcitx.Fcitx5.desktop
+          rm $out/$autostart
+          mv $out/$desktop $out/$autostart
+          rm -rf $out/share/applications
+        '';
+      });
+    })
   ];
 
   nixpkgs.config = osConfig.nixpkgs.config // {
@@ -4144,6 +4159,12 @@ in {
 
         (use-package! evil-little-word
           :after evil)
+
+        (use-package! fcitx
+          :after evil
+          :config
+          (setq fcitx-remote-command "fcitx5-remote")
+          (fcitx-evil-turn-on))
       '';
       "doom/init.el" = {
         text = ''
@@ -4491,6 +4512,112 @@ in {
           ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
         ''}";
       };
+      "fcitx5/config".text = ''
+        [Hotkey]
+        TriggerKeys=
+        EnumerateWithTriggerKeys=False
+        AltTriggerKeys=
+        EnumerateForwardKeys=
+        EnumerateBackwardKeys=
+        EnumerateSkipFirst=False
+        EnumerateGroupForwardKeys=
+        EnumerateGroupBackwardKeys=
+        ActivateKeys=
+        DeactivateKeys=
+        [Hotkey/PrevPage]
+        0=Up
+        [Hotkey/NextPage]
+        0=Down
+        [Hotkey/PrevCandidate]
+        0=Shift+Tab
+        [Hotkey/NextCandidate]
+        0=Tab
+        [Hotkey/TogglePreedit]
+        0=
+        [Behavior]
+        ActiveByDefault=False
+        ShareInputState=No
+        PreeditEnabledByDefault=False
+        ShowInputMethodInformation=False
+        showInputMethodInformationWhenFocusIn=False
+        CompactInputMethodInformation=False
+        ShowFirstInputMethodInformation=False
+        DefaultPageSize=5
+        OverrideXkbOption=False
+        CustomXkbOption=
+        EnabledAddons=
+        PreloadInputMethod=True
+        AllowInputMethodForPassword=False
+        ShowPreeditForPassword=False
+        [Behavior/DisabledAddons]
+        0=clipboard
+        1=emoji
+        2=imselector
+        3=kimpanel
+        4=notificationitem
+        5=notifications
+        6=spell
+      '';
+      "fcitx5/profile".text = ''
+        [Groups/0]
+        Name=Default
+        Default Layout=us-dvp
+        DefaultIM=keyboard-us
+        [Groups/0/Items/0]
+        Name=keyboard-us-dvp
+        Layout=
+        [Groups/0/Items/1]
+        Name=keyboard-us
+        Layout=
+        [GroupOrder]
+        0=Default
+      '';
+      "fcitx5/conf/classicui.conf".text = ''
+        Vertical Candidate List=True
+        WheelForPaging=True
+        PreferTextIcon=False
+        ShowLayoutNameInIcon=False
+        UseInputMethodLanguageToDisplayText=False
+        Theme=Nord-Light
+        DarkTheme=Nord-Dark
+        UseDarkTheme=True
+        UseAccentColor=True
+        PerScreenDPI=False
+        ForceWaylandDPI=0
+        EnableFractionalScale=True
+      '';
+      "fcitx5/conf/keyboard.conf".text = ''
+        PageSize=5
+        EnableEmoji=False
+        EnableQuickPhraseEmoji=True
+        Choose Modifier=None
+        EnableHintByDefault=False
+        Hint Trigger=
+        One Time Hint Trigger=
+        UseNewComposeBehavior=True
+        EnableLongPress=False
+        [PrevCandidate]
+        0=Shift+Tab
+        [NextCandidate]
+        0=Tab
+      '';
+      "fcitx5/conf/quickphrase.conf".text = ''
+        Choose Modifier=None
+        Spell=False
+        FallbackSpellLanguage=en
+        [TriggerKey]
+        0=Super+period
+      '';
+      "fcitx5/conf/unicode.conf".text = ''
+        [TriggerKey]
+        0=Control+Alt+Shift+U
+        [DirectUnicodeMode]
+        0=Control+Shift+U
+      '';
+      "fcitx5/conf/xcb.conf".text = ''
+        Allow Overriding System XKB Settings=False
+        AlwaysSetToGroupLayout=False
+      '';
       "kitty/themes/Nord light.conf".text = ''
         # From: https://github.com/ayamir/nord-and-light/blob/master/.config/kitty/polar.conf
         foreground            #2E3440
@@ -4952,6 +5079,15 @@ in {
               }
             ];
       };
+      "fcitx5/data/quickphrase.d/emoji.mb".source = ./emoji.mb;
+      "fcitx5/data/quickphrase.d/kaomoji.mb".source = ./kaomoji.mb;
+      "fcitx5/data/quickphrase.d/latex.mb".source = ./latex.mb;
+      "fcitx5/themes".source = pkgs.fetchFromGitHub {
+        owner = "tonyfettes";
+        repo = "fcitx5-nord";
+        rev = "bdaa8fb723b8d0b22f237c9a60195c5f9c9d74d1";
+        hash = "sha256-qVo/0ivZ5gfUP17G29CAW0MrRFUO0KN1ADl1I/rvchE=";
+      };
     };
     desktopEntries = {
       file-scheme-handler = {
@@ -5190,6 +5326,8 @@ in {
       }/src/nord"
     '';
   };
+
+  i18n.inputMethod.enabled = "fcitx5";
 
   gtk = {
     enable = true;
