@@ -328,6 +328,8 @@ in {
   services.xserver = {
     enable = true;
 
+    videoDrivers = [ "ati" ];
+
     serverFlagsSection = ''
       Option "StandbyTime"  "5"
       Option "SuspendTime"  "5"
@@ -353,9 +355,9 @@ in {
     };
 
     xrandrHeads = [
-      "DP-1"
+      "DisplayPort-0"
       {
-        output = "DP-2";
+        output = "DisplayPort-1";
         primary = true;
       }
     ];
