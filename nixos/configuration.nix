@@ -37,15 +37,10 @@ in {
 
     plymouth.enable = true;
 
+    initrd.systemd.enable = true;
     initrd.luks.devices = {
-      cryptkey = {
-        device = "/dev/disk/by-uuid/6b17a213-6987-4a8e-b609-5243f6ba1467";
-        preLVM = true;
-      };
       cryptroot = {
         device = "/dev/disk/by-uuid/556cb835-419a-48b6-a081-36d2998d9c57";
-        keyFile = "/dev/mapper/cryptkey";
-        preLVM = true;
         allowDiscards = true;
       };
     };
@@ -196,7 +191,6 @@ in {
       enable = true;
       label = "cryptdata";
       blkDev = "/dev/disk/by-uuid/14924ada-f427-411b-b426-e9db44ab0752";
-      keyFile = "/dev/mapper/cryptkey";
     };
   };
 
