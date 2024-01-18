@@ -3375,7 +3375,8 @@ in {
               from i3ipc.aio import Connection, Event
 
               def on_exit(i3, e):
-                  Popen(['${i3-session-exit}'])
+                  if e.change == "exit":
+                    Popen(['${i3-session-exit}'])
 
               i3 = await Connection().connect()
 
