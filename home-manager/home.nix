@@ -3358,10 +3358,6 @@ in {
         };
         startup = [
           {
-            command = "${pkgs.dex}/bin/dex --autostart --environment i3";
-            notification = false;
-          }
-          {
             command = "${pkgs.writeShellScript "i3-session-start" ''
               ${pkgs.systemd}/bin/systemctl --user set-environment I3SOCK=$(${config.xsession.windowManager.i3.package}/bin/i3 --get-socketpath)
               ${pkgs.systemd}/bin/systemctl --user start graphical-session-i3.target
@@ -3670,16 +3666,15 @@ in {
         Unit = {
           Description = "Polkit authentication agent";
           Documentation = "https://gitlab.freedesktop.org/polkit/polkit/";
-          Wants = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
+          After = [ "graphical-session-pre.target" ];
+          PartOf = [ "graphical-session.target" ];
         };
+        Install.WantedBy = [ "graphical-session.target" ];
         Service = {
-          Type = "simple";
           ExecStart =
             "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
           Restart = "on-failure";
         };
-        Install.WantedBy = [ "graphical-session.target" ];
       };
       # https://github.com/nix-community/home-manager/issues/213#issuecomment-829743999
       polybar = {
@@ -3696,7 +3691,7 @@ in {
         Service = {
           Environment = "PATH=${config.home.profileDirectory}/bin";
           ExecStart = "${pkgs.xfce.xfce4-settings}/bin/xfsettingsd";
-          Restart = "on-abort";
+          Restart = "on-failure";
         };
       };
       yubikey-touch-detector = {
@@ -3715,12 +3710,18 @@ in {
       };
     };
     targets = {
-      graphical-session-i3 = {
-        Unit = {
-          Description = "i3 X session";
-          BindsTo = [ "graphical-session.target" ];
-          Requisite = [ "graphical-session.target" ];
-        };
+      graphical-session-i3.Unit = {
+        Description = "i3 X session";
+        BindsTo = [ "graphical-session.target" ];
+        Requisite = [ "graphical-session.target" ];
+        Wants = [ "xdg-autostart.target" ];
+      };
+      xdg-autostart.Unit = {
+        Description = "Run XDG autostart files";
+        Requires =
+          [ "xdg-desktop-autostart.target" "graphical-session.target" ];
+        Before = [ "xdg-desktop-autostart.target" "graphical-session.target" ];
+        BindsTo = [ "graphical-session.target" ];
       };
     };
   };
