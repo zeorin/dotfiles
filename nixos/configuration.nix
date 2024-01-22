@@ -68,13 +68,13 @@ in {
       options kvm_intel emulate_invalid_guest_state=0
       options kvm ignore_msrs=1 report_ignored_msrs=0
 
-      options snd-hda-intel power_save=0 power_save_controller=N
+      options snd-hda-intel power_save=0 power_save_controller=N model=asus
 
       options v4l2loopback devices=1 exclusive_caps=1 video_nr=10 card_label="OBS Camera"
     '';
     supportedFilesystems = [ "ntfs" ];
   };
-  services.udev.packages = with pkgs; [ vial ];
+  services.udev.packages = with pkgs; [ vial alsa-utils ];
   services.udev.extraRules = ''
     # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/issues/18#note_853163044
     ACTION=="add", KERNEL=="snd_seq_dummy", SUBSYSTEM=="module", RUN{builtin}+="kmod load ddcci_backlight"
@@ -102,6 +102,7 @@ in {
   environment.systemPackages = with pkgs; [
     config.boot.kernelPackages.v4l2loopback
     virtiofsd
+    alsa-utils
   ];
 
   powerManagement.enable = true;
@@ -399,6 +400,18 @@ in {
       support32Bit = true;
     };
     pulse.enable = true;
+  };
+  systemd.services.alsa-store = {
+    description = "Store Sound Card State";
+    wantedBy = [ "multi-user.target" ];
+    unitConfig.RequiresMountsFor = "/var/lib/alsa";
+    unitConfig.ConditionVirtualization = "!systemd-nspawn";
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.coreutils}/bin/mkdir -p /var/lib/alsa";
+      ExecStop = "${pkgs.alsa-utils}/sbin/alsactl store --ignore";
+    };
   };
 
   # Location-based stuff
