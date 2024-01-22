@@ -421,8 +421,6 @@ in {
     firewall = {
       allowPing = true;
       allowedTCPPorts = [
-        # Printing
-        631
         # Calibre wireless
         9090
         # Samba
@@ -438,8 +436,6 @@ in {
         }
       ];
       allowedUDPPorts = [
-        # Printing
-        631
         # Calibre wireless
         9090
         # Samba
@@ -546,16 +542,15 @@ in {
   system.stateVersion = "23.11"; # Did you read the comment?
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
-  services.printing.drivers = [ pkgs.hplipWithPlugin ];
-  services.printing.browsing = true;
-  # services.printing.listenAddresses = [
-  #   "*:631"
-  # ]; # Not 100% sure this is needed and you might want to restrict to the local network
-  services.printing.allowFrom = [
-    "all"
-  ]; # this gives access to anyone on the interface you might want to limit it see the official documentation
-  services.printing.defaultShared = true; # If you want
+  services.printing = {
+    enable = true;
+    drivers = [ pkgs.hplipWithPlugin ];
+    browsing = true;
+    openFirewall = true;
+    # this gives access to anyone on the interface you might want to limit it see the official documentation
+    allowFrom = [ "all" ];
+    defaultShared = true; # If you want
+  };
 
   # Security/crypto
   services.gnome.gnome-keyring.enable = true;
