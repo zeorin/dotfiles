@@ -62,7 +62,7 @@ in {
       v4l2loopback
       ddcci-driver
     ];
-    kernelModules = [ "kvm-intel" "v4l2loopback" "ddcci_backlight" ];
+    kernelModules = [ "kvm-intel" "v4l2loopback" ];
     extraModprobeConfig = ''
       options kvm_intel nested=1
       options kvm_intel emulate_invalid_guest_state=0
@@ -74,55 +74,14 @@ in {
     '';
     supportedFilesystems = [ "ntfs" ];
   };
-  services.udev.packages = let
-    mkUdevRules = (name: text:
-      (pkgs.writeTextFile {
-        inherit name;
-        text = lib.strings.stringAsChars (x: if x == "\n" then " " else x) text;
-        destination = "/etc/udev/rules.d/${name}";
-      }));
-  in [
-    (mkUdevRules "99-ddcci.rules" ''
-      SUBSYSTEM=="i2c-dev", ACTION=="add",
-        ATTR{name}=="NVIDIA i2c adapter*",
-        TAG+="ddcci",
-        TAG+="systemd",
-        ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
-    '')
-    # https://github.com/NixOS/nixpkgs/issues/226346
-    # (mkUdevRules "99-keyd.rules" ''
-    #   SUBSYSTEM=="input", ACTION=="add",
-    #     ATTR{name}!="keyd virtual*",
-    #     RUN+="${pkgs.systemd}/bin/systemctl try-restart keyd.service"
-    # '')
-    pkgs.vial
-  ];
+  services.udev.packages = with pkgs; [ vial ];
+  services.udev.extraRules = ''
+    # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/issues/18#note_853163044
+    ACTION=="add", KERNEL=="snd_seq_dummy", SUBSYSTEM=="module", RUN{builtin}+="kmod load ddcci_backlight"
+    # https://github.com/NixOS/nixpkgs/issues/226346#issuecomment-1892314545
+    # SUBSYSTEM=="input", ACTION=="add", ATTR{name}!="keyd virtual*", RUN+="${pkgs.systemd}/bin/systemctl try-restart keyd.service"
+  '';
   systemd.services = {
-    "ddcci@" = {
-      description = "ddcci handler";
-      after = [ "graphical.target" ];
-      before = [ "shutdown.target" ];
-      conflicts = [ "shutdown.target" ];
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${
-            pkgs.writeShellScript "attach-ddcci" ''
-              echo "Trying to attach ddcci to $1"
-              success=0
-              i=0
-              id=$(echo $1 | cut -d "-" -f 2)
-              while ((success < 1)) && ((i++ < 5)); do
-                ${pkgs.ddcutil}/bin/ddcutil getvcp 10 -b $id && {
-                  success=1
-                  echo "ddcci 0x37" > /sys/bus/i2c/devices/$1/new_device
-                  echo "ddcci attached to $1";
-                } || sleep 5
-              done
-            ''
-          } %i";
-        Restart = "no";
-      };
-    };
     v4l2loopback-test-card = {
       description = "OBS Camera test card, shown on timeout";
       after = [ "graphical.target" ];
