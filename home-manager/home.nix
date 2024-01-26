@@ -4512,112 +4512,117 @@ in {
           ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
         ''}";
       };
-      "fcitx5/config".text = ''
-        [Hotkey]
-        TriggerKeys=
-        EnumerateWithTriggerKeys=False
-        AltTriggerKeys=
-        EnumerateForwardKeys=
-        EnumerateBackwardKeys=
-        EnumerateSkipFirst=False
-        EnumerateGroupForwardKeys=
-        EnumerateGroupBackwardKeys=
-        ActivateKeys=
-        DeactivateKeys=
-        [Hotkey/PrevPage]
-        0=Up
-        [Hotkey/NextPage]
-        0=Down
-        [Hotkey/PrevCandidate]
-        0=Shift+Tab
-        [Hotkey/NextCandidate]
-        0=Tab
-        [Hotkey/TogglePreedit]
-        0=
-        [Behavior]
-        ActiveByDefault=False
-        ShareInputState=No
-        PreeditEnabledByDefault=False
-        ShowInputMethodInformation=False
-        showInputMethodInformationWhenFocusIn=False
-        CompactInputMethodInformation=False
-        ShowFirstInputMethodInformation=False
-        DefaultPageSize=5
-        OverrideXkbOption=False
-        CustomXkbOption=
-        EnabledAddons=
-        PreloadInputMethod=True
-        AllowInputMethodForPassword=False
-        ShowPreeditForPassword=False
-        [Behavior/DisabledAddons]
-        0=clipboard
-        1=emoji
-        2=imselector
-        3=kimpanel
-        4=notificationitem
-        5=notifications
-        6=spell
-      '';
-      "fcitx5/profile".text = ''
-        [Groups/0]
-        Name=Default
-        Default Layout=us-dvp
-        DefaultIM=keyboard-us
-        [Groups/0/Items/0]
-        Name=keyboard-us-dvp
-        Layout=
-        [Groups/0/Items/1]
-        Name=keyboard-us
-        Layout=
-        [GroupOrder]
-        0=Default
-      '';
-      "fcitx5/conf/classicui.conf".text = ''
-        Vertical Candidate List=True
-        WheelForPaging=True
-        PreferTextIcon=False
-        ShowLayoutNameInIcon=False
-        UseInputMethodLanguageToDisplayText=False
-        Theme=Nord-Light
-        DarkTheme=Nord-Dark
-        UseDarkTheme=True
-        UseAccentColor=True
-        PerScreenDPI=False
-        ForceWaylandDPI=0
-        EnableFractionalScale=True
-      '';
-      "fcitx5/conf/keyboard.conf".text = ''
-        PageSize=5
-        EnableEmoji=False
-        EnableQuickPhraseEmoji=True
-        Choose Modifier=None
-        EnableHintByDefault=False
-        Hint Trigger=
-        One Time Hint Trigger=
-        UseNewComposeBehavior=True
-        EnableLongPress=False
-        [PrevCandidate]
-        0=Shift+Tab
-        [NextCandidate]
-        0=Tab
-      '';
-      "fcitx5/conf/quickphrase.conf".text = ''
-        Choose Modifier=None
-        Spell=False
-        FallbackSpellLanguage=en
-        [TriggerKey]
-        0=Super+period
-      '';
-      "fcitx5/conf/unicode.conf".text = ''
-        [TriggerKey]
-        0=Control+Alt+Shift+U
-        [DirectUnicodeMode]
-        0=Control+Shift+U
-      '';
-      "fcitx5/conf/xcb.conf".text = ''
-        Allow Overriding System XKB Settings=False
-        AlwaysSetToGroupLayout=False
-      '';
+      "fcitx5".source = pkgs.symlinkJoin {
+        name = "config-fcitx5";
+        paths = [
+          (pkgs.writeTextDir "config" ''
+            [Hotkey]
+            TriggerKeys=
+            EnumerateWithTriggerKeys=False
+            AltTriggerKeys=
+            EnumerateForwardKeys=
+            EnumerateBackwardKeys=
+            EnumerateSkipFirst=False
+            EnumerateGroupForwardKeys=
+            EnumerateGroupBackwardKeys=
+            ActivateKeys=
+            DeactivateKeys=
+            [Hotkey/PrevPage]
+            0=Up
+            [Hotkey/NextPage]
+            0=Down
+            [Hotkey/PrevCandidate]
+            0=Shift+Tab
+            [Hotkey/NextCandidate]
+            0=Tab
+            [Hotkey/TogglePreedit]
+            0=
+            [Behavior]
+            ActiveByDefault=False
+            ShareInputState=No
+            PreeditEnabledByDefault=False
+            ShowInputMethodInformation=False
+            showInputMethodInformationWhenFocusIn=False
+            CompactInputMethodInformation=False
+            ShowFirstInputMethodInformation=False
+            DefaultPageSize=5
+            OverrideXkbOption=False
+            CustomXkbOption=
+            EnabledAddons=
+            PreloadInputMethod=True
+            AllowInputMethodForPassword=False
+            ShowPreeditForPassword=False
+            [Behavior/DisabledAddons]
+            0=clipboard
+            1=emoji
+            2=imselector
+            3=kimpanel
+            4=notificationitem
+            5=notifications
+            6=spell
+          '')
+          (pkgs.writeTextDir "profile" ''
+            [Groups/0]
+            Name=Default
+            Default Layout=us-dvp
+            DefaultIM=keyboard-us
+            [Groups/0/Items/0]
+            Name=keyboard-us-dvp
+            Layout=
+            [Groups/0/Items/1]
+            Name=keyboard-us
+            Layout=
+            [GroupOrder]
+            0=Default
+          '')
+          (pkgs.writeTextDir "conf/classicui.conf" ''
+            Vertical Candidate List=True
+            WheelForPaging=True
+            PreferTextIcon=False
+            ShowLayoutNameInIcon=False
+            UseInputMethodLanguageToDisplayText=False
+            Theme=Nord-Light
+            DarkTheme=Nord-Dark
+            UseDarkTheme=True
+            UseAccentColor=True
+            PerScreenDPI=False
+            ForceWaylandDPI=0
+            EnableFractionalScale=True
+          '')
+          (pkgs.writeTextDir "conf/keyboard.conf" ''
+            PageSize=5
+            EnableEmoji=False
+            EnableQuickPhraseEmoji=True
+            Choose Modifier=None
+            EnableHintByDefault=False
+            Hint Trigger=
+            One Time Hint Trigger=
+            UseNewComposeBehavior=True
+            EnableLongPress=False
+            [PrevCandidate]
+            0=Shift+Tab
+            [NextCandidate]
+            0=Tab
+          '')
+          (pkgs.writeTextDir "conf/quickphrase.conf" ''
+            Choose Modifier=None
+            Spell=False
+            FallbackSpellLanguage=en
+            [TriggerKey]
+            0=Super+period
+          '')
+          (pkgs.writeTextDir "conf/unicode.conf" ''
+            [TriggerKey]
+            0=Control+Alt+Shift+U
+            [DirectUnicodeMode]
+            0=Control+Shift+U
+          '')
+          (pkgs.writeTextDir "conf/xcb.conf" ''
+            Allow Overriding System XKB Settings=False
+            AlwaysSetToGroupLayout=False
+          '')
+        ];
+      };
       "kitty/themes/Nord light.conf".text = ''
         # From: https://github.com/ayamir/nord-and-light/blob/master/.config/kitty/polar.conf
         foreground            #2E3440
