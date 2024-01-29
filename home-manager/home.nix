@@ -4159,12 +4159,6 @@ in {
 
         (use-package! evil-little-word
           :after evil)
-
-        (use-package! fcitx
-          :after evil
-          :config
-          (setq fcitx-remote-command "fcitx5-remote")
-          (fcitx-evil-turn-on))
       '';
       "doom/init.el" = {
         text = ''
