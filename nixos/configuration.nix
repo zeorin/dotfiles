@@ -300,10 +300,10 @@ in {
     '';
 
     serverFlagsSection = ''
-      Option "StandbyTime"  "5"
-      Option "SuspendTime"  "5"
-      Option "OffTime"      "5"
-      Option "BlankTime"    "5"
+      Option "StandbyTime"  "10"
+      Option "SuspendTime"  "10"
+      Option "OffTime"      "10"
+      Option "BlankTime"    "10"
     '';
 
     # Configure keymap in X11
