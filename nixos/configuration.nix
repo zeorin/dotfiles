@@ -559,6 +559,7 @@ in {
   # Enable CUPS to print documents.
   services.printing = {
     enable = true;
+    webInterface = false;
     drivers = [ pkgs.hplipWithPlugin ];
     browsing = true;
     openFirewall = true;
