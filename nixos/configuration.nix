@@ -614,66 +614,22 @@ in {
     dim-screen = pkgs.writeShellScript "dim-screen" ''
       min_brightness=0
 
-      # 60 FPS baby!
-      fade_step_time="$(${pkgs.bc}/bin/bc -l <<< "1 / 60")"
-
-      # Set -time and -steps for fading to $min_brightness here. Setting steps
-      # to 1 disables fading.
-      fade_time=1.5
-      fade_steps="$(${pkgs.bc}/bin/bc -l <<< "scale=0; ($fade_time / $fade_step_time) / 1")"
-
-      # Find devices with backlights
-      devices=()
-      for device in /sys/class/backlight/*; do
-        devices+=("$(basename "$device")")
-      done
-
-      get_brightness() {
-          local device="$1"
-          ${pkgs.brightnessctl}/bin/brightnessctl --device="$device" get
-      }
-
-      declare -A starting_levels
-      for device in "''${devices[@]}"; do
-        starting_levels["$device"]="$(get_brightness "$device")"
-      done
-
-      set_brightness() {
-          local device="$1"
-          local level="$2"
-          ${pkgs.brightnessctl}/bin/brightnessctl --device="$device" set "$level"
-      }
-
-      fade_brightness() {
-          local target_level="$1"
-          local delta
-          local intermediate_level
-          for fade_step in $(seq "$fade_steps"); do
-              for device in "''${devices[@]}"; do
-                delta="$(${pkgs.bc}/bin/bc -l <<< "(''${starting_levels["$device"]} - $target_level) / $fade_steps")"
-                intermediate_level="$(${pkgs.bc}/bin/bc -l <<< "scale=0; (''${starting_levels["$device"]} - ($delta * $fade_step)) / 1")"
-                set_brightness "$device" "$intermediate_level" &
-              done
-              sleep "$fade_step_time"
-          done
-      }
-
-      restore_brightness() {
-        for device in "''${devices[@]}"; do
-          set_brightness "$device" "''${starting_levels["$device"]}"
+      brightnessctl () {
+        for device in "$("${pkgs.brightnessctl}/bin/brightnessctl" --class="backlight" --list --machine | cut -f1 -d,)"; do
+          "${pkgs.brightnessctl}/bin/brightnessctl" --exponent=4 "$@"
         done
       }
 
       trap "exit 0" TERM INT
-      trap "restore_brightness; kill %%" EXIT
-      fade_brightness "$min_brightness"
+      trap "brightnessctl --restore; kill %%" EXIT
+      brightnessctl set "$min_brightness"
       sleep 2147483647 &
       wait
     '';
   in {
     enable = true;
     lockerCommand = "${config.security.wrapperDir}/slock";
-    extraOptions = [ "--notifier=${dim-screen}" ];
+    extraOptions = [ ''--notifier="${dim-screen}"'' ];
   };
   # security.pam.services.hibernate-on-multiple-failures = {
   #   name = "hibernate-on-multiple-failures";
