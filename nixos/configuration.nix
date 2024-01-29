@@ -537,14 +537,16 @@ in {
       options = "--delete-older-than 14d";
     };
     optimise.automatic = true;
-  };
 
-  # Enable content-addressed derivations and flaxes
-  nix.extraOptions = ''
-    experimental-features = nix-command flakes ca-derivations
-    keep-outputs = true
-    keep-derivations = true
-  '';
+    settings.max-jobs = 4;
+    # Enable content-addressed derivations and flaxes
+    extraOptions = lib.mkForce ''
+      experimental-features = nix-command flakes ca-derivations
+      # keep-outputs = true
+      # keep-derivations = true
+      # use-xdg-base-directories = true
+    '';
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
