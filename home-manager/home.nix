@@ -631,7 +631,7 @@ in {
       # (nomAliases { inherit (pkgs) nix nixos-rebuild home-manager; }) // {
       {
         g = "git";
-        e = toString config.home.sessionVariables.EDITOR;
+        e = "edit";
         m = "neomutt";
         o = "xdg-open";
         s = "systemctl";
@@ -5378,16 +5378,8 @@ in {
         '';
       })
       my-emacs
-      (writeShellScriptBin "edit" ''
-        if [ -n "$INSIDE_EMACS" ]; then
-          ${my-emacs}/bin/emacsclient --no-wait --quiet "$@"
-        elif [ "$SSH_TTY$DISPLAY" = "''${DISPLAY#*:[1-9][0-9]}" ]; then
-          # If we're not connected via SSH and the DISPLAY is less than 10
-          ${my-emacs}/bin/emacsclient --no-wait --create-frame --alternate-editor="" --quiet "$@"
-        else
-          ${my-emacs}/bin/emacsclient --no-wait --tty --alternate-editor="" --quiet "$@"
-        fi
-      '')
+      (writeShellScriptBin "edit"
+        (toString config.home.sessionVariables.EDITOR))
       (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
       (hunspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
       (nuspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
