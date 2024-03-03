@@ -722,21 +722,6 @@ in {
             pkgs.nur.repos.pborzenkov.firefox-addons.wallabagger
           ] ++ [
             (buildFirefoxXpiAddon rec {
-              pname = "better_tweetdeck";
-              version = "4.7.2";
-              addonId = "BetterTweetDeckDev@erambert.me";
-              url =
-                "https://addons.mozilla.org/firefox/downloads/file/3891208/better_tweetdeck-${version}-fx.xpi";
-              sha256 = "1ckp7n2qjhwnzzdrsw50ahrcdsszcsgr6gsxamhf9p2dpfxhxiny";
-              meta = with lib; {
-                homepage = "https://better.tw/";
-                description =
-                  "Improve your experience on TweetDeck web with emojis, thumbnails, and a lot of customization options to make TweetDeck even better for you.";
-                licence = licences.mit;
-                platforms = platforms.all;
-              };
-            })
-            (buildFirefoxXpiAddon rec {
               pname = "chromelogger";
               version = "2.0";
               addonId = "chromelogger@burningmoth.com";
