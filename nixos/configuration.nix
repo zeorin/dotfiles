@@ -312,8 +312,13 @@ in {
     xkbOptions = "grp:alt_space_toggle,grp_led:scroll,terminate:ctrl_alt_bksp";
 
     libinput.touchpad = {
+      accelProfile = "adaptive";
+      accelSpeed = "1";
       disableWhileTyping = true;
       naturalScrolling = true;
+      additionalOptions = ''
+        Option "PalmDetection" "True"
+      '';
     };
 
     xrandrHeads = [
