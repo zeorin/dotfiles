@@ -3,6 +3,8 @@
 let
   unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
 
+  dpiScale = x: x * 1;
+
   writeShellScriptDir = path: text:
     pkgs.writeTextFile {
       name = builtins.baseNameOf path;
@@ -1940,7 +1942,7 @@ in {
         window = {
           location = mkLiteral "north";
           anchor = mkLiteral "north";
-          y-offset = mkLiteral "280px";
+          y-offset = mkLiteral "${toString (dpiScale 280)}px";
           width = mkLiteral "40em";
           background-color = mkLiteral "@bg0";
         };
@@ -2718,7 +2720,7 @@ in {
           method = "dual_kawase";
           strength = 5;
         };
-        corner-radius = 8;
+        corner-radius = dpiScale 8;
         rounded-corners-exclude =
           [ "window_type = 'dock'" "window_type = 'desktop'" ];
         blur-background-exclude = [
@@ -3802,11 +3804,21 @@ in {
         ;; See 'C-h v doom-font' for documentation and more examples of what they
         ;; accept. For example:
         ;;
-        (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
-              doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 12 :weight 'light)
-              doom-big-font (font-spec :family "Iosevka Nerd Font" :size 18 :weight 'light)
-              doom-symbol-font (font-spec :family "Symbols Nerd Font" :size 12)
-              doom-serif-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
+        (setq doom-font (font-spec :family "Iosevka Nerd Font" :size ${
+          toString (dpiScale 12)
+        } :weight 'light)
+              doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size ${
+                toString (dpiScale 12)
+              } :weight 'light)
+              doom-big-font (font-spec :family "Iosevka Nerd Font" :size ${
+                toString (dpiScale 18)
+              } :weight 'light)
+              doom-symbol-font (font-spec :family "Symbols Nerd Font" :size ${
+                toString (dpiScale 12)
+              })
+              doom-serif-font (font-spec :family "Iosevka Nerd Font" :size ${
+                toString (dpiScale 12)
+              } :weight 'light)
               nerd-icons-font-family "Iosevka NF Light")
         ;;
         ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
@@ -5277,7 +5289,7 @@ in {
         "Xft.hinting" = 1;
         "Xft.antialias" = 1;
         "Xft.rgba" = "rgb";
-        "Xft.dpi" = 96;
+        "Xft.dpi" = dpiScale 96;
       }
       # xterm
       // (mapAttrs' (name: value: nameValuePair "XTerm.${name}" value) ({
@@ -5289,7 +5301,7 @@ in {
         backarrowKey = false;
         locale = false;
         utf8 = true;
-        internalBorder = 11;
+        internalBorder = dpiScale 11;
         visualbell = true;
         bellIsUrgent = true;
         fullscreen = "never";
@@ -5342,7 +5354,7 @@ in {
     cursorTheme = {
       package = pkgs.capitaine-cursors-themed;
       name = "Capitaine Cursors (Nord)";
-      size = 16;
+      size = dpiScale 32;
     };
     font = {
       name = "SF Pro Text Semibold";
