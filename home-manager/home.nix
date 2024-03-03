@@ -2520,46 +2520,62 @@ in {
           ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
         '';
         gtk-theme = ''
-          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Dark"
-          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Dark'"
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${
+            builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
+          }"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${
+            builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
+          }'"
           ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
           ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
         '';
         icon-theme = ''
-          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir-dark"
-          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'Qogir-dark'"
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${config.gtk.iconTheme.name}-dark"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${config.gtk.iconTheme.name}-dark'"
         '';
         cursor-theme = ''
-          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord)"
-          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'Capitaine Cursors (Nord)'"
-          ${pkgs.xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name}"
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${
+            toString config.gtk.cursorTheme.size
+          }
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name}'"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${
+            toString config.gtk.cursorTheme.size
+          }
+          ${pkgs.xorg.xsetroot}/bin/xsetroot -xfc "${config.gtk.cursorTheme.package}/usr/share/icons/${config.gtk.cursorTheme.name}/cursors/left_ptr" ${
+            toString config.gtk.cursorTheme.size
+          }
         '';
-        desktop-background = ''
-          ${scripts.setDesktopBackground}
-        '';
+        inherit (scripts) setDesktopBackground;
       };
       lightModeScripts = {
         notify = ''
           ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
         '';
         gtk-theme = ''
-          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/ThemeName -s "Qogir-Light"
-          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'Qogir-Light'"
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${config.gtk.theme.name}"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${config.gtk.theme.name}'"
           ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
           ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
         '';
         icon-theme = ''
-          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Net/IconThemeName -s "Qogir"
-          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'Qogir'"
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${config.gtk.iconTheme.name}"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${config.gtk.iconTheme.name}'"
         '';
         cursor-theme = ''
-          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string -c xsettings -p /Gtk/CursorThemeName -s "Capitaine Cursors (Nord) - White"
-          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'Capitaine Cursors (Nord) - White'"
-          ${pkgs.xorg.xsetroot}/bin/xsetroot -cursor_name left_ptr
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name} - White"
+          ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${
+            toString config.gtk.cursorTheme.size
+          }
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name} - White'"
+          ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${
+            toString config.gtk.cursorTheme.size
+          }
+          ${pkgs.xorg.xsetroot}/bin/xsetroot -xfc "${config.gtk.cursorTheme.package}/usr/share/icons/${config.gtk.cursorTheme.name} - White/cursors/left_ptr" ${
+            toString config.gtk.cursorTheme.size
+          }
         '';
-        desktop-background = ''
-          ${scripts.setDesktopBackground}
-        '';
+        inherit (scripts) setDesktopBackground;
       };
     };
     dunst = {
@@ -5341,6 +5357,7 @@ in {
     cursorTheme = {
       package = pkgs.capitaine-cursors-themed;
       name = "Capitaine Cursors (Nord)";
+      size = 16;
     };
     font = {
       name = "SF Pro Text Semibold";
