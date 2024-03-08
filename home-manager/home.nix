@@ -4864,7 +4864,32 @@ in {
 
           " Fix clobbering of Tridactyl command line iframe
           " https://github.com/tridactyl/tridactyl/issues/4807
-          autocmd DocStart .* js const cmdlineIframe = document.getElementById('cmdline_iframe'); requestAnimationFrame(function reattachCmdlineIframe() { !cmdlineIframe.isConnected && document.documentElement.insertBefore(cmdlineIframe, document.documentElement.firstElementChild); requestAnimationFrame(reattachCmdlineIframe) })
+          autocmd DocStart .* js -s ${
+            pkgs.writeText "restore-tridactyl-commandline.js" ''
+              const cmdlineIframe = document.getElementById("cmdline_iframe");
+
+              let { parentElement } = cmdlineIframe;
+
+              const mutationObserver = new MutationObserver((records, mutationObserver) => {
+                if (!parentElement.isConnected) {
+                  mutationObserver.disconnect();
+                  parentElement = document.documentElement;
+                  mutationObserver.observe(parentElement, { childList: true });
+                }
+
+                if (
+                  records.some(({ removedNodes }) =>
+                    Array.from(removedNodes).includes(cmdlineIframe),
+                  )
+                ) {
+
+                  parentElement.appendChild(cmdlineIframe);
+                }
+              });
+
+              mutationObserver.observe(parentElement, { childList: true });
+            ''
+          }
 
           " Disable Tridactyl on certain websites
           ${lib.strings.concatMapStrings (url: "blacklistadd ${url}") [
