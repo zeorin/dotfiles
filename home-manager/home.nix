@@ -4901,6 +4901,8 @@ in {
         '';
       };
       dataFile = {
+        # TODO: This should be a systemd service that periodically checks for
+        # updates to the files on disk and downloads new ones if there are.
         docsets.source = pkgs.symlinkJoin {
           name = "docsets";
           paths =
@@ -4921,7 +4923,7 @@ in {
                 }
                 {
                   name = "Emacs_Lisp";
-                  hash = "sha256-Cc0Ms59nY7+yFRZSt+6D8xQpaFukj4NVzjL8Lv0VuIE=";
+                  hash = "sha256-sTXNYv64F5whATuha6StMoBJRYtZau1WQYTWEu2Nd2I=";
                 }
                 {
                   name = "Emmet";
