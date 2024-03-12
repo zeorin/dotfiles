@@ -255,13 +255,7 @@
 
     networking = {
       # Easy network config
-      networkmanager = {
-        enable = true;
-        insertNameservers = [
-          # Tailscale
-          "100.100.100.100"
-        ];
-      };
+      networkmanager.enable = true;
 
       # Enable IPv6
       enableIPv6 = true;
@@ -523,7 +517,12 @@
       };
     };
 
-    services.tailscale.enable = true;
+    services.tailscale = {
+      enable = true;
+      openFirewall = true;
+      useRoutingFeatures = "client";
+      extraUpFlags = [ "--accept-routes" ];
+    };
 
     # Bluetooth support
     hardware.bluetooth.enable = true;
