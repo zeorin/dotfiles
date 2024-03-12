@@ -3722,7 +3722,21 @@ in {
 
           ;; This determines the style of line numbers in effect. If set to `nil', line
           ;; numbers are disabled. For relative line numbers, set this to `relative'.
-          (setq display-line-numbers-type 'relative)
+          (setq-default display-line-numbers-type 'relative
+                        display-line-numbers-widen t)
+
+          (defun me/relative-line-numbers ()
+            "Show relative line numbers."
+            (unless (equal display-line-numbers nil)
+              (setq-local display-line-numbers 'relative)))
+
+          (defun me/absolute-line-numbers ()
+            "Show absolute line numbers."
+            (unless (equal display-line-numbers nil)
+              (setq-local display-line-numbers t)))
+
+          (add-hook 'evil-insert-state-entry-hook #'me/absolute-line-numbers)
+          (add-hook 'evil-insert-state-exit-hook #'me/relative-line-numbers)
 
           ;; If you use `org' and don't want your org files in the default location below,
           ;; change `org-directory'. It must be set before org loads!
