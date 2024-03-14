@@ -652,7 +652,7 @@ in {
       bash.enable = true;
       browserpass = {
         enable = true;
-        browsers = [ "firefox" "chromium" "chrome" ];
+        browsers = [ "chrome" "chromium" ];
       };
       dircolors = {
         enable = true;
@@ -669,7 +669,13 @@ in {
       };
       firefox = {
         enable = true;
-        package = pkgs.unstable.firefox;
+        package = pkgs.unstable.firefox.override {
+          nativeMessagingHosts = with pkgs; [
+            browserpass
+            plasma-browser-integration
+            tridactyl-native
+          ];
+        };
         profiles = let
           extensions = with config.nur.repos.rycee.firefox-addons;
             [
@@ -5195,11 +5201,6 @@ in {
       ".haskeline".text = ''
         editMode: Vi
       '';
-      # TODO: Do these extensions work?
-      # ".mozilla/native-messaging-hosts/tridactyl.json".source =
-      #   "${pkgs.tridactyl-native}/lib/mozilla/native-messaging-hosts/tridactyl.json";
-      # ".mozilla/native-messaging-hosts/org.kde.plasma.browser_integration.json".source =
-      #   "${pkgs.plasma5Packages.plasma-browser-integration}/lib/mozilla/native-messaging-hosts/org.kde.plasma.browser_integration.json";
       ".my.cnf".text = ''
         [mysql]
         no-beep
@@ -5558,9 +5559,27 @@ in {
             paths = [ wrapped pkg ];
           };
       in [
-        (wrapFirefoxWithProfile unstable.firefox-devedition)
-        (wrapFirefoxWithProfile unstable.firefox-beta)
-        (wrapFirefoxWithProfile unstable.firefox-esr)
+        (wrapFirefoxWithProfile (unstable.firefox-devedition.override {
+          nativeMessagingHosts = with pkgs; [
+            browserpass
+            plasma-browser-integration
+            tridactyl-native
+          ];
+        }))
+        (wrapFirefoxWithProfile (unstable.firefox-beta.override {
+          nativeMessagingHosts = with pkgs; [
+            browserpass
+            plasma-browser-integration
+            tridactyl-native
+          ];
+        }))
+        (wrapFirefoxWithProfile (unstable.firefox-esr.override {
+          nativeMessagingHosts = with pkgs; [
+            browserpass
+            plasma-browser-integration
+            tridactyl-native
+          ];
+        }))
       ]) ++ [
         ungoogled-chromium
         google-chrome
