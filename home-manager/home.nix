@@ -5546,40 +5546,51 @@ in {
           exec = "${firefox-guest}/bin/firefox-guest %U";
         }))
       ]) ++ (let
-        wrapFirefoxWithProfile = pkg:
-          let
-            inherit (pkg.passthru.unwrapped) binaryName;
-            wrapped = pkgs.writeShellScriptBin binaryName ''
-              exec ${pkg}/bin/${binaryName} -P "${
-                lib.strings.removePrefix "firefox-" binaryName
-              }" "$@"
-            '';
-          in pkgs.symlinkJoin {
-            name = "${binaryName}-with-profile";
-            paths = [ wrapped pkg ];
-          };
+        wrapFirefoxWithProfile = launcherName: profile: pkg:
+          let inherit (pkg.passthru.unwrapped) binaryName;
+          in pkgs.runCommandLocal "${binaryName}-with-${profile}-profile" {
+            buildInputs = with pkgs; [ makeWrapper xorg.lndir ];
+          } ''
+            # Symlink everything
+            mkdir -p "$out"
+            lndir -silent "${pkg}" "$out"
+
+            # Remove symlink to original wrapper, if it exists, this may
+            # collide with the same file in other firefox packages.
+            # Workaround for issue fixed by
+            # https://github.com/NixOS/nixpkgs/pull/294971
+            rm -f "$out/bin/.${binaryName}-wrapper"
+
+            # Make our wrapper
+            rm "$out/bin/${launcherName}"
+            makeWrapper "${pkg}/bin/${launcherName}" "$out/bin/${launcherName}" \
+              --add-flags '-P "${profile}"'
+          '';
       in [
-        (wrapFirefoxWithProfile (unstable.firefox-devedition.override {
-          nativeMessagingHosts = with pkgs; [
-            browserpass
-            plasma-browser-integration
-            tridactyl-native
-          ];
-        }))
-        (wrapFirefoxWithProfile (unstable.firefox-beta.override {
-          nativeMessagingHosts = with pkgs; [
-            browserpass
-            plasma-browser-integration
-            tridactyl-native
-          ];
-        }))
-        (wrapFirefoxWithProfile (unstable.firefox-esr.override {
-          nativeMessagingHosts = with pkgs; [
-            browserpass
-            plasma-browser-integration
-            tridactyl-native
-          ];
-        }))
+        (wrapFirefoxWithProfile "firefox-devedition" "developer-edition"
+          (unstable.firefox-devedition.override {
+            nativeMessagingHosts = with pkgs; [
+              browserpass
+              plasma-browser-integration
+              tridactyl-native
+            ];
+          }))
+        (wrapFirefoxWithProfile "firefox-beta" "beta"
+          (unstable.firefox-beta.override {
+            nativeMessagingHosts = with pkgs; [
+              browserpass
+              plasma-browser-integration
+              tridactyl-native
+            ];
+          }))
+        (wrapFirefoxWithProfile "firefox-esr" "esr"
+          (unstable.firefox-esr.override {
+            nativeMessagingHosts = with pkgs; [
+              browserpass
+              plasma-browser-integration
+              tridactyl-native
+            ];
+          }))
       ]) ++ [
         ungoogled-chromium
         google-chrome
