@@ -840,7 +840,6 @@ in {
             settings = commonSettings // noNoiseSuppression;
             inherit extensions;
           };
-          spotify-kiosk = { id = 4; };
         };
       };
       fish = {
@@ -3447,7 +3446,6 @@ in {
               class = "^firefox";
               instance = "^Navigator$";
             }];
-            "${workspace4}" = [{ class = "^spotify-kiosk$"; }];
             "${workspace9}" = [{ class = "^thunderbird$"; }];
             "${workspace10}" = [
               { class = "^TelegramDesktop$"; }
@@ -5169,23 +5167,6 @@ in {
           type = "Application";
           terminal = false;
           categories = [ "System" ];
-        };
-        spotify-firefox-kiosk = let firefox = config.programs.firefox.package;
-        in {
-          name = "Spotify Firefox Kiosk";
-          exec =
-            "${firefox}/bin/${firefox.passthru.unwrapped.binaryName} -P spotify-kiosk --class spotify-kiosk --kiosk https://open.spotify.com %U";
-          startupNotify = true;
-          terminal = false;
-          icon = "spotify-client";
-          genericName = "Music Player";
-          categories = [ "Audio" "Music" "Player" "AudioVideo" ];
-          mimeType = [ "x-scheme-handler/spotify" ];
-          settings = {
-            StartupWMClass = "spotify-kiosk";
-            TryExec =
-              "${firefox}/bin/${firefox.passthru.unwrapped.binaryName} -P spotify-kiosk --class spotify-kiosk --kiosk https://open.spotify.com";
-          };
         };
       };
     };
