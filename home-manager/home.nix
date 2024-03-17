@@ -1929,60 +1929,10 @@ in {
         plugins = with pkgs.tmuxPlugins; [
           sensible
           pain-control
-          sessionist
           prefix-highlight
-          fpp
           nord
           {
-            plugin = yank;
-            extraConfig = ''
-              set -g @override_copy_command '${pkgs.xsel}/bin/xsel'
-              set -g @yank_action 'copy-pipe'
-            '';
-          }
-          {
-            plugin = open;
-            extraConfig = ''
-              set -g @open-S 'https://www.duckduckgo.com/'
-            '';
-          }
-          {
-            plugin = mkTmuxPlugin {
-              pluginName = "fzf-url";
-              version = "unstable-2021-02-20";
-              rtpFilePath = "fzf-url.tmux";
-              src = pkgs.fetchFromGitHub {
-                owner = "wfxr";
-                repo = "tmux-fzf-url";
-                rev = "5b202610ae9dd788a4c07e18c07a2634854401cd";
-                hash = "sha256-r1tAXFPa41V6f8Ea5Z5Gz8bZXVamuixpcAZmupQmmd4=";
-              };
-              postInstall = ''
-                sed -i -e 's|fzf-tmux|${pkgs.fzf}/bin/fzf-tmux|g' $target/fzf-url.sh
-              '';
-            };
-          }
-          {
-            plugin = extrakto;
-            extraConfig = ''
-              set-option -g @extrakto_fzf_tool '${pkgs.fzf}/bin/fzf'
-              set-option -g @extrakto_clip_tool '${pkgs.xsel}/bin/xsel --input --clipboard' # works better for nvim
-              set-option -g @extrakto_copy_key 'tab'
-              set-option -g @extrakto_insert_key 'enter'
-            '';
-          }
-          {
-            plugin = mkTmuxPlugin {
-              pluginName = "better-mouse-mode";
-              rtpFilePath = "scroll_copy_mode.tmux";
-              version = "unstable-2021-02-20";
-              src = pkgs.fetchFromGitHub {
-                owner = "NHDaly";
-                repo = "tmux-better-mouse-mode";
-                rev = "aa59077c635ab21b251bd8cb4dc24c415e64a58e";
-                hash = "sha256-nPNa3JvDgptGvy2vpo0WSZytyu7kFSEn/Jp/OGA0ZBg=";
-              };
-            };
+            plugin = better-mouse-mode;
             extraConfig = ''
               set-option -g @scroll-without-changing-pane 'on'
               set-option -g @emulate-scroll-for-no-mouse-alternate-buffer 'on'
