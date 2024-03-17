@@ -12,29 +12,9 @@ let
     emacsPkg = with pkgs;
       (emacsPackagesFor emacs29).emacsWithPackages
       (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
-    emacsLspBooster = pkgs.rustPlatform.buildRustPackage rec {
-      pname = "emacs-lsp-booster";
-      version = "0.1.1";
-      src = pkgs.fetchFromGitHub {
-        owner = "blahgeek";
-        repo = "emacs-lsp-booster";
-        rev = "v${version}";
-        hash = "sha256-0roQxzQrxcmS2RHQPguBRL76xSErf2hVjuJEyFr5MeM=";
-      };
-
-      cargoHash = "sha256-quqhAMKsZorYKFByy2bojGgYR2Ps959Rg/TP8SnwbqM=";
-      doCheck = false;
-
-      meta = {
-        description = "Emacs LSP performance booster";
-        homepage = "https://github.com/blahgeek/emacs-lsp-booster";
-        license = lib.licenses.mit;
-        maintainers = [ lib.maintainers.acowley ];
-      };
-    };
     pathDeps = with pkgs; [
       git
-      emacsLspBooster
+      unstable.emacs-lsp-booster
       dockfmt
       libxml2.bin
       rstfmt
