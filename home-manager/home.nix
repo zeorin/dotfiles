@@ -71,7 +71,6 @@ let
       jq
       nixfmt
       nil
-      rnix-lsp
       black
       isort
       pipenv
