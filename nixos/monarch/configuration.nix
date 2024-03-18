@@ -85,8 +85,8 @@
   services.thermald.configFile = ./thermal-conf.xml.auto;
   services.udev.extraRules = ''
     # Adjust screen brightness when AC power is [un]plugged
-    SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.brightnessctl}/bin/brightnessctl set 50%-"
-    SUBSYSTEM=="power_supply", ATTR{online}=="1", RUN+="${pkgs.brightnessctl}/bin/brightnessctl set 50%+"
+    SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 50%-"
+    SUBSYSTEM=="power_supply", ATTR{online}=="1", RUN+="${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 50%+"
     # Suspend the system when battery level drops to 5% or lower
     SUBSYSTEM=="power_supply", ATTR{status}=="Discharging", ATTR{capacity}=="[0-5]", RUN+="${pkgs.systemd}/bin/systemctl hibernate"
   '';
@@ -128,17 +128,11 @@
 
   programs.xss-lock = let
     dim-screen = pkgs.writeShellScript "dim-screen" ''
-      min_brightness=40
-
-      brightnessctl () {
-        for device in "$("${pkgs.brightnessctl}/bin/brightnessctl" --class="backlight" --list --machine | cut -f1 -d,)"; do
-          "${pkgs.brightnessctl}/bin/brightnessctl" --exponent=4 "$@"
-        done
-      }
+      min_brightness="40%"
 
       trap "exit 0" TERM INT
-      trap "brightnessctl --restore; kill %%" EXIT
-      brightnessctl set "$min_brightness"
+      trap "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --restore; kill %%" EXIT
+      ${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set "$min_brightness"
       sleep 2147483647 &
       wait
     '';

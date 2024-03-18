@@ -6,12 +6,21 @@
   # This one contains whatever you want to overlay
   # You can change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
-  modifications = final: prev:
-    {
-      # example = prev.example.overrideAttrs (oldAttrs: rec {
-      # ...
-      # });
-    };
+  modifications = final: prev: {
+    # example = prev.example.overrideAttrs (oldAttrs: rec {
+    # ...
+    # });
+    brightnessctl = let rev = "3152968fee82796e5d3bac3b49d81e1dd9787850";
+    in prev.brightnessctl.overrideAttrs (finalAttrs: oldAttrs: {
+      version = builtins.substring 0 7 rev;
+      src = final.fetchFromGitHub {
+        owner = "Hummer12007";
+        repo = "brightnessctl";
+        inherit rev;
+        hash = "sha256-zDohA3F+zX9xbS0SGpF0cygPRPN6iXcH1TrRMhoO1qs=";
+      };
+    });
+  };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will
   # be accessible through 'pkgs.unstable'

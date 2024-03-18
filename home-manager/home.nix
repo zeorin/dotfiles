@@ -3119,9 +3119,9 @@ in {
 
           # Screen brightness controls
           "XF86MonBrightnessUp" =
-            "${pkgs.brightnessctl}/bin/brightnessctl set 5%+";
+            "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%+";
           "XF86MonBrightnessDown" =
-            "${pkgs.brightnessctl}/bin/brightnessctl set 5%-";
+            "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%-";
         };
       };
       syncthing = {
