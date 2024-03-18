@@ -353,18 +353,17 @@
       keyboards.default = {
         ids = [ "*" ];
         settings = {
-          global.layer_indicator = 1;
           main = {
             capslock = "overload(control, esc)";
             enter = "overload(control, enter)";
             space = "overload(alt, space)";
             rightalt = "overload(meta, compose)";
-            leftcontrol = "overload(nav, oneshot(nav))";
-            rightcontrol = "overload(nav, oneshot(nav))";
+            leftcontrol = "overload(layer1, oneshot(layer1))";
+            rightcontrol = "overload(layer1, oneshot(layer1))";
           };
-          nav = {
-            leftcontrol = "toggle(nav)";
-            rightcontrol = "toggle(nav)";
+          layer1 = {
+            leftcontrol = "toggle(layer1)";
+            rightcontrol = "toggle(layer1)";
 
             # Like wasd, but aligned with home row
             e = "up";
@@ -383,12 +382,64 @@
             v = "up";
             # j = "left"; # already bound, luckily to the same key
             p = "right";
+
+            "1" = "f1";
+            "2" = "f2";
+            "3" = "f3";
+            "4" = "f4";
+            "5" = "f5";
+            "6" = "f6";
+            "7" = "f7";
+            "8" = "f8";
+            "9" = "f9";
+            "0" = "f10";
+            "-" = "f11";
+            "=" = "f12";
+
+            "~" = "escape";
+            "\\" = "insert";
+            backspace = "delete";
+
+            m = "previoussong";
+            "," = "playcd";
+            "." = "nextsong";
+            ";" = "volumeup";
+            "/" = "volumedown";
+
+            a = "brightnessup";
+            z = "brightnessdown";
           };
           shift = {
             leftshift = "capslock";
             rightshift = "capslock";
           };
         };
+        extraConfig = ''
+          [layer1+shift]
+
+          # Like wasd, but aligned with home row
+          e = pageup
+          s = home
+          d = pagedown
+          f = end
+
+          # Same thing, but for right hand
+          i = pageup
+          j = home
+          k = pagedown
+          l = end
+
+          # hjkl on the Dvorak layout
+          c = pagedown
+          v = pageup
+          # j = home # already bound, luckily to the same key
+          p = end
+
+          m = rewind
+          , = stopcd
+          . = fastforward
+          / = mute
+        '';
       };
     };
 
