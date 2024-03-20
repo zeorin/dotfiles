@@ -60,7 +60,9 @@
         packages = import ./pkgs { inherit pkgs; };
         # Devshell for bootstrapping
         # Acessible through 'nix develop' or 'nix-shell' (legacy)
-        devShells = import ./shell.nix { inherit pkgs; };
+        devShells = import ./shell.nix {
+          pkgs = pkgs.appendOverlays (builtins.attrValues outputs.overlays);
+        };
       }) // {
         # Your custom packages and modifications, exported as overlays
         overlays = import ./overlays { inherit inputs; };

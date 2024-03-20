@@ -653,6 +653,9 @@ in {
             browserpass
             plasma-browser-integration
             tridactyl-native
+            (tabfs.override {
+              mountDir = "${config.xdg.dataHome}/tabfs/personal";
+            })
           ];
         };
         profiles = let
@@ -688,7 +691,8 @@ in {
               ublock-origin
               wallabagger
               wayback-machine
-            ] ++ (with config.nur.repos.meain.firefox-addons; [ containerise ]);
+            ] ++ (with config.nur.repos.meain.firefox-addons; [ containerise ])
+            ++ (with pkgs; [ tabfs ]);
           commonSettings = {
             "browser.startup.page" = 3; # resume previous session
             "browser.startup.homepage" = "about:blank";
@@ -5483,6 +5487,9 @@ in {
               browserpass
               plasma-browser-integration
               tridactyl-native
+              (tabfs.override {
+                mountDir = "${config.xdg.dataHome}/tabfs/developer-edition";
+              })
             ];
           }))
         (wrapFirefoxWithProfile "firefox-beta" "beta"
@@ -5491,6 +5498,9 @@ in {
               browserpass
               plasma-browser-integration
               tridactyl-native
+              (tabfs.override {
+                mountDir = "${config.xdg.dataHome}/tabfs/beta";
+              })
             ];
           }))
         (wrapFirefoxWithProfile "firefox-esr" "esr"
@@ -5499,6 +5509,9 @@ in {
               browserpass
               plasma-browser-integration
               tridactyl-native
+              (tabfs.override {
+                mountDir = "${config.xdg.dataHome}/tabfs/esr";
+              })
             ];
           }))
       ]) ++ [
