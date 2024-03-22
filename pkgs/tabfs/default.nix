@@ -33,6 +33,8 @@ in ({ lib, stdenv, writeShellScriptBin, fetchFromGitHub, runCommandLocal, tabfs
       allowed_extensions = [ addonId ];
     };
 
+    patches = [ ./dont-kill-all-other-instances-on-start.patch ];
+
     preBuild = ''
       makeFlagsArray+=('CFLAGS+=-I${fuse}/include -L${fuse}/lib $(CFLAGS_EXTRA)')
       cd fs/
