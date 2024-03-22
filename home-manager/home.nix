@@ -742,6 +742,8 @@ in {
             "browser.aboutConfig.showWarning" = false;
             # Hide bookmarks toolbar
             "browser.toolbars.bookmarks.visibility" = "never";
+            # On i3 tabs in titlebar are pretty ugly
+            "browser.tabs.inTitlebar" = 0;
             # Allow all fontconfig substitutions
             "gfx.font_rendering.fontconfig.max_generic_substitutions" = 127;
             # Use system emoji
