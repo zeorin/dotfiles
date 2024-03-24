@@ -4304,6 +4304,9 @@ in {
           ''}";
         };
         emacs.source = inputs.chemacs;
+        "enchant/enchant.ordering".text = ''
+          *:nuspell,hunspell,aspell
+        '';
         "flameshot/flameshot.ini" = {
           text = ''
             [General]
@@ -5250,9 +5253,12 @@ in {
         my-emacs
         (writeShellScriptBin "edit"
           (toString config.home.sessionVariables.EDITOR))
-        (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
-        (hunspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
-        (nuspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
+        aspellDicts.en
+        aspellDicts.en-computers
+        aspellDicts.en-science
+        (hunspellWithDicts (with hunspellDicts; [ en-gb-large ]))
+        hunspellDicts.en-gb-large
+        (nuspellWithDicts (with hunspellDicts; [ en-gb-large ]))
         enchant
         languagetool
         webcamoid
