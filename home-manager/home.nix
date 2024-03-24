@@ -3815,6 +3815,153 @@ in {
           (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
           (advice-add 'org-todo-list :before #'vulpea-agenda-files-update)
 
+          (after! org (progn
+                      (with-no-warnings
+                        (custom-declare-face '+org-todo-next   '((t (:inherit (bold font-lock-constant-face org-todo)))) "")
+                        (custom-declare-face '+org-todo-wait '((t (:inherit (bold warning org-todo)))) "")
+                        (custom-declare-face '+org-todo-hold '((t (:inherit (bold font-lock-doc-face org-todo)))) "")
+                        (custom-declare-face '+org-todo-kill '((t (:inherit (bold font-lock-comment-face org-todo)))) ""))
+
+                        org-todo-keywords '((sequence
+                                            "TODO(t!)"  ; A single task (that is not made up of other tasks—which would be a /project/)
+                                            "NEXT(x!)"  ; A TODO that is the next action item in a project
+                                            "LOOP(r!)"  ; A recurring task
+                                            "WAIT(w!)"  ; A task that is current blocked because it is waiting for someone or something external
+                                            "|"
+                                            "DONE(d!)"  ; Done
+                                            "HOLD(h!)"  ; On hold due to me
+                                            "IDEA(i!)"  ; Someday/maybe
+                                            "KILL(k!)") ; Cancelled
+                                            (sequence
+                                            "[ ](T)"  ; A task that needs doing
+                                            "|"
+                                            "[?](W)"  ; Waiting
+                                            "[X](D)") ; Done
+                                            (sequence
+                                            "|"
+                                            "OKAY(o)"
+                                            "YES(y)"
+                                            "NO(n)"))
+
+                        org-todo-keyword-faces
+                        '(("NEXT" . +org-todo-next)
+                          ("[?]"  . +org-todo-wait)
+                          ("WAIT" . +org-todo-wait)
+                          ("HOLD" . +org-todo-hold)
+                          ("IDEA" . +org-todo-hold)
+                          ("NO"   . +org-todo-kill)
+                          ("KILL" . +org-todo-kill))
+
+                        org-auto-align-tags nil
+                        org-tags-column 0
+                        org-catch-invisible-edits 'show-and-error
+                        org-special-ctrl-a/e t
+                        org-insert-heading-respect-content t
+
+                        org-hide-emphasis-markers t
+                        org-pretty-entities t
+                        org-ellipsis "…"
+
+                        ;; org-agenda-tags-column 0
+                        ;; org-agenda-block-separator ?─
+                        ;; org-agenda-time-grid
+                        ;; '((daily today require-timed)
+                        ;;   (800 1000 1200 1400 1600 1800 2000)
+                        ;;   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+                        ;; org-agenda-current-time-string
+                        ;; "◀── now ─────────────────────────────────────────────────"
+
+                        ;; display-line-numbers-mode 0
+                        ;; variable-pitch-mode 1
+                        ))
+
+          (use-package! org-modern
+            :hook ((org-mode . org-modern-mode)
+                   (org-agenda-finalize . org-modern-agenda))
+            :config
+            (setq org-modern-star '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶")
+                  org-modern-table-vertical 1
+                  org-modern-table-horizontal 0.2
+                  org-modern-list '((43 . "➤")
+                                    (45 . "–")
+                                    (42 . "•"))
+                  org-modern-todo-faces
+                  '(("TODO" :inverse-video t :inherit org-todo)
+                    ("NEXT" :inverse-video t :inherit +org-todo-next)
+                    ("PROJ" :inverse-video t :inherit +org-todo-project)
+                    ("STRT" :inverse-video t :inherit +org-todo-active)
+                    ("[-]"  :inverse-video t :inherit +org-todo-active)
+                    ("HOLD" :inverse-video t :inherit +org-todo-onhold)
+                    ("WAIT" :inverse-video t :inherit +org-todo-onhold)
+                    ("[?]"  :inverse-video t :inherit +org-todo-onhold)
+                    ("KILL" :inverse-video t :inherit +org-todo-cancel)
+                    ("NO"   :inverse-video t :inherit +org-todo-cancel))
+                  org-modern-footnote
+                  (cons nil (cadr org-script-display))
+                  org-modern-block-fringe nil
+                  org-modern-block-name
+                  '((t . t)
+                    ("src" "»" "«")
+                    ("example" "»–" "–«")
+                    ("quote" "❝" "❞")
+                    ("export" "⏩" "⏪"))
+                  org-modern-progress nil
+                  org-modern-priority nil
+                  org-modern-horizontal-rule (make-string 36 ?─)
+                  org-modern-keyword
+                  '((t . t)
+                    ("title" . "𝙏")
+                    ("subtitle" . "𝙩")
+                    ("author" . "𝘼")
+                    ("email" . #("" 0 1 (display (raise -0.14))))
+                    ("date" . "𝘿")
+                    ("property" . "☸")
+                    ("options" . "⌥")
+                    ("startup" . "⏻")
+                    ("macro" . "𝓜")
+                    ("bind" . #("" 0 1 (display (raise -0.1))))
+                    ("bibliography" . "")
+                    ("print_bibliography" . #("" 0 1 (display (raise -0.1))))
+                    ("cite_export" . "⮭")
+                    ("print_glossary" . #("ᴬᶻ" 0 1 (display (raise -0.1))))
+                    ("glossary_sources" . #("" 0 1 (display (raise -0.14))))
+                    ("include" . "⇤")
+                    ("setupfile" . "⇚")
+                    ("html_head" . "🅷")
+                    ("html" . "🅗")
+                    ("latex_class" . "🄻")
+                    ("latex_class_options" . #("🄻" 1 2 (display (raise -0.14))))
+                    ("latex_header" . "🅻")
+                    ("latex_header_extra" . "🅻⁺")
+                    ("latex" . "🅛")
+                    ("beamer_theme" . "🄱")
+                    ("beamer_color_theme" . #("🄱" 1 2 (display (raise -0.12))))
+                    ("beamer_font_theme" . "🄱𝐀")
+                    ("beamer_header" . "🅱")
+                    ("beamer" . "🅑")
+                    ("attr_latex" . "🄛")
+                    ("attr_html" . "🄗")
+                    ("attr_org" . "⒪")
+                    ("call" . #("" 0 1 (display (raise -0.15))))
+                    ("name" . "⁍")
+                    ("header" . "›")
+                    ("caption" . "☰")
+                    ("results" . "🠶")))
+            (custom-set-faces! '(org-modern-statistics :inherit org-checkbox-statistics-todo)))
+
+          (after! spell-fu
+            (cl-pushnew 'org-modern-tag (alist-get 'org-mode +spell-excluded-faces-alist)))
+
+          (use-package! org-appear
+            :hook (org-mode . org-appear-mode)
+            :config
+            (setq org-appear-autoemphasis t
+                  org-appear-autosubmarkers t
+                  org-appear-autolinks nil)
+            ;; for proper first-time setup, `org-appear--set-elements'
+            ;; needs to be run after other hooks have acted.
+            (run-at-time nil nil #'org-appear--set-elements))
+
           (setq projectile-project-search-path '(("~/Code/" . 2)))
 
           ;; Here are some additional functions/macros that could help you configure Doom:
@@ -4319,6 +4466,9 @@ in {
             (package! evil-little-word
               :recipe (:host github :repo "tarao/evil-plugins"
                        :files ("evil-little-word.el")))
+
+            (package! org-modern)
+            (package! org-appear)
           '';
           onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
             export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
