@@ -3791,6 +3791,180 @@ in {
           (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
           (advice-add 'org-todo-list :before #'vulpea-agenda-files-update)
 
+          (after! org (progn
+                      (with-no-warnings
+                        (custom-declare-face '+org-todo-next   '((t (:inherit (bold font-lock-constant-face org-todo)))) "")
+                        (custom-declare-face '+org-todo-wait '((t (:inherit (bold warning org-todo)))) "")
+                        (custom-declare-face '+org-todo-hold '((t (:inherit (bold font-lock-doc-face org-todo)))) "")
+                        (custom-declare-face '+org-todo-kill '((t (:inherit (bold font-lock-comment-face org-todo)))) ""))
+
+                        org-todo-keywords '((sequence
+                                            "TODO(t!)"  ; A single task (that is not made up of other tasks—which would be a /project/)
+                                            "NEXT(x!)"  ; A TODO that is the next action item in a project
+                                            "LOOP(r!)"  ; A recurring task
+                                            "WAIT(w!)"  ; A task that is current blocked because it is waiting for someone or something external
+                                            "|"
+                                            "DONE(d!)"  ; Done
+                                            "HOLD(h!)"  ; On hold due to me
+                                            "IDEA(i!)"  ; Someday/maybe
+                                            "KILL(k!)") ; Cancelled
+                                            (sequence
+                                            "[ ](T)"  ; A task that needs doing
+                                            "|"
+                                            "[?](W)"  ; Waiting
+                                            "[X](D)") ; Done
+                                            (sequence
+                                            "|"
+                                            "OKAY(o)"
+                                            "YES(y)"
+                                            "NO(n)"))
+
+                        org-todo-keyword-faces
+                        '(("NEXT" . +org-todo-next)
+                          ("[?]"  . +org-todo-wait)
+                          ("WAIT" . +org-todo-wait)
+                          ("HOLD" . +org-todo-hold)
+                          ("IDEA" . +org-todo-hold)
+                          ("NO"   . +org-todo-kill)
+                          ("KILL" . +org-todo-kill))
+
+                        org-auto-align-tags nil
+                        org-tags-column 0
+                        org-catch-invisible-edits 'show-and-error
+                        org-special-ctrl-a/e t
+                        org-insert-heading-respect-content t
+
+                        org-hide-emphasis-markers t
+                        org-pretty-entities t
+                        org-ellipsis "…"
+
+                        ;; org-agenda-tags-column 0
+                        ;; org-agenda-block-separator ?─
+                        ;; org-agenda-time-grid
+                        ;; '((daily today require-timed)
+                        ;;   (800 1000 1200 1400 1600 1800 2000)
+                        ;;   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+                        ;; org-agenda-current-time-string
+                        ;; "◀── now ─────────────────────────────────────────────────"
+
+                        ;; display-line-numbers-mode 0
+                        ;; variable-pitch-mode 1
+                        ))
+
+          (use-package! org-modern
+                        :hook ((org-mode . org-modern-mode)
+                              (org-agenda-finalize . org-modern-agenda))
+                        :custom
+                        (org-modern-timestamp nil)
+                        (org-modern-priority nil)
+                        (org-modern-todo nil)
+                        (org-modern-tag nil)
+                        (org-modern-progress nil)
+                        (org-modern-block-fringe t))
+                        ; org-modern-hide-stars t))
+
+          (use-package! svg-tag-mode
+            :hook (org-mode . svg-tag-mode)
+            :config (progn
+                    (with-eval-after-load 'my-gui
+                      (setq svg-lib-style-default (svg-lib-style-compute-default)))
+                    (defconst date-re "[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}")
+                    (defconst time-re "[0-9]\\{2\\}:[0-9]\\{2\\}")
+                    (defconst day-re "[A-Za-z]\\{3\\}")
+                    (defconst day-time-re (format "\\(%s\\)? ?\\(%s\\)?" day-re time-re))
+                    (setq svg-tag-action-at-point 'edit)
+                    (defun org-agenda-show-svg ()
+                        (let* ((case-fold-search nil)
+                              (keywords (mapcar #'svg-tag--build-keywords svg-tag--active-tags))
+                              (keyword (car keywords)))
+                          (while keyword
+                            (save-excursion
+                              (while (re-search-forward (nth 0 keyword) nil t)
+                                (overlay-put (make-overlay
+                                              (match-beginning 0) (match-end 0))
+                                            'display  (nth 3 (eval (nth 2 keyword)))) ))
+                            (pop keywords)
+                            (setq keyword (car keywords)))))
+                    (add-hook 'org-agenda-finalize-hook #'org-agenda-show-svg)
+                    (defun svg-progress-percent (value)
+                      (svg-image (svg-lib-concat
+                                  (svg-lib-progress-bar (/ (string-to-number value) 100.0)
+                                                    nil :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+                                  (svg-lib-tag (concat value "%")
+                                              nil :stroke 0 :margin 0)) :ascent 'center))
+                    (defun svg-progress-count (value)
+                      (let* ((seq (mapcar #'string-to-number (split-string value "/")))
+                            (count (float (car seq)))
+                            (total (float (cadr seq))))
+                      (svg-image (svg-lib-concat
+                                  (svg-lib-progress-bar (/ count total) nil
+                                                        :margin 0 :stroke 2 :radius 3 :padding 2 :width 11)
+                                  (svg-lib-tag value nil
+                                              :stroke 0 :margin 0)) :ascent 'center)))
+                    (setq svg-tag-tags
+                          `(
+                            ;; Tags
+                            (":\\([A-Za-z0-9]+\\)" . ((lambda (tag) (svg-tag-make tag))))
+                            (":\\([A-Za-z0-9]+[ \-]\\)" . ((lambda (tag) tag)))
+                            ;; Task priority
+                            ("\\[#[A-Z]\\]" . ( (lambda (tag)
+                                                  (svg-tag-make tag :face 'org-priority
+                                                                :beg 2 :end -1 :margin 0))))
+                            ;; Progress
+                            ("\\(\\[[0-9]\\{1,3\\}%\\]\\)" . ((lambda (tag)
+                                                                (svg-progress-percent (substring tag 1 -2)))))
+                            ("\\(\\[[0-9]+/[0-9]+\\]\\)" . ((lambda (tag)
+                                                              (svg-progress-count (substring tag 1 -1)))))
+                            ;; Todo keywords
+                            ("NEXT"                     . ((lambda (tag) (svg-tag-make tag :face '+org-todo-next :inverse t :margin 0))))
+                            ("TODO\\|LOOP\\|YES\\|OKAY" . ((lambda (tag) (svg-tag-make tag :face 'org-todo :margin 0))))
+                            ("WAIT"                     . ((lambda (tag) (svg-tag-make tag :face '+org-todo-wait :inverse t :margin 0))))
+                            ("HOLD"                     . ((lambda (tag) (svg-tag-make tag :face '+org-todo-hold :inverse t :margin 0))))
+                            ("IDEA"                     . ((lambda (tag) (svg-tag-make tag :face '+org-todo-hold :margin 0))))
+                            ("KILL\\|NO"                . ((lambda (tag) (svg-tag-make tag :face '+org-todo-kill :margin 0))))
+                            ("DONE"                     . ((lambda (tag) (svg-tag-make tag :face 'org-done :margin 0))))
+                            ;; Citation of the form [cite:@Knuth:1984]
+                            ("\\(\\[cite:@[A-Za-z]+:\\)" . ((lambda (tag)
+                                                              (svg-tag-make tag
+                                                                            :inverse t
+                                                                            :beg 7 :end -1
+                                                                            :crop-right t))))
+                            ("\\[cite:@[A-Za-z]+:\\([0-9]+\\]\\)" . ((lambda (tag)
+                                                                    (svg-tag-make tag
+                                                                                  :end -1
+                                                                                  :crop-left t))))
+                            ;; Active date (with or without day name, with or without time)
+                            (,(format "\\(<%s>\\)" date-re) .
+                            ((lambda (tag)
+                                (svg-tag-make tag :beg 1 :end -1 :margin 0))))
+                            (,(format "\\(<%s \\)%s>" date-re day-time-re) .
+                            ((lambda (tag)
+                                (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0))))
+                            (,(format "<%s \\(%s>\\)" date-re day-time-re) .
+                            ((lambda (tag)
+                                (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0))))
+                            ;; Inactive date  (with or without day name, with or without time)
+                            (,(format "\\(\\[%s\\]\\)" date-re) .
+                              ((lambda (tag)
+                                (svg-tag-make tag :beg 1 :end -1 :margin 0 :face 'org-date))))
+                            (,(format "\\(\\[%s \\)%s\\]" date-re day-time-re) .
+                              ((lambda (tag)
+                                (svg-tag-make tag :beg 1 :inverse nil :crop-right t :margin 0 :face 'org-date))))
+                            (,(format "\\[%s \\(%s\\]\\)" date-re day-time-re) .
+                              ((lambda (tag)
+                                (svg-tag-make tag :end -1 :inverse t :crop-left t :margin 0 :face 'org-date))))))
+                              ))
+
+          ;; Problem using svg-lib / svg-tag-mode with daemon and emacsclient · Issue #18 · rougier/svg-lib
+          ;; https://github.com/rougier/svg-lib/issues/18
+          (defun first-graphical-frame-hook-function ()
+            (remove-hook 'focus-in-hook #'first-graphical-frame-hook-function)
+            (provide 'my-gui))
+          (add-hook 'focus-in-hook #'first-graphical-frame-hook-function)
+
+          (use-package! org-appear
+                        :hook (org-mode . org-appear-mode))
+
           (setq projectile-project-search-path '(("~/Code/" . 2)))
 
           ;; Here are some additional functions/macros that could help you configure Doom:
@@ -4295,6 +4469,10 @@ in {
             (package! evil-little-word
               :recipe (:host github :repo "tarao/evil-plugins"
                        :files ("evil-little-word.el")))
+
+            (package! org-modern)
+            (package! svg-tag-mode)
+            (package! org-appear)
           '';
           onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
             export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
