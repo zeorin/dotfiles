@@ -5516,10 +5516,33 @@ in {
               })
             ];
           }))
-      ]) ++ [
-        ungoogled-chromium
-        google-chrome
-        netflix
+      ]) ++ (let
+        mkChrome = (chrome:
+          (chrome.overrideAttrs (oldAttrs: {
+            postInstall = ''
+              wrapProgram $exe \
+                --set-default LIBVA_DRI3_DISABLE 1
+            '';
+          })).override {
+            commandLineArgs = ''
+              --disable-features=UseChromeOSDirectVideoDecoder \
+              --enable-features=TouchpadOverscrollHistoryNavigation
+            '';
+          });
+      in [ (mkChrome ungoogled-chromium) (mkChrome google-chrome) ]) ++ [
+        ((netflix.overrideAttrs (oldAttrs: {
+          nativeBuildInputs = oldAttrs.nativeBuildInputs or [ ]
+            ++ [ makeWrapper ];
+          postInstall = ''
+            wrapProgram $out/bin/${netflix.name} \
+              --set-default LIBVA_DRI3_DISABLE 1
+          '';
+        })).override {
+          commandLineArgs = [
+            "--disable-features=UseChromeOSDirectVideoDecoder"
+            "--enable-features=TouchpadOverscrollHistoryNavigation"
+          ];
+        })
         tor-browser-bundle-bin
         virt-manager
         qemu
