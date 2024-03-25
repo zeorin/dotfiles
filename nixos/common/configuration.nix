@@ -208,9 +208,28 @@
       usbutils
       pciutils
       inetutils
+      mtr
       config.boot.kernelPackages.v4l2loopback.bin
       alsa-utils
       virtiofsd
+
+      # https://www.brendangregg.com/blog/2024-03-24/linux-crisis-tools.html
+      procps
+      util-linux
+      sysstat
+      iproute2
+      numactl
+      tcpdump
+      config.boot.kernelPackages.turbostat
+      config.boot.kernelPackages.perf
+      bcc
+      bpftrace
+      trace-cmd
+      ethtool
+      tiptop
+      cpuid
+      msr-tools
+      gdb
     ];
 
     powerManagement = {
