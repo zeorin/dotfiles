@@ -971,14 +971,6 @@ in {
 
           fish_nord_theme dark
 
-          # Notify for long-running commands
-          function ntfy_on_duration --on-event fish_prompt
-            if test "$CMD_DURATION" -gt (math "1000 * 10")
-              set secs (math "$CMD_DURATION / 1000")
-              ${pkgs.ntfy}/bin/ntfy -t "$history[1]" send "Returned $status, took $secs seconds"
-            end
-          end
-
           # Determine whether to use side-by-side mode for delta
           function delta_sidebyside --on-signal WINCH
             if test "$COLUMNS" -ge 170; and ! contains side-by-side "$DELTA_FEATURES"
@@ -994,6 +986,15 @@ in {
             source ${my-emacs.emacs.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${my-emacs.emacs.pkgs.vterm.version}/etc/emacs-vterm.fish
           end
         '';
+        plugins = [{
+          name = "done";
+          src = pkgs.fetchFromGitHub {
+            owner = "franciscolourenco";
+            repo = "done";
+            rev = "1.19.2";
+            hash = "sha256-VSCYsGjNPSFIZSdLrkc7TU7qyPVm8UupOoav5UqXPMk=";
+          };
+        }];
       };
       fzf = {
         enable = true;
