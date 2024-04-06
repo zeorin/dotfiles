@@ -502,8 +502,6 @@
         allowedTCPPorts = [
           # Calibre wireless
           9090
-          # Samba
-          5357
           # Syncthing
           22000
         ];
@@ -517,8 +515,6 @@
         allowedUDPPorts = [
           # Calibre wireless
           9090
-          # Samba
-          3702
           # Syncthing
           21027
           22000
@@ -530,47 +526,6 @@
             to = 1764;
           }
         ];
-      };
-    };
-    services.samba-wsdd.enable = true;
-    services.samba = {
-      enable = true;
-      openFirewall = true;
-      securityType = "user";
-      extraConfig = ''
-        workgroup = WORKGROUP
-        server string = smbnix
-        netbios name = smbnix
-        security = user
-        #use sendfile = yes
-        #max protocol = smb2
-        # note: localhost is the ipv6 localhost ::1
-        hosts allow = 192.168.122. 192.168.0. 127.0.0.1 localhost
-        hosts deny = 0.0.0.0/0
-        guest account = nobody
-        map to guest = bad user
-      '';
-      shares = {
-        public = {
-          path = "/mnt/Shares/Public";
-          browseable = "yes";
-          "read only" = "no";
-          "guest ok" = "yes";
-          "create mask" = "0644";
-          "directory mask" = "0755";
-          "force user" = "zeorin";
-          "force group" = "zeorin";
-        };
-        private = {
-          path = "/mnt/Shares/Private";
-          browseable = "yes";
-          "read only" = "no";
-          "guest ok" = "no";
-          "create mask" = "0644";
-          "directory mask" = "0755";
-          "force user" = "zeorin";
-          "force group" = "zeorin";
-        };
       };
     };
 

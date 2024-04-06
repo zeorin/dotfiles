@@ -5525,9 +5525,7 @@ in {
         tor-browser-bundle-bin
         virt-manager
         qemu
-        (unstable.quickemu.override {
-          qemu = unstable.qemu.override { smbdSupport = true; };
-        })
+        quickemu
         slack
         discord
         tdesktop
