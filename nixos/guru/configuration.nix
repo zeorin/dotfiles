@@ -102,17 +102,7 @@
   environment.etc."X11/xorg.conf.d/90-nvidia-i2c.conf".source =
     "${pkgs.ddcutil}/share/ddcutil/data/90-nvidia-i2c.conf";
 
-  fileSystems = {
-    "/".options = [ "noatime" "nodiratime" "discard" ];
-    "/data" = {
-      device = "/dev/disk/by-uuid/6ee6e25c-fe6f-4c50-b7fb-985260cf8ca9";
-      encrypted = {
-        enable = true;
-        label = "cryptdata";
-        blkDev = "/dev/disk/by-uuid/14924ada-f427-411b-b426-e9db44ab0752";
-      };
-    };
-  };
+  fileSystems = { "/".options = [ "noatime" "nodiratime" "discard" ]; };
 
   services.tlp.settings = {
     SOUND_POWER_SAVE_ON_AC = 0;
