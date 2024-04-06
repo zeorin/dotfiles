@@ -81,8 +81,11 @@
 
   powerManagement.cpuFreqGovernor = "powersave";
 
-  # Generated using https://github.com/intel/dptfxtract
-  services.thermald.configFile = ./thermal-conf.xml.auto;
+  services.thermald = {
+    enable = true;
+    # Generated using https://github.com/intel/dptfxtract
+    configFile = ./thermal-conf.xml.auto;
+  };
   services.udev.extraRules = ''
     # Adjust screen brightness when AC power is [un]plugged
     SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 50%-"

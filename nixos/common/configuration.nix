@@ -237,7 +237,6 @@
       enable = true;
       cpuFreqGovernor = lib.mkDefault "performance";
     };
-    services.upower.enable = true;
     services.tlp = {
       enable = true;
       settings = {
@@ -246,7 +245,6 @@
         NMI_WATCHDOG = 0;
       };
     };
-    services.thermald.enable = true;
 
     systemd.sleep.extraConfig = "HibernateDelaySec=4h";
     services.logind.lidSwitch = "suspend-then-hibernate";
