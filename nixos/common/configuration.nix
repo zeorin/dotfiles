@@ -155,18 +155,9 @@
 
       kernelParams = [ "quiet" "udev.log_level=3" ];
       kernelPackages = pkgs.unstable.linuxPackages_zen;
-      extraModulePackages = with config.boot.kernelPackages;
-        [
-          # exfat-nofuse
-          # akvcam
-          v4l2loopback
-        ];
-      kernelModules = [ "kvm-intel" "v4l2loopback" ];
+      extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
+      kernelModules = [ "v4l2loopback" ];
       extraModprobeConfig = ''
-        options kvm_intel nested=1
-        options kvm_intel emulate_invalid_guest_state=0
-        options kvm ignore_msrs=1 report_ignored_msrs=0
-
         options v4l2loopback devices=1 exclusive_caps=1 video_nr=10 card_label="OBS Camera"
       '';
       supportedFilesystems = [ "ntfs" ];

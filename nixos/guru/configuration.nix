@@ -61,11 +61,12 @@
       };
     };
 
-    kernelParams = [ "libata.noacpi=1" ];
+    kernelParams = [ "mem_sleep_default=deep" ];
     extraModulePackages = with config.boot.kernelPackages; [ ddcci-driver ];
     kernelModules = [ "ddcci_backlight" ];
     extraModprobeConfig = ''
-      options snd-hda-intel power_save=0 power_save_controller=N model=asus
+      options kvm_amd nested=1
+      options kvm ignore_msrs=1 report_ignored_msrs=0
     '';
   };
   services.udev.packages = with pkgs; [ vial ];
@@ -113,6 +114,7 @@
   };
 
   networking.hostName = "guru";
+  networking.interfaces.enp4s0.wakeOnLan.enable = true;
 
   # https://github.com/NixOS/nixpkgs/issues/30796#issuecomment-615680290
   services.xserver.displayManager.setupCommands =
