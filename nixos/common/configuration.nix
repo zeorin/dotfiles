@@ -134,7 +134,6 @@
 
     boot = {
       loader = {
-        # Use the systemd-boot EFI boot loader.
         efi.canTouchEfiVariables = true;
         systemd-boot = {
           enable = true;
@@ -144,12 +143,10 @@
         };
       };
 
-      uvesafb = {
+      plymouth = {
         enable = true;
-        gfx-mode = "1920x1080-32";
+        theme = "breeze";
       };
-
-      plymouth.enable = true;
 
       initrd.systemd.enable = true;
 
