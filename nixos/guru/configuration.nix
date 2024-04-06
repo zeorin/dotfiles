@@ -5,8 +5,8 @@
     common-pc
     common-pc-hdd
     common-pc-ssd
-    common-cpu-intel
-    common-cpu-intel-sandy-bridge
+    common-cpu-amd
+    common-cpu-amd-pstate
     common-gpu-nvidia-nonprime
     ./hardware-configuration.nix
     ../common/configuration.nix
