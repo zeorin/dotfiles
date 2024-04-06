@@ -135,4 +135,6 @@
     allowFrom = [ "all" ];
     defaultShared = true; # If you want
   };
+
+  services.hardware.openrgb.enable = true;
 }
