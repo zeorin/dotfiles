@@ -122,6 +122,7 @@
         experimental-features =
           lib.strings.concatStringsSep " " [ "nix-command" "flakes" ];
         auto-optimise-store = true;
+        trusted-users = [ "root" "@wheel" ];
         # keep-outputs = true;
         # keep-derivations = true;
         # https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-use-xdg-base-directories
