@@ -7,15 +7,23 @@
   imports = [ inputs.nixpkgs.nixosModules.notDetected ];
 
   boot.initrd.availableKernelModules =
-    [ "ehci_pci" "ahci" "xhci_pci" "usb_storage" "usbhid" "sd_mod" "sr_mod" ];
+    [ "nvme" "xhci_pci" "ahci" "usbhid" "sd_mod" ];
   boot.initrd.kernelModules = [ "dm-snapshot" ];
-  boot.kernelModules = [ "kvm-intel" ];
+  boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/757cf7da-9ad2-457a-b402-96e34a21cf42";
     fsType = "ext4";
   };
+
+  fileSystems."/data" = {
+    device = "/dev/disk/by-uuid/6ee6e25c-fe6f-4c50-b7fb-985260cf8ca9";
+    fsType = "ext4";
+  };
+
+  boot.initrd.luks.devices."cryptdata".device =
+    "/dev/disk/by-uuid/14924ada-f427-411b-b426-e9db44ab0752";
 
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/F471-068C";
@@ -25,14 +33,16 @@
   swapDevices =
     [{ device = "/dev/disk/by-uuid/eca45b18-eb6d-4110-8cba-af9d54cf9a17"; }];
 
-  nix = {
-    settings.max-jobs = lib.mkDefault 4;
-    extraOptions = ''
-      keep-outputs = true
-      keep-derivations = true
-    '';
-  };
-  powerManagement.cpuFreqGovernor = lib.mkDefault "performance";
+  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+  # (the default) this is the recommended approach. When using systemd-networkd it's
+  # still possible to use this option, but it's recommended to use it in conjunction
+  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+  networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.docker0.useDHCP = lib.mkDefault true;
+  networking.interfaces.enp4s0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.tailscale0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.cpu.amd.updateMicrocode =
+    lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
