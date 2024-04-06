@@ -5266,6 +5266,7 @@ in {
         xclip
         curl
         httpie
+        unstable.devenv
         xdg-user-dirs
         unstable.wineWowPackages.stagingFull
         winetricks
