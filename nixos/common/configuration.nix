@@ -482,7 +482,15 @@
       isNormalUser = true;
       shell = pkgs.fish;
       group = "zeorin";
-      extraGroups = [ "wheel" "networkmanager" "docker" "adbusers" "libvirtd" ];
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+        "docker"
+        "adbusers"
+        "libvirtd"
+        "video"
+        "input"
+      ];
     };
     users.groups.zeorin = { };
     home-manager = {
