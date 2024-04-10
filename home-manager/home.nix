@@ -2329,22 +2329,38 @@ in {
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
             ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
           '';
+          kvantum-theme = ''
+            ${pkgs.libsForQt5.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNordDark
+          '';
           icon-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${config.gtk.iconTheme.name}-dark"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${config.gtk.iconTheme.name}-dark'"
+            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${
+              builtins.replaceStrings [ "light" ] [ "dark" ]
+              config.gtk.iconTheme.name
+            }"
+            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${
+              builtins.replaceStrings [ "light" ] [ "dark" ]
+              config.gtk.iconTheme.name
+            }'"
           '';
           cursor-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name}"
+            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${
+              builtins.replaceStrings [ "light" ] [ "dark" ]
+              config.gtk.cursorTheme.name
+            }"
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${
               toString config.gtk.cursorTheme.size
             }
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name}'"
+            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${
+              builtins.replaceStrings [ "light" ] [ "dark" ]
+              config.gtk.cursorTheme.name
+            }'"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${
               toString config.gtk.cursorTheme.size
             }
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xfc "${config.gtk.cursorTheme.package}/usr/share/icons/${config.gtk.cursorTheme.name}/cursors/left_ptr" ${
-              toString config.gtk.cursorTheme.size
-            }
+            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${
+              builtins.replaceStrings [ "light" ] [ "dark" ]
+              config.gtk.cursorTheme.name
+            }/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
           '';
           inherit (scripts) setDesktopBackground;
         };
@@ -2358,20 +2374,23 @@ in {
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
             ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
           '';
+          kvantum-theme = ''
+            ${pkgs.libsForQt5.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNord
+          '';
           icon-theme = ''
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${config.gtk.iconTheme.name}"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${config.gtk.iconTheme.name}'"
           '';
           cursor-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name} - White"
+            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name}"
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${
               toString config.gtk.cursorTheme.size
             }
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name} - White'"
+            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name}'"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${
               toString config.gtk.cursorTheme.size
             }
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xfc "${config.gtk.cursorTheme.package}/usr/share/icons/${config.gtk.cursorTheme.name} - White/cursors/left_ptr" ${
+            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${config.gtk.cursorTheme.name}/cursors/left_ptr" ${
               toString config.gtk.cursorTheme.size
             }
           '';
@@ -4514,6 +4533,20 @@ in {
           color7   #E5E9F0
           color15  #ECEFF4
         '';
+        "Kvantum/ColloidNord".source = "${
+            pkgs.unstable.colloid-kde.overrideAttrs (oldAttrs: {
+              postInstall = (oldAttrs.postInstall or "") + ''
+                rm -r $out/share/Kvantum/ColloidNord/ColloidNordDark.*
+              '';
+            })
+          }/share/Kvantum/ColloidNord";
+        "Kvantum/ColloidNordDark".source = "${
+            pkgs.unstable.colloid-kde.overrideAttrs (oldAttrs: {
+              postInstall = (oldAttrs.postInstall or "") + ''
+                rm -r $out/share/Kvantum/ColloidNord/ColloidNord.*
+              '';
+            })
+          }/share/Kvantum/ColloidNord";
         "npm/npmrc".text = ''
           init-author-name=Xandor Schiefer
           init-author-email=me@xandor.co.za
@@ -5199,20 +5232,103 @@ in {
     gtk = {
       enable = true;
       theme = {
-        package = pkgs.qogir-theme;
-        name = "Qogir-Light";
+        package = pkgs.unstable.colloid-gtk-theme.override {
+          tweaks = [ "nord" "rimless" ];
+        };
+        name = "Colloid-Light-Nord";
       };
       iconTheme = {
-        package = pkgs.qogir-icon-theme;
-        name = "Qogir";
+        package = pkgs.unstable.colloid-icon-theme.override {
+          schemeVariants = [ "nord" ];
+        };
+        name = "Colloid-nord-light";
       };
       cursorTheme = {
-        package = pkgs.capitaine-cursors-themed;
-        name = "Capitaine Cursors (Nord)";
-        size = dpiScale 32;
+        package = let version = "2024-02-28";
+        in pkgs.stdenv.mkDerivation {
+          inherit version;
+          pname = "colloid-cursor-theme";
+          src = "${
+              pkgs.fetchFromGitHub {
+                owner = "vinceliuice";
+                repo = "Colloid-icon-theme";
+                rev = version;
+                hash = "sha256-bTN6x3t88yBL4WsPfOJIiNGWTywdIVi7E2VJKgMzEso=";
+              }
+            }/cursors";
+          nativeBuildInputs = with pkgs; [ inkscape xorg.xcursorgen jdupes ];
+          postPatch = ''
+            sed -i \
+              -e 's/#000000/#2e3440/g' \
+              -e 's/#1191f4/#5e81ac/g' \
+              -e 's/#14adf6/#88c0d0/g' \
+              -e 's/#1a1a1a/#2e3440/g' \
+              -e 's/#1b9aeb/#5e81ac/g' \
+              -e 's/#2a2a2a/#3b4252/g' \
+              -e 's/#2c2c2c/#3b4252/g' \
+              -e 's/#3bbd1c/#a3be8c/g' \
+              -e 's/#4caf50/#a3be8c/g' \
+              -e 's/#52cf30/#a3be8c/g' \
+              -e 's/#5b9bf8/#81a1c1/g' \
+              -e 's/#666666/#4c566a/g' \
+              -e 's/#6fce55/#a3be8c/g' \
+              -e 's/#ac44ca/#b48ead/g' \
+              -e 's/#b452cb/#b48ead/g' \
+              -e 's/#c7c7c7/#d8dee9/g' \
+              -e 's/#ca70e1/#b48ead/g' \
+              -e 's/#cecece/#d8dee9/g' \
+              -e 's/#d1d1d1/#d8dee9/g' \
+              -e 's/#dcdcdc/#d8dee9/g' \
+              -e 's/#ed1515/#bf616a/g' \
+              -e 's/#f5f5f5/#e5e9f0/g' \
+              -e 's/#f67400/#d08770/g' \
+              -e 's/#f83f31/#bf616a/g' \
+              -e 's/#faa91e/#d08770/g' \
+              -e 's/#fbb114/#d08770/g' \
+              -e 's/#fbd939/#ebcb8b/g' \
+              -e 's/#fdcf01/#ebcb8b/g' \
+              -e 's/#ff2a2a/#bf616a/g' \
+              -e 's/#ff4332/#bf616a/g' \
+              -e 's/#ff645d/#bf616a/g' \
+              -e 's/#ff9508/#d08770/g' \
+              -e 's/#ffaa07/#d08770/g' \
+              -e 's/#ffd305/#ebcb8b/g' \
+              -e 's/#ffffff/#eceff4/g' \
+              src/svg/*.svg \
+              src/svg-white/*.svg
+
+            patchShebangs build.sh
+
+            substituteInPlace build.sh \
+              --replace 'THEME="Colloid Cursors"' 'THEME="Colloid-nord-light-cursors"' \
+              --replace 'THEME="Colloid-dark Cursors"' 'THEME="Colloid-nord-dark-cursors"'
+
+            patchShebangs install.sh
+
+            substituteInPlace install.sh \
+              --replace '$HOME/.local' $out \
+              --replace '$THEME_NAME-cursors' '$THEME_NAME-nord-light-cursors' \
+              --replace '$THEME_NAME-dark-cursors' '$THEME_NAME-nord-dark-cursors'
+          '';
+          buildPhase = ''
+            runHook preBuild
+            ./build.sh
+            runHook postBuild
+          '';
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/share/icons
+            ./install.sh
+            jdupes --quiet --link-soft --recurse $out/share
+            runHook postInstall
+          '';
+        };
+        name = "Colloid-nord-light-cursors";
+        size = dpiScale 24;
       };
       font = {
-        name = "SF Pro Text Semibold";
+        package = pkgs.unstable.geist-font;
+        name = "Geist Light";
         size = 10;
       };
       gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
@@ -5220,7 +5336,8 @@ in {
 
     qt = {
       enable = true;
-      platformTheme = "gtk";
+      platformTheme = "qtct";
+      style.name = "kvantum";
     };
 
     fonts.fontconfig.enable = true;
@@ -5557,6 +5674,8 @@ in {
         #########
         # FONTS #
         #########
+
+        unstable.geist-font
 
         # Emoji
         # emojione
