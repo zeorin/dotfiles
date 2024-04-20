@@ -1652,7 +1652,7 @@ in {
             # rofi command. Make sure to have "$@" as last argument
             _rofi () {
                 ${pkgs.rofi}/bin/rofi \
-                  -dpi 0 \
+                  -dpi ${toString (dpiScale 96)} \
                   -i \
                   -kb-accept-custom "" \
                   -kb-row-down "${remove-binding "Control+n" kb-row-down}" \
@@ -2416,7 +2416,9 @@ in {
             max_icon_size = 60;
             icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro-icons";
             enable_recursive_icon_lookup = "true";
-            dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst";
+            dmenu = "${pkgs.rofi}/bin/rofi -dpi ${
+                toString (dpiScale 96)
+              } -dmenu -p dunst";
             mouse_left_click = "close_current";
             mouse_middle_click = "context";
             mouse_right_click = "do_action";
@@ -3203,7 +3205,9 @@ in {
           modifier = "Mod4";
           terminal = terminal-emulator;
           menu = ''
-            "${pkgs.rofi}/bin/rofi -dpi 0 -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
+            "${pkgs.rofi}/bin/rofi -dpi ${
+              toString (dpiScale 96)
+            } -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
           focus = {
             followMouse = false;
             newWindow = "urgent";
