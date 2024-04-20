@@ -14,35 +14,6 @@
 
   dpi = 192;
 
-  hardware.firmware = with pkgs;
-    [
-      # HP Spectre Bang & Olufsen Speakers
-      # https://bugzilla.kernel.org/show_bug.cgi?id=189331#c285
-      (runCommandNoCC "firmware-hda-jack-retask" { } ''
-        mkdir -p $out/lib/firmware
-        cp ${
-          writeText "hda-jack-retask.fw" ''
-            [codec]
-            0x10ec0295 0x103c83b9 0
-
-            [pincfg]
-            0x12 0xb7a60130
-            0x13 0x40000000
-            0x14 0x90170151
-            0x16 0x411111f0
-            0x17 0x90170152
-            0x18 0x411111f0
-            0x19 0x03a11040
-            0x1a 0x411111f0
-            0x1b 0x411111f0
-            0x1d 0x40600001
-            0x1e 0x220140b0
-            0x21 0x03211020
-          ''
-        } $out/lib/firmware/hda-jack-retask.fw
-      '')
-    ];
-
   boot = {
     plymouth.extraConfig = ''
       DeviceScale=2
@@ -61,8 +32,7 @@
       options iwlwifi bt_coex_active=Y
 
       # Fix speakers
-      # https://bugzilla.kernel.org/show_bug.cgi?id=189331#c285
-      options snd-hda-intel patch=hda-jack-retask.fw,hda-jack-retask.fw,hda-jack-retask.fw,hda-jack-retask.fw
+      options snd_hda_intel index=1 model=alc285-hp-spectre-x360
     '';
   };
 
