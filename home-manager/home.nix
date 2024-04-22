@@ -4112,20 +4112,19 @@ in {
             (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 
           ;; Debug Adapter Protocol
-          ;; (setq dap-firefox-debug-path "${pkgs.vscode-extensions.firefox-devtools.vscode-firefox-debug}/share/vscode/extensions/firefox-devtools.vscode-firefox-debug"
-          ;;       dap-firefox-debug-program (list "${pkgs.nodejs}/bin/node" (concat dap-firefox-debug-path "/dist/extension.bundle.js"))
-          ;;       dap-chrome-debug-path "${pkgs.vscodium}/lib/vscode/resources/app/extensions/ms-vscode.js-debug"
-          ;;       dap-chrome-debug-program (list "${pkgs.nodejs}/bin/node" (concat dap-chrome-debug-path "/src/extension.js"))
-          ;;       dap-node-debug-path dap-chrome-debug-path
-          ;;       dap-node-debug-program dap-chrome-debug-program)
-          ;; (dap-mode 1)
-          ;; (dap-ui-mode 1)
-          ;; (dap-tooltip-mode 1)
-          ;; (tooltip-mode 1)
-          ;; (dap-ui-controls-mode 1)
-          ;; (require 'dap-firefox)
-          ;; (require 'dap-chrome)
-          ;; (require 'dap-node)
+          (setq dap-firefox-debug-path "${pkgs.vscode-extensions.firefox-devtools.vscode-firefox-debug}/share/vscode/extensions/firefox-devtools.vscode-firefox-debug"
+                dap-firefox-debug-program `("${pkgs.nodejs}/bin/node" ,(concat dap-firefox-debug-path "/dist/adapter.bundle.js"))
+                dap-js-debug-program "${pkgs.vscode-js-debug}/bin/js-debug")
+          (plist-put (cdr
+                      (assoc '(:lang javascript +lsp) +debugger--dap-alist))
+                      :require '(dap-js dap-firefox))
+          (after! dap-js (dap-register-debug-provider "node" #'dap-js--populate-start-file-args)
+                         (dap-register-debug-provider "node-terminal" #'dap-js--populate-start-file-args)
+                         (dap-register-debug-provider "chrome" #'dap-js--populate-start-file-args)
+                         (dap-register-debug-provider "msedge" #'dap-js--populate-start-file-args)
+                         (dap-register-debug-provider "pwa-node" #'dap-js--populate-start-file-args)
+                         (dap-register-debug-provider "pwa-chrome" #'dap-js--populate-start-file-args)
+                         (dap-register-debug-provider "pwa-msedge" #'dap-js--populate-start-file-args))
 
           (setq fancy-splash-image "${./backgrounds/doom.png}")
           (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
@@ -4275,7 +4274,7 @@ in {
 
                    :tools
                    ;;ansible
-                   ;;(debugger +lsp)          ; FIXME stepping through code, to help you add bugs
+                   (debugger +lsp)          ; FIXME stepping through code, to help you add bugs
                    direnv
                    (docker +lsp)
                    editorconfig      ; let someone else argue about tabs vs spaces
