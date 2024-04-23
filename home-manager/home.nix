@@ -5793,8 +5793,8 @@ in {
         netflix
         tor-browser-bundle-bin
         virt-manager
-        qemu
-        quickemu
+        qemu_full
+        (quickemu.override { qemu = qemu_full; })
         slack
         discord
         tdesktop
