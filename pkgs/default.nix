@@ -10,4 +10,6 @@ with pkgs;
   tabfs-unwrapped = callPackage ./tabfs { };
   tabfs = wrapTabfs tabfs-unwrapped { };
   vscode-js-debug = callPackage ./vscode-js-debug { };
+  modorganizer2-linux-installer =
+    callPackage ./modorganizer2-linux-installer { };
 }

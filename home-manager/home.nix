@@ -5806,6 +5806,7 @@ in {
         spotify
         # https://github.com/NixOS/nixpkgs/issues/179323
         prismlauncher
+        modorganizer2-linux-installer
         manix
         cachix
         nix-prefetch-git
