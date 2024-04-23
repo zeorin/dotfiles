@@ -537,6 +537,28 @@
       };
     };
 
+    services.samba-wsdd.enable = true;
+    services.samba-wsdd.openFirewall = true;
+    services.samba = {
+      enable = true;
+      package = pkgs.sambaFull;
+      openFirewall = true;
+      securityType = "user";
+      extraConfig = ''
+        workgroup = WORKGROUP
+        server string = smbnix
+        netbios name = smbnix
+        security = user
+        #use sendfile = yes
+        #max protocol = smb2
+        # note: localhost is the ipv6 localhost ::1
+        hosts allow = 192.168.0. 127.0.0.1 localhost
+        hosts deny = 0.0.0.0/0
+        guest account = nobody
+        map to guest = bad user
+      '';
+    };
+
     services.tailscale = {
       enable = true;
       openFirewall = true;
