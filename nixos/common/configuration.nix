@@ -494,8 +494,14 @@
     };
 
     sops = {
-      defaultSopsFile = ./secrets/secrets.yaml;
-      secrets = { };
+      defaultSopsFile = ../../secrets/secrets.yaml;
+      secrets = {
+        "mail.xandor.co.za/me@xandor.co.za" = {
+          mode = "0400";
+          owner = config.users.users.zeorin.name;
+          group = config.users.users.zeorin.group;
+        };
+      };
     };
 
     environment.pathsToLink = [
