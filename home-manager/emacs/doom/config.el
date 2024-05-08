@@ -3,6 +3,55 @@
 (setq user-full-name "Xandor Schiefer"
       user-mail-address "me@xandor.co.za")
 
+(set-email-account! "personal"
+		    '((mu4e-sent-folder       . "/personal/Sent")
+		      (mu4e-drafts-folder     . "/personal/Drafts")
+		      (mu4e-trash-folder      . "/personal/Trash")
+		      (mu4e-refile-folder     . "/personal/Archive")
+		      (smtpmail-smtp-user     . "me@xandor.co.za"))
+		    t)
+(set-email-account! "pixeltheory"
+		    '((mu4e-sent-folder       . "/pixeltheory/Sent")
+		      (mu4e-drafts-folder     . "/pixeltheory/Drafts")
+		      (mu4e-trash-folder      . "/pixeltheory/Trash")
+		      (mu4e-refile-folder     . "/pixeltheory/Archive")
+		      (smtpmail-smtp-user     . "xandor@pixeltheory.dev"))
+		    t)
+(set-email-account! "zeorin"
+		    '((mu4e-sent-folder       . "/zeorin/Sent")
+		      (mu4e-drafts-folder     . "/zeorin/Drafts")
+		      (mu4e-trash-folder      . "/zeorin/Trash")
+		      (mu4e-refile-folder     . "/zeorin/Archive")
+		      (smtpmail-smtp-user     . "zeorin@gmail.com"))
+		    t)
+(set-email-account! "xandorschiefer"
+		    '((mu4e-sent-folder       . "/xandorschiefer/Sent")
+		      (mu4e-drafts-folder     . "/xandorschiefer/Drafts")
+		      (mu4e-trash-folder      . "/xandorschiefer/Trash")
+		      (mu4e-refile-folder     . "/xandorschiefer/Archive")
+		      (smtpmail-smtp-user     . "xandor.schiefer@gmail.com"))
+		    t)
+
+(use-package! mu4e
+  :config
+  (add-to-list
+   'mu4e-headers-custom-markers
+   '("From" (lambda (msg msg-at-point-from)
+	      (let ((msg-from (mu4e-message-field msg :from)))
+		(seq-every-p
+		 (lambda (msg-at-point-from)
+		   (seq-some
+		    (lambda (msg-from)
+		      (and
+		       (equal (mu4e-contact-name msg-at-point-from)
+			      (mu4e-contact-name msg-from))
+		       (equal (mu4e-contact-email msg-at-point-from)
+			      (mu4e-contact-email msg-from))))
+		    msg-from))
+		 msg-at-point-from)
+		))
+     (lambda () (mu4e-message-field-at-point :from)))))
+
 (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
       doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 12 :weight 'light)
       doom-big-font (font-spec :family "Iosevka Nerd Font" :size 18 :weight 'light)

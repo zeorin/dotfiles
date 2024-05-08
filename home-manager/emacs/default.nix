@@ -11,6 +11,7 @@ in
   imports = [
     ./vterm.nix
     ./tsc.nix
+    ./mu.nix
     ./doom.nix
   ];
 

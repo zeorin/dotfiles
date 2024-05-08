@@ -11,7 +11,7 @@
 }@moduleArgs:
 
 let
-  myKey = "0x5E1C0971FE4F665A";
+  myKey = "863F 093A CF82 D2C8 6FD7 FB74 5E1C 0971 FE4F 665A";
 
   colors = {
     "nord0" = "#2E3440";
@@ -141,6 +141,7 @@ in
     inputs.nix-index-database.homeModules.nix-index
     ./emacs
     ./oama
+    ./email
   ];
 
   config = {
@@ -3985,7 +3986,6 @@ in
         protonvpn-cli
         thunderbird
         neomutt
-        isync
         zathura
         sigil
         calibre
