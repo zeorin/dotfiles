@@ -333,6 +333,8 @@ in {
     { programs.nix-index-database.comma.enable = true; }
     inputs.nixos-vscode-server.homeModules.default
     { services.vscode-server.enable = true; }
+    ./email.nix
+    # ./email.nix
   ];
 
   options = with lib; {
