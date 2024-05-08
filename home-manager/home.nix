@@ -357,6 +357,7 @@ in
     inputs.nixos-vscode-server.homeModules.default
     { services.vscode-server.enable = true; }
     ./emacs
+    ./email
   ];
 
   options = with lib; {
