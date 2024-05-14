@@ -4142,6 +4142,11 @@ in {
           (advice-add 'magit-branch-and-checkout ; This is `b c'.
                       :after #'run-projectile-invalidate-cache)
 
+          (use-package! spell-fu
+            :config
+            ;; https://github.com/doomemacs/doomemacs/issues/4483#issuecomment-910698739
+            (ispell-check-version))
+
           ;; Don't use language servers to auto-format
           (setq +format-with-lsp nil)
 
@@ -4338,7 +4343,7 @@ in {
 
                    :checkers
                    (syntax +childframe) ; tasing you for every semicolon you forget
-                   (spell +enchant) ; tasing you for misspelling mispelling
+                   (spell +enchant +everywhere) ; tasing you for misspelling mispelling
                    grammar           ; tasing grammar mistake every you make
 
                    :tools
