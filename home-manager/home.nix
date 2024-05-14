@@ -1581,9 +1581,83 @@ in {
       mpv = {
         enable = true;
         config = {
+          save-position-on-quit = "";
           hwdec = "auto-safe";
           vo = "gpu";
           profile = "gpu-hq";
+          ytdl-format =
+            "bestvideo[height<=?720][fps<=?30][vcodec!=?vp9]+bestaudio/best";
+          osd-bar = "no";
+        };
+        bindings = {
+          "space" = "cycle pause; script-binding uosc/flash-pause-indicator";
+          "right" = "seek 5";
+          "left" = "seek -5";
+          "shift+right" = "seek 30; script-binding uosc/flash-timeline";
+          "shift+left" = "seek -30; script-binding uosc/flash-timeline";
+          "m" = "no-osd cycle mute; script-binding uosc/flash-volume";
+          "up" = "no-osd add volume  10; script-binding uosc/flash-volume";
+          "down" = "no-osd add volume -10; script-binding uosc/flash-volume";
+          "[" = "no-osd add speed -0.25; script-binding uosc/flash-speed";
+          "]" = "no-osd add speed  0.25; script-binding uosc/flash-speed";
+          "\\" = "no-osd set speed 1; script-binding uosc/flash-speed";
+          ">" =
+            "script-binding uosc/next; script-message-to uosc flash-elements top_bar,timeline";
+          "<" =
+            "script-binding uosc/prev; script-message-to uosc flash-elements top_bar,timeline";
+          "tab" = "script-binding uosc/toggle-ui";
+          "menu" = "script-binding uosc/menu";
+          "mbtn_right" = "script-binding uosc/menu";
+          "s" = "script-binding uosc/subtitles #! Subtitles";
+          "a" = "script-binding uosc/audio #! Audio tracks";
+          "q" = "script-binding uosc/stream-quality #! Stream quality";
+          "p" = "script-binding uosc/items #! Playlist";
+          "c" = "script-binding uosc/chapters #! Chapters";
+          "alt+>" =
+            "script-binding uosc/delete-file-next #! Navigation > Delete file & Next";
+          "alt+<" =
+            "script-binding uosc/delete-file-prev #! Navigation > Delete file & Prev";
+          "alt+esc" =
+            "script-binding uosc/delete-file-quit #! Navigation > Delete file & Quit";
+          "o" = "script-binding uosc/open-file #! Navigation > Open file";
+          # "#" = "set video-aspect-override \"-1\" #! Utils > Aspect ratio > Default";
+          # "#" = "set video-aspect-override \"16:9\" #! Utils > Aspect ratio > 16:9";
+          # "#" = "set video-aspect-override \"4:3\" #! Utils > Aspect ratio > 4:3";
+          # "#" = "set video-aspect-override \"2.35:1\" #! Utils > Aspect ratio > 2.35:1";
+          # "#" = "script-binding uosc/audio-device #! Utils > Audio devices";
+          # "#" = "script-binding uosc/editions #! Utils > Editions";
+          "ctrl+s" = "async screenshot #! Utils > Screenshot";
+          "alt+i" = "script-binding uosc/keybinds #! Utils > Key bindings";
+          "O" =
+            "script-binding uosc/show-in-directory #! Utils > Show in directory";
+          # "#" = "script-binding uosc/open-config-directory #! Utils > Open config directory";
+          # "#" = "script-binding uosc/update #! Utils > Update uosc";
+          "R" = ''script-message-to uosc show-submenu "Utils > Aspect ratio"'';
+          "F" = "script-binding quality_menu/video_formats_toggle";
+          "Alt+f" = "script-binding quality_menu/audio_formats_toggle";
+        };
+        scripts = with pkgs.mpvScripts; [
+          uosc
+          thumbfast
+          sponsorblock
+          mpv-playlistmanager
+          quality-menu
+          mpris
+          # autodeint
+          # autocrop
+          # acompressor
+        ];
+        scriptOpts = {
+          thumbfast = {
+            network = "yes";
+            hwdec = "yes";
+          };
+          playlistmanager = { resolve_url_titles = "yes"; };
+          uosc = {
+            click_threshold = 100;
+            click_command =
+              "cycle pause; script-binding uosc/flash-pause-indicator";
+          };
         };
       };
       nix-index.enable = true;
@@ -5578,7 +5652,6 @@ in {
         gnucash
         xournalpp
         transmission-gtk
-        mpv
         weechat
         yubikey-manager
         yubikey-manager-qt
