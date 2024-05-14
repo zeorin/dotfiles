@@ -160,7 +160,7 @@
       supportedFilesystems = [ "ntfs" ];
     };
 
-    services.udev.packages = with pkgs; [ alsa-utils ];
+    services.udev.packages = with pkgs; [ alsa-utils brightnessctl ];
     services.udev.extraRules = ''
       # https://github.com/NixOS/nixpkgs/issues/226346#issuecomment-1892314545
       # SUBSYSTEM=="input", ACTION=="add", ATTR{name}!="keyd virtual*", RUN+="${pkgs.systemd}/bin/systemctl try-restart keyd.service"

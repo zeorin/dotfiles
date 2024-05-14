@@ -19,6 +19,12 @@
         inherit rev;
         hash = "sha256-zDohA3F+zX9xbS0SGpF0cygPRPN6iXcH1TrRMhoO1qs=";
       };
+      postInstall = (oldAttrs.postInstall or "") + ''
+        mkdir -p $out/lib/udev/rules.d
+        substitute ${finalAttrs.src}/90-brightnessctl.rules $out/lib/udev/rules.d/90-brightnessctl.rules \
+          --replace /bin/chgrp ${final.coreutils}/bin/chgrp \
+          --replace /bin/chmod ${final.coreutils}/bin/chmod
+      '';
     });
   };
 
