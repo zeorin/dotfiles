@@ -5652,6 +5652,7 @@ in {
         gnucash
         xournalpp
         transmission-gtk
+        newpipelist
         weechat
         yubikey-manager
         yubikey-manager-qt
