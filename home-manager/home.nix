@@ -4539,6 +4539,9 @@ in {
 
             (unpin! dap-mode)
             (package! dap-mode :recipe (:host github :repo "zeorin/dap-mode" :branch "fixed"))
+
+            (unpin! apheleia)
+            (package! apheleia :recipe (:host github :repo "zeorin/apheleia" :branch "fix/apheleia-npx"))
           '';
           onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
             export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
