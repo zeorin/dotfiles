@@ -4187,19 +4187,13 @@ in {
             (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 
           ;; Debug Adapter Protocol
-          (setq dap-firefox-debug-path "${pkgs.vscode-extensions.firefox-devtools.vscode-firefox-debug}/share/vscode/extensions/firefox-devtools.vscode-firefox-debug"
-                dap-firefox-debug-program `("${pkgs.nodejs}/bin/node" ,(concat dap-firefox-debug-path "/dist/adapter.bundle.js"))
-                dap-js-debug-program "${pkgs.vscode-js-debug}/bin/js-debug")
-          (plist-put (cdr
-                      (assoc '(:lang javascript +lsp) +debugger--dap-alist))
-                      :require '(dap-js dap-firefox))
-          (after! dap-js (dap-register-debug-provider "node" #'dap-js--populate-start-file-args)
-                         (dap-register-debug-provider "node-terminal" #'dap-js--populate-start-file-args)
-                         (dap-register-debug-provider "chrome" #'dap-js--populate-start-file-args)
-                         (dap-register-debug-provider "msedge" #'dap-js--populate-start-file-args)
-                         (dap-register-debug-provider "pwa-node" #'dap-js--populate-start-file-args)
-                         (dap-register-debug-provider "pwa-chrome" #'dap-js--populate-start-file-args)
-                         (dap-register-debug-provider "pwa-msedge" #'dap-js--populate-start-file-args))
+          (use-package! dap-mode
+            :init
+            (setq ;; dap-auto-configure-features '(sessions locals breakpoints expressions tooltip)
+                  dap-firefox-debug-path "${pkgs.vscode-extensions.firefox-devtools.vscode-firefox-debug}/share/vscode/extensions/firefox-devtools.vscode-firefox-debug"
+                  dap-firefox-debug-program `("${pkgs.nodejs}/bin/node" ,(concat dap-firefox-debug-path "/dist/adapter.bundle.js"))
+                  dap-js-path "${pkgs.vscode-js-debug}/bin"
+                  dap-js-debug-program (list (concat dap-js-path "/js-debug"))))
 
           (setq fancy-splash-image "${./backgrounds/doom.png}")
           (remove-hook '+doom-dashboard-functions #'doom-dashboard-widget-shortmenu)
@@ -4542,6 +4536,9 @@ in {
 
             (package! org-modern)
             (package! org-appear)
+
+            (unpin! dap-mode)
+            (package! dap-mode :recipe (:host github :repo "zeorin/dap-mode" :branch "fixed"))
           '';
           onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
             export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
