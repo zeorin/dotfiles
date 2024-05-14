@@ -5808,11 +5808,12 @@ in {
           exec = "${firefox-guest}/bin/firefox-guest %U";
         }))
       ]) ++ (let
-        wrapFirefoxWithProfile = launcherName: profile: pkg:
+        wrapFirefoxWithProfile = { name, profile, ... }@args:
+          pkg:
           let inherit (pkg.passthru.unwrapped) binaryName;
-          in pkgs.runCommandLocal "${binaryName}-with-${profile}-profile" {
+          in pkgs.runCommandLocal "${binaryName}-with-${profile}-profile" ({
             buildInputs = with pkgs; [ makeWrapper xorg.lndir ];
-          } ''
+          } // (removeAttrs args [ "name" "profile" ])) ''
             # Symlink everything
             mkdir -p "$out"
             lndir -silent "${pkg}" "$out"
@@ -5824,50 +5825,55 @@ in {
             rm -f "$out/bin/.${binaryName}-wrapper"
 
             # Make our wrapper
-            rm "$out/bin/${launcherName}"
-            makeWrapper "${pkg}/bin/${launcherName}" "$out/bin/${launcherName}" \
-              --add-flags '-P "${profile}"'
+            rm "$out/bin/${name}"
+            makeWrapper "${pkg}/bin/${name}" "$out/bin/${name}" \
+              --add-flags '-P "${profile}"' \
+              ''${makeWrapperArgs}
           '';
       in [
-        (wrapFirefoxWithProfile "firefox-devedition" "developer-edition"
-          (unstable.firefox-devedition.override {
-            nativeMessagingHosts = with pkgs; [
-              browserpass
-              plasma-browser-integration
-              tridactyl-native
-              (tabfs.override {
-                mountDir = "${config.xdg.dataHome}/tabfs/developer-edition";
-              })
-            ];
-          }))
-        (wrapFirefoxWithProfile "firefox-beta" "beta"
-          (unstable.firefox-beta.override {
-            nativeMessagingHosts = with pkgs; [
-              browserpass
-              plasma-browser-integration
-              tridactyl-native
-              (tabfs.override {
-                mountDir = "${config.xdg.dataHome}/tabfs/beta";
-              })
-            ];
-          }))
-        (wrapFirefoxWithProfile "firefox-esr" "esr"
-          (unstable.firefox-esr.override {
-            nativeMessagingHosts = with pkgs; [
-              browserpass
-              plasma-browser-integration
-              tridactyl-native
-              (tabfs.override {
-                mountDir = "${config.xdg.dataHome}/tabfs/esr";
-              })
-            ];
-          }))
+        (wrapFirefoxWithProfile {
+          name = "firefox-devedition";
+          profile = "developer-edition";
+          makeWrapperArgs = [ "--add-flags" "--start-debugger-server" ];
+        } (unstable.firefox-devedition.override {
+          nativeMessagingHosts = with pkgs; [
+            browserpass
+            plasma-browser-integration
+            tridactyl-native
+            (tabfs.override {
+              mountDir = "${config.xdg.dataHome}/tabfs/developer-edition";
+            })
+          ];
+        }))
+        (wrapFirefoxWithProfile {
+          name = "firefox-beta";
+          profile = "beta";
+        } (unstable.firefox-beta.override {
+          nativeMessagingHosts = with pkgs; [
+            browserpass
+            plasma-browser-integration
+            tridactyl-native
+            (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/beta"; })
+          ];
+        }))
+        (wrapFirefoxWithProfile {
+          name = "firefox-esr";
+          profile = "esr";
+        } (unstable.firefox-esr.override {
+          nativeMessagingHosts = with pkgs; [
+            browserpass
+            plasma-browser-integration
+            tridactyl-native
+            (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/esr"; })
+          ];
+        }))
       ]) ++ [
         ungoogled-chromium
         google-chrome
         netflix
         tor-browser-bundle-bin
         virt-manager
+        virt-viewer
         qemu_full
         (quickemu.override { qemu = qemu_full; })
         slack
