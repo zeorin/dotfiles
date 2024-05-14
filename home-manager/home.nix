@@ -3269,6 +3269,7 @@ in {
           gaps = {
             inner = 10;
             outer = 5;
+            smartGaps = true;
           };
           fonts = {
             names = [ "DejaVu Sans Mono" ];
