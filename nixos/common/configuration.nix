@@ -492,6 +492,7 @@
         "libvirtd"
         "video"
         "input"
+        "i2c"
       ];
     };
     users.groups.zeorin = { };

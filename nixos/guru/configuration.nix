@@ -63,7 +63,7 @@
 
     kernelParams = [ "mem_sleep_default=deep" ];
     extraModulePackages = with config.boot.kernelPackages; [ ddcci-driver ];
-    kernelModules = [ "ddcci_backlight" ];
+    kernelModules = [ "ddcci_backlight" "nct6775" ];
     extraModprobeConfig = ''
       options kvm_amd nested=1
       options kvm ignore_msrs=1 report_ignored_msrs=0
@@ -137,4 +137,5 @@
   };
 
   services.hardware.openrgb.enable = true;
+  services.hardware.openrgb.package = pkgs.openrgb-with-all-plugins;
 }
