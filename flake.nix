@@ -26,7 +26,7 @@
     nixos-vscode-server.url = "github:nix-community/nixos-vscode-server";
     nixos-vscode-server.inputs.nixpkgs.follows = "nixpkgs";
 
-    doomemacs.url = "github:doomemacs/doomemacs";
+    doomemacs.url = "github:zeorin/doomemacs/feat/dap-js";
     doomemacs.flake = false;
 
     nord-dircolors.url = "github:nordtheme/dircolors";

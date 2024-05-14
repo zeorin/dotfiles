@@ -35,15 +35,16 @@
     "doomemacs": {
       "flake": false,
       "locked": {
-        "lastModified": 1712886674,
-        "narHash": "sha256-YWuYKOz2QYmx0/R0ptjxDWHfK7hYOUKn6wgobpsnm90=",
-        "owner": "doomemacs",
+        "lastModified": 1713793959,
+        "narHash": "sha256-ALoGdhs6tJwic0faMkf7IG9xdhTz8EDuxTVPO1OBA0w=",
+        "owner": "zeorin",
         "repo": "doomemacs",
-        "rev": "5b7d6763f8f899e556c7c5d89556bf39a1c81f64",
+        "rev": "b8a69140271d5e6f4838fa998051a65b0830a70a",
         "type": "github"
       },
       "original": {
-        "owner": "doomemacs",
+        "owner": "zeorin",
+        "ref": "feat/dap-js",
         "repo": "doomemacs",
         "type": "github"
       }
