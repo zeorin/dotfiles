@@ -12,4 +12,5 @@ with pkgs;
   vscode-js-debug = callPackage ./vscode-js-debug { };
   modorganizer2-linux-installer =
     callPackage ./modorganizer2-linux-installer { };
+  newpipelist = callPackage ./newpipelist { };
 }
