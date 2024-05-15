@@ -564,6 +564,7 @@
 
     services.tailscale = {
       enable = true;
+      package = pkgs.unstable.tailscale;
       openFirewall = true;
       useRoutingFeatures = "client";
       extraUpFlags = [ "--accept-routes" ];
