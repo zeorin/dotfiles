@@ -2712,7 +2712,7 @@ in {
               nativeBuildInputs = [ makeWrapper ];
               installPhase = ''
                 mkdir -p $out/bin
-                mv pulseaudio-control.bash $out/bin/pulseaudio-control
+                mv pulseaudio-control $out/bin/pulseaudio-control
                 wrapProgram $out/bin/pulseaudio-control \
                   --prefix PATH : ${
                     lib.makeBinPath [
