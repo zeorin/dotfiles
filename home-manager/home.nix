@@ -3393,6 +3393,8 @@ in {
               "${mod}+Shift+0" =
                 "move container to workspace ${workspace10}; workspace ${workspace10}";
 
+              "${mod}+Shift+f" = "sticky toggle";
+
               # change focus (Vi keybindings)
               "${mod}+h" = "focus left";
               "${mod}+j" = "focus down";
