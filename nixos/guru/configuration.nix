@@ -61,7 +61,6 @@
       };
     };
 
-    kernelParams = [ "mem_sleep_default=deep" ];
     extraModulePackages = with config.boot.kernelPackages; [ ddcci-driver ];
     kernelModules = [ "ddcci_backlight" "nct6775" ];
     extraModprobeConfig = ''
