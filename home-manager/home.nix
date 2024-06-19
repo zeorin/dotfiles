@@ -4197,7 +4197,7 @@ in {
             (setq ;; dap-auto-configure-features '(sessions locals breakpoints expressions tooltip)
                   dap-firefox-debug-path "${pkgs.vscode-extensions.firefox-devtools.vscode-firefox-debug}/share/vscode/extensions/firefox-devtools.vscode-firefox-debug"
                   dap-firefox-debug-program `("${pkgs.nodejs}/bin/node" ,(concat dap-firefox-debug-path "/dist/adapter.bundle.js"))
-                  dap-js-path "${pkgs.vscode-js-debug}/bin"
+                  dap-js-path "${pkgs.unstable.vscode-js-debug}/bin"
                   dap-js-debug-program (list (concat dap-js-path "/js-debug"))))
 
           (setq fancy-splash-image "${./backgrounds/doom.png}")
