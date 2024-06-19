@@ -150,6 +150,11 @@
 
       initrd.systemd.enable = true;
 
+      # https://discourse.nixos.org/t/hibernate-doesnt-work-anymore/24673/14
+      resumeDevice = lib.mkIf (config.swapDevices != [ ]
+        && (builtins.head config.swapDevices) ? device)
+        (lib.mkDefault (builtins.head config.swapDevices).device);
+
       kernelParams = [ "quiet" "udev.log_level=3" ];
       kernelPackages = pkgs.unstable.linuxPackages_zen;
       extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
