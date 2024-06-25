@@ -12,91 +12,12 @@ let
     emacsPkg = with pkgs;
       (emacsPackagesFor emacs29).emacsWithPackages
       (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
-    pathDeps = with pkgs; [
-      git
-      emacs-lsp-booster
-      dockfmt
-      libxml2.bin
-      rstfmt
-      texlive.combined.scheme-medium
-      python3
-      binutils
-      (ripgrep.override { withPCRE2 = true; })
-      fd
-      gnutls
-      imagemagick
-      zstd
-      shfmt
-      maim
-      shellcheck
-      sqlite
-      editorconfig-core-c
-      nodePackages.mermaid-cli
-      pandoc
-      gcc
-      gdb
-      lldb
-      graphviz-nox
-      wordnet
-      beancount
-      beancount-language-server
-      fava
-      html-tidy
-      nodejs
-      nodePackages.bash-language-server
-      nodePackages.stylelint
-      nodePackages.dockerfile-language-server-nodejs
-      nodePackages.js-beautify
-      nodePackages.typescript-language-server
-      nodePackages.typescript
-      (writeScriptBin "vscode-css-language-server" ''
-        #!${nodejs}/bin/node
-        require('${vscodium}/lib/vscode/resources/app/extensions/css-language-features/server/dist/node/cssServerMain.js')
-      '')
-      (writeScriptBin "vscode-html-language-server" ''
-        #!${nodejs}/bin/node
-        require('${vscodium}/lib/vscode/resources/app/extensions/html-language-features/server/dist/node/htmlServerMain.js')
-      '')
-      (writeScriptBin "vscode-json-language-server" ''
-        #!${nodejs}/bin/node
-        require('${vscodium}/lib/vscode/resources/app/extensions/json-language-features/server/dist/node/jsonServerMain.js')
-      '')
-      (writeScriptBin "vscode-markdown-language-server" ''
-        #!${nodejs}/bin/node
-        require('${vscodium}/lib/vscode/resources/app/extensions/markdown-language-features/server/dist/node/workerMain.js')
-      '')
-      nodePackages.yaml-language-server
-      nodePackages.unified-language-server
-      nodePackages.prettier
-      jq
-      # nixfmt-classic
-      nixfmt-rfc-style
-      nil
-      black
-      isort
-      pipenv
-      python3Packages.pytest
-      python3Packages.nose
-      python3Packages.pyflakes
-      python3Packages.python-lsp-server
-      python3Packages.grip
-      multimarkdown
-      xclip
-      xdotool
-      xorg.xwininfo
-      xorg.xprop
-      watchman
-    ];
   in emacsPkg // (pkgs.symlinkJoin {
     name = "my-emacs";
     paths = [ emacsPkg ];
     nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
     postBuild = ''
       wrapProgram $out/bin/emacs \
-        --prefix PATH : ${lib.makeBinPath pathDeps} \
-        --set LSP_USE_PLISTS true
-      wrapProgram $out/bin/emacsclient \
-        --prefix PATH : ${lib.makeBinPath pathDeps} \
         --set LSP_USE_PLISTS true
     '';
   });
@@ -4250,6 +4171,9 @@ in {
                         (not (functionp 'json-rpc-connection))  ;; native json-rpc
                         (executable-find "emacs-lsp-booster"))
                     (progn
+                      (let ((command-from-exec-path (executable-find (car orig-result))))
+                        (when command-from-exec-path
+                              (setcar orig-result command-from-exec-path)))
                       (message "Using emacs-lsp-booster for %s!" orig-result)
                       (cons "emacs-lsp-booster" orig-result))
                   orig-result)))
@@ -4321,10 +4245,96 @@ in {
 
           (use-package! evil-little-word
             :after evil)
+
+          (use-package! envrc
+            :config
+            (setq envrc-show-summary-in-minibuffer nil))
         '';
         "doom/init.el" = {
           text = ''
             ;;; init.el -*- lexical-binding: t; -*-
+
+            (setq exec-path (append '("${
+              pkgs.buildEnv {
+                name = "my-emacs-deps";
+                pathsToLink = [ "/bin" ];
+                paths = map lib.getBin (with pkgs; [
+                  git
+                  emacs-lsp-booster
+                  dockfmt
+                  libxml2
+                  rstfmt
+                  texlive.combined.scheme-medium
+                  python3
+                  binutils
+                  (ripgrep.override { withPCRE2 = true; })
+                  fd
+                  gnutls
+                  imagemagick
+                  zstd
+                  shfmt
+                  maim
+                  shellcheck
+                  sqlite
+                  editorconfig-core-c
+                  nodePackages.mermaid-cli
+                  pandoc
+                  gcc
+                  gdb
+                  lldb
+                  graphviz-nox
+                  wordnet
+                  beancount
+                  beancount-language-server
+                  fava
+                  html-tidy
+                  nodejs
+                  nodePackages.bash-language-server
+                  nodePackages.stylelint
+                  nodePackages.dockerfile-language-server-nodejs
+                  nodePackages.js-beautify
+                  nodePackages.typescript-language-server
+                  nodePackages.typescript
+                  (writeScriptBin "vscode-css-language-server" ''
+                    #!${nodejs}/bin/node
+                    require('${vscodium}/lib/vscode/resources/app/extensions/css-language-features/server/dist/node/cssServerMain.js')
+                  '')
+                  (writeScriptBin "vscode-html-language-server" ''
+                    #!${nodejs}/bin/node
+                    require('${vscodium}/lib/vscode/resources/app/extensions/html-language-features/server/dist/node/htmlServerMain.js')
+                  '')
+                  (writeScriptBin "vscode-json-language-server" ''
+                    #!${nodejs}/bin/node
+                    require('${vscodium}/lib/vscode/resources/app/extensions/json-language-features/server/dist/node/jsonServerMain.js')
+                  '')
+                  (writeScriptBin "vscode-markdown-language-server" ''
+                    #!${nodejs}/bin/node
+                    require('${vscodium}/lib/vscode/resources/app/extensions/markdown-language-features/server/dist/node/workerMain.js')
+                  '')
+                  nodePackages.yaml-language-server
+                  nodePackages.unified-language-server
+                  nodePackages.prettier
+                  jq
+                  # nixfmt-classic
+                  nixfmt-rfc-style
+                  nil
+                  black
+                  isort
+                  pipenv
+                  python3Packages.pytest
+                  python3Packages.nose
+                  python3Packages.pyflakes
+                  python3Packages.python-lsp-server
+                  python3Packages.grip
+                  multimarkdown
+                  xclip
+                  xdotool
+                  xorg.xwininfo
+                  xorg.xprop
+                  watchman
+                ]);
+              }
+            }/bin") exec-path))
 
             ;; This file controls what Doom modules are enabled and what order they load
             ;; in. Remember to run 'doom sync' after modifying it!
@@ -4611,6 +4621,9 @@ in {
 
             (unpin! apheleia)
             (package! apheleia :recipe (:host github :repo "zeorin/apheleia" :branch "fix/apheleia-npx"))
+
+            (unpin! envrc)
+            (package! envrc :recipe (:host github :repo "zeorin/envrc" :branch "fix-exec-path"))
           '';
           onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
             export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
