@@ -14,7 +14,7 @@ let
       (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
     pathDeps = with pkgs; [
       git
-      unstable.emacs-lsp-booster
+      emacs-lsp-booster
       dockfmt
       libxml2.bin
       rstfmt
@@ -69,7 +69,8 @@ let
       nodePackages.unified-language-server
       nodePackages.prettier
       jq
-      nixfmt
+      # nixfmt-classic
+      nixfmt-rfc-style
       nil
       black
       isort
@@ -468,6 +469,7 @@ in {
           "steam" # protontricks
           "steam-run" # protontricks
           "steam-original" # protontricks
+          (pkg: lib.hasPrefix "libretro-" (lib.getName pkg)) # retroarchFull
           "corefonts"
           "vista-fonts"
           "joypixels"
@@ -580,20 +582,20 @@ in {
         createXdgCacheAndDataDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           # Cache dirs
           for dir in less pg X11; do
-            $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
+            run mkdir --parents $VERBOSE_ARG \
               ${cacheHome}/$dir
           done
 
           # Data dirs
           for dir in bash go pass stack wineprefixes picom; do
-            $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
+            run mkdir --parents $VERBOSE_ARG \
               ${dataHome}/$dir
           done
-          $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
+          run mkdir --parents $VERBOSE_ARG \
             --mode=700 ${dataHome}/gnupg
 
           # Flameshot dir
-          $DRY_RUN_CMD mkdir --parents $VERBOSE_ARG \
+          run mkdir --parents $VERBOSE_ARG \
             ${config.home.homeDirectory}/Screenshots
         '';
       };
@@ -646,13 +648,15 @@ in {
         enable = true;
         nix-direnv.enable = true;
         config = {
-          strict_env = true;
-          warn_timeout = "30s";
+          global = {
+            strict_env = true;
+            warn_timeout = "30s";
+          };
         };
       };
       firefox = {
         enable = true;
-        package = pkgs.unstable.firefox.override {
+        package = pkgs.firefox.override {
           nativeMessagingHosts = with pkgs; [
             browserpass
             plasma-browser-integration
@@ -2532,7 +2536,7 @@ in {
       gpg-agent = {
         enable = true;
         enableSshSupport = true;
-        pinentryFlavor = "gnome3";
+        pinentryPackage = pkgs.pinentry-gnome3;
         defaultCacheTtl = 0;
         maxCacheTtl = 0;
         defaultCacheTtlSsh = 0;
@@ -3708,7 +3712,6 @@ in {
             if [ ! -d "$DOOMLOCALDIR" ]; then
               doom --force install
             else
-              doom --force clean
               doom --force sync -u
             fi
           ''}";
@@ -4773,14 +4776,14 @@ in {
           color15  #ECEFF4
         '';
         "Kvantum/ColloidNord".source = "${
-            pkgs.unstable.colloid-kde.overrideAttrs (oldAttrs: {
+            pkgs.colloid-kde.overrideAttrs (oldAttrs: {
               postInstall = (oldAttrs.postInstall or "") + ''
                 rm -r $out/share/Kvantum/ColloidNord/ColloidNordDark.*
               '';
             })
           }/share/Kvantum/ColloidNord";
         "Kvantum/ColloidNordDark".source = "${
-            pkgs.unstable.colloid-kde.overrideAttrs (oldAttrs: {
+            pkgs.colloid-kde.overrideAttrs (oldAttrs: {
               postInstall = (oldAttrs.postInstall or "") + ''
                 rm -r $out/share/Kvantum/ColloidNord/ColloidNord.*
               '';
@@ -5471,15 +5474,13 @@ in {
     gtk = {
       enable = true;
       theme = {
-        package = pkgs.unstable.colloid-gtk-theme.override {
-          tweaks = [ "nord" "rimless" ];
-        };
+        package =
+          pkgs.colloid-gtk-theme.override { tweaks = [ "nord" "rimless" ]; };
         name = "Colloid-Light-Nord";
       };
       iconTheme = {
-        package = pkgs.unstable.colloid-icon-theme.override {
-          schemeVariants = [ "nord" ];
-        };
+        package =
+          pkgs.colloid-icon-theme.override { schemeVariants = [ "nord" ]; };
         name = "Colloid-nord-light";
       };
       cursorTheme = {
@@ -5566,7 +5567,7 @@ in {
         size = dpiScale 24;
       };
       font = {
-        package = pkgs.unstable.geist-font;
+        package = pkgs.geist-font;
         name = "Geist Light";
         size = 10;
       };
@@ -5575,7 +5576,7 @@ in {
 
     qt = {
       enable = true;
-      platformTheme = "qtct";
+      platformTheme.name = "qtct";
       style.name = "kvantum";
     };
 
@@ -5624,7 +5625,7 @@ in {
         httpie
         unstable.devenv
         xdg-user-dirs
-        unstable.wineWowPackages.stagingFull
+        wineWowPackages.stagingFull
         winetricks
         protontricks
         protonup
@@ -5847,7 +5848,7 @@ in {
           name = "firefox-devedition";
           profile = "developer-edition";
           makeWrapperArgs = [ "--add-flags" "--start-debugger-server" ];
-        } (unstable.firefox-devedition.override {
+        } (firefox-devedition.override {
           nativeMessagingHosts = with pkgs; [
             browserpass
             plasma-browser-integration
@@ -5860,7 +5861,7 @@ in {
         (wrapFirefoxWithProfile {
           name = "firefox-beta";
           profile = "beta";
-        } (unstable.firefox-beta.override {
+        } (firefox-beta.override {
           nativeMessagingHosts = with pkgs; [
             browserpass
             plasma-browser-integration
@@ -5871,7 +5872,7 @@ in {
         (wrapFirefoxWithProfile {
           name = "firefox-esr";
           profile = "esr";
-        } (unstable.firefox-esr.override {
+        } (firefox-esr.override {
           nativeMessagingHosts = with pkgs; [
             browserpass
             plasma-browser-integration
@@ -5921,7 +5922,7 @@ in {
         # FONTS #
         #########
 
-        unstable.geist-font
+        geist-font
 
         # Emoji
         # emojione
@@ -6010,8 +6011,8 @@ in {
 
         # Iosevka and friends
         iosevka
-        (iosevka-bin.override { variant = "aile"; })
-        (iosevka-bin.override { variant = "etoile"; })
+        (iosevka-bin.override { variant = "Aile"; })
+        (iosevka-bin.override { variant = "Etoile"; })
 
         # Other Coding fonts
         # hack-font
@@ -6036,7 +6037,7 @@ in {
           src = fetchurl {
             url =
               "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/v${nerdfonts.version}/10-nerd-font-symbols.conf";
-            hash = "sha256-i+qcd/MN/eWfkcocTYYKO/iyKLnm+fca/RcB2QLpzOc=";
+            hash = "sha256-ZgHkMcXEPYDfzjdRR7KX3ws2u01GWUj48heMHaiaznY=";
           };
           dontUnpack = true;
           dontConfigure = true;
@@ -6136,6 +6137,6 @@ in {
     systemd.user.startServices = "sd-switch";
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    home.stateVersion = "23.11";
+    home.stateVersion = "24.05";
   };
 }
