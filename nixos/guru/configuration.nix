@@ -137,4 +137,6 @@
 
   services.hardware.openrgb.enable = true;
   services.hardware.openrgb.package = pkgs.openrgb-with-all-plugins;
+
+  virtualisation.docker.daemon.settings = { dns = [ "192.168.0.1" ]; };
 }
