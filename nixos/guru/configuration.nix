@@ -108,7 +108,7 @@
     SOUND_POWER_SAVE_ON_AC = 0;
     USB_EXCLUDE_PHONE = 1;
     USB_EXCLUDE_BTUSB = 1;
-    USB_EXCLUDE_PRINTER = 1;
+    USB_DENYLIST = lib.concatStringsSep " " [ "03f0:002a" ];
     WOL_DISABLE = "N";
   };
 
@@ -126,14 +126,39 @@
   # i2c
   hardware.i2c.enable = true;
 
-  services.printing = {
-    drivers = [ pkgs.hplipWithPlugin ];
-    browsing = true;
-    openFirewall = true;
-    # this gives access to anyone on the interface you might want to limit it see the official documentation
-    allowFrom = [ "all" ];
-    defaultShared = true; # If you want
+  # hardware.printers.ensureDefaultPrinter = "LaserJet";
+  # hardware.printers.ensurePrinters = [{
+  #   name = "LaserJet";
+  #   description = "HP LaserJet Professional P1102";
+  #   location = "Xandor Office";
+  #   deviceUri =
+  #     "hp:/usb/HP_LaserJet_Professional_P1102?serial=000000000Q836L72PR1a";
+  #   model = "drv:///hp/hpcups.drv/hp-laserjet_professional_p1102.ppd";
+  # }];
+  services.printing.drivers = with pkgs; [ hplipWithPlugin ];
+  # Printer sharing
+  services.printing.listenAddresses = [ "*:631" ];
+  # this gives access to anyone on the interface you might want to limit it see the official documentation
+  services.printing.allowFrom = [ "all" ];
+  services.printing.browsing = true;
+  services.printing.defaultShared = true; # If you want
+  services.printing.openFirewall = true;
+  services.samba.extraConfig = ''
+    load printers = yes
+    printing = cups
+    printcap name = cups
+  '';
+  services.samba.shares.printers = {
+    comment = "All Printers";
+    path = "/var/spool/samba";
+    public = "yes";
+    browseable = "yes";
+    "guest ok" = "yes";
+    writable = "no";
+    printable = "yes";
+    "create mode" = 700;
   };
+  systemd.tmpfiles.rules = [ "d /var/spool/samba 1777 root root -" ];
 
   services.hardware.openrgb.enable = true;
   services.hardware.openrgb.package = pkgs.openrgb-with-all-plugins;

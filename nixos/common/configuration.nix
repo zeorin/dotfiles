@@ -595,10 +595,8 @@
     virtualisation.libvirtd.enable = true;
 
     # Enable CUPS to print documents.
-    services.printing = {
-      enable = true;
-      webInterface = false;
-    };
+    services.printing.enable = true;
+    services.printing.drivers = with pkgs; [ gutenprint gutenprintBin ];
 
     # Security/crypto
     services.gnome.gnome-keyring.enable = true;
