@@ -18,9 +18,8 @@
     };
 
     nixpkgs.allowUnfreePackages = mkOption {
-      type = with types; listOf str;
+      type = with types; (listOf (either str (functionTo bool)));
       default = [ ];
-      example = [ "steam" "steam-original" ];
     };
   };
 
@@ -90,7 +89,12 @@
       config = (homePkgs.config or { }) // {
         # https://github.com/NixOS/nixpkgs/issues/197325#issuecomment-1579420085
         allowUnfreePredicate = pkg:
-          builtins.elem (lib.getName pkg) config.nixpkgs.allowUnfreePackages;
+          let
+            names = lib.filter lib.isString config.nixpkgs.allowUnfreePackages;
+            predicates =
+              lib.filter lib.isFunction config.nixpkgs.allowUnfreePackages;
+          in (builtins.elem (lib.getName pkg) names)
+          || (lib.lists.any (p: p pkg) predicates);
       };
 
       allowUnfreePackages = [ "steam" "steam-original" "steam-run" ]
