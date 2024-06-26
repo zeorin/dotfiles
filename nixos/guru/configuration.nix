@@ -106,7 +106,7 @@
 
   services.tlp.settings = {
     SOUND_POWER_SAVE_ON_AC = 0;
-    USB_BLACKLIST_PHONE = 1;
+    USB_EXCLUDE_PHONE = 1;
     USB_EXCLUDE_BTUSB = 1;
     USB_EXCLUDE_PRINTER = 1;
     WOL_DISABLE = "N";
