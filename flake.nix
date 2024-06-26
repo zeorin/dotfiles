@@ -4,13 +4,13 @@
   inputs = {
     systems.url = "github:nix-systems/x86_64-linux";
 
-    nixpkgs.url = "nixpkgs/nixos-23.11";
+    nixpkgs.url = "nixpkgs/nixos-24.05";
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
     nixos-hardware.url = "nixos-hardware";
 
-    home-manager.url = "home-manager/release-23.11";
+    home-manager.url = "home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     nur.url = "nur";

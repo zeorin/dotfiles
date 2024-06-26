@@ -1,17 +1,28 @@
 { lib, pkgsCross, stdenvNoCC, fetchFromGitHub, fetchurl, makeDesktopItem, p7zip
-, gnome, curl, protontricks, makeWrapper }:
+, gnome, curl, protontricks, makeWrapper, overrideCC }:
 
 let
-  version = "4.6.1";
+  version = "4.6.2";
   src = fetchFromGitHub {
     owner = "rockerbacon";
     repo = "modorganizer2-linux-installer";
     rev = version;
-    hash = "sha256-SI1XDWp2uDR1QJx9iGB1F1ixHOMiarHGEvLX6WLo8Zc=";
+    hash = "sha256-+lVB7Yai7SvK5XtE9bCM/LiH9VIf3pIFA/W9FDm/szM=";
   };
 
+  useWin32ThreadModel = stdenv:
+    overrideCC stdenv (stdenv.cc.override (old: {
+      cc = old.cc.override {
+        threadsCross = {
+          model = "win32";
+          package = null;
+        };
+      };
+    }));
+
   steam-redirector = pkgsCross.mingwW64.callPackage ({ stdenv, windows }:
-    stdenv.mkDerivation {
+
+    (useWin32ThreadModel stdenv).mkDerivation {
       pname = "steam-redirector";
       inherit version;
       src = "${src}/steam-redirector";

@@ -143,7 +143,7 @@
           enable = true;
           configurationLimit = 10;
           memtest86.enable = true;
-          memtest86.entryFilename = "z-memtest86.conf";
+          memtest86.sortKey = "zmemtest86";
         };
       };
 
@@ -166,7 +166,7 @@
       extraModprobeConfig = ''
         options v4l2loopback devices=1 exclusive_caps=1 video_nr=10 card_label="OBS Camera"
       '';
-      supportedFilesystems = [ "ntfs" ];
+      supportedFilesystems.ntfs = true;
     };
 
     services.udev.packages = with pkgs; [ alsa-utils brightnessctl ];
@@ -326,24 +326,14 @@
       '';
 
       # Configure keymap in X11
-      layout = "us,us";
-      xkbVariant = "dvp,";
-      xkbOptions =
-        "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
-
-      libinput.touchpad = {
-        accelProfile = "adaptive";
-        accelSpeed = "1";
-        disableWhileTyping = true;
-        naturalScrolling = true;
-        additionalOptions = ''
-          Option "PalmDetection" "True"
-        '';
+      xkb = {
+        layout = "us,us";
+        variant = "dvp,";
+        options =
+          "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
       };
 
       displayManager = {
-        # Log in automatically
-        autoLogin.user = "zeorin";
         # https://github.com/NixOS/nixpkgs/issues/174099#issuecomment-1201697954
         sessionCommands = ''
           ${
@@ -360,6 +350,18 @@
           '';
         }];
       };
+    };
+
+    services.displayManager.autoLogin.user = "zeorin";
+
+    services.libinput.touchpad = {
+      accelProfile = "adaptive";
+      accelSpeed = "1";
+      disableWhileTyping = true;
+      naturalScrolling = true;
+      additionalOptions = ''
+        Option "PalmDetection" "True"
+      '';
     };
 
     # Rebind some keys
@@ -510,6 +512,7 @@
       };
       useGlobalPkgs = true;
       useUserPackages = true;
+      backupFileExtension = "bak";
       users.zeorin = import ../../home-manager/home.nix;
     };
 
@@ -571,7 +574,7 @@
 
     services.tailscale = {
       enable = true;
-      package = pkgs.unstable.tailscale;
+      package = pkgs.tailscale;
       openFirewall = true;
       useRoutingFeatures = "client";
       extraUpFlags = [ "--accept-routes" ];
@@ -620,7 +623,7 @@
     services.avahi = {
       enable = true;
       openFirewall = true;
-      nssmdns = true;
+      nssmdns4 = true;
       publish = {
         enable = true;
         userServices = true;
@@ -761,6 +764,6 @@
     };
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    system.stateVersion = "23.11"; # Did you read the comment?
+    system.stateVersion = "24.05"; # Did you read the comment?
   };
 }
