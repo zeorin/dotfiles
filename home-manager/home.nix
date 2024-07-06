@@ -3829,6 +3829,10 @@ in {
           (setq-default vterm-shell (executable-find "fish"))
           (setq-default explicit-shell-file-name (executable-find "fish"))
 
+          (use-package! org
+            :config
+            (setq org-return-follows-link t))
+
           ;; Boris Buliga - Task management with org-roam Vol. 5: Dynamic and fast agenda
           ;; https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
           (use-package! vulpea
@@ -4106,6 +4110,7 @@ in {
           ;; Enable some more Evil keybindings for org-mode
           (after! evil-org
             (evil-org-set-key-theme '(navigation
+                                      return
                                       insert
                                       textobjects
                                       additional
