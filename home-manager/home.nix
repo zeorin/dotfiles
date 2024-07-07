@@ -849,6 +849,15 @@ in {
             # resetting all bindings.
             # The argument specifies the initial mode (insert, "default" or visual).
             fish_vi_key_bindings --no-erase insert
+
+            # Inhibit empty command line submissions
+            # https://github.com/fish-shell/fish-shell/issues/7797
+            bind --user \r 'commandline | string trim | string length -q \
+              && transient_execute \
+              || commandline -r ""'
+            bind --user -M insert \r 'commandline | string trim | string length -q \
+              && transient_execute \
+              || commandline -r ""'
           '';
           man = {
             wraps = "man";
@@ -988,6 +997,12 @@ in {
             end
           end
           delta_sidebyside
+
+          # Put a newline under the last command
+          # https://github.com/starship/starship/issues/560#issuecomment-1465630645
+          function echo_prompt --on-event fish_postexec
+            echo ""
+          end
 
           # https://github.com/akermu/emacs-libvterm
           if test -n "$INSIDE_EMACS"
@@ -1960,7 +1975,18 @@ in {
         '';
         includes = [ "config_local" ];
       };
-      starship.enable = true;
+      starship = {
+        enable = true;
+        enableTransience = true;
+        settings = (builtins.fromTOML (builtins.readFile (pkgs.fetchurl {
+          url = "https://starship.rs/presets/toml/nerd-font-symbols.toml";
+          hash = "sha256-BVe5JMSIa3CoY2Wf9pvcF1EUtDVCWCLhW3IyKuwfHug=";
+        }))) // {
+          add_newline = false;
+          format = "$character";
+          right_format = "$all";
+        };
+      };
       tmux = {
         enable = true;
         clock24 = true;
@@ -4991,10 +5017,6 @@ in {
               "\C-n": history-search-forward
           $endif
         '';
-        "starship.toml".source = pkgs.fetchurl {
-          url = "https://starship.rs/presets/toml/nerd-font-symbols.toml";
-          hash = "sha256-BVe5JMSIa3CoY2Wf9pvcF1EUtDVCWCLhW3IyKuwfHug=";
-        };
         "todo/config".text = ''
           export TODO_DIR="${userDirs.documents}/todo"
           export TODO_FILE="$TODO_DIR/todo.txt"
