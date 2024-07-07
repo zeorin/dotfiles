@@ -3646,6 +3646,15 @@ in {
           Unit.After = [ "graphical-session-i3.target" ];
           Install.WantedBy = lib.mkForce [ "graphical-session-i3.target" ];
         };
+        tmux = {
+          Unit.Description = "tmux server";
+          Install.WantedBy = [ "default.target" ];
+          Service = {
+            ExecStart = "${config.programs.tmux.package}/bin/tmux -D";
+            ExecStop = "${config.programs.tmux.package}/bin/tmux kill-server";
+            Restart = "on-failure";
+          };
+        };
         xfsettingsd = {
           Unit = {
             Description = "xfsettingsd";
