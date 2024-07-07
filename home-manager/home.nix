@@ -1963,10 +1963,9 @@ in {
       starship.enable = true;
       tmux = {
         enable = true;
-        baseIndex = 1;
         clock24 = true;
-        disableConfirmationPrompt = true;
         keyMode = "vi";
+        mouse = true;
         shortcut = "Space";
         terminal = "tmux-256color";
 
@@ -1988,22 +1987,33 @@ in {
           # Clipboard integration
           set-option -g set-clipboard on
 
-          # Mouse behaviour
-          set-option -g mouse on
-
           set-option -g update-environment 'DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY TERM'
         '';
 
         plugins = with pkgs.tmuxPlugins; [
-          sensible
           pain-control
-          prefix-highlight
           nord
           {
             plugin = better-mouse-mode;
             extraConfig = ''
               set-option -g @scroll-without-changing-pane 'on'
               set-option -g @emulate-scroll-for-no-mouse-alternate-buffer 'on'
+            '';
+          }
+          {
+            plugin = mkTmuxPlugin {
+              pluginName = "transient-status";
+              version = "unstable-2024-07-07";
+              rtpFilePath = "main.tmux";
+              src = pkgs.fetchFromGitHub {
+                owner = "TheSast";
+                repo = "tmux-transient-status";
+                rev = "c3fcd5180999a7afc075d2dd37d37d1b1b82f7e8";
+                sha256 = "sha256-fOIn8hVVBDFVLwzmPZP+Bf3ccxy/hsAnKIXYD9yv3BE=";
+              };
+            };
+            extraConfig = ''
+              set-option -g status 'off'
             '';
           }
         ];
