@@ -4216,7 +4216,7 @@ in {
 
           ;; LSP perf tweaks
           ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
-          (setq read-process-output-max (* 1024 1024)) ;; 1mb
+          (setq read-process-output-max (* 1024 1024 3)) ;; 3mb
           (setq lsp-idle-delay 0.500)
           (setq gc-cons-threshold 100000000) ;; 100mb
 
