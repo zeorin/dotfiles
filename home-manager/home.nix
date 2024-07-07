@@ -850,6 +850,10 @@ in {
             # The argument specifies the initial mode (insert, "default" or visual).
             fish_vi_key_bindings --no-erase insert
 
+            # CTRL+Backspace deletes work
+            bind --user \b backward-kill-path-component
+            bind --user -M insert \b backward-kill-path-component
+
             # Inhibit empty command line submissions
             # https://github.com/fish-shell/fish-shell/issues/7797
             bind --user \r 'commandline | string trim | string length -q \
