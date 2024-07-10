@@ -479,6 +479,8 @@ in {
           DOOMDIR = "${configHome}/doom";
           DOOMLOCALDIR = "${dataHome}/doom";
 
+          LEDGER_FILE = "${config.xdg.userDirs.documents}/2. Areas/Finances/hledger.journal";
+
           # Suppress direnv's verbose output
           # https://github.com/direnv/direnv/issues/68#issuecomment-42525172
           DIRENV_LOG_FORMAT = "";
@@ -4249,6 +4251,33 @@ in {
           (use-package! envrc
             :config
             (setq envrc-show-summary-in-minibuffer nil))
+
+          (use-package! ledger-mode
+            :init
+            (add-to-list 'auto-mode-alist '("\\.\\(h?ledger\\|journal\\|j\\)$" . ledger-mode))
+            :config
+            (setq ledger-binary-path (executable-find "hledger")
+                  ledger-mode-should-check-version nil
+                  ledger-report-links-in-register nil
+                  ledger-report-auto-width nil
+                  ledger-report-use-header-line t
+                  ledger-report-native-highlighting-arguments '("--color=always")
+                  ledger-report-use-native-highlighting t
+                  ledger-report-auto-refresh-sticky-cursor t
+                  ledger-report-use-strict t
+                  ledger-init-file-name " "
+                  ledger-post-amount-alignment-column 64
+                  ledger-reconcile-default-commodity "ZAR"
+                  ledger-highlight-xact-under-point nil)
+            (add-hook 'ledger-mode-hook #'auto-revert-tail-mode)
+            (add-hook 'ledger-mode-hook #'orgstruct-mode))
+
+          (use-package! flycheck-hledger
+            :after (flycheck ledger-mode)
+            :demand t
+            :config
+            (setq flycheck-hledger-strict t))
+
         '';
         "doom/init.el" = {
           text = ''
@@ -4284,8 +4313,41 @@ in {
                   lldb
                   graphviz-nox
                   wordnet
-                  beancount
-                  beancount-language-server
+                  (writeShellScriptBin "hledger" ''
+                    # https://github.com/simonmichael/hledger/issues/367#issuecomment-956436493
+                    iargs=("$@")
+                    oargs=()
+                    j=0;
+                    date=;
+                    for((i=0; i<''${#iargs[@]}; ++i)); do
+                        case ''${iargs[i]} in
+                            --date-format)
+                                # drop --date-format and the next arg
+                                i=$((i+1));
+                                ;;
+                            xact)
+                                # convert "xact" to "print --match"
+                                oargs[j]=print; oargs[j+1]=--match; j=$((j+2));
+                                # drop xact argument and stash the date argument
+                                i=$((i+1));
+                                date=''${iargs[i]};
+                                ;;
+                            *)
+                                # keep any other args:
+                                oargs[j]=''${iargs[i]};
+                                j=$((j+1));
+                                ;;
+                        esac
+                    done
+
+                    if test "$date"
+                    then
+                        # substitute the given date for the old date:
+                        ${lib.getBin hledger}/bin/hledger "''${oargs[@]}" | sed "1s/....-..-../$date/"
+                    else
+                        ${lib.getBin hledger}/bin/hledger "''${oargs[@]}"
+                    fi
+                  '')
                   fava
                   html-tidy
                   nodejs
@@ -4451,7 +4513,7 @@ in {
 
                    :lang
                    ;;agda              ; types of types of types of types...
-                   (beancount +lsp)    ; Mind the GAAP
+                   ;;(beancount +lsp)    ; Mind the GAAP
                    ;;(cc +lsp)         ; C > C++ == 1
                    ;;clojure           ; java with a lisp
                    ;;common-lisp       ; if you've seen one lisp, you've seen them all
@@ -4484,7 +4546,7 @@ in {
                    ;;kotlin            ; a better, slicker Java(Script)
                    ;;latex             ; writing papers in Emacs has never been so fun
                    ;;lean              ; for folks with too much to prove
-                   ;;ledger            ; be audit you can be
+                   ledger            ; be audit you can be
                    ;;lua               ; one-based indices? one-based indices
                    (markdown +grip)          ; writing docs for people to ignore
                    ;;nim               ; python + lisp at the speed of c
@@ -4624,6 +4686,9 @@ in {
 
             (unpin! envrc)
             (package! envrc :recipe (:host github :repo "zeorin/envrc" :branch "fix-exec-path"))
+
+            (package! flycheck-ledger :disable t)
+            (package! flycheck-hledger)
           '';
           onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
             export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
@@ -5755,7 +5820,7 @@ in {
         libreoffice
         onlyoffice-bin
         pdfchain
-        beancount
+        hledger
         fava
         arandr
         barrier
