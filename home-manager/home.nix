@@ -6021,7 +6021,7 @@ in {
         virt-manager
         virt-viewer
         qemu_full
-        (quickemu.override { qemu = qemu_full; })
+        quickemu
         slack
         discord
         tdesktop
