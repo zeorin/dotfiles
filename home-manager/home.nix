@@ -2375,7 +2375,7 @@ in {
             ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
           '';
           kvantum-theme = ''
-            ${pkgs.libsForQt5.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNordDark
+            ${pkgs.kdePackages.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNordDark
           '';
           icon-theme = ''
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${
@@ -2420,7 +2420,7 @@ in {
             ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
           '';
           kvantum-theme = ''
-            ${pkgs.libsForQt5.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNord
+            ${pkgs.kdePackages.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNord
           '';
           icon-theme = ''
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${config.gtk.iconTheme.name}"
