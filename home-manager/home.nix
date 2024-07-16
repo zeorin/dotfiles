@@ -5508,6 +5508,12 @@ in {
           categories = [ "System" ];
         };
       };
+      portal = {
+        enable = true;
+        extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
+        xdgOpenUsePortal = true;
+        config.common.default = [ "gtk" ];
+      };
     };
 
     home.file = {
