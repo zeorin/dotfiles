@@ -485,6 +485,7 @@
 
     # Location-based stuff
     services.geoclue2.enable = true;
+    services.geoclue2.geoProviderUrl = "https://beacondb.net/v1/geolocate";
     location.provider = "geoclue2";
     services.localtimed.enable = true;
 
