@@ -518,6 +518,8 @@
       users.zeorin = import ../../home-manager/home.nix;
     };
 
+    environment.pathsToLink = [ "/share/xdg-desktop-portal" "/share/applications" ];
+
     networking = {
       iproute2.enable = true;
       firewall = {
@@ -693,15 +695,6 @@
     programs.gamemode.enable = true;
 
     environment.shells = [ pkgs.fish ];
-
-    # TODO: Move this to home-manager when ready: https://github.com/nix-community/home-manager/issues/1167
-    xdg.portal = {
-      enable = true;
-      xdgOpenUsePortal = true;
-      extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
-      configPackages = with pkgs; [ xdg-desktop-portal-gtk ];
-      config = { common = { default = [ "gtk" ]; }; };
-    };
 
     # Compatibility for binaries
     services.envfs.enable = true;
