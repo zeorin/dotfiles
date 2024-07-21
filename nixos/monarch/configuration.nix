@@ -17,8 +17,6 @@
     ../common/configuration.nix
   ];
 
-  dpi = 192;
-
   boot = {
     plymouth.extraConfig = ''
       DeviceScale=2
@@ -78,27 +76,10 @@
     font = "ter-v32b";
   };
 
-  environment.variables = {
-    # HiDPI
-    GDK_SCALE = "2";
-    GDK_DPI_SCALE = "0.5";
-    QT_AUTO_SCREEN_SCALE_FACTOR = "1";
-    _JAVA_OPTIONS = "-Dsun.java2d.uiScale=2";
-  };
-
   # Overlays
   nixpkgs.overlays = [
     (_: prev: { vaapiIntel = prev.vaapiIntel.override { enableHybridCodec = true; }; })
   ];
-
-  services.xserver = {
-    monitorSection = ''
-      DisplaySize   508 286
-    '';
-    screenSection = ''
-      Option "DPI" "192 x 192"
-    '';
-  };
 
   # Sensors
   hardware.sensor.iio.enable = true;

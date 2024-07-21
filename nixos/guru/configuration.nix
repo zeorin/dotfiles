@@ -20,7 +20,6 @@
 
   nixpkgs.allowUnfreePackages = [
     "hplip"
-    "nvidia-x11"
     "nvidia-settings"
     "cuda_cccl"
     "cuda_cudart"
@@ -103,8 +102,6 @@
     };
   };
 
-  environment.etc."X11/xorg.conf.d/90-nvidia-i2c.conf".source = "${pkgs.ddcutil}/share/ddcutil/data/90-nvidia-i2c.conf";
-
   fileSystems = {
     "/".options = [
       "noatime"
@@ -123,9 +120,6 @@
 
   networking.hostName = "guru";
   networking.interfaces.enp4s0.wakeOnLan.enable = true;
-
-  # https://github.com/NixOS/nixpkgs/issues/30796#issuecomment-615680290
-  services.xserver.displayManager.setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --auto --output DP-1 --auto --right-of HDMI-0 --primary";
 
   hardware.nvidia.modesetting.enable = true;
 

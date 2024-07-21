@@ -11,15 +11,13 @@
 }@moduleArgs:
 
 let
-  dpiScale = x: x * ((moduleArgs.dpi or 96) / 96);
-
   myKey = "0x5E1C0971FE4F665A";
 
   my-emacs =
     let
       emacsPkg =
         with pkgs;
-        (emacsPackagesFor emacs29).emacsWithPackages (
+        (emacsPackagesFor emacs29-pgtk).emacsWithPackages (
           ps: with ps; [
             vterm
             tsc
@@ -144,14 +142,6 @@ let
     };
     setDesktopBackground = pkgs.writeShellScript "set-desktop-background" ''
       color_scheme="$(${pkgs.darkman}/bin/darkman get)"
-
-      if [ -f "${config.xdg.dataHome}/picom/env" ]; then
-        source "${config.xdg.dataHome}/picom/env"
-      fi
-
-      if [ "$PICOM_SHADER" = "grayscale" ]; then
-        color_scheme="''${color_scheme}-gray"
-      fi
 
       if [ "$color_scheme" = "light" ]; then
         background_image="${./backgrounds/martian-terrain-light.jpg}"
@@ -369,7 +359,6 @@ let
         paths = (builtins.attrValues (nixNomPkgs pkgs)) ++ (builtins.attrValues pkgs);
       }
     );
-
 in
 {
   # You can import other home-manager modules here
@@ -555,7 +544,7 @@ in
           done
 
           # Data dirs
-          for dir in bash go pass stack wineprefixes picom; do
+          for dir in bash go pass stack wineprefixes; do
             run mkdir --parents $VERBOSE_ARG \
               ${dataHome}/$dir
           done
@@ -598,6 +587,97 @@ in
           sortnr = "sort -n -r";
           sudo = "sudo --askpass";
         };
+      pointerCursor = {
+        gtk.enable = true;
+        package =
+          let
+            version = "2024-02-28";
+          in
+          pkgs.stdenv.mkDerivation {
+            inherit version;
+            pname = "colloid-cursor-theme";
+            src = "${
+              pkgs.fetchFromGitHub {
+                owner = "vinceliuice";
+                repo = "Colloid-icon-theme";
+                rev = version;
+                hash = "sha256-bTN6x3t88yBL4WsPfOJIiNGWTywdIVi7E2VJKgMzEso=";
+              }
+            }/cursors";
+            nativeBuildInputs = with pkgs; [
+              inkscape
+              xorg.xcursorgen
+              jdupes
+            ];
+            postPatch = ''
+              sed -i \
+                -e 's/#000000/#2e3440/g' \
+                -e 's/#1191f4/#5e81ac/g' \
+                -e 's/#14adf6/#88c0d0/g' \
+                -e 's/#1a1a1a/#2e3440/g' \
+                -e 's/#1b9aeb/#5e81ac/g' \
+                -e 's/#2a2a2a/#3b4252/g' \
+                -e 's/#2c2c2c/#3b4252/g' \
+                -e 's/#3bbd1c/#a3be8c/g' \
+                -e 's/#4caf50/#a3be8c/g' \
+                -e 's/#52cf30/#a3be8c/g' \
+                -e 's/#5b9bf8/#81a1c1/g' \
+                -e 's/#666666/#4c566a/g' \
+                -e 's/#6fce55/#a3be8c/g' \
+                -e 's/#ac44ca/#b48ead/g' \
+                -e 's/#b452cb/#b48ead/g' \
+                -e 's/#c7c7c7/#d8dee9/g' \
+                -e 's/#ca70e1/#b48ead/g' \
+                -e 's/#cecece/#d8dee9/g' \
+                -e 's/#d1d1d1/#d8dee9/g' \
+                -e 's/#dcdcdc/#d8dee9/g' \
+                -e 's/#ed1515/#bf616a/g' \
+                -e 's/#f5f5f5/#e5e9f0/g' \
+                -e 's/#f67400/#d08770/g' \
+                -e 's/#f83f31/#bf616a/g' \
+                -e 's/#faa91e/#d08770/g' \
+                -e 's/#fbb114/#d08770/g' \
+                -e 's/#fbd939/#ebcb8b/g' \
+                -e 's/#fdcf01/#ebcb8b/g' \
+                -e 's/#ff2a2a/#bf616a/g' \
+                -e 's/#ff4332/#bf616a/g' \
+                -e 's/#ff645d/#bf616a/g' \
+                -e 's/#ff9508/#d08770/g' \
+                -e 's/#ffaa07/#d08770/g' \
+                -e 's/#ffd305/#ebcb8b/g' \
+                -e 's/#ffffff/#eceff4/g' \
+                src/svg/*.svg \
+                src/svg-white/*.svg
+
+              patchShebangs build.sh
+
+              substituteInPlace build.sh \
+                --replace 'THEME="Colloid Cursors"' 'THEME="Colloid-nord-light-cursors"' \
+                --replace 'THEME="Colloid-dark Cursors"' 'THEME="Colloid-nord-dark-cursors"'
+
+              patchShebangs install.sh
+
+              substituteInPlace install.sh \
+                --replace '$HOME/.local' $out \
+                --replace '$THEME_NAME-cursors' '$THEME_NAME-nord-light-cursors' \
+                --replace '$THEME_NAME-dark-cursors' '$THEME_NAME-nord-dark-cursors'
+            '';
+            buildPhase = ''
+              runHook preBuild
+              ./build.sh
+              runHook postBuild
+            '';
+            installPhase = ''
+              runHook preInstall
+              mkdir -p $out/share/icons
+              ./install.sh
+              jdupes --quiet --link-soft --recurse $out/share
+              runHook postInstall
+            '';
+          };
+        name = "Colloid-nord-light-cursors";
+        size = 24;
+      };
     };
 
     programs = {
@@ -1712,6 +1792,7 @@ in
       };
       rofi = {
         enable = true;
+        package = pkgs.rofi-wayland;
         pass = {
           enable = true;
           extraConfig =
@@ -1730,8 +1811,7 @@ in
             ''
               # rofi command. Make sure to have "$@" as last argument
               _rofi () {
-                  ${pkgs.rofi}/bin/rofi \
-                    -dpi ${toString (dpiScale 96)} \
+                  ${pkgs.rofi-wayland}/bin/rofi \
                     -i \
                     -kb-accept-custom "" \
                     -kb-row-down "${remove-binding "Control+n" kb-row-down}" \
@@ -1884,7 +1964,7 @@ in
             window = {
               location = mkLiteral "north";
               anchor = mkLiteral "north";
-              y-offset = mkLiteral "${toString (dpiScale 280)}px";
+              y-offset = mkLiteral "200px";
               width = mkLiteral "40em";
               background-color = mkLiteral "@bg0";
             };
@@ -2438,9 +2518,6 @@ in
             ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
           '';
           gtk-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${
-              builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
-            }"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${
               builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
             }'"
@@ -2451,25 +2528,15 @@ in
             ${pkgs.kdePackages.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNordDark
           '';
           icon-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.iconTheme.name
-            }"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${
               builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.iconTheme.name
             }'"
           '';
           cursor-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
-            }"
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${toString config.gtk.cursorTheme.size}
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${
               builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
             }'"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${toString config.gtk.cursorTheme.size}
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
-            }/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
           '';
           inherit (scripts) setDesktopBackground;
         };
@@ -2478,7 +2545,6 @@ in
             ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
           '';
           gtk-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${config.gtk.theme.name}"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${config.gtk.theme.name}'"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
             ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
@@ -2487,15 +2553,11 @@ in
             ${pkgs.kdePackages.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNord
           '';
           icon-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${config.gtk.iconTheme.name}"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${config.gtk.iconTheme.name}'"
           '';
           cursor-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name}"
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${toString config.gtk.cursorTheme.size}
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name}'"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${toString config.gtk.cursorTheme.size}
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${config.gtk.cursorTheme.name}/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
           '';
           inherit (scripts) setDesktopBackground;
         };
@@ -2519,7 +2581,7 @@ in
             max_icon_size = 60;
             icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro-icons";
             enable_recursive_icon_lookup = "true";
-            dmenu = "${pkgs.rofi}/bin/rofi -dpi ${toString (dpiScale 96)} -dmenu -p dunst";
+            dmenu = "${pkgs.rofi-wayland}/bin/rofi -dmenu -p dunst";
             mouse_left_click = "close_current";
             mouse_middle_click = "context";
             mouse_right_click = "do_action";
@@ -2572,620 +2634,37 @@ in
       mpris-proxy.enable = true;
       network-manager-applet.enable = true;
       nextcloud-client.enable = true;
-      picom = {
+      syncthing = {
         enable = true;
-        package =
-          let
-            picomPkg = pkgs.picom-next;
-          in
-          pkgs.symlinkJoin {
-            name = "picom";
-            paths = [
-              (pkgs.writeShellScriptBin "picom" (
-                let
-                  grayscale-glsl = pkgs.writeText "grayscale.glsl" ''
-                    #version 330
-
-                    in vec2 texcoord;
-                    uniform sampler2D tex;
-                    uniform float opacity;
-
-                    vec4 default_post_processing(vec4 c);
-
-                    vec4 window_shader() {
-                      vec2 texsize = textureSize(tex, 0);
-                      vec4 color = texture2D(tex, texcoord / texsize, 0);
-
-                      color = vec4(vec3(0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) * opacity, color.a * opacity);
-
-                      return default_post_processing(color);
-                    }
-                  '';
-                in
-                ''
-                  if [ "$PICOM_SHADER" = "grayscale" ]; then
-                    "${picomPkg}/bin/picom" \
-                      --window-shader-fg="${grayscale-glsl}" \
-                      "$@"
-                  else
-                    "${picomPkg}/bin/picom" "$@"
-                  fi
-                ''
-              ))
-              pkgs.picom
-            ];
-          }
-          // {
-            inherit (pkgs.picom) meta;
-          };
-        backend = "glx";
-        fade = true;
-        fadeDelta = 3;
-        inactiveOpacity = 0.95;
-        menuOpacity = 0.95;
-        shadow = true;
-        shadowOffsets = [
-          (-7)
-          (-7)
-        ];
-        shadowExclude = [
-          # unknown windows
-          "! name~=''"
-          # shaped windows
-          "bounding_shaped && !rounded_corners"
-          # no shadow on i3 frames
-          "class_g = 'i3-frame'"
-          # hidden windows
-          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
-          # stacked / tabbed windows
-          "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
-          "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
-          # GTK
-          "_GTK_FRAME_EXTENTS@:c"
-          "class_g ~= 'xdg-desktop-portal' && _NET_FRAME_EXTENTS@:c && window_type = 'dialog'"
-          "class_g ~= 'xdg-desktop-portal' && window_type = 'menu'"
-          "_NET_FRAME_EXTENTS@:c && WM_WINDOW_ROLE@:s = 'Popup'"
-          # Mozilla fixes
-          "(class_g *?= 'firefox' || class_g = 'thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
-          # notifications
-          "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_NOTIFICATION'"
-          # Zoom
-          "name = 'cpt_frame_xcb_window'"
-          "class_g *?= 'zoom' && name *?= 'meeting'"
-        ];
-        opacityRules =
-          # Only apply these opacity rules if the windows are not hidden
-          map (str: str + " && !(_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN')") [
-            "100:class_g *?= 'zoom' && name *?= 'meeting'"
-            "100:role = 'browser' && name ^= 'Meet -'"
-            "100:role = 'browser' && name ^= 'Netflix'"
-            "95:class_g = 'Emacs'"
-          ]
-          ++ [ "0:_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'" ];
-        vSync = true;
-        settings = {
-          inactive-dim = 0.2;
-          blur = {
-            method = "dual_kawase";
-            strength = 5;
-          };
-          corner-radius = dpiScale 8;
-          rounded-corners-exclude = [
-            "window_type = 'dock'"
-            "window_type = 'desktop'"
-          ];
-          blur-background-exclude = [
-            # shaped windows
-            "bounding_shaped && !rounded_corners"
-            # hidden windows
-            "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'"
-            # stacked / tabbed windows
-            "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
-            "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
-            # i3 borders
-            "class_g = 'i3-frame'"
-            # GTK
-            "_GTK_FRAME_EXTENTS@:c"
-            "class_g ~= 'xdg-desktop-portal' && _NET_FRAME_EXTENTS@:c && window_type = 'dialog'"
-            "class_g ~= 'xdg-desktop-portal' && window_type = 'menu'"
-            "_NET_FRAME_EXTENTS@:c && WM_WINDOW_ROLE@:s = 'Popup'"
-            # Mozilla fixes
-            "(class_g *?= 'firefox' || class_g = 'thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
-            # Zoom
-            "name = 'cpt_frame_xcb_window'"
-            "class_g *?= 'zoom' && name *?= 'meeting'"
-            "class_g = 'Peek'"
-          ];
-          mark-wmwin-focused = true;
-          mark-ovredir-focused = true;
-          detect-client-opacity = true;
-          detect-transient = true;
-          glx-no-stencil = true;
-          glx-no-rebind-pixmap = true;
-          use-damage = true;
-          shadow-radius = 7;
-          xinerama-shadow-crop = true;
-          xrender-sync-fence = true;
-          focus-exclude = [
-            "name = 'Picture-in-Picture'"
-            "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_FULLSCREEN'"
-            "class_g *?= 'zoom' && name *?= 'meeting'"
-            "role = 'browser' && name ^= 'Netflix'"
-            "role = 'browser' && name ^= 'Meet -'"
-          ];
-          detect-rounded-corners = true;
-          win-types = {
-            tooltip = {
-              fade = true;
-              shadow = true;
-              opacity = 0.8;
-              focus = true;
-              full-shadow = false;
-            };
-            dock = {
-              shadow = false;
-              clip-shadow-above = true;
-            };
-            dnd = {
-              shadow = false;
-            };
-            popup_menu = {
-              opacity = 0.9;
-            };
-            dropdown_menu = {
-              opacity = 0.9;
-            };
-          };
+        tray = {
+          enable = true;
+          command = "syncthingtray --wait";
         };
       };
-      polybar = {
-        enable = true;
-        package = pkgs.polybar.override {
-          i3Support = true;
-          mpdSupport = true;
-        };
-        settings =
-          let
-            superColors = colors;
-          in
-          let
-            colors = superColors // {
-              background = colors.nord0;
-              foreground = colors.nord9;
-              foreground-alt = colors.nord10;
-              urgent = colors.nord12;
-              alert = colors.nord13;
-            };
-            pulseaudio-control =
-              with pkgs;
-              stdenv.mkDerivation {
-                name = "pulseaudio-control";
-                src = inputs.pulseaudio-control;
-                buildInputs = [
-                  bash
-                  pulseaudio
-                  libnotify
-                  gnugrep
-                  gawk
-                  gnused
-                  coreutils
-                ];
-                nativeBuildInputs = [ makeWrapper ];
-                installPhase = ''
-                  mkdir -p $out/bin
-                  mv pulseaudio-control $out/bin/pulseaudio-control
-                  wrapProgram $out/bin/pulseaudio-control \
-                    --prefix PATH : ${
-                      lib.makeBinPath [
-                        bash
-                        pulseaudio
-                        libnotify
-                        gnugrep
-                        gawk
-                        gnused
-                        coreutils
-                      ]
-                    }
-                '';
-              };
-            mkFormats =
-              let
-                formats = [
-                  "format"
-                  # "format-volume"
-                  # "format-muted"
-                  # "format-mounted"
-                  # "format-unmounted"
-                  # "format-connected"
-                  # "format-disconnected"
-                  # "format-charging"
-                  # "format-discharging"
-                  # "format-full"
-                  # "format-low"
-                ];
-              in
-              attrset:
-              lib.lists.foldr (
-                format: acc:
-                acc
-                // (lib.attrsets.mapAttrs' (name: value: {
-                  inherit value;
-                  name = "${format}-${name}";
-                }) attrset)
-              ) { } formats;
-            mkAlpha = str: "#cc${lib.strings.removePrefix "#" str}";
-          in
-          {
-            settings = {
-              screenchange-reload = true;
-              # https://www.cairographics.org/manual/cairo-cairo-t.html#cairo-operator-t
-              compositing-background = "source";
-              compositing-foreground = "source";
-              compositing-overline = "over";
-              compositing-underline = "over";
-              compositing-border = "over";
-              pseudo-transparency = false;
-            };
-            "bar/top" = {
-              inherit (colors) foreground;
-              background = "${mkAlpha colors.background}";
-              monitor = "\${env:MONITOR:}";
-              monitor-strict = true;
-              monitor-exact = true;
-              dpi = 0;
-              width = "100%";
-              height = "${toString (24.0 / 1080 * 100)}%";
-              enable-struts = true;
-              double-click-interval = 150;
-              override-redirect = false;
-              wm-restack = "i3";
+      vscode-server.enable = true;
+    };
 
-              fixed-center = true;
-
-              # For symbols
-              font-0 = "Symbols Nerd Font Mono:size=10;2";
-              # For Powerline glyphs
-              font-1 = "Symbols Nerd Font Mono:size=18;3";
-              # If it's not a symbol, it falls back to this
-              font-2 = "Iosevka:size=8;2";
-
-              format-foreground = colors.foreground;
-              format-background = "${mkAlpha colors.background}";
-
-              modules-left = "i3 title";
-              # modules-center = "yubikey mpd";
-              modules-center = "yubikey";
-              modules-right = "audio-input audio-output xkeyboard battery date";
-            };
-            "bar/top-primary" = {
-              "inherit" = "bar/top";
-              modules-right = "audio-input audio-output xkeyboard battery date tray";
-            };
-            "powerline/right-facing-arrow" = {
-              type = "custom/text";
-              label = "";
-              label-font = 2;
-              label-foreground = "\${self.background}";
-              label-background = "\${self.background-next}";
-            };
-            "powerline/right-facing-separator" = {
-              type = "custom/text";
-              label = "";
-              label-font = 2;
-              label-foreground = "\${self.separator}";
-              label-background = "\${self.background}";
-            };
-            "powerline/left-facing-arrow" = {
-              type = "custom/text";
-              label = "";
-              label-font = 2;
-              label-foreground = "\${self.background}";
-              label-background = "\${self.background-next}";
-            };
-            "powerline/left-facing-separator" = {
-              type = "custom/text";
-              label = "";
-              label-font = 2;
-              label-foreground = "\${self.separator}";
-              label-background = "\${self.background}";
-            };
-            "powerline/left-section-arrow" = mkFormats {
-              suffix = "\${powerline/right-facing-arrow.label}";
-              suffix-font = "\${powerline/right-facing-arrow.label-font}";
-              suffix-foreground = "\${self.background}";
-              suffix-background = "\${self.background-next}";
-            };
-            "powerline/left-section-separator" = mkFormats {
-              prefix = "\${powerline/right-facing-separator.label}";
-              prefix-font = "\${powerline/right-facing-separator.label-font}";
-              prefix-foreground = "\${self.separator}";
-              prefix-background = "\${self.background}";
-            };
-            "powerline/right-section-arrow" = mkFormats {
-              prefix = "\${powerline/left-facing-arrow.label}";
-              prefix-font = "\${powerline/left-facing-arrow.label-font}";
-              prefix-foreground = "\${self.background}";
-              prefix-background = "\${self.background-next}";
-            };
-            "powerline/right-section-separator" = mkFormats {
-              suffix = "\${powerline/left-facing-separator.label}";
-              suffix-font = "\${powerline/left-facing-separator.label-font}";
-              suffix-foreground = "\${self.separator}";
-              suffix-background = "\${self.background}";
-            };
-            "module/i3" = {
-              "inherit" = "powerline/left-section-arrow";
-              type = "internal/i3";
-              strip-wsnumbers = true;
-              pin-workspaces = true;
-              show-urgent = true;
-              index-sort = true;
-              enable-scroll = false;
-              wrapping-scroll = false;
-
-              format = "<label-mode> <label-state> ";
-              format-foreground = colors.nord0;
-              format-background = "${mkAlpha colors.nord3}";
-              format-prefix = "  ";
-              format-prefix-background = "${mkAlpha colors.nord3}";
-              background = "${mkAlpha colors.nord3}";
-              background-next = "${mkAlpha colors.nord1}";
-
-              label-mode-foreground = colors.alert;
-              label-mode-padding = 1;
-
-              label-separator = "​"; # zero-width space
-              label-separator-padding = 1;
-
-              # unfocused = Inactive workspace on any monitor
-              label-unfocused = "%name%";
-
-              # focused = Active workspace on focused monitor
-              label-focused = "%name%";
-              label-focused-foreground = colors.nord6;
-
-              # visible = Active workspace on unfocused monitor
-              label-visible = "%name%";
-
-              # urgent = Workspace with urgency hint set
-              label-urgent = "%name%";
-              label-urgent-foreground = colors.urgent;
-            };
-            "module/title" = {
-              "inherit" = "powerline/left-section-arrow";
-              type = "internal/xwindow";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              background = "${mkAlpha colors.nord1}";
-              background-next = "${mkAlpha colors.nord0}";
-              # Prepend a zero-width space to keep rendering
-              # the suffix even on an empty workspace
-              label = " %title:0:120:…% ";
-              label-empty = " ";
-            };
-            "module/mpd" = {
-              type = "internal/mpd";
-              format-online = "<label-song> <bar-progress> <label-time>  <icon-prev> <icon-seekb> <icon-stop> <toggle> <icon-seekf> <icon-next>  <icon-repeat> <icon-random>";
-              format-online-foreground = colors.nord1;
-
-              icon-foreground = "\${self.format-online-foreground}";
-
-              icon-play = "⏵";
-              icon-pause = "⏸";
-              icon-stop = "⏹";
-              icon-prev = "⏮";
-              icon-next = "⏭";
-              icon-seekb = "⏪";
-              icon-seekf = "⏩";
-              icon-random = "🔀";
-              icon-repeat = "🔁";
-
-              icon-play-foreground = "\${self.icon-foreground}";
-              icon-pause-foreground = "\${self.icon-foreground}";
-              icon-stop-foreground = "\${self.icon-foreground}";
-              icon-prev-foreground = "\${self.icon-foreground}";
-              icon-next-foreground = "\${self.icon-foreground}";
-              icon-seekb-foreground = "\${self.icon-foreground}";
-              icon-seekf-foreground = "\${self.icon-foreground}";
-              icon-random-foreground = "\${self.icon-foreground}";
-              icon-repeat-foreground = "\${self.icon-foreground}";
-
-              toggle-off-foreground = "\${self.icon-foreground}";
-              toggle-on-foreground = colors.nord4;
-
-              label-song-maxlen = 50;
-              label-song-ellipsis = true;
-              label-song-foreground = colors.nord4;
-
-              label-time-foreground = colors.nord4;
-
-              bar-progress-width = 30;
-              bar-progress-indicator = "|";
-              bar-progress-indicator-foreground = colors.nord2;
-              bar-progress-fill = "─";
-              bar-progress-fill-foreground = colors.nord4;
-              bar-progress-empty = "─";
-              bar-progress-empty-foreground = colors.nord3;
-            };
-            "module/yubikey" =
-              let
-                indicator-script = pkgs.writeShellScript "yubikey-indicator" ''
-                  ${pkgs.nmap}/bin/ncat --unixsock $XDG_RUNTIME_DIR/yubikey-touch-detector.socket | while read -n5 message; do
-                    [[ $message = *1 ]] && echo "                " || echo ""
-                  done
-                '';
-              in
-              {
-                type = "custom/script";
-                exec = indicator-script;
-                tail = true;
-                format-background = colors.urgent;
-                format-foreground = "${mkAlpha colors.background}";
-                format-prefix = "\${powerline/left-facing-arrow.label}";
-                format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
-                format-prefix-foreground = colors.urgent;
-                format-prefix-background = "${mkAlpha colors.background}";
-                format-suffix = "\${powerline/right-facing-arrow.label}";
-                format-suffix-font = "\${powerline/right-facing-arrow.label-font}";
-                format-suffix-foreground = colors.urgent;
-                format-suffix-background = "${mkAlpha colors.background}";
-              };
-            "module/audio-input" = {
-              "inherit" = "powerline/right-section-separator";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              format-prefix = "\${powerline/left-facing-arrow.label}";
-              format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
-              format-prefix-foreground = "${mkAlpha colors.nord1}";
-              format-prefix-background = "${mkAlpha colors.nord0}";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-              type = "custom/script";
-              tail = true;
-              exec = ''${pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "󰍬" --icon-muted "󰍭" --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-blacklist "*.monitor" --notifications listen'';
-              click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-              click-left = "${pulseaudio-control}/bin/pulseaudio-control --node-type input togmute";
-              click-middle = "${pulseaudio-control}/bin/pulseaudio-control --node-type input next-node";
-              scroll-up = "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 up";
-              scroll-down = "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 down";
-            };
-            "module/audio-output" = {
-              "inherit" = "powerline/right-section-separator";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-              type = "custom/script";
-              tail = true;
-              exec = ''${pulseaudio-control}/bin/pulseaudio-control --icons-volume "󰕿 ,󰖀 ,󰕾 " --icon-muted "󰖁 " --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-nicknames-from "device.description" --notifications listen'';
-              click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-              click-left = "${pulseaudio-control}/bin/pulseaudio-control togmute";
-              click-middle = "${pulseaudio-control}/bin/pulseaudio-control next-node";
-              scroll-up = "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 up";
-              scroll-down = "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 down";
-            };
-            "module/xkeyboard" = {
-              "inherit" = "powerline/right-section-separator";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-
-              type = "internal/xkeyboard";
-
-              label-layout = " 󰌓 %icon%";
-              layout-icon-0 = "us;programmer Dvorak;DVP";
-              layout-icon-1 = "us;US;US";
-
-              indicator-icon-default = "";
-              indicator-icon-0 = "caps lock;;󰌎";
-              indicator-icon-1 = "scroll lock;;󱅜";
-              indicator-icon-2 = "num lock;;󰎠";
-
-              label-indicator-on = "%icon%";
-              label-indicator-off = "";
-            };
-            "module/battery" = {
-              "inherit" = "powerline/right-section-separator";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-
-              type = "internal/battery";
-              battery = "BAT0";
-              adapter = "ADP1";
-
-              format-charging = "<animation-charging> <label-charging>";
-              format-charging-foreground = colors.nord4;
-              format-charging-background = "${mkAlpha colors.nord1}";
-
-              format-discharging = "<ramp-capacity> <label-discharging>";
-              format-discharging-foreground = colors.nord4;
-              format-discharging-background = "${mkAlpha colors.nord1}";
-
-              format-full = "<ramp-capacity> <label-full>";
-              format-full-foreground = colors.nord4;
-              format-full-background = "${mkAlpha colors.nord1}";
-
-              low-at = 15;
-              format-low = "<animation-low> <label-low>";
-              format-low-foreground = colors.urgent;
-              format-low-background = "${mkAlpha colors.nord1}";
-
-              ramp-capacity-0 = " ";
-              ramp-capacity-1 = " ";
-              ramp-capacity-2 = " ";
-              ramp-capacity-3 = " ";
-              ramp-capacity-4 = " ";
-
-              animation-charging-0 = " ";
-              animation-charging-1 = " ";
-              animation-charging-2 = " ";
-              animation-charging-3 = " ";
-              animation-charging-4 = " ";
-              animation-charging-framerate = 750;
-
-              animation-low-0 = " ";
-              animation-low-1 = " ";
-              animation-low-framerate = 200;
-
-            };
-            "module/date" = {
-              "inherit" = "powerline/right-section-separator";
-              format = "󱑃 <label>";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              format-prefix = " ";
-              format-suffix = "";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-
-              type = "internal/date";
-              interval = 1;
-
-              date = "";
-              date-alt = " %Y-%m-%d";
-
-              time = "%H:%M";
-              time-alt = "%H:%M:%S";
-
-              label = "%time%%date%";
-            };
-            "module/tray" = {
-              "inherit" = "powerline/right-section-arrow";
-              background = "${mkAlpha colors.nord3}";
-              background-next = "${mkAlpha colors.nord1}";
-              format-foreground = colors.nord0;
-              format-background = "${mkAlpha colors.nord3}";
-              label-tray-padding = "8px";
-
-              type = "internal/tray";
-
-              tray-background = "${mkAlpha colors.nord3}";
-              tray-foreground = colors.nord4;
-              tray-padding = 2;
-            };
+    wayland.windowManager.hyprland = {
+      enable = true;
+      xwayland.enable = true;
+      systemd.enableXdgAutostart = true;
+      settings = {
+        "monitor" = ",preferred,auto,auto";
+        "$terminal" = terminal-emulator;
+        "$menu" = "${pkgs.rofi-wayland}/bin/rofi -show drun -run-shell-command '{terminal} -e \" {cmd}; read -n 1 -s\"'";
+        "$mod" = "SUPER";
+        input = {
+          kb_layout = "us,us";
+          kb_variant = "dvp,";
+          kb_options = "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
+          accel_profile = "adaptive";
+          touchpad = {
+            disable_while_typing = true;
+            natural_scroll = true;
+            drag_lock = true;
           };
-        script = ''
-          # Launch bar on each monitor, tray on primary
-          polybar --list-monitors | while IFS=$'\n' read line; do
-            monitor=$(echo $line | ${pkgs.coreutils}/bin/cut -d':' -f1)
-            primary=$(echo $line | ${pkgs.coreutils}/bin/cut -d' ' -f3)
-            tray_position=$([ -n "$primary" ] && echo "right" || echo "none")
-            MONITOR=$monitor polybar --reload "top''${primary:+"-primary"}" &
-          done
-        '';
-      };
-      redshift = {
-        enable = true;
-        tray = true;
-        provider = "geoclue2";
-        settings.redshift.adjustment-method = "randr";
-      };
-      sxhkd = {
-        enable = true;
-        keybindings =
+        };
+        bind =
           let
             flameshot-region = (
               pkgs.writeShellScript "flameshot-region" ''
@@ -3208,383 +2687,113 @@ in
               ''
             );
           in
-          {
+          [
+            "$mod, Return, exec, $terminal"
+            "$mod, D, exec, $menu"
+
             # Screenshot
-            "Print" = "${pkgs.flameshot}/bin/flameshot gui";
-            "super + Print" = "${flameshot-region} activewindow";
-            "super + shift + Print" = "${flameshot-region}";
+            ", Print, exec, ${pkgs.flameshot}/bin/flameshot gui"
+            "$mod, Print, exec, ${flameshot-region} activewindow"
+            "$mod + SHIFT, Print, exec, ${flameshot-region}"
 
             # Notifications
-            "super + dollar" = "${pkgs.dunst}/bin/dunstctl close";
-            "super + shift + dollar" = "${pkgs.dunst}/bin/dunstctl close-all";
-            "super + ampersand" = "${pkgs.dunst}/bin/dunstctl history-pop";
-            "super + m" = "${pkgs.dunst}/bin/dunstctl action 0";
-            "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
-
-            # Toggle grayscale
-            "super + shift + g" = "${pkgs.writeShellScript "toggle-grayscale" ''
-              if [ -f ${config.xdg.dataHome}/picom/env ]; then
-                rm ${config.xdg.dataHome}/picom/env
-                ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to colour mode"
-              else
-                ln -s ${config.xdg.configHome}/picom/env-grayscale ${config.xdg.dataHome}/picom/env
-                ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to grayscale mode"
-              fi
-              ${scripts.setDesktopBackground}
-              ${pkgs.systemd}/bin/systemctl --user restart picom.service
-            ''}";
+            "$mod, dollar, exec, ${pkgs.dunst}/bin/dunstctl close"
+            "$mod + SHIFT, dollar, exec, ${pkgs.dunst}/bin/dunstctl close-all"
+            "$mod, ampersand, exec, ${pkgs.dunst}/bin/dunstctl history-pop"
+            "$mod, m, exec, ${pkgs.dunst}/bin/dunstctl action 0"
+            "$mod + SHIFT, m, exec, ${pkgs.dunst}/bin/dunstctl context"
 
             # Toggle dark mode
-            "super + shift + d" = "${pkgs.darkman}/bin/darkman toggle";
-
-            # Transparency controls
-            "super + Home" = "${pkgs.picom}/bin/picom-trans --current --delete";
-            "super + button2" = "${pkgs.picom}/bin/picom-trans --current --delete";
-            "super + Prior" = "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
-            "super + button5" = "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
-            "super + Next" = "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
-            "super + button4" = "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
-            "super + End" = "${pkgs.picom}/bin/picom-trans --current --opacity=100";
-            "super + shift + button2" = "${pkgs.picom}/bin/picom-trans --current --opacity=100";
+            "$mod + SHIFT, d, exec, ${pkgs.darkman}/bin/darkman toggle"
 
             # Lock screen
-            "super + x" = "${pkgs.systemd}/bin/loginctl lock-session";
+            "$mod, x, exec, ${pkgs.systemd}/bin/loginctl lock-session"
 
             # Programs
-            "super + p" = "${pkgs.rofi-pass}/bin/rofi-pass";
-            "super + shift + e" = "${config.programs.emacs.package}/bin/emacsclient –eval '(emacs-everywhere)'";
+            "$mod, p, exec, ${pkgs.rofi-pass-wayland}/bin/rofi-pass"
+            "$mod + SHIFT, e, exec, ${config.programs.emacs.package}/bin/emacsclient –eval '(emacs-everywhere)'"
 
             # Audio controls
-            "XF86AudioRaiseVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 +5%";
-            "XF86AudioLowerVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 -5%";
-            "XF86AudioMute" = "${pkgs.pulseaudio}/bin/pactl set-sink-mute 0 toggle";
-            "XF86AudioPlay" = "${pkgs.playerctl}/bin/playerctl play-pause";
-            "XF86AudioPause" = "${pkgs.playerctl}/bin/playerctl pause";
-            "XF86AudioNext" = "${pkgs.playerctl}/bin/playerctl next";
-            "XF86AudioPrev" = "${pkgs.playerctl}/bin/playerctl previous";
-            "XF86AudioForward" = "${pkgs.playerctl}/bin/playerctl position 5+";
-            "XF86AudioRewind" = "${pkgs.playerctl}/bin/playerctl position 5-";
+            ", XF86AudioRaiseVolume, exec, ${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 +5%"
+            ", XF86AudioLowerVolume, exec, ${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 -5%"
+            ", XF86AudioMute, exec, ${pkgs.pulseaudio}/bin/pactl set-sink-mute 0 toggle"
+            ", XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl play-pause"
+            ", XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl pause"
+            ", XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl next"
+            ", XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl previous"
+            ", XF86AudioForward, exec, ${pkgs.playerctl}/bin/playerctl position 5+"
+            ", XF86AudioRewind, exec, ${pkgs.playerctl}/bin/playerctl position 5-"
 
             # Screen brightness controls
-            "XF86MonBrightnessUp" = "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%+";
-            "XF86MonBrightnessDown" = "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%-";
-          };
-      };
-      syncthing = {
-        enable = true;
-        tray = {
-          enable = true;
-          command = "syncthingtray --wait";
-        };
-      };
-      vscode-server.enable = true;
-      unclutter = {
-        enable = true;
-        threshold = 10;
-        extraOptions = [ "ignore-scrolling" ];
-      };
-    };
+            ", XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%+"
+            ", XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%-"
 
-    xsession = {
-      enable = true;
-      initExtra = ''
-        ${scripts.setDesktopBackground} &
-      '';
-      windowManager.i3 = {
-        enable = true;
-        package = pkgs.i3-gaps;
-        config =
-          let
-            # Define workspace names
-            workspace1 = ''number "1: "'';
-            workspace2 = ''number "2: "'';
-            workspace3 = ''number "3: "'';
-            workspace4 = ''number "4: "'';
-            workspace5 = ''number "5: "'';
-            workspace6 = ''number "6: 6"'';
-            workspace7 = ''number "7: 7"'';
-            workspace8 = ''number "8: 8"'';
-            workspace9 = ''number "9: "'';
-            workspace10 = ''number "10: "'';
-            # Gaps modes
-            mode-gaps = "Gaps: (o) outer, (i) inner";
-            mode-gaps-inner = "Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)";
-            mode-gaps-outer = "Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)";
-          in
-          {
-            bars = [ ];
-            gaps = {
-              inner = 10;
-              outer = 5;
-              smartGaps = true;
-            };
-            fonts = {
-              names = [ "DejaVu Sans Mono" ];
-              style = "Regular";
-              size = 0.0;
-            };
-            modifier = "Mod4";
-            terminal = terminal-emulator;
-            menu = ''"${pkgs.rofi}/bin/rofi -dpi ${toString (dpiScale 96)} -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
-            focus = {
-              followMouse = false;
-              newWindow = "urgent";
-              wrapping = "workspace";
-            };
-            startup = [
-              {
-                command = "${pkgs.writeShellScript "i3-session-start" ''
-                  ${pkgs.systemd}/bin/systemctl --user set-environment I3SOCK=$(${config.xsession.windowManager.i3.package}/bin/i3 --get-socketpath)
-                  ${pkgs.systemd}/bin/systemctl --user start graphical-session-i3.target
-                ''}";
-                notification = false;
-              }
-              {
-                command =
-                  let
-                    i3-session-exit = pkgs.writeShellScript "i3-session-exit" ''
-                      ${pkgs.systemd}/bin/systemctl --user stop graphical-session-i3.target
-                    '';
-                  in
-                  "${pkgs.writeScript "i3-on-exit" ''
-                    #!${pkgs.python3.withPackages (ps: with ps; [ i3ipc ])}/bin/python
-                    from subprocess import Popen
-                    from i3ipc.aio import Connection, Event
+            "$mod, W, togglegroup"
+            "$mod + SHIFT, Q, closewindow, activewindow"
+            "$mod, F, fullscreen, 0"
+            "$mod + SHIFT, F, pin, active"
+            "$mod + SHIFT, Space, togglefloating, active"
 
-                    def on_exit(i3, e):
-                        if e.change == "exit":
-                          Popen(['${i3-session-exit}'])
+            # change focus (Vi keybindings)
+            "$mod, H, movefocus, l"
+            "$mod, J, movefocus, d"
+            "$mod, K, movefocus, u"
+            "$mod, L, movefocus, r"
+            "$mod + SHIFT, H, movewindoworgroup, l"
+            "$mod + SHIFT, J, movewindoworgroup, d"
+            "$mod + SHIFT, K, movewindoworgroup, u"
+            "$mod + SHIFT, L, movewindoworgroup, r"
 
-                    i3 = await Connection().connect()
+            # Toggle scratchpad
+            "$mod, numbersign, togglespecialworkspace"
+            # Move window to scratchpad
+            "$mod + SHIFT, numbersign, movetoworkspace, special"
 
-                    i3.on(Event.SHUTDOWN_EXIT, on_exit)
-
-                    await i3.main()
-                  ''}";
-                notification = false;
-              }
-            ];
-            colors = {
-              # Nord theme
-              focused = {
-                border = colors.nord9;
-                background = colors.nord9;
-                text = "#ffffff";
-                indicator = colors.nord9;
-                childBorder = colors.nord9;
-              };
-              unfocused = {
-                border = colors.nord0;
-                background = "#1f222d";
-                text = "#888888";
-                indicator = "#1f222d";
-                childBorder = colors.nord0;
-              };
-              focusedInactive = {
-                border = colors.nord0;
-                background = "#1f222d";
-                text = "#888888";
-                indicator = "#1f222d";
-                childBorder = colors.nord0;
-              };
-              placeholder = {
-                border = colors.nord0;
-                background = "#1f222d";
-                text = "#888888";
-                indicator = "#1f222d";
-                childBorder = colors.nord0;
-              };
-              urgent = {
-                border = "#900000";
-                background = "#900000";
-                text = "#ffffff";
-                indicator = "#900000";
-                childBorder = "#900000";
-              };
-              background = "#242424";
-            };
-            keybindings =
-              let
-                mod = config.xsession.windowManager.i3.config.modifier;
-              in
-              lib.mkOptionDefault {
-                "${mod}+1" = "workspace ${workspace1}";
-                "${mod}+2" = "workspace ${workspace2}";
-                "${mod}+3" = "workspace ${workspace3}";
-                "${mod}+4" = "workspace ${workspace4}";
-                "${mod}+5" = "workspace ${workspace5}";
-                "${mod}+6" = "workspace ${workspace6}";
-                "${mod}+7" = "workspace ${workspace7}";
-                "${mod}+8" = "workspace ${workspace8}";
-                "${mod}+9" = "workspace ${workspace9}";
-                "${mod}+0" = "workspace ${workspace10}";
-                "${mod}+Shift+1" = "move container to workspace ${workspace1}; workspace ${workspace1}";
-                "${mod}+Shift+2" = "move container to workspace ${workspace2}; workspace ${workspace2}";
-                "${mod}+Shift+3" = "move container to workspace ${workspace3}; workspace ${workspace3}";
-                "${mod}+Shift+4" = "move container to workspace ${workspace4}; workspace ${workspace4}";
-                "${mod}+Shift+5" = "move container to workspace ${workspace5}; workspace ${workspace5}";
-                "${mod}+Shift+6" = "move container to workspace ${workspace6}; workspace ${workspace6}";
-                "${mod}+Shift+7" = "move container to workspace ${workspace7}; workspace ${workspace7}";
-                "${mod}+Shift+8" = "move container to workspace ${workspace8}; workspace ${workspace8}";
-                "${mod}+Shift+9" = "move container to workspace ${workspace9}; workspace ${workspace9}";
-                "${mod}+Shift+0" = "move container to workspace ${workspace10}; workspace ${workspace10}";
-
-                "${mod}+Shift+f" = "sticky toggle";
-
-                # change focus (Vi keybindings)
-                "${mod}+h" = "focus left";
-                "${mod}+j" = "focus down";
-                "${mod}+k" = "focus up";
-                "${mod}+l" = "focus right";
-                "${mod}+Shift+h" = "move left";
-                "${mod}+Shift+j" = "move down";
-                "${mod}+Shift+k" = "move up";
-                "${mod}+Shift+l" = "move right";
-
-                # split in horizontal orientation
-                "${mod}+backslash" = "split h";
-                "${mod}+Shift+backslash" = "split h";
-                # split in vertical orientation
-                "${mod}+minus" = "split v";
-                "${mod}+Shift+minus" = "split v";
-
-                # Toggle scratchpad
-                "${mod}+numbersign" = "scratchpad show";
-                # Move window to scratchpad
-                "${mod}+Shift+numbersign" = "move scratchpad";
-
-                # focus the parent container
-                "${mod}+a" = "focus parent";
-                # focus the child container
-                "${mod}+Shift+a" = "focus child";
-                "${mod}+apostrophe" = "focus child";
-
-                # Move focus/workspace/window to different monitor
-                "${mod}+at" = "focus output left";
-                "${mod}+Shift+at" = "move container to output left; focus output left";
-                "${mod}+Shift+Ctrl+at" = "move workspace to output left";
-                "${mod}+slash" = "focus output right";
-                "${mod}+Shift+slash" = "move container to output right; focus output right";
-                "${mod}+Shift+Ctrl+slash" = "move workspace to output right";
-
-                # Gaps mode
-                "${mod}+g" = ''mode "${mode-gaps}"'';
-              };
-            modes = {
-              resize = {
-                "h" = "resize shrink width 20 px or 10 ppt";
-                "j" = "resize grow height 20 px or 10 ppt";
-                "k" = "resize shrink height 20 px or 10 ppt";
-                "l" = "resize grow width 20 px or 10 ppt";
-                "Shift+h" = "resize shrink width 200 px or 20 ppt";
-                "Shift+j" = "resize grow height 200 px or 20 ppt";
-                "Shift+k" = "resize shrink height 200 px or 20 ppt";
-                "Shift+l" = "resize grow width 200 px or 20 ppt";
-                "Return" = "mode default";
-                "Escape" = "mode default";
-              };
-              "${mode-gaps}" = {
-                "o" = ''mode "${mode-gaps-outer}"'';
-                "i" = ''mode "${mode-gaps-inner}"'';
-                "Return" = "mode default";
-                "Escape" = "mode default";
-              };
-              "${mode-gaps-inner}" = {
-                "plus" = "gaps inner current plus 5";
-                "minus" = "gaps inner current minus 5";
-                "asterisk" = "gaps inner current set 0";
-                "Shift+plus" = "gaps inner all plus 5";
-                "Shift+minus" = "gaps inner all minus 5";
-                "Shift+asterisk" = "gaps inner all set 0";
-                "Return" = "mode default";
-                "Escape" = "mode default";
-              };
-              "${mode-gaps-outer}" = {
-                "plus" = "gaps outer current plus 5";
-                "minus" = "gaps outer current minus 5";
-                "asterisk" = "gaps outer current set 0";
-                "Shift+plus" = "gaps outer all plus 5";
-                "Shift+minus" = "gaps outer all minus 5";
-                "Shift+asterisk" = "gaps outer all set 0";
-                "Return" = "mode default";
-                "Escape" = "mode default";
-              };
-            };
-            assigns = {
-              "${workspace2}" = [
-                {
-                  class = "^firefox";
-                  instance = "^Navigator$";
-                }
-              ];
-              "${workspace9}" = [ { class = "^thunderbird$"; } ];
-              "${workspace10}" = [
-                { class = "^TelegramDesktop$"; }
-                { class = "^Slack$"; }
-                { class = "^Skype$"; }
-                { class = "^Signal$"; }
-                { class = "^Ferdium$"; }
-              ];
-            };
-            floating.titlebar = false;
-            window = {
-              border = 0;
-              hideEdgeBorders = "both";
-              titlebar = false;
-              commands =
+            # Move focus/workspace/window to different monitor
+            "$mod, at, focusmonitor, l"
+            "$mod + SHIFT, at, movetoworkspace, l"
+            "$mod + SHIFT + CTRL, at, movecurrentworkspacetomonitor, l"
+            "$mod, slash, focusmonitor, r"
+            "$mod + SHIFT, slash, movetoworkspace, r"
+            "$mod + SHIFT + CTRL, slash, movecurrentworkspacetomonitor, r"
+          ]
+          ++ (
+            # workspaces
+            # binds $mod + [shift +] {1..10} to [move to] workspace {1..10}
+            builtins.concatLists (
+              builtins.genList (
+                x:
                 let
-                  mkCommand = command: criteria: { inherit command criteria; };
-                  mkFloating = mkCommand "floating enable";
-                  mkSticky = mkCommand "sticky enable";
+                  ws =
+                    let
+                      c = (x + 1) / 10;
+                    in
+                    builtins.toString (x + 1 - (c * 10));
                 in
                 [
-                  {
-                    criteria = {
-                      class = ".*";
-                    };
-                    command = "border pixel 0";
-                  }
-                  (mkFloating { class = "^emacs-everywhere$"; })
-                  (mkFloating { class = "^Tor Browser$"; })
-                  (mkFloating { class = "^gnome-calculator$"; })
-                  (mkFloating { class = "^feh$"; })
-                  (mkFloating { class = "^Sxiv$"; })
-                  (mkFloating {
-                    class = "^Thunderbird$";
-                    instance = "^Calendar$";
-                  })
-                  (mkFloating {
-                    class = "^Steam$";
-                    instance = "Steam Guard";
-                  })
-                  (mkFloating { class = "^(?i)zoom$"; })
-                  (mkFloating { class = "(?i)blueman-manager"; })
-                  (mkFloating {
-                    class = "^Steam$";
-                    title = "^Steam Guard";
-                  })
-                  (mkFloating { class = "(?i)protonvpn"; })
-                  (mkFloating { title = "Preferences$"; })
-                  (mkFloating { window_role = "About"; })
-                  (mkFloating { window_role = "Preferences"; })
-                  (mkFloating { window_role = "Organizer"; })
-                  (mkFloating { window_role = "bubble"; })
-                  (mkFloating { window_role = "page-info"; })
-                  (mkFloating { window_role = "pop-up"; })
-                  (mkFloating { window_role = "task_dialog"; })
-                  (mkFloating { window_role = "toolbox"; })
-                  (mkFloating { window_role = "webconsole"; })
-                  (mkFloating { window_type = "dialog"; })
-                  (mkFloating { window_type = "menu"; })
-                  (mkSticky { title = "Picture-in-Picture"; })
-                  (mkSticky { title = "AlarmWindow"; })
-                ];
-            };
-          };
-        extraConfig = ''
-          popup_during_fullscreen leave_fullscreen
-        '';
+                  "$mod, ${ws}, workspace, ${toString (x + 1)}"
+                  "$mod + SHIFT, ${ws}, movetoworkspace, ${toString (x + 1)}"
+                ]
+              ) 10
+            )
+          );
       };
+      extraConfig = ''
+        # window resize
+        bind = $mod, R, submap, resize
+        submap = resize
+        binde = , H, resizeactive, -10 0
+        binde = , J, resizeactive, 0 10
+        binde = , K, resizeactive, 0 -10
+        binde = , L, resizeactive, 10 0
+        bind = SHIFT, H, resizeactive, -100 0
+        bind = SHIFT, J, resizeactive, 0 100
+        bind = SHIFT, K, resizeactive, 0 -100
+        bind = SHIFT, L, resizeactive, 100 0
+        bind = , Escape, submap, reset
+        bind = , Return, submap, reset
+        submap = reset
+      '';
     };
 
     systemd.user = {
@@ -3643,7 +2852,6 @@ in
                 }
             '';
           };
-        picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
         polkit-authentication-agent = {
           Unit = {
             Description = "Polkit authentication agent";
@@ -3657,30 +2865,12 @@ in
             Restart = "on-failure";
           };
         };
-        # https://github.com/nix-community/home-manager/issues/213#issuecomment-829743999
-        polybar = {
-          Unit.After = [ "graphical-session-i3.target" ];
-          Install.WantedBy = lib.mkForce [ "graphical-session-i3.target" ];
-        };
         tmux = {
           Unit.Description = "tmux server";
           Install.WantedBy = [ "default.target" ];
           Service = {
             ExecStart = "${config.programs.tmux.package}/bin/tmux -D";
             ExecStop = "${config.programs.tmux.package}/bin/tmux kill-server";
-            Restart = "on-failure";
-          };
-        };
-        xfsettingsd = {
-          Unit = {
-            Description = "xfsettingsd";
-            After = [ "graphical-session-pre.target" ];
-            PartOf = [ "graphical-session.target" ];
-          };
-          Install.WantedBy = [ "graphical-session.target" ];
-          Service = {
-            Environment = "PATH=${config.home.profileDirectory}/bin";
-            ExecStart = "${pkgs.xfce.xfce4-settings}/bin/xfsettingsd";
             Restart = "on-failure";
           };
         };
@@ -3695,26 +2885,6 @@ in
             ExecStart = "${pkgs.yubikey-touch-detector}/bin/yubikey-touch-detector --libnotify";
             Restart = "on-abort";
           };
-        };
-      };
-      targets = {
-        graphical-session-i3.Unit = {
-          Description = "i3 X session";
-          BindsTo = [ "graphical-session.target" ];
-          Requisite = [ "graphical-session.target" ];
-          Wants = [ "xdg-autostart.target" ];
-        };
-        xdg-autostart.Unit = {
-          Description = "Run XDG autostart files";
-          Requires = [
-            "xdg-desktop-autostart.target"
-            "graphical-session.target"
-          ];
-          Before = [
-            "xdg-desktop-autostart.target"
-            "graphical-session.target"
-          ];
-          BindsTo = [ "graphical-session.target" ];
         };
       };
     };
@@ -3777,11 +2947,11 @@ in
           ;; See 'C-h v doom-font' for documentation and more examples of what they
           ;; accept. For example:
           ;;
-          (setq doom-font (font-spec :family "Iosevka Nerd Font" :size ${toString (dpiScale 12)} :weight 'light)
-                doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size ${toString (dpiScale 12)} :weight 'light)
-                doom-big-font (font-spec :family "Iosevka Nerd Font" :size ${toString (dpiScale 18)} :weight 'light)
-                doom-symbol-font (font-spec :family "Symbols Nerd Font" :size ${toString (dpiScale 12)})
-                doom-serif-font (font-spec :family "Iosevka Nerd Font" :size ${toString (dpiScale 12)} :weight 'light)
+          (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
+                doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 12 :weight 'light)
+                doom-big-font (font-spec :family "Iosevka Nerd Font" :size 18 :weight 'light)
+                doom-symbol-font (font-spec :family "Symbols Nerd Font" :size 12)
+                doom-serif-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
                 nerd-icons-font-family "Iosevka NF Light")
           ;;
           ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
@@ -4451,10 +3621,6 @@ in
                     python3Packages.python-lsp-server
                     python3Packages.grip
                     multimarkdown
-                    xclip
-                    xdotool
-                    xorg.xwininfo
-                    xorg.xprop
                     watchman
                   ]
                 );
@@ -4892,7 +4058,6 @@ in
               DarkTheme=Nord-Dark
               UseDarkTheme=True
               UseAccentColor=True
-              PerScreenDPI=False
               ForceWaylandDPI=0
               EnableFractionalScale=True
             '')
@@ -4996,9 +4161,6 @@ in
           init-license=LGPL-3.0
           prefix=${dataHome}/npm
           cache=${cacheHome}/npm
-        '';
-        "picom/env-grayscale".text = ''
-          PICOM_SHADER="grayscale"
         '';
         "pipewire/pipewire.conf.d/10-source-rnnoise.conf" = {
           text = ''
@@ -5563,7 +4725,7 @@ in
         };
         my-emacs = {
           name = "My Emacs";
-          exec = "${pkgs.emacs29-gtk3}/bin/emacs --with-profile default";
+          exec = "${pkgs.emacs29-pgtk}/bin/emacs --with-profile default";
           icon = "emacs";
           type = "Application";
           terminal = false;
@@ -5572,9 +4734,15 @@ in
       };
       portal = {
         enable = true;
-        extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
-        xdgOpenUsePortal = true;
         config.common.default = [ "gtk" ];
+        configPackages = with pkgs; [ config.wayland.windowManager.hyprland.finalPackage ];
+        extraPortals = with pkgs; [
+          xdg-desktop-portal-gtk
+          (xdg-desktop-portal-hyprland.override {
+            hyprland = config.wayland.windowManager.hyprland.finalPackage;
+          })
+        ];
+        xdgOpenUsePortal = true;
       };
     };
 
@@ -5616,7 +4784,6 @@ in
           "Xft.hinting" = 1;
           "Xft.antialias" = 1;
           "Xft.rgba" = "rgb";
-          "Xft.dpi" = dpiScale 96;
         }
         # xterm
         // (mapAttrs' (name: value: nameValuePair "XTerm.${name}" value) (
@@ -5630,7 +4797,7 @@ in
             backarrowKey = false;
             locale = false;
             utf8 = true;
-            internalBorder = dpiScale 11;
+            internalBorder = 11;
             visualbell = true;
             bellIsUrgent = true;
             fullscreen = "never";
@@ -5685,96 +4852,6 @@ in
       iconTheme = {
         package = pkgs.colloid-icon-theme.override { schemeVariants = [ "nord" ]; };
         name = "Colloid-nord-light";
-      };
-      cursorTheme = {
-        package =
-          let
-            version = "2024-02-28";
-          in
-          pkgs.stdenv.mkDerivation {
-            inherit version;
-            pname = "colloid-cursor-theme";
-            src = "${
-              pkgs.fetchFromGitHub {
-                owner = "vinceliuice";
-                repo = "Colloid-icon-theme";
-                rev = version;
-                hash = "sha256-bTN6x3t88yBL4WsPfOJIiNGWTywdIVi7E2VJKgMzEso=";
-              }
-            }/cursors";
-            nativeBuildInputs = with pkgs; [
-              inkscape
-              xorg.xcursorgen
-              jdupes
-            ];
-            postPatch = ''
-              sed -i \
-                -e 's/#000000/#2e3440/g' \
-                -e 's/#1191f4/#5e81ac/g' \
-                -e 's/#14adf6/#88c0d0/g' \
-                -e 's/#1a1a1a/#2e3440/g' \
-                -e 's/#1b9aeb/#5e81ac/g' \
-                -e 's/#2a2a2a/#3b4252/g' \
-                -e 's/#2c2c2c/#3b4252/g' \
-                -e 's/#3bbd1c/#a3be8c/g' \
-                -e 's/#4caf50/#a3be8c/g' \
-                -e 's/#52cf30/#a3be8c/g' \
-                -e 's/#5b9bf8/#81a1c1/g' \
-                -e 's/#666666/#4c566a/g' \
-                -e 's/#6fce55/#a3be8c/g' \
-                -e 's/#ac44ca/#b48ead/g' \
-                -e 's/#b452cb/#b48ead/g' \
-                -e 's/#c7c7c7/#d8dee9/g' \
-                -e 's/#ca70e1/#b48ead/g' \
-                -e 's/#cecece/#d8dee9/g' \
-                -e 's/#d1d1d1/#d8dee9/g' \
-                -e 's/#dcdcdc/#d8dee9/g' \
-                -e 's/#ed1515/#bf616a/g' \
-                -e 's/#f5f5f5/#e5e9f0/g' \
-                -e 's/#f67400/#d08770/g' \
-                -e 's/#f83f31/#bf616a/g' \
-                -e 's/#faa91e/#d08770/g' \
-                -e 's/#fbb114/#d08770/g' \
-                -e 's/#fbd939/#ebcb8b/g' \
-                -e 's/#fdcf01/#ebcb8b/g' \
-                -e 's/#ff2a2a/#bf616a/g' \
-                -e 's/#ff4332/#bf616a/g' \
-                -e 's/#ff645d/#bf616a/g' \
-                -e 's/#ff9508/#d08770/g' \
-                -e 's/#ffaa07/#d08770/g' \
-                -e 's/#ffd305/#ebcb8b/g' \
-                -e 's/#ffffff/#eceff4/g' \
-                src/svg/*.svg \
-                src/svg-white/*.svg
-
-              patchShebangs build.sh
-
-              substituteInPlace build.sh \
-                --replace 'THEME="Colloid Cursors"' 'THEME="Colloid-nord-light-cursors"' \
-                --replace 'THEME="Colloid-dark Cursors"' 'THEME="Colloid-nord-dark-cursors"'
-
-              patchShebangs install.sh
-
-              substituteInPlace install.sh \
-                --replace '$HOME/.local' $out \
-                --replace '$THEME_NAME-cursors' '$THEME_NAME-nord-light-cursors' \
-                --replace '$THEME_NAME-dark-cursors' '$THEME_NAME-nord-dark-cursors'
-            '';
-            buildPhase = ''
-              runHook preBuild
-              ./build.sh
-              runHook postBuild
-            '';
-            installPhase = ''
-              runHook preInstall
-              mkdir -p $out/share/icons
-              ./install.sh
-              jdupes --quiet --link-soft --recurse $out/share
-              runHook postInstall
-            '';
-          };
-        name = "Colloid-nord-light-cursors";
-        size = dpiScale 24;
       };
       font = {
         package = pkgs.geist-font;
@@ -5837,8 +4914,6 @@ in
         libnotify
         file
         tree
-        xsel
-        xclip
         curl
         httpie
         unstable.devenv
@@ -5859,7 +4934,6 @@ in
         silver-searcher
         ripgrep
         fd
-        xorg.xkill
         bc
         feh
         lxappearance
@@ -6173,13 +5247,9 @@ in
         zeal
         dasht
 
-        # For dark mode toggling
-        xfce.xfconf
-
         retroarchFull
         mangohud
         protonup
-
       ]
       ++ [
 
@@ -6394,14 +5464,12 @@ in
 
         # Fallback fonts
         cm_unicode
-        xorg.fontcursormisc
         symbola
         freefont_ttf
         unifont
         noto-fonts
         noto-fonts-extra
         noto-fonts-cjk
-
       ];
 
     # Nicely reload system units when changing configs
