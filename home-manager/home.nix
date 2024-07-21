@@ -4693,6 +4693,8 @@ in {
 
             (package! flycheck-ledger :disable t)
             (package! flycheck-hledger)
+
+            (unpin! compat)
           '';
           onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
             export PATH="${configHome}/doom-emacs/bin:${my-emacs}/bin:$PATH"
