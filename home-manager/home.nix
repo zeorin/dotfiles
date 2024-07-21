@@ -4131,6 +4131,7 @@ in {
 
           (use-package! spell-fu
             :config
+            (setq ispell-personal-dictionary "${config.home.sessionVariables.DOOMLOCALDIR}/etc/spell-fu/.pws")
             ;; https://github.com/doomemacs/doomemacs/issues/4483#issuecomment-910698739
             (ispell-check-version))
 
@@ -4180,6 +4181,10 @@ in {
                       (cons "emacs-lsp-booster" orig-result))
                   orig-result)))
             (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+
+          (add-hook! 'typescript-tsx-mode-hook
+            (setq comment-start "//"
+                  comment-end ""))
 
           ;; Debug Adapter Protocol
           (use-package! dap-mode
