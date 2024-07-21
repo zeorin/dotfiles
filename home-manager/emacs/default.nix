@@ -45,7 +45,7 @@ in
 
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs29;
+    package = pkgs.emacs29-pgtk;
   };
 
   services.emacs = {

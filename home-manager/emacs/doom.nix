@@ -138,10 +138,6 @@ in
               python3Packages.python-lsp-server
               python3Packages.grip
               multimarkdown
-              xclip
-              xdotool
-              xorg.xwininfo
-              xorg.xprop
               watchman
             ]
           );
