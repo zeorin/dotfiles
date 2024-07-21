@@ -1047,6 +1047,7 @@ in
             autoUpdate = true;
           };
           log.abbrevCommit = true;
+          blame.ignoreRevsFile = ".git-blame-ignore-revs";
         };
         signing = {
           key = myKey;
