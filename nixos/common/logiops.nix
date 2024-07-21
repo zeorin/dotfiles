@@ -1,9 +1,16 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
-let cfg = config.services.logiops;
-in {
+let
+  cfg = config.services.logiops;
+in
+{
   options.services.logiops = {
     enable = mkOption {
       type = types.bool;

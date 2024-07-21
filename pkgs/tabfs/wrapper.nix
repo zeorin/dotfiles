@@ -1,18 +1,29 @@
-{ lib, stdenvNoCC, lndir, makeWrapper }:
+{
+  lib,
+  stdenvNoCC,
+  lndir,
+  makeWrapper,
+}:
 
 tabfs:
 
 let
   inherit (tabfs.passthru) pname version nativeMessenger;
 
-  wrapper = { mountDir ? "" }:
+  wrapper =
+    {
+      mountDir ? "",
+    }:
     if mountDir == "" then
       tabfs
     else
       stdenvNoCC.mkDerivation {
         inherit pname version;
 
-        nativeBuildInputs = [ lndir makeWrapper ];
+        nativeBuildInputs = [
+          lndir
+          makeWrapper
+        ];
 
         dontUnpack = true;
         dontConfigure = true;
@@ -42,4 +53,5 @@ let
 
         inherit (tabfs) passthru;
       };
-in lib.makeOverridable wrapper
+in
+lib.makeOverridable wrapper
