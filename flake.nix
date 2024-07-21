@@ -35,8 +35,7 @@
     firefox-csshacks.url = "github:MrOtherGuy/firefox-csshacks";
     firefox-csshacks.flake = false;
 
-    pulseaudio-control.url =
-      "github:marioortizmanero/polybar-pulseaudio-control";
+    pulseaudio-control.url = "github:marioortizmanero/polybar-pulseaudio-control";
     pulseaudio-control.flake = false;
 
     chemacs.url = "github:plexus/chemacs2";
@@ -45,16 +44,27 @@
     base16-tridactyl.url = "github:tridactyl/base16-tridactyl";
     base16-tridactyl.flake = false;
 
-    emoji-variation-sequences.url =
-      "https://www.unicode.org/Public/15.0.0/ucd/emoji/emoji-variation-sequences.txt";
+    emoji-variation-sequences.url = "https://www.unicode.org/Public/15.0.0/ucd/emoji/emoji-variation-sequences.txt";
     emoji-variation-sequences.flake = false;
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, ... }@inputs:
-    let inherit (self) outputs;
-    in flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = nixpkgs.legacyPackages.${system};
-      in {
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      flake-utils,
+      ...
+    }@inputs:
+    let
+      inherit (self) outputs;
+    in
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
         # Your custom packages
         # Acessible through 'nix build', 'nix shell', etc
         packages = import ./pkgs { inherit pkgs; };
@@ -63,45 +73,58 @@
         devShells = import ./shell.nix {
           pkgs = pkgs.appendOverlays (builtins.attrValues outputs.overlays);
         };
-      }) // {
-        # Your custom packages and modifications, exported as overlays
-        overlays = import ./overlays { inherit inputs; };
+      }
+    )
+    // {
+      # Your custom packages and modifications, exported as overlays
+      overlays = import ./overlays { inherit inputs; };
 
-        # Reusable nixos modules you might want to export
-        # These are usually stuff you would upstream into nixpkgs
-        nixosModules = import ./modules/nixos;
+      # Reusable nixos modules you might want to export
+      # These are usually stuff you would upstream into nixpkgs
+      nixosModules = import ./modules/nixos;
 
-        # Reusable home-manager modules you might want to export
-        # These are usually stuff you would upstream into home-manager
-        homeManagerModules = import ./modules/home-manager;
+      # Reusable home-manager modules you might want to export
+      # These are usually stuff you would upstream into home-manager
+      homeManagerModules = import ./modules/home-manager;
 
-        # NixOS configuration entrypoint
-        # Available through 'nixos-rebuild --flake .#your-hostname'
-        nixosConfigurations = {
-          guru = nixpkgs.lib.nixosSystem {
-            specialArgs = { inherit inputs outputs; };
-            modules = [ ./nixos/guru ];
+      # NixOS configuration entrypoint
+      # Available through 'nixos-rebuild --flake .#your-hostname'
+      nixosConfigurations = {
+        guru = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs outputs;
           };
-          monarch = nixpkgs.lib.nixosSystem {
-            specialArgs = { inherit inputs outputs; };
-            modules = [ ./nixos/monarch ];
-          };
+          modules = [ ./nixos/guru ];
         };
+        monarch = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs outputs;
+          };
+          modules = [ ./nixos/monarch ];
+        };
+      };
 
-        # Standalone home-manager configuration entrypoint
-        # Available through 'home-manager --flake .#your-username@your-hostname'
-        homeConfigurations = let pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        in {
+      # Standalone home-manager configuration entrypoint
+      # Available through 'home-manager --flake .#your-username@your-hostname'
+      homeConfigurations =
+        let
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+        in
+        {
           "zeorin@guru" = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
-            extraSpecialArgs = { inherit inputs outputs; };
+            extraSpecialArgs = {
+              inherit inputs outputs;
+            };
             modules = [ ./home-manager/home.nix ];
           };
           "zeorin@monarch" = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
-            extraSpecialArgs = { inherit inputs outputs; };
+            extraSpecialArgs = {
+              inherit inputs outputs;
+            };
             modules = [ ./home-manager/home.nix ];
           };
         };
-      };
+    };
 }

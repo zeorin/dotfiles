@@ -1,26 +1,42 @@
 # This is your home-manager configuration file
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 
-{ lib, config, pkgs, inputs, outputs, ... }@moduleArgs:
+{
+  lib,
+  config,
+  pkgs,
+  inputs,
+  outputs,
+  ...
+}@moduleArgs:
 
 let
   dpiScale = x: x * ((moduleArgs.dpi or 96) / 96);
 
   myKey = "0x5E1C0971FE4F665A";
 
-  my-emacs = let
-    emacsPkg = with pkgs;
-      (emacsPackagesFor emacs29).emacsWithPackages
-      (ps: with ps; [ vterm tsc treesit-grammars.with-all-grammars ]);
-  in emacsPkg // (pkgs.symlinkJoin {
-    name = "my-emacs";
-    paths = [ emacsPkg ];
-    nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/emacs \
-        --set LSP_USE_PLISTS true
-    '';
-  });
+  my-emacs =
+    let
+      emacsPkg =
+        with pkgs;
+        (emacsPackagesFor emacs29).emacsWithPackages (
+          ps: with ps; [
+            vterm
+            tsc
+            treesit-grammars.with-all-grammars
+          ]
+        );
+    in
+    emacsPkg
+    // (pkgs.symlinkJoin {
+      name = "my-emacs";
+      paths = [ emacsPkg ];
+      nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/emacs \
+          --set LSP_USE_PLISTS true
+      '';
+    });
 
   colors = {
     "nord0" = "#2E3440";
@@ -229,103 +245,133 @@ let
         ;;
     esac
   '';
-  nixWithNomArgs = nix:
+  nixWithNomArgs =
+    nix:
     pkgs.symlinkJoin {
       name = "nix-with-nom-args-${nix.version}";
-      paths = (lib.attrsets.mapAttrsToList pkgs.writeShellScriptBin {
-        nix = ''
-          program="$(basename $0)"
-          case "$program" in
-            nix)
-              ${collectFlakeFlags}
-              command="$1"; shift
-              case "$command" in
-                build)
-                  ${nixBuildCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} build"}
-                  ;;
-                shell)
-                  ${nixShellCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} shell"}
-                  ;;
-                store)
-                  ${nixStoreCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} store"}
-                  ;;
-                *)
-                  ${nix}/bin/nix ${flakeFlags} "$command" "$@"
-                  ;;
-              esac
-              ;;
-            *)
-              "${nix}/bin/$program" "$@"
-              ;;
-          esac
-        '';
-        nix-build = nixBuildCmdWithNomArgs "${nix}/bin/nix-build";
-        nix-shell = nixShellCmdWithNomArgs "${nix}/bin/nix-shell";
-        nix-store = nixStoreCmdWithNomArgs "${nix}/bin/nix-store";
-      }) ++ [ nix ];
-    };
-  nixNomPkgs = { nix ? null, nixos-rebuild ? null, home-manager ? null }:
-    lib.attrsets.mapAttrs pkgs.writeShellScriptBin ((if nix != null then {
-      nix = ''
-        program="$(basename $0)"
-        case "$program" in
-          nix)
-            ${collectFlakeFlags}
-            command="$1"; shift
-            case "$command" in
-              build|shell|develop)
-                ${pkgs.nix-output-monitor}/bin/nom ${flakeFlags} "$command" "$@"
+      paths =
+        (lib.attrsets.mapAttrsToList pkgs.writeShellScriptBin {
+          nix = ''
+            program="$(basename $0)"
+            case "$program" in
+              nix)
+                ${collectFlakeFlags}
+                command="$1"; shift
+                case "$command" in
+                  build)
+                    ${nixBuildCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} build"}
+                    ;;
+                  shell)
+                    ${nixShellCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} shell"}
+                    ;;
+                  store)
+                    ${nixStoreCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} store"}
+                    ;;
+                  *)
+                    ${nix}/bin/nix ${flakeFlags} "$command" "$@"
+                    ;;
+                esac
                 ;;
               *)
-                ${nix}/bin/nix ${flakeFlags} "$command" "$@"
+                "${nix}/bin/$program" "$@"
                 ;;
             esac
-            ;;
-          *)
-            "${nix}/bin/$program" "$@"
-            ;;
-        esac
-      '';
-      nix-build = ''
-        ${pkgs.nix-output-monitor}/bin/nom-build "$@"
-      '';
-      nix-shell = ''
-        ${pkgs.nix-output-monitor}/bin/nom-shell "$@"
-      '';
-      nix-store = ''
-        ${nixWithNomArgs nix}/bin/nix-store "$@" \
-          |& ${pkgs.nix-output-monitor}/bin/nom --json
-      '';
-    } else
-      { }) // (if nixos-rebuild != null then {
-        nixos-rebuild = ''
-          ${pkgs.expect}/bin/unbuffer \
-            ${
-              nixos-rebuild.override (old: { nix = nixWithNomArgs old.nix; })
-            }/bin/nixos-rebuild "$@" \
-            |& ${pkgs.nix-output-monitor}/bin/nom --json
-        '';
-      } else
-        { }) // (if home-manager != null then {
-          home-manager = ''
-            PATH="${nixWithNomArgs pkgs.nix}/bin:$PATH" \
-              ${pkgs.expect}/bin/unbuffer \
-              ${home-manager}/bin/home-manager "$@" \
-              |& ${pkgs.nix-output-monitor}/bin/nom --json
           '';
-        } else
-          { }));
-  nomAliases = pkgs:
-    lib.attrsets.mapAttrs (name: pkg: "${pkg}/bin/${name}") (nixNomPkgs pkgs);
-  wrapWithNom = let inherit (pkgs) symlinkJoin;
-  in (pkgs:
-    symlinkJoin {
-      name = "wrapped-with-nom";
-      paths = (builtins.attrValues (nixNomPkgs pkgs))
-        ++ (builtins.attrValues pkgs);
-    });
+          nix-build = nixBuildCmdWithNomArgs "${nix}/bin/nix-build";
+          nix-shell = nixShellCmdWithNomArgs "${nix}/bin/nix-shell";
+          nix-store = nixStoreCmdWithNomArgs "${nix}/bin/nix-store";
+        })
+        ++ [ nix ];
+    };
+  nixNomPkgs =
+    {
+      nix ? null,
+      nixos-rebuild ? null,
+      home-manager ? null,
+    }:
+    lib.attrsets.mapAttrs pkgs.writeShellScriptBin (
+      (
+        if nix != null then
+          {
+            nix = ''
+              program="$(basename $0)"
+              case "$program" in
+                nix)
+                  ${collectFlakeFlags}
+                  command="$1"; shift
+                  case "$command" in
+                    build|shell|develop)
+                      ${pkgs.nix-output-monitor}/bin/nom ${flakeFlags} "$command" "$@"
+                      ;;
+                    *)
+                      ${nix}/bin/nix ${flakeFlags} "$command" "$@"
+                      ;;
+                  esac
+                  ;;
+                *)
+                  "${nix}/bin/$program" "$@"
+                  ;;
+              esac
+            '';
+            nix-build = ''
+              ${pkgs.nix-output-monitor}/bin/nom-build "$@"
+            '';
+            nix-shell = ''
+              ${pkgs.nix-output-monitor}/bin/nom-shell "$@"
+            '';
+            nix-store = ''
+              ${nixWithNomArgs nix}/bin/nix-store "$@" \
+                |& ${pkgs.nix-output-monitor}/bin/nom --json
+            '';
+          }
+        else
+          { }
+      )
+      // (
+        if nixos-rebuild != null then
+          {
+            nixos-rebuild = ''
+              ${pkgs.expect}/bin/unbuffer \
+                ${
+                  nixos-rebuild.override (old: {
+                    nix = nixWithNomArgs old.nix;
+                  })
+                }/bin/nixos-rebuild "$@" \
+                |& ${pkgs.nix-output-monitor}/bin/nom --json
+            '';
+          }
+        else
+          { }
+      )
+      // (
+        if home-manager != null then
+          {
+            home-manager = ''
+              PATH="${nixWithNomArgs pkgs.nix}/bin:$PATH" \
+                ${pkgs.expect}/bin/unbuffer \
+                ${home-manager}/bin/home-manager "$@" \
+                |& ${pkgs.nix-output-monitor}/bin/nom --json
+            '';
+          }
+        else
+          { }
+      )
+    );
+  nomAliases = pkgs: lib.attrsets.mapAttrs (name: pkg: "${pkg}/bin/${name}") (nixNomPkgs pkgs);
+  wrapWithNom =
+    let
+      inherit (pkgs) symlinkJoin;
+    in
+    (
+      pkgs:
+      symlinkJoin {
+        name = "wrapped-with-nom";
+        paths = (builtins.attrValues (nixNomPkgs pkgs)) ++ (builtins.attrValues pkgs);
+      }
+    );
 
-in {
+in
+{
   # You can import other home-manager modules here
   imports = [
     inputs.nur.hmModules.nur
@@ -343,80 +389,77 @@ in {
   };
 
   config = {
-    nixpkgs =
-      lib.mkIf (!(moduleArgs.osConfig.home-manager.useGlobalPkgs or false)) {
-        # You can add overlays here
-        overlays = [
-          # Add overlays your own flake exports (from overlays and pkgs dir):
-          outputs.overlays.additions
-          outputs.overlays.modifications
-          outputs.overlays.unstable-packages
+    nixpkgs = lib.mkIf (!(moduleArgs.osConfig.home-manager.useGlobalPkgs or false)) {
+      # You can add overlays here
+      overlays = [
+        # Add overlays your own flake exports (from overlays and pkgs dir):
+        outputs.overlays.additions
+        outputs.overlays.modifications
+        outputs.overlays.unstable-packages
 
-          inputs.nix-alien.overlays.default
+        inputs.nix-alien.overlays.default
 
-          (final: prev: {
-            fcitx5-with-addons = prev.fcitx5-with-addons.overrideAttrs
-              (oldAttrs: {
-                postBuild = ''
-                  ${oldAttrs.postBuild or ""}
-                  # Don't install bundled phrases
-                  rm $out/share/fcitx5/data/quickphrase.d/*.mb
-                  # Don't install desktop files
-                  desktop=share/applications/org.fcitx.Fcitx5.desktop
-                  autostart=etc/xdg/autostart/org.fcitx.Fcitx5.desktop
-                  rm $out/$autostart
-                  mv $out/$desktop $out/$autostart
-                  rm -rf $out/share/applications
-                '';
-              });
-          })
-        ];
+        (final: prev: {
+          fcitx5-with-addons = prev.fcitx5-with-addons.overrideAttrs (oldAttrs: {
+            postBuild = ''
+              ${oldAttrs.postBuild or ""}
+              # Don't install bundled phrases
+              rm $out/share/fcitx5/data/quickphrase.d/*.mb
+              # Don't install desktop files
+              desktop=share/applications/org.fcitx.Fcitx5.desktop
+              autostart=etc/xdg/autostart/org.fcitx.Fcitx5.desktop
+              rm $out/$autostart
+              mv $out/$desktop $out/$autostart
+              rm -rf $out/share/applications
+            '';
+          });
+        })
+      ];
 
-        # Configure your nixpkgs instance
-        config = {
-          joypixels.acceptLicense = true;
-          # https://github.com/NixOS/nixpkgs/issues/197325#issuecomment-1579420085
-          allowUnfreePredicate = pkg:
-            let
-              names =
-                lib.filter lib.isString config.nixpkgs.allowUnfreePackages;
-              predicates =
-                lib.filter lib.isFunction config.nixpkgs.allowUnfreePackages;
-            in (builtins.elem (lib.getName pkg) names)
-            || (lib.lists.any (p: p pkg) predicates);
-        };
-
-        allowUnfreePackages = [
-          "steam" # protontricks
-          "steam-run" # protontricks
-          "steam-original" # protontricks
-          (pkg: lib.hasPrefix "libretro-" (lib.getName pkg)) # retroarchFull
-          "corefonts"
-          "vista-fonts"
-          "joypixels"
-          "xkcd-font"
-          "san-francisco-pro"
-          "san-francisco-compact"
-          "san-francisco-mono"
-          "new-york"
-          "symbola"
-          "spotify"
-          "google-chrome"
-          "netflix-via-google-chrome"
-          "netflix-icon"
-          "enhancer-for-youtube"
-          "slack"
-          "discord"
-          "skypeforlinux"
-          "zoom"
-          "code"
-          "vscode"
-          "vscode-extension-ms-vscode-remote-remote-ssh"
-          "cudatoolkit"
-          "cudatoolkit-11-cudnn"
-          "cudatoolkit-11.8-tensorrt"
-        ];
+      # Configure your nixpkgs instance
+      config = {
+        joypixels.acceptLicense = true;
+        # https://github.com/NixOS/nixpkgs/issues/197325#issuecomment-1579420085
+        allowUnfreePredicate =
+          pkg:
+          let
+            names = lib.filter lib.isString config.nixpkgs.allowUnfreePackages;
+            predicates = lib.filter lib.isFunction config.nixpkgs.allowUnfreePackages;
+          in
+          (builtins.elem (lib.getName pkg) names) || (lib.lists.any (p: p pkg) predicates);
       };
+
+      allowUnfreePackages = [
+        "steam" # protontricks
+        "steam-run" # protontricks
+        "steam-original" # protontricks
+        (pkg: lib.hasPrefix "libretro-" (lib.getName pkg)) # retroarchFull
+        "corefonts"
+        "vista-fonts"
+        "joypixels"
+        "xkcd-font"
+        "san-francisco-pro"
+        "san-francisco-compact"
+        "san-francisco-mono"
+        "new-york"
+        "symbola"
+        "spotify"
+        "google-chrome"
+        "netflix-via-google-chrome"
+        "netflix-icon"
+        "enhancer-for-youtube"
+        "slack"
+        "discord"
+        "skypeforlinux"
+        "zoom"
+        "code"
+        "vscode"
+        "vscode-extension-ms-vscode-remote-remote-ssh"
+        "cudatoolkit"
+        "cudatoolkit-11-cudnn"
+        "cudatoolkit-11.8-tensorrt"
+      ];
+    };
 
     home = {
       username = "zeorin";
@@ -432,7 +475,8 @@ in {
         ];
       };
       sessionPath = [ "${config.xdg.configHome}/doom-emacs/bin" ];
-      sessionVariables = with config.xdg;
+      sessionVariables =
+        with config.xdg;
         let
           EDITOR = pkgs.writeShellScript "editor" ''
             if [ -n "$INSIDE_EMACS" ]; then
@@ -442,7 +486,8 @@ in {
             fi
           '';
           VISUAL = EDITOR;
-        in rec {
+        in
+        rec {
           inherit EDITOR VISUAL;
           # Non-standard env var, found in https://github.com/facebook/react/pull/22649
           EDITOR_URL = "editor://{path}:{line}";
@@ -560,12 +605,14 @@ in {
       bash.enable = true;
       browserpass = {
         enable = true;
-        browsers = [ "chrome" "chromium" ];
+        browsers = [
+          "chrome"
+          "chromium"
+        ];
       };
       dircolors = {
         enable = true;
-        extraConfig =
-          builtins.readFile "${inputs.nord-dircolors}/src/dir_colors";
+        extraConfig = builtins.readFile "${inputs.nord-dircolors}/src/dir_colors";
       };
       direnv = {
         enable = true;
@@ -584,179 +631,172 @@ in {
             browserpass
             plasma-browser-integration
             tridactyl-native
-            (tabfs.override {
-              mountDir = "${config.xdg.dataHome}/tabfs/personal";
-            })
+            (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/personal"; })
           ];
         };
-        profiles = let
-          extensions = with config.nur.repos.rycee.firefox-addons;
-            [
-              a11ycss
-              amp2html
-              auto-tab-discard
-              browserpass
-              canvasblocker
-              clearurls
-              cookies-txt
-              darkreader
-              enhancer-for-youtube
-              fediact
-              ghosttext
-              mailvelope
-              metamask
-              octolinker
-              octotree
-              org-capture
-              plasma-integration
-              privacy-badger
-              react-devtools
-              reddit-enhancement-suite
-              reduxdevtools
-              refined-github
-              sponsorblock
-              tab-session-manager
-              terms-of-service-didnt-read
-              tree-style-tab
-              tridactyl
-              ublock-origin
-              wallabagger
-              wayback-machine
-            ] ++ (with config.nur.repos.meain.firefox-addons; [ containerise ])
-            ++ (with pkgs; [ tabfs ]);
-          commonSettings = {
-            "browser.startup.page" = 3; # resume previous session
-            "browser.startup.homepage" = "about:blank";
-            "browser.newtabpage.enabled" = false;
-            "browser.newtab.preload" = false;
-            "browser.newtab.url" = "about:blank";
-            "browser.startup.homepage_override.mstone" =
-              "ignore"; # hide welcome & what's new notices
-            "browser.messaging-system.whatsNewPanel.enabled" =
-              false; # hide what's new
-            "browser.menu.showViewImageInfo" = true; # restore "view image info"
-            "browser.ctrlTab.recentlyUsedOrder" =
-              false; # use chronological order
-            "browser.display.show_image_placeholders" = false;
-            "browser.tabs.loadBookmarksInTabs" =
-              true; # open bookmarks in a new tab
-            "browser.urlbar.decodeURLsOnCopy" = true;
-            "editor.truncate_user_pastes" =
-              false; # don't truncate pasted passwords
-            "media.videocontrols.picture-in-picture.video-toggle.has-used" =
-              true; # smaller picture-in-picture icon
-            "accessibility.typeaheadfind" = true; # enable "Find As You Type"
-            "layout.spellcheckDefault" = 2; # multi-line & single-line
-            # we use an external password manager
-            "signon.rememberSignons" = false;
-            "privacy.clearOnShutdown.passwords" = true;
-            # dropdown options in the URL bar
-            "browser.urlbar.suggest.bookmarks" = true;
-            "browser.urlbar.suggest.engines" = false;
-            "browser.urlbar.suggest.history" = true;
-            "browser.urlbar.suggest.openpage" = true;
-            "browser.urlbar.suggest.searches" = true;
-            "browser.urlbar.suggest.topsites" =
-              false; # disable dropdown suggestions with empty query
-            # Smooth scroll
-            "general.smoothScroll" = true;
-            "general.smoothScroll.currentVelocityWeighting" = "0.1";
-            "general.smoothScroll.mouseWheel.durationMaxMS" = 250;
-            "general.smoothScroll.mouseWheel.durationMinMS" = 125;
-            "general.smoothScroll.stopDecelerationWeighting" = "0.7";
-            "mousewheel.min_line_scroll_amount" = 25;
-            "apz.overscroll.enabled" = true; # elastic overscroll
-            # Disable annoying warnings
-            "browser.tabs.warnOnClose" = false;
-            "browser.tabs.warnOnCloseOtherTabs" = false;
-            "browser.tabs.warnOnOpen" = false;
-            "browser.aboutConfig.showWarning" = false;
-            # Hide bookmarks toolbar
-            "browser.toolbars.bookmarks.visibility" = "never";
-            # On i3 tabs in titlebar are pretty ugly
-            "browser.tabs.inTitlebar" = 0;
-            # Allow all fontconfig substitutions
-            "gfx.font_rendering.fontconfig.max_generic_substitutions" = 127;
-            # Use system emoji
-            "font.name-list.emoji" = "emoji";
-            # HTTPS-only
-            "dom.security.https_only_mode" = true;
-            "dom.security.https_only_mode_ever_enabled" = true;
-            # XDG Desktop Portal Integration
-            "widget.use-xdg-desktop-portal.file-picker" = 1;
-            "widget.use-xdg-desktop-portal.mime-handler" = 1;
-            "widget.use-xdg-desktop-portal.settings" = 1;
-            "widget.use-xdg-desktop-portal.location" = 1;
-            "widget.use-xdg-desktop-portal.open-uri" = 1;
-            # Gluten-free
-            "cookiebanners.bannerClicking.enabled" = true;
-            "cookiebanners.service.mode" = 2;
-            "cookiebanners.service.mode.privateBrowsing" = 2;
+        profiles =
+          let
+            extensions =
+              with config.nur.repos.rycee.firefox-addons;
+              [
+                a11ycss
+                amp2html
+                auto-tab-discard
+                browserpass
+                canvasblocker
+                clearurls
+                cookies-txt
+                darkreader
+                enhancer-for-youtube
+                fediact
+                ghosttext
+                mailvelope
+                metamask
+                octolinker
+                octotree
+                org-capture
+                plasma-integration
+                privacy-badger
+                react-devtools
+                reddit-enhancement-suite
+                reduxdevtools
+                refined-github
+                sponsorblock
+                tab-session-manager
+                terms-of-service-didnt-read
+                tree-style-tab
+                tridactyl
+                ublock-origin
+                wallabagger
+                wayback-machine
+              ]
+              ++ (with config.nur.repos.meain.firefox-addons; [ containerise ])
+              ++ (with pkgs; [ tabfs ]);
+            commonSettings = {
+              "browser.startup.page" = 3; # resume previous session
+              "browser.startup.homepage" = "about:blank";
+              "browser.newtabpage.enabled" = false;
+              "browser.newtab.preload" = false;
+              "browser.newtab.url" = "about:blank";
+              "browser.startup.homepage_override.mstone" = "ignore"; # hide welcome & what's new notices
+              "browser.messaging-system.whatsNewPanel.enabled" = false; # hide what's new
+              "browser.menu.showViewImageInfo" = true; # restore "view image info"
+              "browser.ctrlTab.recentlyUsedOrder" = false; # use chronological order
+              "browser.display.show_image_placeholders" = false;
+              "browser.tabs.loadBookmarksInTabs" = true; # open bookmarks in a new tab
+              "browser.urlbar.decodeURLsOnCopy" = true;
+              "editor.truncate_user_pastes" = false; # don't truncate pasted passwords
+              "media.videocontrols.picture-in-picture.video-toggle.has-used" = true; # smaller picture-in-picture icon
+              "accessibility.typeaheadfind" = true; # enable "Find As You Type"
+              "layout.spellcheckDefault" = 2; # multi-line & single-line
+              # we use an external password manager
+              "signon.rememberSignons" = false;
+              "privacy.clearOnShutdown.passwords" = true;
+              # dropdown options in the URL bar
+              "browser.urlbar.suggest.bookmarks" = true;
+              "browser.urlbar.suggest.engines" = false;
+              "browser.urlbar.suggest.history" = true;
+              "browser.urlbar.suggest.openpage" = true;
+              "browser.urlbar.suggest.searches" = true;
+              "browser.urlbar.suggest.topsites" = false; # disable dropdown suggestions with empty query
+              # Smooth scroll
+              "general.smoothScroll" = true;
+              "general.smoothScroll.currentVelocityWeighting" = "0.1";
+              "general.smoothScroll.mouseWheel.durationMaxMS" = 250;
+              "general.smoothScroll.mouseWheel.durationMinMS" = 125;
+              "general.smoothScroll.stopDecelerationWeighting" = "0.7";
+              "mousewheel.min_line_scroll_amount" = 25;
+              "apz.overscroll.enabled" = true; # elastic overscroll
+              # Disable annoying warnings
+              "browser.tabs.warnOnClose" = false;
+              "browser.tabs.warnOnCloseOtherTabs" = false;
+              "browser.tabs.warnOnOpen" = false;
+              "browser.aboutConfig.showWarning" = false;
+              # Hide bookmarks toolbar
+              "browser.toolbars.bookmarks.visibility" = "never";
+              # On i3 tabs in titlebar are pretty ugly
+              "browser.tabs.inTitlebar" = 0;
+              # Allow all fontconfig substitutions
+              "gfx.font_rendering.fontconfig.max_generic_substitutions" = 127;
+              # Use system emoji
+              "font.name-list.emoji" = "emoji";
+              # HTTPS-only
+              "dom.security.https_only_mode" = true;
+              "dom.security.https_only_mode_ever_enabled" = true;
+              # XDG Desktop Portal Integration
+              "widget.use-xdg-desktop-portal.file-picker" = 1;
+              "widget.use-xdg-desktop-portal.mime-handler" = 1;
+              "widget.use-xdg-desktop-portal.settings" = 1;
+              "widget.use-xdg-desktop-portal.location" = 1;
+              "widget.use-xdg-desktop-portal.open-uri" = 1;
+              # Gluten-free
+              "cookiebanners.bannerClicking.enabled" = true;
+              "cookiebanners.service.mode" = 2;
+              "cookiebanners.service.mode.privateBrowsing" = 2;
+            };
+            noNoiseSuppression = {
+              "media.getusermedia.aec_enabled" = false;
+              "media.getusermedia.agc_enabled" = false;
+              "media.getusermedia.noise_enabled" = false;
+              "media.getusermedia.hpf_enabled" = false;
+            };
+            performanceSettings = {
+              "gfx.webrender.all" = true; # Use webrender everywhere
+              # "gfx.webrender.software" = true; # If the hardware doesn't support it, use software webrendering
+              "dom.image-lazy-loading.enabled" = true;
+              # Restore tabs only on demand
+              "browser.sessionstore.restore_on_demand" = true;
+              "browser.sessionstore.restore_pinned_tabs_on_demand" = true;
+              "browser.sessionstore.restore_tabs_lazily" = true;
+              # Disable preSkeletonUI on startup
+              "browser.startup.preXulSkeletonUI" = false;
+              # Process count (more is faster, but uses more memory)
+              # "dom.ipc.processCount" = 8; # default
+              # "dom.ipc.processCount" = 16;
+              # "dom.ipc.processCount" = -1; # as many as FF wants
+              # "network.http.max-persistent-connections-per-server" = 6; # default
+              # "network.http.max-persistent-connections-per-server" = 10;
+            };
+            enableUserChrome = {
+              "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+            };
+            saneNewTab = {
+              # Don't open links in new tabs, except when it makes sense
+              "browser.link.open_newwindow" = 1; # force new window into same tab
+              "browser.link.open_newwindow.restriction" = 2; # except for script windows with features
+              "browser.link.open_newwindow.override.external" = 3; # open external links in a new tab in last active window
+              "browser.newtab.url" = "about:blank";
+            };
+          in
+          {
+            personal = {
+              id = 0;
+              isDefault = true;
+              settings =
+                commonSettings // noNoiseSuppression // performanceSettings // enableUserChrome // saneNewTab;
+              userChrome = ''
+                @import url('${inputs.firefox-csshacks}/chrome/window_control_placeholder_support.css');
+                @import url('${inputs.firefox-csshacks}/chrome/hide_tabs_toolbar.css');
+                @import url('${inputs.firefox-csshacks}/chrome/autohide_toolbox.css');
+              '';
+              inherit extensions;
+            };
+            developer-edition = {
+              id = 1;
+              settings = commonSettings // noNoiseSuppression;
+              inherit extensions;
+            };
+            beta = {
+              id = 2;
+              settings = commonSettings // noNoiseSuppression;
+              inherit extensions;
+            };
+            esr = {
+              id = 3;
+              settings = commonSettings // noNoiseSuppression;
+              inherit extensions;
+            };
           };
-          noNoiseSuppression = {
-            "media.getusermedia.aec_enabled" = false;
-            "media.getusermedia.agc_enabled" = false;
-            "media.getusermedia.noise_enabled" = false;
-            "media.getusermedia.hpf_enabled" = false;
-          };
-          performanceSettings = {
-            "gfx.webrender.all" = true; # Use webrender everywhere
-            # "gfx.webrender.software" = true; # If the hardware doesn't support it, use software webrendering
-            "dom.image-lazy-loading.enabled" = true;
-            # Restore tabs only on demand
-            "browser.sessionstore.restore_on_demand" = true;
-            "browser.sessionstore.restore_pinned_tabs_on_demand" = true;
-            "browser.sessionstore.restore_tabs_lazily" = true;
-            # Disable preSkeletonUI on startup
-            "browser.startup.preXulSkeletonUI" = false;
-            # Process count (more is faster, but uses more memory)
-            # "dom.ipc.processCount" = 8; # default
-            # "dom.ipc.processCount" = 16;
-            # "dom.ipc.processCount" = -1; # as many as FF wants
-            # "network.http.max-persistent-connections-per-server" = 6; # default
-            # "network.http.max-persistent-connections-per-server" = 10;
-          };
-          enableUserChrome = {
-            "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-          };
-          saneNewTab = {
-            # Don't open links in new tabs, except when it makes sense
-            "browser.link.open_newwindow" = 1; # force new window into same tab
-            "browser.link.open_newwindow.restriction" =
-              2; # except for script windows with features
-            "browser.link.open_newwindow.override.external" =
-              3; # open external links in a new tab in last active window
-            "browser.newtab.url" = "about:blank";
-          };
-        in {
-          personal = {
-            id = 0;
-            isDefault = true;
-            settings = commonSettings // noNoiseSuppression
-              // performanceSettings // enableUserChrome // saneNewTab;
-            userChrome = ''
-              @import url('${inputs.firefox-csshacks}/chrome/window_control_placeholder_support.css');
-              @import url('${inputs.firefox-csshacks}/chrome/hide_tabs_toolbar.css');
-              @import url('${inputs.firefox-csshacks}/chrome/autohide_toolbox.css');
-            '';
-            inherit extensions;
-          };
-          developer-edition = {
-            id = 1;
-            settings = commonSettings // noNoiseSuppression;
-            inherit extensions;
-          };
-          beta = {
-            id = 2;
-            settings = commonSettings // noNoiseSuppression;
-            inherit extensions;
-          };
-          esr = {
-            id = 3;
-            settings = commonSettings // noNoiseSuppression;
-            inherit extensions;
-          };
-        };
       };
       fish = {
         enable = true;
@@ -936,24 +976,23 @@ in {
             source ${my-emacs.emacs.pkgs.vterm}/share/emacs/site-lisp/elpa/vterm-${my-emacs.emacs.pkgs.vterm.version}/etc/emacs-vterm.fish
           end
         '';
-        plugins = [{
-          name = "done";
-          src = pkgs.fetchFromGitHub {
-            owner = "franciscolourenco";
-            repo = "done";
-            rev = "1.19.2";
-            hash = "sha256-VSCYsGjNPSFIZSdLrkc7TU7qyPVm8UupOoav5UqXPMk=";
-          };
-        }];
+        plugins = [
+          {
+            name = "done";
+            src = pkgs.fetchFromGitHub {
+              owner = "franciscolourenco";
+              repo = "done";
+              rev = "1.19.2";
+              hash = "sha256-VSCYsGjNPSFIZSdLrkc7TU7qyPVm8UupOoav5UqXPMk=";
+            };
+          }
+        ];
       };
       fzf = {
         enable = true;
-        defaultCommand =
-          "${pkgs.fd}/bin/fd --type file --strip-cwd-prefix --glob";
-        fileWidgetCommand =
-          "${pkgs.fd}/bin/fd --type empty --type file --strip-cwd-prefix --hidden --follow --glob";
-        changeDirWidgetCommand =
-          "${pkgs.fd}/bin/fd --type empty --type directory --strip-cwd-prefix --hidden --follow --glob";
+        defaultCommand = "${pkgs.fd}/bin/fd --type file --strip-cwd-prefix --glob";
+        fileWidgetCommand = "${pkgs.fd}/bin/fd --type empty --type file --strip-cwd-prefix --hidden --follow --glob";
+        changeDirWidgetCommand = "${pkgs.fd}/bin/fd --type empty --type directory --strip-cwd-prefix --hidden --follow --glob";
       };
       git = {
         enable = true;
@@ -1001,8 +1040,7 @@ in {
             conflictStyle = "zdiff3";
           };
           mergetool.prompt = false;
-          "mergetool \"nvimdiff\"".cmd = ''
-            $VISUAL -d -c '4wincmd w | wincmd J'  "$LOCAL" "$BASE" "$REMOTE" "$MERGED"'';
+          "mergetool \"nvimdiff\"".cmd = ''$VISUAL -d -c '4wincmd w | wincmd J'  "$LOCAL" "$BASE" "$REMOTE" "$MERGED"'';
           branch.autosetupmerge = true;
           rerere = {
             enabled = true;
@@ -1028,83 +1066,85 @@ in {
             };
           };
         };
-        aliases = {
-          a = "add";
-          b = "branch";
-          # Use commitizen if it’s installed, otherwise just use `git commit`
-          c = lib.strings.removeSuffix "\n" ''
-            !f() {
-              if command -v git-cz >/dev/null 2>&1; then
-                git-cz "$@"
-              else
-                git commit "$@"
-              fi
-            }
-            f
-          '';
-          co = "checkout";
-          d = "diff";
-          p = "push";
-          r = "rebase";
-          s = "status";
-          u = "unstage";
-          unstage = "reset HEAD --";
-          last = "log -1 HEAD";
-          stash-unapply = lib.strings.removeSuffix "\n" ''
-            !git stash show -p |
-              git apply -R
-          '';
-          assume = "update-index --assume-unchanged";
-          unassume = "update-index --no-assume-unchanged";
-          assumed = lib.strings.removeSuffix "\n" ''
-            !git ls-files -v |
-              ${pkgs.gnugrep}/bin/grep '^h' |
-              cut -c 3-
-          '';
-          assume-all = lib.strings.removeSuffix "\n" ''
-            !git status --porcelain |
-              ${pkgs.gawk}/bin/awk {'print $2'} |
-              ${pkgs.findutils}/bin/xargs -r git assume
-          '';
-          unassume-all = lib.strings.removeSuffix "\n" ''
-            !git assumed |
-              ${pkgs.findutils}/bin/xargs -r git unassume
-          '';
-          skip = "update-index --skip-worktree";
-          unskip = "update-index --no-skip-worktree";
-          skipped = lib.strings.removeSuffix "\n" ''
-            !git ls-files -t |
-              ${pkgs.gnugrep}/bin/grep '^S' |
-              cut -c 3-
-          '';
-          skip-all = lib.strings.removeSuffix "\n" ''
-            !git status --porcelain |
-              ${pkgs.gawk}/bin/awk {'print $2'} |
-              ${pkgs.findutils}/bin/xargs -r git skip
-          '';
-          unskip-all = lib.strings.removeSuffix "\n" ''
-            !git skipped |
-              ${pkgs.findutils}/bin/xargs -r git unskip
-          '';
-          edit-dirty = lib.strings.removeSuffix "\n" ''
-            !git status --porcelain |
-              ${pkgs.gnused}/bin/sed s/^...// |
-              ${pkgs.findutils}/bin/xargs -r "$EDITOR"
-          '';
-          tracked-ignores = lib.strings.removeSuffix "\n" ''
-            !git ls-files |
-              git check-ignore --no-index --stdin
-          '';
-          # https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
-          branch-purge = lib.strings.removeSuffix "\n" ''
-            !git for-each-ref \
-              --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' \
-              refs/heads |
-              ${pkgs.findutils}/bin/xargs -r git branch -d
-          '';
-        } // (let
-          git-ignore = "!${
-              pkgs.writeShellScript "git-ignore" ''
+        aliases =
+          {
+            a = "add";
+            b = "branch";
+            # Use commitizen if it’s installed, otherwise just use `git commit`
+            c = lib.strings.removeSuffix "\n" ''
+              !f() {
+                if command -v git-cz >/dev/null 2>&1; then
+                  git-cz "$@"
+                else
+                  git commit "$@"
+                fi
+              }
+              f
+            '';
+            co = "checkout";
+            d = "diff";
+            p = "push";
+            r = "rebase";
+            s = "status";
+            u = "unstage";
+            unstage = "reset HEAD --";
+            last = "log -1 HEAD";
+            stash-unapply = lib.strings.removeSuffix "\n" ''
+              !git stash show -p |
+                git apply -R
+            '';
+            assume = "update-index --assume-unchanged";
+            unassume = "update-index --no-assume-unchanged";
+            assumed = lib.strings.removeSuffix "\n" ''
+              !git ls-files -v |
+                ${pkgs.gnugrep}/bin/grep '^h' |
+                cut -c 3-
+            '';
+            assume-all = lib.strings.removeSuffix "\n" ''
+              !git status --porcelain |
+                ${pkgs.gawk}/bin/awk {'print $2'} |
+                ${pkgs.findutils}/bin/xargs -r git assume
+            '';
+            unassume-all = lib.strings.removeSuffix "\n" ''
+              !git assumed |
+                ${pkgs.findutils}/bin/xargs -r git unassume
+            '';
+            skip = "update-index --skip-worktree";
+            unskip = "update-index --no-skip-worktree";
+            skipped = lib.strings.removeSuffix "\n" ''
+              !git ls-files -t |
+                ${pkgs.gnugrep}/bin/grep '^S' |
+                cut -c 3-
+            '';
+            skip-all = lib.strings.removeSuffix "\n" ''
+              !git status --porcelain |
+                ${pkgs.gawk}/bin/awk {'print $2'} |
+                ${pkgs.findutils}/bin/xargs -r git skip
+            '';
+            unskip-all = lib.strings.removeSuffix "\n" ''
+              !git skipped |
+                ${pkgs.findutils}/bin/xargs -r git unskip
+            '';
+            edit-dirty = lib.strings.removeSuffix "\n" ''
+              !git status --porcelain |
+                ${pkgs.gnused}/bin/sed s/^...// |
+                ${pkgs.findutils}/bin/xargs -r "$EDITOR"
+            '';
+            tracked-ignores = lib.strings.removeSuffix "\n" ''
+              !git ls-files |
+                git check-ignore --no-index --stdin
+            '';
+            # https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
+            branch-purge = lib.strings.removeSuffix "\n" ''
+              !git for-each-ref \
+                --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' \
+                refs/heads |
+                ${pkgs.findutils}/bin/xargs -r git branch -d
+            '';
+          }
+          // (
+            let
+              git-ignore = "!${pkgs.writeShellScript "git-ignore" ''
                 # Unofficial Bash strict mode
                 set -euo pipefail
 
@@ -1330,42 +1370,45 @@ in {
                     xargs git rm --cached -- &>/dev/null
                   rm "$tmp"
                 fi
-              ''
-            }";
-        in {
-          ignore = "${git-ignore} --subcommand ignore";
-          exclude = "${git-ignore} --subcommand exclude";
-        }) // {
-          # https://stackoverflow.com/a/34467298
-          l = "lg";
-          lg = "lg1";
-          lg1 =
-            "lg1-specific --branches --decorate-refs-exclude=refs/remotes/*";
-          lg2 =
-            "lg2-specific --branches --decorate-refs-exclude=refs/remotes/*";
-          lg3 =
-            "lg3-specific --branches --decorate-refs-exclude=refs/remotes/*";
-          lg-all = "lg1-all";
-          lg1-all = "lg1-specific --all";
-          lg2-all = "lg2-specific --all";
-          lg3-all = "lg3-specific --all";
-          lg-specific = "lg1-specific";
-          lg1-specific =
-            "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
-          lg2-specific =
-            "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'";
-          lg3-specific =
-            "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'";
-          # https://docs.gitignore.io/use/command-line
-          ignore-boilerplate = lib.strings.removeSuffix "\n" ''
-            !f() {
-              ${pkgs.curl}/bin/curl -sL "https://www.gitignore.io/api/$@" 2>/dev/null;
+              ''}";
+            in
+            {
+              ignore = "${git-ignore} --subcommand ignore";
+              exclude = "${git-ignore} --subcommand exclude";
             }
-            f
-          '';
-        };
-        ignores =
-          [ "*~" "*.swp" "*.swo" ".DS_Store" "tags" "Session.vim" "/.vim" ];
+          )
+          // {
+            # https://stackoverflow.com/a/34467298
+            l = "lg";
+            lg = "lg1";
+            lg1 = "lg1-specific --branches --decorate-refs-exclude=refs/remotes/*";
+            lg2 = "lg2-specific --branches --decorate-refs-exclude=refs/remotes/*";
+            lg3 = "lg3-specific --branches --decorate-refs-exclude=refs/remotes/*";
+            lg-all = "lg1-all";
+            lg1-all = "lg1-specific --all";
+            lg2-all = "lg2-specific --all";
+            lg3-all = "lg3-specific --all";
+            lg-specific = "lg1-specific";
+            lg1-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
+            lg2-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'";
+            lg3-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'";
+            # https://docs.gitignore.io/use/command-line
+            ignore-boilerplate = lib.strings.removeSuffix "\n" ''
+              !f() {
+                ${pkgs.curl}/bin/curl -sL "https://www.gitignore.io/api/$@" 2>/dev/null;
+              }
+              f
+            '';
+          };
+        ignores = [
+          "*~"
+          "*.swp"
+          "*.swo"
+          ".DS_Store"
+          "tags"
+          "Session.vim"
+          "/.vim"
+        ];
       };
       gpg = {
         enable = true;
@@ -1381,8 +1424,7 @@ in {
           # Use ZLIB, BZIP2, ZIP, or no compression
           personal-compress-preferences = "ZLIB BZIP2 ZIP Uncompressed";
           # Default preferences for new keys
-          default-preference-list =
-            "SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed";
+          default-preference-list = "SHA512 SHA384 SHA256 AES256 AES192 AES ZLIB BZIP2 ZIP Uncompressed";
           # SHA512 as digest to sign keys
           cert-digest-algo = "SHA512";
           # SHA512 as digest for symmetric ops
@@ -1453,12 +1495,15 @@ in {
       };
       kitty = {
         enable = true;
-        package = let kitty = pkgs.kitty;
-        in lib.attrsets.recursiveUpdate kitty {
-          passthru.set-theme = pkgs.writeShellScript "kitty-set-theme" ''
-            ${config.programs.kitty.package}/bin/kitty +kitten themes --reload-in=all --config-file-name="theme.conf" "$@"
-          '';
-        };
+        package =
+          let
+            kitty = pkgs.kitty;
+          in
+          lib.attrsets.recursiveUpdate kitty {
+            passthru.set-theme = pkgs.writeShellScript "kitty-set-theme" ''
+              ${config.programs.kitty.package}/bin/kitty +kitten themes --reload-in=all --config-file-name="theme.conf" "$@"
+            '';
+          };
         font = {
           name = "Iosevka NF Light";
           size = 9;
@@ -1490,14 +1535,13 @@ in {
             with builtins;
             with lib;
             with strings;
-            trivial.pipe
-            (fileContents (toString (inputs.emoji-variation-sequences))) [
+            trivial.pipe (fileContents (toString (inputs.emoji-variation-sequences))) [
               (splitString "\n")
-              (filter
-                (line: (stringLength line) > 0 && (substring 0 1 line) != "#"))
+              (filter (line: (stringLength line) > 0 && (substring 0 1 line) != "#"))
               (map (line: elemAt (splitString " " line) 0))
               lists.unique
-              (filter (codepoint:
+              (filter (
+                codepoint:
                 !(elem codepoint [
                   "0023" # #
                   "002A" # *
@@ -1514,7 +1558,8 @@ in {
                   # "00A9" # ©
                   # "00AE" # ®
                   # "2122" # ™
-                ])))
+                ])
+              ))
               (concatMapStringsSep "," (codepoint: "U+${codepoint}"))
             ]
           } Noto Color Emoji
@@ -1536,8 +1581,7 @@ in {
           hwdec = "auto-safe";
           vo = "gpu";
           profile = "gpu-hq";
-          ytdl-format =
-            "bestvideo[height<=?720][fps<=?30][vcodec!=?vp9]+bestaudio/best";
+          ytdl-format = "bestvideo[height<=?720][fps<=?30][vcodec!=?vp9]+bestaudio/best";
           osd-bar = "no";
         };
         bindings = {
@@ -1552,10 +1596,8 @@ in {
           "[" = "no-osd add speed -0.25; script-binding uosc/flash-speed";
           "]" = "no-osd add speed  0.25; script-binding uosc/flash-speed";
           "\\" = "no-osd set speed 1; script-binding uosc/flash-speed";
-          ">" =
-            "script-binding uosc/next; script-message-to uosc flash-elements top_bar,timeline";
-          "<" =
-            "script-binding uosc/prev; script-message-to uosc flash-elements top_bar,timeline";
+          ">" = "script-binding uosc/next; script-message-to uosc flash-elements top_bar,timeline";
+          "<" = "script-binding uosc/prev; script-message-to uosc flash-elements top_bar,timeline";
           "tab" = "script-binding uosc/toggle-ui";
           "menu" = "script-binding uosc/menu";
           "mbtn_right" = "script-binding uosc/menu";
@@ -1564,12 +1606,9 @@ in {
           "q" = "script-binding uosc/stream-quality #! Stream quality";
           "p" = "script-binding uosc/items #! Playlist";
           "c" = "script-binding uosc/chapters #! Chapters";
-          "alt+>" =
-            "script-binding uosc/delete-file-next #! Navigation > Delete file & Next";
-          "alt+<" =
-            "script-binding uosc/delete-file-prev #! Navigation > Delete file & Prev";
-          "alt+esc" =
-            "script-binding uosc/delete-file-quit #! Navigation > Delete file & Quit";
+          "alt+>" = "script-binding uosc/delete-file-next #! Navigation > Delete file & Next";
+          "alt+<" = "script-binding uosc/delete-file-prev #! Navigation > Delete file & Prev";
+          "alt+esc" = "script-binding uosc/delete-file-quit #! Navigation > Delete file & Quit";
           "o" = "script-binding uosc/open-file #! Navigation > Open file";
           # "#" = "set video-aspect-override \"-1\" #! Utils > Aspect ratio > Default";
           # "#" = "set video-aspect-override \"16:9\" #! Utils > Aspect ratio > 16:9";
@@ -1579,8 +1618,7 @@ in {
           # "#" = "script-binding uosc/editions #! Utils > Editions";
           "ctrl+s" = "async screenshot #! Utils > Screenshot";
           "alt+i" = "script-binding uosc/keybinds #! Utils > Key bindings";
-          "O" =
-            "script-binding uosc/show-in-directory #! Utils > Show in directory";
+          "O" = "script-binding uosc/show-in-directory #! Utils > Show in directory";
           # "#" = "script-binding uosc/open-config-directory #! Utils > Open config directory";
           # "#" = "script-binding uosc/update #! Utils > Update uosc";
           "R" = ''script-message-to uosc show-submenu "Utils > Aspect ratio"'';
@@ -1603,11 +1641,12 @@ in {
             network = "yes";
             hwdec = "yes";
           };
-          playlistmanager = { resolve_url_titles = "yes"; };
+          playlistmanager = {
+            resolve_url_titles = "yes";
+          };
           uosc = {
             click_threshold = 100;
-            click_command =
-              "cycle pause; script-binding uosc/flash-pause-indicator";
+            click_command = "cycle pause; script-binding uosc/flash-pause-indicator";
           };
         };
       };
@@ -1618,25 +1657,30 @@ in {
       };
       password-store = {
         enable = true;
-        package = pkgs.pass.withExtensions (exts:
-          with exts; [
-            (pass-otp.overrideAttrs (oldAttrs:
+        package = pkgs.pass.withExtensions (
+          exts: with exts; [
+            (pass-otp.overrideAttrs (
+              oldAttrs:
               let
-                perl-pass-otp = with pkgs.perlPackages;
+                perl-pass-otp =
+                  with pkgs.perlPackages;
                   buildPerlPackage {
                     pname = "Pass-OTP";
                     version = "1.5";
                     src = pkgs.fetchurl {
-                      url =
-                        "mirror://cpan/authors/id/J/JB/JBAIER/Pass-OTP-1.5.tar.gz";
-                      hash =
-                        "sha256-GujxwmvfSXMAsX7LRiI7Q9YgsolIToeFRYEVAYFJeaM=";
+                      url = "mirror://cpan/authors/id/J/JB/JBAIER/Pass-OTP-1.5.tar.gz";
+                      hash = "sha256-GujxwmvfSXMAsX7LRiI7Q9YgsolIToeFRYEVAYFJeaM=";
                     };
-                    buildInputs =
-                      [ ConvertBase32 DigestHMAC DigestSHA3 MathBigInt ];
+                    buildInputs = [
+                      ConvertBase32
+                      DigestHMAC
+                      DigestSHA3
+                      MathBigInt
+                    ];
                     doCheck = false;
                   };
-              in {
+              in
+              {
                 version = "1.2.0.r29.a364d2a";
                 src = pkgs.fetchFromGitHub {
                   owner = "tadfisher";
@@ -1649,14 +1693,16 @@ in {
                   sed -i -e 's|OATH=\$(which oathtool)|OATH=${perl-pass-otp}/bin/oathtool|' otp.bash
                   sed -i -e 's|OTPTOOL=\$(which otptool)|OTPTOOL=${perl-pass-otp}/bin/otptool|' otp.bash
                 '';
-              }))
+              }
+            ))
             pass-import
             pass-audit
             pass-update
             pass-checkup
             pass-genphrase
             pass-tomb
-          ]);
+          ]
+        );
         settings = {
           PASSWORD_STORE_GPG_OPTS = "--no-throw-keyids";
           PASSWORD_STORE_GENERATED_LENGTH = "128";
@@ -1667,130 +1713,138 @@ in {
         enable = true;
         pass = {
           enable = true;
-          extraConfig = let
-            remove-binding = binding: str:
-              let bindings = lib.strings.splitString "," str;
-              in let newBindings = lib.lists.remove binding bindings;
-              in lib.strings.concatStringsSep "," newBindings;
-          in with config.programs.rofi.extraConfig; ''
-            # rofi command. Make sure to have "$@" as last argument
-            _rofi () {
-                ${pkgs.rofi}/bin/rofi \
-                  -dpi ${toString (dpiScale 96)} \
-                  -i \
-                  -kb-accept-custom "" \
-                  -kb-row-down "${remove-binding "Control+n" kb-row-down}" \
-                  -kb-row-up "${remove-binding "Control+p" kb-row-up}" \
-                  -kb-mode-complete "" \
-                  -kb-remove-char-back "BackSpace,Shift+BackSpace" \
-                  -kb-move-front "" \
-                  -kb-remove-to-sol "" \
-                  -no-auto-select \
-                  "$@"
-            }
+          extraConfig =
+            let
+              remove-binding =
+                binding: str:
+                let
+                  bindings = lib.strings.splitString "," str;
+                in
+                let
+                  newBindings = lib.lists.remove binding bindings;
+                in
+                lib.strings.concatStringsSep "," newBindings;
+            in
+            with config.programs.rofi.extraConfig;
+            ''
+              # rofi command. Make sure to have "$@" as last argument
+              _rofi () {
+                  ${pkgs.rofi}/bin/rofi \
+                    -dpi ${toString (dpiScale 96)} \
+                    -i \
+                    -kb-accept-custom "" \
+                    -kb-row-down "${remove-binding "Control+n" kb-row-down}" \
+                    -kb-row-up "${remove-binding "Control+p" kb-row-up}" \
+                    -kb-mode-complete "" \
+                    -kb-remove-char-back "BackSpace,Shift+BackSpace" \
+                    -kb-move-front "" \
+                    -kb-remove-to-sol "" \
+                    -no-auto-select \
+                    "$@"
+              }
 
-            # default command to generate passwords
-            _pwgen () {
-              ${pkgs.pwgen}/bin/pwgen -y "$@"
-            }
+              # default command to generate passwords
+              _pwgen () {
+                ${pkgs.pwgen}/bin/pwgen -y "$@"
+              }
 
-            # image viewer to display qrcode of selected entry
-            # qrencode is needed to generate the image and a viewer
-            # that can read from pipes. Known viewers to work are feh and display
-            _image_viewer () {
-              ${pkgs.feh}/bin/feh -
-            #    display
-            }
+              # image viewer to display qrcode of selected entry
+              # qrencode is needed to generate the image and a viewer
+              # that can read from pipes. Known viewers to work are feh and display
+              _image_viewer () {
+                ${pkgs.feh}/bin/feh -
+              #    display
+              }
 
-            # It is possible to use wl-copy and wl-paste from wl-clipboard
-            # Just uncomment the lines with wl-copy and wl-paste
-            # and comment the xclip lines
-            #
-            _clip_in_primary() {
-              ${pkgs.xclip}/bin/xclip
-              # wl-copy-p
-            }
+              # It is possible to use wl-copy and wl-paste from wl-clipboard
+              # Just uncomment the lines with wl-copy and wl-paste
+              # and comment the xclip lines
+              #
+              _clip_in_primary() {
+                ${pkgs.xclip}/bin/xclip
+                # wl-copy-p
+              }
 
-            _clip_in_clipboard() {
-              ${pkgs.xclip}/bin/xclip -selection clipboard
-              # wl-copy
-            }
+              _clip_in_clipboard() {
+                ${pkgs.xclip}/bin/xclip -selection clipboard
+                # wl-copy
+              }
 
-            _clip_out_primary() {
-              ${pkgs.xclip}/bin/xclip -o
-              # wl-paste -p
-            }
+              _clip_out_primary() {
+                ${pkgs.xclip}/bin/xclip -o
+                # wl-paste -p
+              }
 
-            _clip_out_clipboard() {
-              ${pkgs.xclip}/bin/xclip --selection clipboard -o
-              # wl-paste
-            }
+              _clip_out_clipboard() {
+                ${pkgs.xclip}/bin/xclip --selection clipboard -o
+                # wl-paste
+              }
 
-            # fields to be used
-            URL_field='url'
-            USERNAME_field='login'
-            AUTOTYPE_field='autotype'
+              # fields to be used
+              URL_field='url'
+              USERNAME_field='login'
+              AUTOTYPE_field='autotype'
 
-            # delay to be used for :delay keyword
-            delay=2
+              # delay to be used for :delay keyword
+              delay=2
 
-            # rofi-pass needs to close itself before it can type passwords. Set delay here.
-            wait=0.2
+              # rofi-pass needs to close itself before it can type passwords. Set delay here.
+              wait=0.2
 
-            # delay between keypresses when typing (in ms)
-            xdotool_delay=12
+              # delay between keypresses when typing (in ms)
+              xdotool_delay=12
 
-            ## Programs to be used
-            # Editor
-            EDITOR='${config.home.sessionVariables.EDITOR}'
+              ## Programs to be used
+              # Editor
+              EDITOR='${config.home.sessionVariables.EDITOR}'
 
-            # Browser
-            BROWSER='${pkgs.xdg-utils}/bin/xdg-open'
+              # Browser
+              BROWSER='${pkgs.xdg-utils}/bin/xdg-open'
 
-            ## Misc settings
+              ## Misc settings
 
-            default_do='menu' # menu, autotype, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
-            auto_enter='false'
-            notify='false'
-            default_autotype='user :tab pass'
+              default_do='menu' # menu, autotype, copyPass, typeUser, typePass, copyUser, copyUrl, viewEntry, typeMenu, actionMenu, copyMenu, openUrl
+              auto_enter='false'
+              notify='false'
+              default_autotype='user :tab pass'
 
-            # color of the help messages
-            # leave empty for autodetection
-            # https://github.com/carnager/rofi-pass/issues/226
-            help_color="#4872FF"
+              # color of the help messages
+              # leave empty for autodetection
+              # https://github.com/carnager/rofi-pass/issues/226
+              help_color="#4872FF"
 
-            # Clipboard settings
-            # Possible options: primary, clipboard, both
-            clip=both
+              # Clipboard settings
+              # Possible options: primary, clipboard, both
+              clip=both
 
-            # Seconds before clearing pass from clipboard
-            clip_clear=45
+              # Seconds before clearing pass from clipboard
+              clip_clear=45
 
-            ## Options for generating new password entries
+              ## Options for generating new password entries
 
-            # open new password entries in editor
-            edit_new_pass="true"
+              # open new password entries in editor
+              edit_new_pass="true"
 
-            # default_user is also used for password files that have no user field.
-            default_user=':filename'
-            password_length=${config.programs.password-store.settings.PASSWORD_STORE_GENERATED_LENGTH}
+              # default_user is also used for password files that have no user field.
+              default_user=':filename'
+              password_length=${config.programs.password-store.settings.PASSWORD_STORE_GENERATED_LENGTH}
 
-            # Custom Keybindings
-            autotype="Control+Return"
-            type_user="Control+u"
-            type_pass="Control+p"
-            open_url="Control+l"
-            copy_name="Alt+u"
-            copy_url="Alt+l"
-            copy_pass="Alt+p"
-            show="Control+o"
-            copy_menu="Control+c"
-            action_menu="Control+a"
-            type_menu="Control+t"
-            help="Control+h"
-            switch="Control+x"
-            insert_pass="Control+n"
-          '';
+              # Custom Keybindings
+              autotype="Control+Return"
+              type_user="Control+u"
+              type_pass="Control+p"
+              open_url="Control+l"
+              copy_name="Alt+u"
+              copy_url="Alt+l"
+              copy_pass="Alt+p"
+              show="Control+o"
+              copy_menu="Control+c"
+              action_menu="Control+a"
+              type_menu="Control+t"
+              help="Control+h"
+              switch="Control+x"
+              insert_pass="Control+n"
+            '';
         };
         font = "Iosevka Nerd Font 12";
         terminal = terminal-emulator;
@@ -1803,80 +1857,92 @@ in {
           kb-row-down = "Down,Control+n,Control+j";
           kb-row-up = "Up,Control+p,Control+k";
         };
-        theme = let
-          # Use `mkLiteral` for string-like values that should show without
-          # quotes, e.g.:
-          # {
-          #   foo = "abc"; => foo: "abc";
-          #   bar = mkLiteral "abc"; => bar: abc;
-          # };
-          inherit (config.lib.formats.rasi) mkLiteral;
-        in {
-          "*" = {
-            bg0 = mkLiteral colors.nord0;
-            bg1 = mkLiteral colors.nord1;
-            fg0 = mkLiteral colors.nord4;
-            accent-color = mkLiteral colors.nord8;
-            urgent-color = mkLiteral colors.nord13;
-            background-color = mkLiteral "transparent";
-            text-color = mkLiteral "@fg0";
-            margin = 0;
-            padding = 0;
-            spacing = 0;
+        theme =
+          let
+            # Use `mkLiteral` for string-like values that should show without
+            # quotes, e.g.:
+            # {
+            #   foo = "abc"; => foo: "abc";
+            #   bar = mkLiteral "abc"; => bar: abc;
+            # };
+            inherit (config.lib.formats.rasi) mkLiteral;
+          in
+          {
+            "*" = {
+              bg0 = mkLiteral colors.nord0;
+              bg1 = mkLiteral colors.nord1;
+              fg0 = mkLiteral colors.nord4;
+              accent-color = mkLiteral colors.nord8;
+              urgent-color = mkLiteral colors.nord13;
+              background-color = mkLiteral "transparent";
+              text-color = mkLiteral "@fg0";
+              margin = 0;
+              padding = 0;
+              spacing = 0;
+            };
+            window = {
+              location = mkLiteral "north";
+              anchor = mkLiteral "north";
+              y-offset = mkLiteral "${toString (dpiScale 280)}px";
+              width = mkLiteral "40em";
+              background-color = mkLiteral "@bg0";
+            };
+            inputbar = {
+              spacing = mkLiteral "0.75em";
+              padding = mkLiteral "0.75em";
+              background-color = mkLiteral "@bg1";
+            };
+            prompt = {
+              vertical-align = mkLiteral "0.5";
+              text-color = mkLiteral "@accent-color";
+            };
+            entry = {
+              vertical-align = mkLiteral "0.5";
+            };
+            textbox = {
+              padding = mkLiteral "0.75em";
+              background-color = mkLiteral "@bg1";
+            };
+            listview = {
+              padding = mkLiteral "0.5em 0";
+              lines = 8;
+              columns = 1;
+              fixed-height = false;
+            };
+            element = {
+              padding = mkLiteral "0.75em";
+              spacing = mkLiteral "0.75em";
+            };
+            "element normal normal" = {
+              text-color = mkLiteral "@fg0";
+            };
+            "element normal urgent" = {
+              text-color = mkLiteral "@urgent-color";
+            };
+            "element normal active" = {
+              text-color = mkLiteral "@accent-color";
+            };
+            "element selected" = {
+              text-color = mkLiteral "@bg0";
+            };
+            "element selected normal" = {
+              background-color = mkLiteral "@accent-color";
+            };
+            "element selected active" = {
+              background-color = mkLiteral "@accent-color";
+            };
+            "element selected urgent" = {
+              background-color = mkLiteral "@urgent-color";
+            };
+            element-icon = {
+              vertical-align = mkLiteral "0.5";
+              size = mkLiteral "1.5em";
+            };
+            element-text = {
+              vertical-align = mkLiteral "0.5";
+              text-color = mkLiteral "inherit";
+            };
           };
-          window = {
-            location = mkLiteral "north";
-            anchor = mkLiteral "north";
-            y-offset = mkLiteral "${toString (dpiScale 280)}px";
-            width = mkLiteral "40em";
-            background-color = mkLiteral "@bg0";
-          };
-          inputbar = {
-            spacing = mkLiteral "0.75em";
-            padding = mkLiteral "0.75em";
-            background-color = mkLiteral "@bg1";
-          };
-          prompt = {
-            vertical-align = mkLiteral "0.5";
-            text-color = mkLiteral "@accent-color";
-          };
-          entry = { vertical-align = mkLiteral "0.5"; };
-          textbox = {
-            padding = mkLiteral "0.75em";
-            background-color = mkLiteral "@bg1";
-          };
-          listview = {
-            padding = mkLiteral "0.5em 0";
-            lines = 8;
-            columns = 1;
-            fixed-height = false;
-          };
-          element = {
-            padding = mkLiteral "0.75em";
-            spacing = mkLiteral "0.75em";
-          };
-          "element normal normal" = { text-color = mkLiteral "@fg0"; };
-          "element normal urgent" = { text-color = mkLiteral "@urgent-color"; };
-          "element normal active" = { text-color = mkLiteral "@accent-color"; };
-          "element selected" = { text-color = mkLiteral "@bg0"; };
-          "element selected normal" = {
-            background-color = mkLiteral "@accent-color";
-          };
-          "element selected active" = {
-            background-color = mkLiteral "@accent-color";
-          };
-          "element selected urgent" = {
-            background-color = mkLiteral "@urgent-color";
-          };
-          element-icon = {
-            vertical-align = mkLiteral "0.5";
-            size = mkLiteral "1.5em";
-          };
-          element-text = {
-            vertical-align = mkLiteral "0.5";
-            text-color = mkLiteral "inherit";
-          };
-        };
       };
       ssh = {
         enable = true;
@@ -1905,14 +1971,20 @@ in {
       starship = {
         enable = true;
         enableTransience = true;
-        settings = (builtins.fromTOML (builtins.readFile (pkgs.fetchurl {
-          url = "https://starship.rs/presets/toml/nerd-font-symbols.toml";
-          hash = "sha256-BVe5JMSIa3CoY2Wf9pvcF1EUtDVCWCLhW3IyKuwfHug=";
-        }))) // {
-          add_newline = false;
-          format = "$character";
-          right_format = "$all";
-        };
+        settings =
+          (builtins.fromTOML (
+            builtins.readFile (
+              pkgs.fetchurl {
+                url = "https://starship.rs/presets/toml/nerd-font-symbols.toml";
+                hash = "sha256-BVe5JMSIa3CoY2Wf9pvcF1EUtDVCWCLhW3IyKuwfHug=";
+              }
+            )
+          ))
+          // {
+            add_newline = false;
+            format = "$character";
+            right_format = "$all";
+          };
       };
       tmux = {
         enable = true;
@@ -2309,24 +2381,26 @@ in {
       vscode = with pkgs; {
         enable = true;
         package = vscode-fhs;
-        extensions = (with vscode-extensions; [
-          bbenoist.nix
-          vscodevim.vim
-          ms-vscode-remote.remote-ssh
-        ]) ++ vscode-utils.extensionsFromVscodeMarketplace [
-          {
-            name = "direnv";
-            publisher = "mkhl";
-            version = "0.6.1";
-            sha256 = "sha256-5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
-          }
-          {
-            name = "remote-containers";
-            publisher = "ms-vscode-remote";
-            version = "0.247.0";
-            sha256 = "sha256-gWFNjkx2+zjkpKDC5a1qIZ5SbcDN8ahtXDPX1upWUg8=";
-          }
-        ];
+        extensions =
+          (with vscode-extensions; [
+            bbenoist.nix
+            vscodevim.vim
+            ms-vscode-remote.remote-ssh
+          ])
+          ++ vscode-utils.extensionsFromVscodeMarketplace [
+            {
+              name = "direnv";
+              publisher = "mkhl";
+              version = "0.6.1";
+              sha256 = "sha256-5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
+            }
+            {
+              name = "remote-containers";
+              publisher = "ms-vscode-remote";
+              version = "0.247.0";
+              sha256 = "sha256-gWFNjkx2+zjkpKDC5a1qIZ5SbcDN8ahtXDPX1upWUg8=";
+            }
+          ];
       };
       zathura = {
         enable = true;
@@ -2364,12 +2438,10 @@ in {
           '';
           gtk-theme = ''
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${
-              builtins.replaceStrings [ "Light" ] [ "Dark" ]
-              config.gtk.theme.name
+              builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
             }"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${
-              builtins.replaceStrings [ "Light" ] [ "Dark" ]
-              config.gtk.theme.name
+              builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
             }'"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
             ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
@@ -2379,32 +2451,23 @@ in {
           '';
           icon-theme = ''
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${
-              builtins.replaceStrings [ "light" ] [ "dark" ]
-              config.gtk.iconTheme.name
+              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.iconTheme.name
             }"
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${
-              builtins.replaceStrings [ "light" ] [ "dark" ]
-              config.gtk.iconTheme.name
+              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.iconTheme.name
             }'"
           '';
           cursor-theme = ''
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${
-              builtins.replaceStrings [ "light" ] [ "dark" ]
-              config.gtk.cursorTheme.name
+              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
             }"
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${
-              toString config.gtk.cursorTheme.size
-            }
+            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${toString config.gtk.cursorTheme.size}
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${
-              builtins.replaceStrings [ "light" ] [ "dark" ]
-              config.gtk.cursorTheme.name
+              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
             }'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${
-              toString config.gtk.cursorTheme.size
-            }
+            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${toString config.gtk.cursorTheme.size}
             ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${
-              builtins.replaceStrings [ "light" ] [ "dark" ]
-              config.gtk.cursorTheme.name
+              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
             }/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
           '';
           inherit (scripts) setDesktopBackground;
@@ -2428,16 +2491,10 @@ in {
           '';
           cursor-theme = ''
             ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name}"
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${
-              toString config.gtk.cursorTheme.size
-            }
+            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${toString config.gtk.cursorTheme.size}
             ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name}'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${
-              toString config.gtk.cursorTheme.size
-            }
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${config.gtk.cursorTheme.name}/cursors/left_ptr" ${
-              toString config.gtk.cursorTheme.size
-            }
+            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${toString config.gtk.cursorTheme.size}
+            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${config.gtk.cursorTheme.name}/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
           '';
           inherit (scripts) setDesktopBackground;
         };
@@ -2461,9 +2518,7 @@ in {
             max_icon_size = 60;
             icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro-icons";
             enable_recursive_icon_lookup = "true";
-            dmenu = "${pkgs.rofi}/bin/rofi -dpi ${
-                toString (dpiScale 96)
-              } -dmenu -p dunst";
+            dmenu = "${pkgs.rofi}/bin/rofi -dpi ${toString (dpiScale 96)} -dmenu -p dunst";
             mouse_left_click = "close_current";
             mouse_middle_click = "context";
             mouse_right_click = "do_action";
@@ -2472,8 +2527,12 @@ in {
             markup = "full";
             foreground = colors.nord6;
           };
-          urgency_low = { background = "${colors.nord3}99"; };
-          urgency_normal = { background = "${colors.nord10}99"; };
+          urgency_low = {
+            background = "${colors.nord3}99";
+          };
+          urgency_normal = {
+            background = "${colors.nord10}99";
+          };
           urgency_critical = {
             background = "${colors.nord11}99";
             fullscreen = "show";
@@ -2514,50 +2573,60 @@ in {
       nextcloud-client.enable = true;
       picom = {
         enable = true;
-        package = let picomPkg = pkgs.picom-next;
-        in pkgs.symlinkJoin {
-          name = "picom";
-          paths = [
-            (pkgs.writeShellScriptBin "picom" (let
-              grayscale-glsl = pkgs.writeText "grayscale.glsl" ''
-                #version 330
+        package =
+          let
+            picomPkg = pkgs.picom-next;
+          in
+          pkgs.symlinkJoin {
+            name = "picom";
+            paths = [
+              (pkgs.writeShellScriptBin "picom" (
+                let
+                  grayscale-glsl = pkgs.writeText "grayscale.glsl" ''
+                    #version 330
 
-                in vec2 texcoord;
-                uniform sampler2D tex;
-                uniform float opacity;
+                    in vec2 texcoord;
+                    uniform sampler2D tex;
+                    uniform float opacity;
 
-                vec4 default_post_processing(vec4 c);
+                    vec4 default_post_processing(vec4 c);
 
-                vec4 window_shader() {
-                  vec2 texsize = textureSize(tex, 0);
-                  vec4 color = texture2D(tex, texcoord / texsize, 0);
+                    vec4 window_shader() {
+                      vec2 texsize = textureSize(tex, 0);
+                      vec4 color = texture2D(tex, texcoord / texsize, 0);
 
-                  color = vec4(vec3(0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) * opacity, color.a * opacity);
+                      color = vec4(vec3(0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) * opacity, color.a * opacity);
 
-                  return default_post_processing(color);
-                }
-              '';
-            in ''
-              if [ "$PICOM_SHADER" = "grayscale" ]; then
-                "${picomPkg}/bin/picom" \
-                  --window-shader-fg="${grayscale-glsl}" \
-                  "$@"
-              else
-                "${picomPkg}/bin/picom" "$@"
-              fi
-            ''))
-            pkgs.picom
-          ];
-        } // {
-          inherit (pkgs.picom) meta;
-        };
+                      return default_post_processing(color);
+                    }
+                  '';
+                in
+                ''
+                  if [ "$PICOM_SHADER" = "grayscale" ]; then
+                    "${picomPkg}/bin/picom" \
+                      --window-shader-fg="${grayscale-glsl}" \
+                      "$@"
+                  else
+                    "${picomPkg}/bin/picom" "$@"
+                  fi
+                ''
+              ))
+              pkgs.picom
+            ];
+          }
+          // {
+            inherit (pkgs.picom) meta;
+          };
         backend = "glx";
         fade = true;
         fadeDelta = 3;
         inactiveOpacity = 0.95;
         menuOpacity = 0.95;
         shadow = true;
-        shadowOffsets = [ (-7) (-7) ];
+        shadowOffsets = [
+          (-7)
+          (-7)
+        ];
         shadowExclude = [
           # unknown windows
           "! name~=''"
@@ -2585,13 +2654,13 @@ in {
         ];
         opacityRules =
           # Only apply these opacity rules if the windows are not hidden
-          map
-          (str: str + " && !(_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN')") [
+          map (str: str + " && !(_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN')") [
             "100:class_g *?= 'zoom' && name *?= 'meeting'"
             "100:role = 'browser' && name ^= 'Meet -'"
             "100:role = 'browser' && name ^= 'Netflix'"
             "95:class_g = 'Emacs'"
-          ] ++ [ "0:_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'" ];
+          ]
+          ++ [ "0:_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'" ];
         vSync = true;
         settings = {
           inactive-dim = 0.2;
@@ -2600,8 +2669,10 @@ in {
             strength = 5;
           };
           corner-radius = dpiScale 8;
-          rounded-corners-exclude =
-            [ "window_type = 'dock'" "window_type = 'desktop'" ];
+          rounded-corners-exclude = [
+            "window_type = 'dock'"
+            "window_type = 'desktop'"
+          ];
           blur-background-exclude = [
             # shaped windows
             "bounding_shaped && !rounded_corners"
@@ -2654,9 +2725,15 @@ in {
               shadow = false;
               clip-shadow-above = true;
             };
-            dnd = { shadow = false; };
-            popup_menu = { opacity = 0.9; };
-            dropdown_menu = { opacity = 0.9; };
+            dnd = {
+              shadow = false;
+            };
+            popup_menu = {
+              opacity = 0.9;
+            };
+            dropdown_menu = {
+              opacity = 0.9;
+            };
           };
         };
       };
@@ -2666,425 +2743,429 @@ in {
           i3Support = true;
           mpdSupport = true;
         };
-        settings = let superColors = colors;
-        in let
-          colors = superColors // {
-            background = colors.nord0;
-            foreground = colors.nord9;
-            foreground-alt = colors.nord10;
-            urgent = colors.nord12;
-            alert = colors.nord13;
-          };
-          pulseaudio-control = with pkgs;
-            stdenv.mkDerivation {
-              name = "pulseaudio-control";
-              src = inputs.pulseaudio-control;
-              buildInputs =
-                [ bash pulseaudio libnotify gnugrep gawk gnused coreutils ];
-              nativeBuildInputs = [ makeWrapper ];
-              installPhase = ''
-                mkdir -p $out/bin
-                mv pulseaudio-control $out/bin/pulseaudio-control
-                wrapProgram $out/bin/pulseaudio-control \
-                  --prefix PATH : ${
-                    lib.makeBinPath [
-                      bash
-                      pulseaudio
-                      libnotify
-                      gnugrep
-                      gawk
-                      gnused
-                      coreutils
-                    ]
-                  }
-              '';
+        settings =
+          let
+            superColors = colors;
+          in
+          let
+            colors = superColors // {
+              background = colors.nord0;
+              foreground = colors.nord9;
+              foreground-alt = colors.nord10;
+              urgent = colors.nord12;
+              alert = colors.nord13;
             };
-          mkFormats = let
-            formats = [
-              "format"
-              # "format-volume"
-              # "format-muted"
-              # "format-mounted"
-              # "format-unmounted"
-              # "format-connected"
-              # "format-disconnected"
-              # "format-charging"
-              # "format-discharging"
-              # "format-full"
-              # "format-low"
-            ];
-          in attrset:
-          lib.lists.foldr (format: acc:
-            acc // (lib.attrsets.mapAttrs' (name: value: {
-              inherit value;
-              name = "${format}-${name}";
-            }) attrset)) { } formats;
-          mkAlpha = str: "#cc${lib.strings.removePrefix "#" str}";
-        in {
-          settings = {
-            screenchange-reload = true;
-            # https://www.cairographics.org/manual/cairo-cairo-t.html#cairo-operator-t
-            compositing-background = "source";
-            compositing-foreground = "source";
-            compositing-overline = "over";
-            compositing-underline = "over";
-            compositing-border = "over";
-            pseudo-transparency = false;
+            pulseaudio-control =
+              with pkgs;
+              stdenv.mkDerivation {
+                name = "pulseaudio-control";
+                src = inputs.pulseaudio-control;
+                buildInputs = [
+                  bash
+                  pulseaudio
+                  libnotify
+                  gnugrep
+                  gawk
+                  gnused
+                  coreutils
+                ];
+                nativeBuildInputs = [ makeWrapper ];
+                installPhase = ''
+                  mkdir -p $out/bin
+                  mv pulseaudio-control $out/bin/pulseaudio-control
+                  wrapProgram $out/bin/pulseaudio-control \
+                    --prefix PATH : ${
+                      lib.makeBinPath [
+                        bash
+                        pulseaudio
+                        libnotify
+                        gnugrep
+                        gawk
+                        gnused
+                        coreutils
+                      ]
+                    }
+                '';
+              };
+            mkFormats =
+              let
+                formats = [
+                  "format"
+                  # "format-volume"
+                  # "format-muted"
+                  # "format-mounted"
+                  # "format-unmounted"
+                  # "format-connected"
+                  # "format-disconnected"
+                  # "format-charging"
+                  # "format-discharging"
+                  # "format-full"
+                  # "format-low"
+                ];
+              in
+              attrset:
+              lib.lists.foldr (
+                format: acc:
+                acc
+                // (lib.attrsets.mapAttrs' (name: value: {
+                  inherit value;
+                  name = "${format}-${name}";
+                }) attrset)
+              ) { } formats;
+            mkAlpha = str: "#cc${lib.strings.removePrefix "#" str}";
+          in
+          {
+            settings = {
+              screenchange-reload = true;
+              # https://www.cairographics.org/manual/cairo-cairo-t.html#cairo-operator-t
+              compositing-background = "source";
+              compositing-foreground = "source";
+              compositing-overline = "over";
+              compositing-underline = "over";
+              compositing-border = "over";
+              pseudo-transparency = false;
+            };
+            "bar/top" = {
+              inherit (colors) foreground;
+              background = "${mkAlpha colors.background}";
+              monitor = "\${env:MONITOR:}";
+              monitor-strict = true;
+              monitor-exact = true;
+              dpi = 0;
+              width = "100%";
+              height = "${toString (24.0 / 1080 * 100)}%";
+              enable-struts = true;
+              double-click-interval = 150;
+              override-redirect = false;
+              wm-restack = "i3";
+
+              fixed-center = true;
+
+              # For symbols
+              font-0 = "Symbols Nerd Font Mono:size=10;2";
+              # For Powerline glyphs
+              font-1 = "Symbols Nerd Font Mono:size=18;3";
+              # If it's not a symbol, it falls back to this
+              font-2 = "Iosevka:size=8;2";
+
+              format-foreground = colors.foreground;
+              format-background = "${mkAlpha colors.background}";
+
+              modules-left = "i3 title";
+              # modules-center = "yubikey mpd";
+              modules-center = "yubikey";
+              modules-right = "audio-input audio-output xkeyboard battery date";
+            };
+            "bar/top-primary" = {
+              "inherit" = "bar/top";
+              modules-right = "audio-input audio-output xkeyboard battery date tray";
+            };
+            "powerline/right-facing-arrow" = {
+              type = "custom/text";
+              label = "";
+              label-font = 2;
+              label-foreground = "\${self.background}";
+              label-background = "\${self.background-next}";
+            };
+            "powerline/right-facing-separator" = {
+              type = "custom/text";
+              label = "";
+              label-font = 2;
+              label-foreground = "\${self.separator}";
+              label-background = "\${self.background}";
+            };
+            "powerline/left-facing-arrow" = {
+              type = "custom/text";
+              label = "";
+              label-font = 2;
+              label-foreground = "\${self.background}";
+              label-background = "\${self.background-next}";
+            };
+            "powerline/left-facing-separator" = {
+              type = "custom/text";
+              label = "";
+              label-font = 2;
+              label-foreground = "\${self.separator}";
+              label-background = "\${self.background}";
+            };
+            "powerline/left-section-arrow" = mkFormats {
+              suffix = "\${powerline/right-facing-arrow.label}";
+              suffix-font = "\${powerline/right-facing-arrow.label-font}";
+              suffix-foreground = "\${self.background}";
+              suffix-background = "\${self.background-next}";
+            };
+            "powerline/left-section-separator" = mkFormats {
+              prefix = "\${powerline/right-facing-separator.label}";
+              prefix-font = "\${powerline/right-facing-separator.label-font}";
+              prefix-foreground = "\${self.separator}";
+              prefix-background = "\${self.background}";
+            };
+            "powerline/right-section-arrow" = mkFormats {
+              prefix = "\${powerline/left-facing-arrow.label}";
+              prefix-font = "\${powerline/left-facing-arrow.label-font}";
+              prefix-foreground = "\${self.background}";
+              prefix-background = "\${self.background-next}";
+            };
+            "powerline/right-section-separator" = mkFormats {
+              suffix = "\${powerline/left-facing-separator.label}";
+              suffix-font = "\${powerline/left-facing-separator.label-font}";
+              suffix-foreground = "\${self.separator}";
+              suffix-background = "\${self.background}";
+            };
+            "module/i3" = {
+              "inherit" = "powerline/left-section-arrow";
+              type = "internal/i3";
+              strip-wsnumbers = true;
+              pin-workspaces = true;
+              show-urgent = true;
+              index-sort = true;
+              enable-scroll = false;
+              wrapping-scroll = false;
+
+              format = "<label-mode> <label-state> ";
+              format-foreground = colors.nord0;
+              format-background = "${mkAlpha colors.nord3}";
+              format-prefix = "  ";
+              format-prefix-background = "${mkAlpha colors.nord3}";
+              background = "${mkAlpha colors.nord3}";
+              background-next = "${mkAlpha colors.nord1}";
+
+              label-mode-foreground = colors.alert;
+              label-mode-padding = 1;
+
+              label-separator = "​"; # zero-width space
+              label-separator-padding = 1;
+
+              # unfocused = Inactive workspace on any monitor
+              label-unfocused = "%name%";
+
+              # focused = Active workspace on focused monitor
+              label-focused = "%name%";
+              label-focused-foreground = colors.nord6;
+
+              # visible = Active workspace on unfocused monitor
+              label-visible = "%name%";
+
+              # urgent = Workspace with urgency hint set
+              label-urgent = "%name%";
+              label-urgent-foreground = colors.urgent;
+            };
+            "module/title" = {
+              "inherit" = "powerline/left-section-arrow";
+              type = "internal/xwindow";
+              format-foreground = colors.nord4;
+              format-background = "${mkAlpha colors.nord1}";
+              background = "${mkAlpha colors.nord1}";
+              background-next = "${mkAlpha colors.nord0}";
+              # Prepend a zero-width space to keep rendering
+              # the suffix even on an empty workspace
+              label = " %title:0:120:…% ";
+              label-empty = " ";
+            };
+            "module/mpd" = {
+              type = "internal/mpd";
+              format-online = "<label-song> <bar-progress> <label-time>  <icon-prev> <icon-seekb> <icon-stop> <toggle> <icon-seekf> <icon-next>  <icon-repeat> <icon-random>";
+              format-online-foreground = colors.nord1;
+
+              icon-foreground = "\${self.format-online-foreground}";
+
+              icon-play = "⏵";
+              icon-pause = "⏸";
+              icon-stop = "⏹";
+              icon-prev = "⏮";
+              icon-next = "⏭";
+              icon-seekb = "⏪";
+              icon-seekf = "⏩";
+              icon-random = "🔀";
+              icon-repeat = "🔁";
+
+              icon-play-foreground = "\${self.icon-foreground}";
+              icon-pause-foreground = "\${self.icon-foreground}";
+              icon-stop-foreground = "\${self.icon-foreground}";
+              icon-prev-foreground = "\${self.icon-foreground}";
+              icon-next-foreground = "\${self.icon-foreground}";
+              icon-seekb-foreground = "\${self.icon-foreground}";
+              icon-seekf-foreground = "\${self.icon-foreground}";
+              icon-random-foreground = "\${self.icon-foreground}";
+              icon-repeat-foreground = "\${self.icon-foreground}";
+
+              toggle-off-foreground = "\${self.icon-foreground}";
+              toggle-on-foreground = colors.nord4;
+
+              label-song-maxlen = 50;
+              label-song-ellipsis = true;
+              label-song-foreground = colors.nord4;
+
+              label-time-foreground = colors.nord4;
+
+              bar-progress-width = 30;
+              bar-progress-indicator = "|";
+              bar-progress-indicator-foreground = colors.nord2;
+              bar-progress-fill = "─";
+              bar-progress-fill-foreground = colors.nord4;
+              bar-progress-empty = "─";
+              bar-progress-empty-foreground = colors.nord3;
+            };
+            "module/yubikey" =
+              let
+                indicator-script = pkgs.writeShellScript "yubikey-indicator" ''
+                  ${pkgs.nmap}/bin/ncat --unixsock $XDG_RUNTIME_DIR/yubikey-touch-detector.socket | while read -n5 message; do
+                    [[ $message = *1 ]] && echo "                " || echo ""
+                  done
+                '';
+              in
+              {
+                type = "custom/script";
+                exec = indicator-script;
+                tail = true;
+                format-background = colors.urgent;
+                format-foreground = "${mkAlpha colors.background}";
+                format-prefix = "\${powerline/left-facing-arrow.label}";
+                format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
+                format-prefix-foreground = colors.urgent;
+                format-prefix-background = "${mkAlpha colors.background}";
+                format-suffix = "\${powerline/right-facing-arrow.label}";
+                format-suffix-font = "\${powerline/right-facing-arrow.label-font}";
+                format-suffix-foreground = colors.urgent;
+                format-suffix-background = "${mkAlpha colors.background}";
+              };
+            "module/audio-input" = {
+              "inherit" = "powerline/right-section-separator";
+              format-foreground = colors.nord4;
+              format-background = "${mkAlpha colors.nord1}";
+              format-prefix = "\${powerline/left-facing-arrow.label}";
+              format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
+              format-prefix-foreground = "${mkAlpha colors.nord1}";
+              format-prefix-background = "${mkAlpha colors.nord0}";
+              background = "${mkAlpha colors.nord1}";
+              separator = "${mkAlpha colors.nord0}";
+              type = "custom/script";
+              tail = true;
+              exec = ''${pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "󰍬" --icon-muted "󰍭" --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-blacklist "*.monitor" --notifications listen'';
+              click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
+              click-left = "${pulseaudio-control}/bin/pulseaudio-control --node-type input togmute";
+              click-middle = "${pulseaudio-control}/bin/pulseaudio-control --node-type input next-node";
+              scroll-up = "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 up";
+              scroll-down = "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 down";
+            };
+            "module/audio-output" = {
+              "inherit" = "powerline/right-section-separator";
+              format-foreground = colors.nord4;
+              format-background = "${mkAlpha colors.nord1}";
+              background = "${mkAlpha colors.nord1}";
+              separator = "${mkAlpha colors.nord0}";
+              type = "custom/script";
+              tail = true;
+              exec = ''${pulseaudio-control}/bin/pulseaudio-control --icons-volume "󰕿 ,󰖀 ,󰕾 " --icon-muted "󰖁 " --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-nicknames-from "device.description" --notifications listen'';
+              click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
+              click-left = "${pulseaudio-control}/bin/pulseaudio-control togmute";
+              click-middle = "${pulseaudio-control}/bin/pulseaudio-control next-node";
+              scroll-up = "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 up";
+              scroll-down = "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 down";
+            };
+            "module/xkeyboard" = {
+              "inherit" = "powerline/right-section-separator";
+              format-foreground = colors.nord4;
+              format-background = "${mkAlpha colors.nord1}";
+              background = "${mkAlpha colors.nord1}";
+              separator = "${mkAlpha colors.nord0}";
+
+              type = "internal/xkeyboard";
+
+              label-layout = " 󰌓 %icon%";
+              layout-icon-0 = "us;programmer Dvorak;DVP";
+              layout-icon-1 = "us;US;US";
+
+              indicator-icon-default = "";
+              indicator-icon-0 = "caps lock;;󰌎";
+              indicator-icon-1 = "scroll lock;;󱅜";
+              indicator-icon-2 = "num lock;;󰎠";
+
+              label-indicator-on = "%icon%";
+              label-indicator-off = "";
+            };
+            "module/battery" = {
+              "inherit" = "powerline/right-section-separator";
+              format-foreground = colors.nord4;
+              format-background = "${mkAlpha colors.nord1}";
+              background = "${mkAlpha colors.nord1}";
+              separator = "${mkAlpha colors.nord0}";
+
+              type = "internal/battery";
+              battery = "BAT0";
+              adapter = "ADP1";
+
+              format-charging = "<animation-charging> <label-charging>";
+              format-charging-foreground = colors.nord4;
+              format-charging-background = "${mkAlpha colors.nord1}";
+
+              format-discharging = "<ramp-capacity> <label-discharging>";
+              format-discharging-foreground = colors.nord4;
+              format-discharging-background = "${mkAlpha colors.nord1}";
+
+              format-full = "<ramp-capacity> <label-full>";
+              format-full-foreground = colors.nord4;
+              format-full-background = "${mkAlpha colors.nord1}";
+
+              low-at = 15;
+              format-low = "<animation-low> <label-low>";
+              format-low-foreground = colors.urgent;
+              format-low-background = "${mkAlpha colors.nord1}";
+
+              ramp-capacity-0 = " ";
+              ramp-capacity-1 = " ";
+              ramp-capacity-2 = " ";
+              ramp-capacity-3 = " ";
+              ramp-capacity-4 = " ";
+
+              animation-charging-0 = " ";
+              animation-charging-1 = " ";
+              animation-charging-2 = " ";
+              animation-charging-3 = " ";
+              animation-charging-4 = " ";
+              animation-charging-framerate = 750;
+
+              animation-low-0 = " ";
+              animation-low-1 = " ";
+              animation-low-framerate = 200;
+
+            };
+            "module/date" = {
+              "inherit" = "powerline/right-section-separator";
+              format = "󱑃 <label>";
+              format-foreground = colors.nord4;
+              format-background = "${mkAlpha colors.nord1}";
+              format-prefix = " ";
+              format-suffix = "";
+              background = "${mkAlpha colors.nord1}";
+              separator = "${mkAlpha colors.nord0}";
+
+              type = "internal/date";
+              interval = 1;
+
+              date = "";
+              date-alt = " %Y-%m-%d";
+
+              time = "%H:%M";
+              time-alt = "%H:%M:%S";
+
+              label = "%time%%date%";
+            };
+            "module/tray" = {
+              "inherit" = "powerline/right-section-arrow";
+              background = "${mkAlpha colors.nord3}";
+              background-next = "${mkAlpha colors.nord1}";
+              format-foreground = colors.nord0;
+              format-background = "${mkAlpha colors.nord3}";
+              label-tray-padding = "8px";
+
+              type = "internal/tray";
+
+              tray-background = "${mkAlpha colors.nord3}";
+              tray-foreground = colors.nord4;
+              tray-padding = 2;
+            };
           };
-          "bar/top" = {
-            inherit (colors) foreground;
-            background = "${mkAlpha colors.background}";
-            monitor = "\${env:MONITOR:}";
-            monitor-strict = true;
-            monitor-exact = true;
-            dpi = 0;
-            width = "100%";
-            height = "${toString (24.0 / 1080 * 100)}%";
-            enable-struts = true;
-            double-click-interval = 150;
-            override-redirect = false;
-            wm-restack = "i3";
-
-            fixed-center = true;
-
-            # For symbols
-            font-0 = "Symbols Nerd Font Mono:size=10;2";
-            # For Powerline glyphs
-            font-1 = "Symbols Nerd Font Mono:size=18;3";
-            # If it's not a symbol, it falls back to this
-            font-2 = "Iosevka:size=8;2";
-
-            format-foreground = colors.foreground;
-            format-background = "${mkAlpha colors.background}";
-
-            modules-left = "i3 title";
-            # modules-center = "yubikey mpd";
-            modules-center = "yubikey";
-            modules-right = "audio-input audio-output xkeyboard battery date";
-          };
-          "bar/top-primary" = {
-            "inherit" = "bar/top";
-            modules-right =
-              "audio-input audio-output xkeyboard battery date tray";
-          };
-          "powerline/right-facing-arrow" = {
-            type = "custom/text";
-            label = "";
-            label-font = 2;
-            label-foreground = "\${self.background}";
-            label-background = "\${self.background-next}";
-          };
-          "powerline/right-facing-separator" = {
-            type = "custom/text";
-            label = "";
-            label-font = 2;
-            label-foreground = "\${self.separator}";
-            label-background = "\${self.background}";
-          };
-          "powerline/left-facing-arrow" = {
-            type = "custom/text";
-            label = "";
-            label-font = 2;
-            label-foreground = "\${self.background}";
-            label-background = "\${self.background-next}";
-          };
-          "powerline/left-facing-separator" = {
-            type = "custom/text";
-            label = "";
-            label-font = 2;
-            label-foreground = "\${self.separator}";
-            label-background = "\${self.background}";
-          };
-          "powerline/left-section-arrow" = mkFormats {
-            suffix = "\${powerline/right-facing-arrow.label}";
-            suffix-font = "\${powerline/right-facing-arrow.label-font}";
-            suffix-foreground = "\${self.background}";
-            suffix-background = "\${self.background-next}";
-          };
-          "powerline/left-section-separator" = mkFormats {
-            prefix = "\${powerline/right-facing-separator.label}";
-            prefix-font = "\${powerline/right-facing-separator.label-font}";
-            prefix-foreground = "\${self.separator}";
-            prefix-background = "\${self.background}";
-          };
-          "powerline/right-section-arrow" = mkFormats {
-            prefix = "\${powerline/left-facing-arrow.label}";
-            prefix-font = "\${powerline/left-facing-arrow.label-font}";
-            prefix-foreground = "\${self.background}";
-            prefix-background = "\${self.background-next}";
-          };
-          "powerline/right-section-separator" = mkFormats {
-            suffix = "\${powerline/left-facing-separator.label}";
-            suffix-font = "\${powerline/left-facing-separator.label-font}";
-            suffix-foreground = "\${self.separator}";
-            suffix-background = "\${self.background}";
-          };
-          "module/i3" = {
-            "inherit" = "powerline/left-section-arrow";
-            type = "internal/i3";
-            strip-wsnumbers = true;
-            pin-workspaces = true;
-            show-urgent = true;
-            index-sort = true;
-            enable-scroll = false;
-            wrapping-scroll = false;
-
-            format = "<label-mode> <label-state> ";
-            format-foreground = colors.nord0;
-            format-background = "${mkAlpha colors.nord3}";
-            format-prefix = "  ";
-            format-prefix-background = "${mkAlpha colors.nord3}";
-            background = "${mkAlpha colors.nord3}";
-            background-next = "${mkAlpha colors.nord1}";
-
-            label-mode-foreground = colors.alert;
-            label-mode-padding = 1;
-
-            label-separator = "​"; # zero-width space
-            label-separator-padding = 1;
-
-            # unfocused = Inactive workspace on any monitor
-            label-unfocused = "%name%";
-
-            # focused = Active workspace on focused monitor
-            label-focused = "%name%";
-            label-focused-foreground = colors.nord6;
-
-            # visible = Active workspace on unfocused monitor
-            label-visible = "%name%";
-
-            # urgent = Workspace with urgency hint set
-            label-urgent = "%name%";
-            label-urgent-foreground = colors.urgent;
-          };
-          "module/title" = {
-            "inherit" = "powerline/left-section-arrow";
-            type = "internal/xwindow";
-            format-foreground = colors.nord4;
-            format-background = "${mkAlpha colors.nord1}";
-            background = "${mkAlpha colors.nord1}";
-            background-next = "${mkAlpha colors.nord0}";
-            # Prepend a zero-width space to keep rendering
-            # the suffix even on an empty workspace
-            label = " %title:0:120:…% ";
-            label-empty = " ";
-          };
-          "module/mpd" = {
-            type = "internal/mpd";
-            format-online =
-              "<label-song> <bar-progress> <label-time>  <icon-prev> <icon-seekb> <icon-stop> <toggle> <icon-seekf> <icon-next>  <icon-repeat> <icon-random>";
-            format-online-foreground = colors.nord1;
-
-            icon-foreground = "\${self.format-online-foreground}";
-
-            icon-play = "⏵";
-            icon-pause = "⏸";
-            icon-stop = "⏹";
-            icon-prev = "⏮";
-            icon-next = "⏭";
-            icon-seekb = "⏪";
-            icon-seekf = "⏩";
-            icon-random = "🔀";
-            icon-repeat = "🔁";
-
-            icon-play-foreground = "\${self.icon-foreground}";
-            icon-pause-foreground = "\${self.icon-foreground}";
-            icon-stop-foreground = "\${self.icon-foreground}";
-            icon-prev-foreground = "\${self.icon-foreground}";
-            icon-next-foreground = "\${self.icon-foreground}";
-            icon-seekb-foreground = "\${self.icon-foreground}";
-            icon-seekf-foreground = "\${self.icon-foreground}";
-            icon-random-foreground = "\${self.icon-foreground}";
-            icon-repeat-foreground = "\${self.icon-foreground}";
-
-            toggle-off-foreground = "\${self.icon-foreground}";
-            toggle-on-foreground = colors.nord4;
-
-            label-song-maxlen = 50;
-            label-song-ellipsis = true;
-            label-song-foreground = colors.nord4;
-
-            label-time-foreground = colors.nord4;
-
-            bar-progress-width = 30;
-            bar-progress-indicator = "|";
-            bar-progress-indicator-foreground = colors.nord2;
-            bar-progress-fill = "─";
-            bar-progress-fill-foreground = colors.nord4;
-            bar-progress-empty = "─";
-            bar-progress-empty-foreground = colors.nord3;
-          };
-          "module/yubikey" = let
-            indicator-script = pkgs.writeShellScript "yubikey-indicator" ''
-              ${pkgs.nmap}/bin/ncat --unixsock $XDG_RUNTIME_DIR/yubikey-touch-detector.socket | while read -n5 message; do
-                [[ $message = *1 ]] && echo "                " || echo ""
-              done
-            '';
-          in {
-            type = "custom/script";
-            exec = indicator-script;
-            tail = true;
-            format-background = colors.urgent;
-            format-foreground = "${mkAlpha colors.background}";
-            format-prefix = "\${powerline/left-facing-arrow.label}";
-            format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
-            format-prefix-foreground = colors.urgent;
-            format-prefix-background = "${mkAlpha colors.background}";
-            format-suffix = "\${powerline/right-facing-arrow.label}";
-            format-suffix-font = "\${powerline/right-facing-arrow.label-font}";
-            format-suffix-foreground = colors.urgent;
-            format-suffix-background = "${mkAlpha colors.background}";
-          };
-          "module/audio-input" = {
-            "inherit" = "powerline/right-section-separator";
-            format-foreground = colors.nord4;
-            format-background = "${mkAlpha colors.nord1}";
-            format-prefix = "\${powerline/left-facing-arrow.label}";
-            format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
-            format-prefix-foreground = "${mkAlpha colors.nord1}";
-            format-prefix-background = "${mkAlpha colors.nord0}";
-            background = "${mkAlpha colors.nord1}";
-            separator = "${mkAlpha colors.nord0}";
-            type = "custom/script";
-            tail = true;
-            exec = ''
-              ${pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "󰍬" --icon-muted "󰍭" --color-muted ${
-                lib.strings.removePrefix "#" colors.nord0
-              } --node-blacklist "*.monitor" --notifications listen'';
-            click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-            click-left =
-              "${pulseaudio-control}/bin/pulseaudio-control --node-type input togmute";
-            click-middle =
-              "${pulseaudio-control}/bin/pulseaudio-control --node-type input next-node";
-            scroll-up =
-              "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 up";
-            scroll-down =
-              "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 down";
-          };
-          "module/audio-output" = {
-            "inherit" = "powerline/right-section-separator";
-            format-foreground = colors.nord4;
-            format-background = "${mkAlpha colors.nord1}";
-            background = "${mkAlpha colors.nord1}";
-            separator = "${mkAlpha colors.nord0}";
-            type = "custom/script";
-            tail = true;
-            exec = ''
-              ${pulseaudio-control}/bin/pulseaudio-control --icons-volume "󰕿 ,󰖀 ,󰕾 " --icon-muted "󰖁 " --color-muted ${
-                lib.strings.removePrefix "#" colors.nord0
-              } --node-nicknames-from "device.description" --notifications listen'';
-            click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-            click-left = "${pulseaudio-control}/bin/pulseaudio-control togmute";
-            click-middle =
-              "${pulseaudio-control}/bin/pulseaudio-control next-node";
-            scroll-up =
-              "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 up";
-            scroll-down =
-              "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 down";
-          };
-          "module/xkeyboard" = {
-            "inherit" = "powerline/right-section-separator";
-            format-foreground = colors.nord4;
-            format-background = "${mkAlpha colors.nord1}";
-            background = "${mkAlpha colors.nord1}";
-            separator = "${mkAlpha colors.nord0}";
-
-            type = "internal/xkeyboard";
-
-            label-layout = " 󰌓 %icon%";
-            layout-icon-0 = "us;programmer Dvorak;DVP";
-            layout-icon-1 = "us;US;US";
-
-            indicator-icon-default = "";
-            indicator-icon-0 = "caps lock;;󰌎";
-            indicator-icon-1 = "scroll lock;;󱅜";
-            indicator-icon-2 = "num lock;;󰎠";
-
-            label-indicator-on = "%icon%";
-            label-indicator-off = "";
-          };
-          "module/battery" = {
-            "inherit" = "powerline/right-section-separator";
-            format-foreground = colors.nord4;
-            format-background = "${mkAlpha colors.nord1}";
-            background = "${mkAlpha colors.nord1}";
-            separator = "${mkAlpha colors.nord0}";
-
-            type = "internal/battery";
-            battery = "BAT0";
-            adapter = "ADP1";
-
-            format-charging = "<animation-charging> <label-charging>";
-            format-charging-foreground = colors.nord4;
-            format-charging-background = "${mkAlpha colors.nord1}";
-
-            format-discharging = "<ramp-capacity> <label-discharging>";
-            format-discharging-foreground = colors.nord4;
-            format-discharging-background = "${mkAlpha colors.nord1}";
-
-            format-full = "<ramp-capacity> <label-full>";
-            format-full-foreground = colors.nord4;
-            format-full-background = "${mkAlpha colors.nord1}";
-
-            low-at = 15;
-            format-low = "<animation-low> <label-low>";
-            format-low-foreground = colors.urgent;
-            format-low-background = "${mkAlpha colors.nord1}";
-
-            ramp-capacity-0 = " ";
-            ramp-capacity-1 = " ";
-            ramp-capacity-2 = " ";
-            ramp-capacity-3 = " ";
-            ramp-capacity-4 = " ";
-
-            animation-charging-0 = " ";
-            animation-charging-1 = " ";
-            animation-charging-2 = " ";
-            animation-charging-3 = " ";
-            animation-charging-4 = " ";
-            animation-charging-framerate = 750;
-
-            animation-low-0 = " ";
-            animation-low-1 = " ";
-            animation-low-framerate = 200;
-
-          };
-          "module/date" = {
-            "inherit" = "powerline/right-section-separator";
-            format = "󱑃 <label>";
-            format-foreground = colors.nord4;
-            format-background = "${mkAlpha colors.nord1}";
-            format-prefix = " ";
-            format-suffix = "";
-            background = "${mkAlpha colors.nord1}";
-            separator = "${mkAlpha colors.nord0}";
-
-            type = "internal/date";
-            interval = 1;
-
-            date = "";
-            date-alt = " %Y-%m-%d";
-
-            time = "%H:%M";
-            time-alt = "%H:%M:%S";
-
-            label = "%time%%date%";
-          };
-          "module/tray" = {
-            "inherit" = "powerline/right-section-arrow";
-            background = "${mkAlpha colors.nord3}";
-            background-next = "${mkAlpha colors.nord1}";
-            format-foreground = colors.nord0;
-            format-background = "${mkAlpha colors.nord3}";
-            label-tray-padding = "8px";
-
-            type = "internal/tray";
-
-            tray-background = "${mkAlpha colors.nord3}";
-            tray-foreground = colors.nord4;
-            tray-padding = 2;
-          };
-        };
         script = ''
           # Launch bar on each monitor, tray on primary
           polybar --list-monitors | while IFS=$'\n' read line; do
@@ -3103,99 +3184,90 @@ in {
       };
       sxhkd = {
         enable = true;
-        keybindings = let
-          flameshot-region = (pkgs.writeShellScript "flameshot-region" ''
-            if [ "$1" = "activewindow" ]; then
-              # Get active window geometry
-              eval $(${pkgs.xdotool}/bin/xdotool getactivewindow getwindowgeometry --shell)
-              REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
-            elif [ "$1" = "selectwindow" ]; then
-              # Let the user select a window and get its geometry
-              eval $(${pkgs.xdotool}/bin/xdotool selectwindow getwindowgeometry --shell)
-              REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
-            else
-              # Get current screen
-              SCREEN=$(${pkgs.xdotool}/bin/xdotool get_desktop)
-              REGION="screen''${SCREEN}"
-            fi
+        keybindings =
+          let
+            flameshot-region = (
+              pkgs.writeShellScript "flameshot-region" ''
+                if [ "$1" = "activewindow" ]; then
+                  # Get active window geometry
+                  eval $(${pkgs.xdotool}/bin/xdotool getactivewindow getwindowgeometry --shell)
+                  REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
+                elif [ "$1" = "selectwindow" ]; then
+                  # Let the user select a window and get its geometry
+                  eval $(${pkgs.xdotool}/bin/xdotool selectwindow getwindowgeometry --shell)
+                  REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
+                else
+                  # Get current screen
+                  SCREEN=$(${pkgs.xdotool}/bin/xdotool get_desktop)
+                  REGION="screen''${SCREEN}"
+                fi
 
-            # Launch the screenshot gui
-            ${pkgs.flameshot}/bin/flameshot gui --region "$REGION"
-          '');
-        in {
-          # Screenshot
-          "Print" = "${pkgs.flameshot}/bin/flameshot gui";
-          "super + Print" = "${flameshot-region} activewindow";
-          "super + shift + Print" = "${flameshot-region}";
+                # Launch the screenshot gui
+                ${pkgs.flameshot}/bin/flameshot gui --region "$REGION"
+              ''
+            );
+          in
+          {
+            # Screenshot
+            "Print" = "${pkgs.flameshot}/bin/flameshot gui";
+            "super + Print" = "${flameshot-region} activewindow";
+            "super + shift + Print" = "${flameshot-region}";
 
-          # Notifications
-          "super + dollar" = "${pkgs.dunst}/bin/dunstctl close";
-          "super + shift + dollar" = "${pkgs.dunst}/bin/dunstctl close-all";
-          "super + ampersand" = "${pkgs.dunst}/bin/dunstctl history-pop";
-          "super + m" = "${pkgs.dunst}/bin/dunstctl action 0";
-          "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
+            # Notifications
+            "super + dollar" = "${pkgs.dunst}/bin/dunstctl close";
+            "super + shift + dollar" = "${pkgs.dunst}/bin/dunstctl close-all";
+            "super + ampersand" = "${pkgs.dunst}/bin/dunstctl history-pop";
+            "super + m" = "${pkgs.dunst}/bin/dunstctl action 0";
+            "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
 
-          # Toggle grayscale
-          "super + shift + g" = "${pkgs.writeShellScript "toggle-grayscale" ''
-            if [ -f ${config.xdg.dataHome}/picom/env ]; then
-              rm ${config.xdg.dataHome}/picom/env
-              ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to colour mode"
-            else
-              ln -s ${config.xdg.configHome}/picom/env-grayscale ${config.xdg.dataHome}/picom/env
-              ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to grayscale mode"
-            fi
-            ${scripts.setDesktopBackground}
-            ${pkgs.systemd}/bin/systemctl --user restart picom.service
-          ''}";
+            # Toggle grayscale
+            "super + shift + g" = "${pkgs.writeShellScript "toggle-grayscale" ''
+              if [ -f ${config.xdg.dataHome}/picom/env ]; then
+                rm ${config.xdg.dataHome}/picom/env
+                ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to colour mode"
+              else
+                ln -s ${config.xdg.configHome}/picom/env-grayscale ${config.xdg.dataHome}/picom/env
+                ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to grayscale mode"
+              fi
+              ${scripts.setDesktopBackground}
+              ${pkgs.systemd}/bin/systemctl --user restart picom.service
+            ''}";
 
-          # Toggle dark mode
-          "super + shift + d" = "${pkgs.darkman}/bin/darkman toggle";
+            # Toggle dark mode
+            "super + shift + d" = "${pkgs.darkman}/bin/darkman toggle";
 
-          # Transparency controls
-          "super + Home" = "${pkgs.picom}/bin/picom-trans --current --delete";
-          "super + button2" =
-            "${pkgs.picom}/bin/picom-trans --current --delete";
-          "super + Prior" =
-            "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
-          "super + button5" =
-            "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
-          "super + Next" =
-            "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
-          "super + button4" =
-            "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
-          "super + End" =
-            "${pkgs.picom}/bin/picom-trans --current --opacity=100";
-          "super + shift + button2" =
-            "${pkgs.picom}/bin/picom-trans --current --opacity=100";
+            # Transparency controls
+            "super + Home" = "${pkgs.picom}/bin/picom-trans --current --delete";
+            "super + button2" = "${pkgs.picom}/bin/picom-trans --current --delete";
+            "super + Prior" = "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
+            "super + button5" = "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
+            "super + Next" = "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
+            "super + button4" = "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
+            "super + End" = "${pkgs.picom}/bin/picom-trans --current --opacity=100";
+            "super + shift + button2" = "${pkgs.picom}/bin/picom-trans --current --opacity=100";
 
-          # Lock screen
-          "super + x" = "${pkgs.systemd}/bin/loginctl lock-session";
+            # Lock screen
+            "super + x" = "${pkgs.systemd}/bin/loginctl lock-session";
 
-          # Programs
-          "super + p" = "${pkgs.rofi-pass}/bin/rofi-pass";
-          "super + shift + e" =
-            "${config.programs.emacs.package}/bin/emacsclient –eval '(emacs-everywhere)'";
+            # Programs
+            "super + p" = "${pkgs.rofi-pass}/bin/rofi-pass";
+            "super + shift + e" = "${config.programs.emacs.package}/bin/emacsclient –eval '(emacs-everywhere)'";
 
-          # Audio controls
-          "XF86AudioRaiseVolume" =
-            "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 +5%";
-          "XF86AudioLowerVolume" =
-            "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 -5%";
-          "XF86AudioMute" =
-            "${pkgs.pulseaudio}/bin/pactl set-sink-mute 0 toggle";
-          "XF86AudioPlay" = "${pkgs.playerctl}/bin/playerctl play-pause";
-          "XF86AudioPause" = "${pkgs.playerctl}/bin/playerctl pause";
-          "XF86AudioNext" = "${pkgs.playerctl}/bin/playerctl next";
-          "XF86AudioPrev" = "${pkgs.playerctl}/bin/playerctl previous";
-          "XF86AudioForward" = "${pkgs.playerctl}/bin/playerctl position 5+";
-          "XF86AudioRewind" = "${pkgs.playerctl}/bin/playerctl position 5-";
+            # Audio controls
+            "XF86AudioRaiseVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 +5%";
+            "XF86AudioLowerVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 -5%";
+            "XF86AudioMute" = "${pkgs.pulseaudio}/bin/pactl set-sink-mute 0 toggle";
+            "XF86AudioPlay" = "${pkgs.playerctl}/bin/playerctl play-pause";
+            "XF86AudioPause" = "${pkgs.playerctl}/bin/playerctl pause";
+            "XF86AudioNext" = "${pkgs.playerctl}/bin/playerctl next";
+            "XF86AudioPrev" = "${pkgs.playerctl}/bin/playerctl previous";
+            "XF86AudioForward" = "${pkgs.playerctl}/bin/playerctl position 5+";
+            "XF86AudioRewind" = "${pkgs.playerctl}/bin/playerctl position 5-";
 
-          # Screen brightness controls
-          "XF86MonBrightnessUp" =
-            "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%+";
-          "XF86MonBrightnessDown" =
-            "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%-";
-        };
+            # Screen brightness controls
+            "XF86MonBrightnessUp" = "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%+";
+            "XF86MonBrightnessDown" = "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%-";
+          };
       };
       syncthing = {
         enable = true;
@@ -3220,299 +3292,294 @@ in {
       windowManager.i3 = {
         enable = true;
         package = pkgs.i3-gaps;
-        config = let
-          # Define workspace names
-          workspace1 = ''number "1: "'';
-          workspace2 = ''number "2: "'';
-          workspace3 = ''number "3: "'';
-          workspace4 = ''number "4: "'';
-          workspace5 = ''number "5: "'';
-          workspace6 = ''number "6: 6"'';
-          workspace7 = ''number "7: 7"'';
-          workspace8 = ''number "8: 8"'';
-          workspace9 = ''number "9: "'';
-          workspace10 = ''number "10: "'';
-          # Gaps modes
-          mode-gaps = "Gaps: (o) outer, (i) inner";
-          mode-gaps-inner = "Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)";
-          mode-gaps-outer = "Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)";
-        in {
-          bars = [ ];
-          gaps = {
-            inner = 10;
-            outer = 5;
-            smartGaps = true;
-          };
-          fonts = {
-            names = [ "DejaVu Sans Mono" ];
-            style = "Regular";
-            size = 0.0;
-          };
-          modifier = "Mod4";
-          terminal = terminal-emulator;
-          menu = ''
-            "${pkgs.rofi}/bin/rofi -dpi ${
-              toString (dpiScale 96)
-            } -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
-          focus = {
-            followMouse = false;
-            newWindow = "urgent";
-            wrapping = "workspace";
-          };
-          startup = [
-            {
-              command = "${pkgs.writeShellScript "i3-session-start" ''
-                ${pkgs.systemd}/bin/systemctl --user set-environment I3SOCK=$(${config.xsession.windowManager.i3.package}/bin/i3 --get-socketpath)
-                ${pkgs.systemd}/bin/systemctl --user start graphical-session-i3.target
-              ''}";
-              notification = false;
-            }
-            {
-              command = let
-                i3-session-exit = pkgs.writeShellScript "i3-session-exit" ''
-                  ${pkgs.systemd}/bin/systemctl --user stop graphical-session-i3.target
-                '';
-              in "${pkgs.writeScript "i3-on-exit" ''
-                #!${
-                  pkgs.python3.withPackages (ps: with ps; [ i3ipc ])
-                }/bin/python
-                from subprocess import Popen
-                from i3ipc.aio import Connection, Event
-
-                def on_exit(i3, e):
-                    if e.change == "exit":
-                      Popen(['${i3-session-exit}'])
-
-                i3 = await Connection().connect()
-
-                i3.on(Event.SHUTDOWN_EXIT, on_exit)
-
-                await i3.main()
-              ''}";
-              notification = false;
-            }
-          ];
-          colors = {
-            # Nord theme
-            focused = {
-              border = colors.nord9;
-              background = colors.nord9;
-              text = "#ffffff";
-              indicator = colors.nord9;
-              childBorder = colors.nord9;
+        config =
+          let
+            # Define workspace names
+            workspace1 = ''number "1: "'';
+            workspace2 = ''number "2: "'';
+            workspace3 = ''number "3: "'';
+            workspace4 = ''number "4: "'';
+            workspace5 = ''number "5: "'';
+            workspace6 = ''number "6: 6"'';
+            workspace7 = ''number "7: 7"'';
+            workspace8 = ''number "8: 8"'';
+            workspace9 = ''number "9: "'';
+            workspace10 = ''number "10: "'';
+            # Gaps modes
+            mode-gaps = "Gaps: (o) outer, (i) inner";
+            mode-gaps-inner = "Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)";
+            mode-gaps-outer = "Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)";
+          in
+          {
+            bars = [ ];
+            gaps = {
+              inner = 10;
+              outer = 5;
+              smartGaps = true;
             };
-            unfocused = {
-              border = colors.nord0;
-              background = "#1f222d";
-              text = "#888888";
-              indicator = "#1f222d";
-              childBorder = colors.nord0;
+            fonts = {
+              names = [ "DejaVu Sans Mono" ];
+              style = "Regular";
+              size = 0.0;
             };
-            focusedInactive = {
-              border = colors.nord0;
-              background = "#1f222d";
-              text = "#888888";
-              indicator = "#1f222d";
-              childBorder = colors.nord0;
+            modifier = "Mod4";
+            terminal = terminal-emulator;
+            menu = ''"${pkgs.rofi}/bin/rofi -dpi ${toString (dpiScale 96)} -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
+            focus = {
+              followMouse = false;
+              newWindow = "urgent";
+              wrapping = "workspace";
             };
-            placeholder = {
-              border = colors.nord0;
-              background = "#1f222d";
-              text = "#888888";
-              indicator = "#1f222d";
-              childBorder = colors.nord0;
-            };
-            urgent = {
-              border = "#900000";
-              background = "#900000";
-              text = "#ffffff";
-              indicator = "#900000";
-              childBorder = "#900000";
-            };
-            background = "#242424";
-          };
-          keybindings =
-            let mod = config.xsession.windowManager.i3.config.modifier;
-            in lib.mkOptionDefault {
-              "${mod}+1" = "workspace ${workspace1}";
-              "${mod}+2" = "workspace ${workspace2}";
-              "${mod}+3" = "workspace ${workspace3}";
-              "${mod}+4" = "workspace ${workspace4}";
-              "${mod}+5" = "workspace ${workspace5}";
-              "${mod}+6" = "workspace ${workspace6}";
-              "${mod}+7" = "workspace ${workspace7}";
-              "${mod}+8" = "workspace ${workspace8}";
-              "${mod}+9" = "workspace ${workspace9}";
-              "${mod}+0" = "workspace ${workspace10}";
-              "${mod}+Shift+1" =
-                "move container to workspace ${workspace1}; workspace ${workspace1}";
-              "${mod}+Shift+2" =
-                "move container to workspace ${workspace2}; workspace ${workspace2}";
-              "${mod}+Shift+3" =
-                "move container to workspace ${workspace3}; workspace ${workspace3}";
-              "${mod}+Shift+4" =
-                "move container to workspace ${workspace4}; workspace ${workspace4}";
-              "${mod}+Shift+5" =
-                "move container to workspace ${workspace5}; workspace ${workspace5}";
-              "${mod}+Shift+6" =
-                "move container to workspace ${workspace6}; workspace ${workspace6}";
-              "${mod}+Shift+7" =
-                "move container to workspace ${workspace7}; workspace ${workspace7}";
-              "${mod}+Shift+8" =
-                "move container to workspace ${workspace8}; workspace ${workspace8}";
-              "${mod}+Shift+9" =
-                "move container to workspace ${workspace9}; workspace ${workspace9}";
-              "${mod}+Shift+0" =
-                "move container to workspace ${workspace10}; workspace ${workspace10}";
-
-              "${mod}+Shift+f" = "sticky toggle";
-
-              # change focus (Vi keybindings)
-              "${mod}+h" = "focus left";
-              "${mod}+j" = "focus down";
-              "${mod}+k" = "focus up";
-              "${mod}+l" = "focus right";
-              "${mod}+Shift+h" = "move left";
-              "${mod}+Shift+j" = "move down";
-              "${mod}+Shift+k" = "move up";
-              "${mod}+Shift+l" = "move right";
-
-              # split in horizontal orientation
-              "${mod}+backslash" = "split h";
-              "${mod}+Shift+backslash" = "split h";
-              # split in vertical orientation
-              "${mod}+minus" = "split v";
-              "${mod}+Shift+minus" = "split v";
-
-              # Toggle scratchpad
-              "${mod}+numbersign" = "scratchpad show";
-              # Move window to scratchpad
-              "${mod}+Shift+numbersign" = "move scratchpad";
-
-              # focus the parent container
-              "${mod}+a" = "focus parent";
-              # focus the child container
-              "${mod}+Shift+a" = "focus child";
-              "${mod}+apostrophe" = "focus child";
-
-              # Move focus/workspace/window to different monitor
-              "${mod}+at" = "focus output left";
-              "${mod}+Shift+at" =
-                "move container to output left; focus output left";
-              "${mod}+Shift+Ctrl+at" = "move workspace to output left";
-              "${mod}+slash" = "focus output right";
-              "${mod}+Shift+slash" =
-                "move container to output right; focus output right";
-              "${mod}+Shift+Ctrl+slash" = "move workspace to output right";
-
-              # Gaps mode
-              "${mod}+g" = ''mode "${mode-gaps}"'';
-            };
-          modes = {
-            resize = {
-              "h" = "resize shrink width 20 px or 10 ppt";
-              "j" = "resize grow height 20 px or 10 ppt";
-              "k" = "resize shrink height 20 px or 10 ppt";
-              "l" = "resize grow width 20 px or 10 ppt";
-              "Shift+h" = "resize shrink width 200 px or 20 ppt";
-              "Shift+j" = "resize grow height 200 px or 20 ppt";
-              "Shift+k" = "resize shrink height 200 px or 20 ppt";
-              "Shift+l" = "resize grow width 200 px or 20 ppt";
-              "Return" = "mode default";
-              "Escape" = "mode default";
-            };
-            "${mode-gaps}" = {
-              "o" = ''mode "${mode-gaps-outer}"'';
-              "i" = ''mode "${mode-gaps-inner}"'';
-              "Return" = "mode default";
-              "Escape" = "mode default";
-            };
-            "${mode-gaps-inner}" = {
-              "plus" = "gaps inner current plus 5";
-              "minus" = "gaps inner current minus 5";
-              "asterisk" = "gaps inner current set 0";
-              "Shift+plus" = "gaps inner all plus 5";
-              "Shift+minus" = "gaps inner all minus 5";
-              "Shift+asterisk" = "gaps inner all set 0";
-              "Return" = "mode default";
-              "Escape" = "mode default";
-            };
-            "${mode-gaps-outer}" = {
-              "plus" = "gaps outer current plus 5";
-              "minus" = "gaps outer current minus 5";
-              "asterisk" = "gaps outer current set 0";
-              "Shift+plus" = "gaps outer all plus 5";
-              "Shift+minus" = "gaps outer all minus 5";
-              "Shift+asterisk" = "gaps outer all set 0";
-              "Return" = "mode default";
-              "Escape" = "mode default";
-            };
-          };
-          assigns = {
-            "${workspace2}" = [{
-              class = "^firefox";
-              instance = "^Navigator$";
-            }];
-            "${workspace9}" = [{ class = "^thunderbird$"; }];
-            "${workspace10}" = [
-              { class = "^TelegramDesktop$"; }
-              { class = "^Slack$"; }
-              { class = "^Skype$"; }
-              { class = "^Signal$"; }
-              { class = "^Ferdium$"; }
-            ];
-          };
-          floating.titlebar = false;
-          window = {
-            border = 0;
-            hideEdgeBorders = "both";
-            titlebar = false;
-            commands = let
-              mkCommand = command: criteria: { inherit command criteria; };
-              mkFloating = mkCommand "floating enable";
-              mkSticky = mkCommand "sticky enable";
-            in [
+            startup = [
               {
-                criteria = { class = ".*"; };
-                command = "border pixel 0";
+                command = "${pkgs.writeShellScript "i3-session-start" ''
+                  ${pkgs.systemd}/bin/systemctl --user set-environment I3SOCK=$(${config.xsession.windowManager.i3.package}/bin/i3 --get-socketpath)
+                  ${pkgs.systemd}/bin/systemctl --user start graphical-session-i3.target
+                ''}";
+                notification = false;
               }
-              (mkFloating { class = "^emacs-everywhere$"; })
-              (mkFloating { class = "^Tor Browser$"; })
-              (mkFloating { class = "^gnome-calculator$"; })
-              (mkFloating { class = "^feh$"; })
-              (mkFloating { class = "^Sxiv$"; })
-              (mkFloating {
-                class = "^Thunderbird$";
-                instance = "^Calendar$";
-              })
-              (mkFloating {
-                class = "^Steam$";
-                instance = "Steam Guard";
-              })
-              (mkFloating { class = "^(?i)zoom$"; })
-              (mkFloating { class = "(?i)blueman-manager"; })
-              (mkFloating {
-                class = "^Steam$";
-                title = "^Steam Guard";
-              })
-              (mkFloating { class = "(?i)protonvpn"; })
-              (mkFloating { title = "Preferences$"; })
-              (mkFloating { window_role = "About"; })
-              (mkFloating { window_role = "Preferences"; })
-              (mkFloating { window_role = "Organizer"; })
-              (mkFloating { window_role = "bubble"; })
-              (mkFloating { window_role = "page-info"; })
-              (mkFloating { window_role = "pop-up"; })
-              (mkFloating { window_role = "task_dialog"; })
-              (mkFloating { window_role = "toolbox"; })
-              (mkFloating { window_role = "webconsole"; })
-              (mkFloating { window_type = "dialog"; })
-              (mkFloating { window_type = "menu"; })
-              (mkSticky { title = "Picture-in-Picture"; })
-              (mkSticky { title = "AlarmWindow"; })
+              {
+                command =
+                  let
+                    i3-session-exit = pkgs.writeShellScript "i3-session-exit" ''
+                      ${pkgs.systemd}/bin/systemctl --user stop graphical-session-i3.target
+                    '';
+                  in
+                  "${pkgs.writeScript "i3-on-exit" ''
+                    #!${pkgs.python3.withPackages (ps: with ps; [ i3ipc ])}/bin/python
+                    from subprocess import Popen
+                    from i3ipc.aio import Connection, Event
+
+                    def on_exit(i3, e):
+                        if e.change == "exit":
+                          Popen(['${i3-session-exit}'])
+
+                    i3 = await Connection().connect()
+
+                    i3.on(Event.SHUTDOWN_EXIT, on_exit)
+
+                    await i3.main()
+                  ''}";
+                notification = false;
+              }
             ];
+            colors = {
+              # Nord theme
+              focused = {
+                border = colors.nord9;
+                background = colors.nord9;
+                text = "#ffffff";
+                indicator = colors.nord9;
+                childBorder = colors.nord9;
+              };
+              unfocused = {
+                border = colors.nord0;
+                background = "#1f222d";
+                text = "#888888";
+                indicator = "#1f222d";
+                childBorder = colors.nord0;
+              };
+              focusedInactive = {
+                border = colors.nord0;
+                background = "#1f222d";
+                text = "#888888";
+                indicator = "#1f222d";
+                childBorder = colors.nord0;
+              };
+              placeholder = {
+                border = colors.nord0;
+                background = "#1f222d";
+                text = "#888888";
+                indicator = "#1f222d";
+                childBorder = colors.nord0;
+              };
+              urgent = {
+                border = "#900000";
+                background = "#900000";
+                text = "#ffffff";
+                indicator = "#900000";
+                childBorder = "#900000";
+              };
+              background = "#242424";
+            };
+            keybindings =
+              let
+                mod = config.xsession.windowManager.i3.config.modifier;
+              in
+              lib.mkOptionDefault {
+                "${mod}+1" = "workspace ${workspace1}";
+                "${mod}+2" = "workspace ${workspace2}";
+                "${mod}+3" = "workspace ${workspace3}";
+                "${mod}+4" = "workspace ${workspace4}";
+                "${mod}+5" = "workspace ${workspace5}";
+                "${mod}+6" = "workspace ${workspace6}";
+                "${mod}+7" = "workspace ${workspace7}";
+                "${mod}+8" = "workspace ${workspace8}";
+                "${mod}+9" = "workspace ${workspace9}";
+                "${mod}+0" = "workspace ${workspace10}";
+                "${mod}+Shift+1" = "move container to workspace ${workspace1}; workspace ${workspace1}";
+                "${mod}+Shift+2" = "move container to workspace ${workspace2}; workspace ${workspace2}";
+                "${mod}+Shift+3" = "move container to workspace ${workspace3}; workspace ${workspace3}";
+                "${mod}+Shift+4" = "move container to workspace ${workspace4}; workspace ${workspace4}";
+                "${mod}+Shift+5" = "move container to workspace ${workspace5}; workspace ${workspace5}";
+                "${mod}+Shift+6" = "move container to workspace ${workspace6}; workspace ${workspace6}";
+                "${mod}+Shift+7" = "move container to workspace ${workspace7}; workspace ${workspace7}";
+                "${mod}+Shift+8" = "move container to workspace ${workspace8}; workspace ${workspace8}";
+                "${mod}+Shift+9" = "move container to workspace ${workspace9}; workspace ${workspace9}";
+                "${mod}+Shift+0" = "move container to workspace ${workspace10}; workspace ${workspace10}";
+
+                "${mod}+Shift+f" = "sticky toggle";
+
+                # change focus (Vi keybindings)
+                "${mod}+h" = "focus left";
+                "${mod}+j" = "focus down";
+                "${mod}+k" = "focus up";
+                "${mod}+l" = "focus right";
+                "${mod}+Shift+h" = "move left";
+                "${mod}+Shift+j" = "move down";
+                "${mod}+Shift+k" = "move up";
+                "${mod}+Shift+l" = "move right";
+
+                # split in horizontal orientation
+                "${mod}+backslash" = "split h";
+                "${mod}+Shift+backslash" = "split h";
+                # split in vertical orientation
+                "${mod}+minus" = "split v";
+                "${mod}+Shift+minus" = "split v";
+
+                # Toggle scratchpad
+                "${mod}+numbersign" = "scratchpad show";
+                # Move window to scratchpad
+                "${mod}+Shift+numbersign" = "move scratchpad";
+
+                # focus the parent container
+                "${mod}+a" = "focus parent";
+                # focus the child container
+                "${mod}+Shift+a" = "focus child";
+                "${mod}+apostrophe" = "focus child";
+
+                # Move focus/workspace/window to different monitor
+                "${mod}+at" = "focus output left";
+                "${mod}+Shift+at" = "move container to output left; focus output left";
+                "${mod}+Shift+Ctrl+at" = "move workspace to output left";
+                "${mod}+slash" = "focus output right";
+                "${mod}+Shift+slash" = "move container to output right; focus output right";
+                "${mod}+Shift+Ctrl+slash" = "move workspace to output right";
+
+                # Gaps mode
+                "${mod}+g" = ''mode "${mode-gaps}"'';
+              };
+            modes = {
+              resize = {
+                "h" = "resize shrink width 20 px or 10 ppt";
+                "j" = "resize grow height 20 px or 10 ppt";
+                "k" = "resize shrink height 20 px or 10 ppt";
+                "l" = "resize grow width 20 px or 10 ppt";
+                "Shift+h" = "resize shrink width 200 px or 20 ppt";
+                "Shift+j" = "resize grow height 200 px or 20 ppt";
+                "Shift+k" = "resize shrink height 200 px or 20 ppt";
+                "Shift+l" = "resize grow width 200 px or 20 ppt";
+                "Return" = "mode default";
+                "Escape" = "mode default";
+              };
+              "${mode-gaps}" = {
+                "o" = ''mode "${mode-gaps-outer}"'';
+                "i" = ''mode "${mode-gaps-inner}"'';
+                "Return" = "mode default";
+                "Escape" = "mode default";
+              };
+              "${mode-gaps-inner}" = {
+                "plus" = "gaps inner current plus 5";
+                "minus" = "gaps inner current minus 5";
+                "asterisk" = "gaps inner current set 0";
+                "Shift+plus" = "gaps inner all plus 5";
+                "Shift+minus" = "gaps inner all minus 5";
+                "Shift+asterisk" = "gaps inner all set 0";
+                "Return" = "mode default";
+                "Escape" = "mode default";
+              };
+              "${mode-gaps-outer}" = {
+                "plus" = "gaps outer current plus 5";
+                "minus" = "gaps outer current minus 5";
+                "asterisk" = "gaps outer current set 0";
+                "Shift+plus" = "gaps outer all plus 5";
+                "Shift+minus" = "gaps outer all minus 5";
+                "Shift+asterisk" = "gaps outer all set 0";
+                "Return" = "mode default";
+                "Escape" = "mode default";
+              };
+            };
+            assigns = {
+              "${workspace2}" = [
+                {
+                  class = "^firefox";
+                  instance = "^Navigator$";
+                }
+              ];
+              "${workspace9}" = [ { class = "^thunderbird$"; } ];
+              "${workspace10}" = [
+                { class = "^TelegramDesktop$"; }
+                { class = "^Slack$"; }
+                { class = "^Skype$"; }
+                { class = "^Signal$"; }
+                { class = "^Ferdium$"; }
+              ];
+            };
+            floating.titlebar = false;
+            window = {
+              border = 0;
+              hideEdgeBorders = "both";
+              titlebar = false;
+              commands =
+                let
+                  mkCommand = command: criteria: { inherit command criteria; };
+                  mkFloating = mkCommand "floating enable";
+                  mkSticky = mkCommand "sticky enable";
+                in
+                [
+                  {
+                    criteria = {
+                      class = ".*";
+                    };
+                    command = "border pixel 0";
+                  }
+                  (mkFloating { class = "^emacs-everywhere$"; })
+                  (mkFloating { class = "^Tor Browser$"; })
+                  (mkFloating { class = "^gnome-calculator$"; })
+                  (mkFloating { class = "^feh$"; })
+                  (mkFloating { class = "^Sxiv$"; })
+                  (mkFloating {
+                    class = "^Thunderbird$";
+                    instance = "^Calendar$";
+                  })
+                  (mkFloating {
+                    class = "^Steam$";
+                    instance = "Steam Guard";
+                  })
+                  (mkFloating { class = "^(?i)zoom$"; })
+                  (mkFloating { class = "(?i)blueman-manager"; })
+                  (mkFloating {
+                    class = "^Steam$";
+                    title = "^Steam Guard";
+                  })
+                  (mkFloating { class = "(?i)protonvpn"; })
+                  (mkFloating { title = "Preferences$"; })
+                  (mkFloating { window_role = "About"; })
+                  (mkFloating { window_role = "Preferences"; })
+                  (mkFloating { window_role = "Organizer"; })
+                  (mkFloating { window_role = "bubble"; })
+                  (mkFloating { window_role = "page-info"; })
+                  (mkFloating { window_role = "pop-up"; })
+                  (mkFloating { window_role = "task_dialog"; })
+                  (mkFloating { window_role = "toolbox"; })
+                  (mkFloating { window_role = "webconsole"; })
+                  (mkFloating { window_type = "dialog"; })
+                  (mkFloating { window_type = "menu"; })
+                  (mkSticky { title = "Picture-in-Picture"; })
+                  (mkSticky { title = "AlarmWindow"; })
+                ];
+            };
           };
-        };
         extraConfig = ''
           popup_during_fullscreen leave_fullscreen
         '';
@@ -3531,54 +3598,50 @@ in {
           };
           Install.WantedBy = [ "graphical-session.target" ];
         };
-        languagetool = let settingsFormat = pkgs.formats.javaProperties { };
-        in {
-          Unit = {
-            Description = "LanguageTool HTTP server";
-            After = [ "network.target" ];
-          };
-          Install.WantedBy = [ "default.target" ];
-          Service.ExecStart = ''
-            ${pkgs.languagetool}/bin/languagetool-http-server \
-              --port 8081 \
-              --allow-origin '*' \
-              --config ${
-                settingsFormat.generate "languagetool.cfg" {
-                  cacheSize = "1000";
-                  pipelineCaching = "true";
-                  pipelinePrewarming = "true";
-                  # https://dev.languagetool.org/finding-errors-using-n-gram-data
-                  languageModel =
-                    "${pkgs.linkFarm "languagetool-languageModel" [
+        languagetool =
+          let
+            settingsFormat = pkgs.formats.javaProperties { };
+          in
+          {
+            Unit = {
+              Description = "LanguageTool HTTP server";
+              After = [ "network.target" ];
+            };
+            Install.WantedBy = [ "default.target" ];
+            Service.ExecStart = ''
+              ${pkgs.languagetool}/bin/languagetool-http-server \
+                --port 8081 \
+                --allow-origin '*' \
+                --config ${
+                  settingsFormat.generate "languagetool.cfg" {
+                    cacheSize = "1000";
+                    pipelineCaching = "true";
+                    pipelinePrewarming = "true";
+                    # https://dev.languagetool.org/finding-errors-using-n-gram-data
+                    languageModel = "${pkgs.linkFarm "languagetool-languageModel" [
                       {
                         name = "en";
                         path = pkgs.fetchzip {
-                          url =
-                            "https://languagetool.org/download/ngram-data/ngrams-en-20150817.zip";
-                          hash =
-                            "sha256-v3Ym6CBJftQCY5FuY6s5ziFvHKAyYD3fTHr99i6N8sE=";
+                          url = "https://languagetool.org/download/ngram-data/ngrams-en-20150817.zip";
+                          hash = "sha256-v3Ym6CBJftQCY5FuY6s5ziFvHKAyYD3fTHr99i6N8sE=";
                         };
                       }
                       {
                         name = "nl";
                         path = pkgs.fetchzip {
-                          url =
-                            "https://languagetool.org/download/ngram-data/ngrams-nl-20181229.zip";
-                          hash =
-                            "sha256-bHOEdb2R7UYvXjqL7MT4yy3++hNMVwnG7TJvvd3Feg8=";
+                          url = "https://languagetool.org/download/ngram-data/ngrams-nl-20181229.zip";
+                          hash = "sha256-bHOEdb2R7UYvXjqL7MT4yy3++hNMVwnG7TJvvd3Feg8=";
                         };
                       }
                     ]}";
-                  fasttextBinary = pkgs.fetchurl {
-                    url =
-                      "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin";
-                    hash =
-                      "sha256-fmnsVFG8JhzHhE5J5HkqhdfwnAZ4nsgA/EpErsNidk4=";
-                  };
+                    fasttextBinary = pkgs.fetchurl {
+                      url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin";
+                      hash = "sha256-fmnsVFG8JhzHhE5J5HkqhdfwnAZ4nsgA/EpErsNidk4=";
+                    };
+                  }
                 }
-              }
-          '';
-        };
+            '';
+          };
         picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
         polkit-authentication-agent = {
           Unit = {
@@ -3589,8 +3652,7 @@ in {
           };
           Install.WantedBy = [ "graphical-session.target" ];
           Service = {
-            ExecStart =
-              "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+            ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
             Restart = "on-failure";
           };
         };
@@ -3623,15 +3685,13 @@ in {
         };
         yubikey-touch-detector = {
           Unit = {
-            Description =
-              "A tool to detect when your YubiKey is waiting for a touch";
+            Description = "A tool to detect when your YubiKey is waiting for a touch";
             After = [ "graphical-session-pre.target" ];
             PartOf = [ "graphical-session.target" ];
           };
           Install.WantedBy = [ "graphical-session.target" ];
           Service = {
-            ExecStart =
-              "${pkgs.yubikey-touch-detector}/bin/yubikey-touch-detector --libnotify";
+            ExecStart = "${pkgs.yubikey-touch-detector}/bin/yubikey-touch-detector --libnotify";
             Restart = "on-abort";
           };
         };
@@ -3645,10 +3705,14 @@ in {
         };
         xdg-autostart.Unit = {
           Description = "Run XDG autostart files";
-          Requires =
-            [ "xdg-desktop-autostart.target" "graphical-session.target" ];
-          Before =
-            [ "xdg-desktop-autostart.target" "graphical-session.target" ];
+          Requires = [
+            "xdg-desktop-autostart.target"
+            "graphical-session.target"
+          ];
+          Before = [
+            "xdg-desktop-autostart.target"
+            "graphical-session.target"
+          ];
           BindsTo = [ "graphical-session.target" ];
         };
       };
@@ -3712,21 +3776,11 @@ in {
           ;; See 'C-h v doom-font' for documentation and more examples of what they
           ;; accept. For example:
           ;;
-          (setq doom-font (font-spec :family "Iosevka Nerd Font" :size ${
-            toString (dpiScale 12)
-          } :weight 'light)
-                doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size ${
-                  toString (dpiScale 12)
-                } :weight 'light)
-                doom-big-font (font-spec :family "Iosevka Nerd Font" :size ${
-                  toString (dpiScale 18)
-                } :weight 'light)
-                doom-symbol-font (font-spec :family "Symbols Nerd Font" :size ${
-                  toString (dpiScale 12)
-                })
-                doom-serif-font (font-spec :family "Iosevka Nerd Font" :size ${
-                  toString (dpiScale 12)
-                } :weight 'light)
+          (setq doom-font (font-spec :family "Iosevka Nerd Font" :size ${toString (dpiScale 12)} :weight 'light)
+                doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size ${toString (dpiScale 12)} :weight 'light)
+                doom-big-font (font-spec :family "Iosevka Nerd Font" :size ${toString (dpiScale 18)} :weight 'light)
+                doom-symbol-font (font-spec :family "Symbols Nerd Font" :size ${toString (dpiScale 12)})
+                doom-serif-font (font-spec :family "Iosevka Nerd Font" :size ${toString (dpiScale 12)} :weight 'light)
                 nerd-icons-font-family "Iosevka NF Light")
           ;;
           ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
@@ -4292,114 +4346,117 @@ in {
               pkgs.buildEnv {
                 name = "my-emacs-deps";
                 pathsToLink = [ "/bin" ];
-                paths = map lib.getBin (with pkgs; [
-                  git
-                  emacs-lsp-booster
-                  dockfmt
-                  libxml2
-                  rstfmt
-                  texlive.combined.scheme-medium
-                  python3
-                  binutils
-                  (ripgrep.override { withPCRE2 = true; })
-                  fd
-                  gnutls
-                  imagemagick
-                  zstd
-                  shfmt
-                  maim
-                  shellcheck
-                  sqlite
-                  editorconfig-core-c
-                  nodePackages.mermaid-cli
-                  pandoc
-                  gcc
-                  gdb
-                  lldb
-                  graphviz-nox
-                  wordnet
-                  (writeShellScriptBin "hledger" ''
-                    # https://github.com/simonmichael/hledger/issues/367#issuecomment-956436493
-                    iargs=("$@")
-                    oargs=()
-                    j=0;
-                    date=;
-                    for((i=0; i<''${#iargs[@]}; ++i)); do
-                        case ''${iargs[i]} in
-                            --date-format)
-                                # drop --date-format and the next arg
-                                i=$((i+1));
-                                ;;
-                            xact)
-                                # convert "xact" to "print --match"
-                                oargs[j]=print; oargs[j+1]=--match; j=$((j+2));
-                                # drop xact argument and stash the date argument
-                                i=$((i+1));
-                                date=''${iargs[i]};
-                                ;;
-                            *)
-                                # keep any other args:
-                                oargs[j]=''${iargs[i]};
-                                j=$((j+1));
-                                ;;
-                        esac
-                    done
+                paths = map lib.getBin (
+                  with pkgs;
+                  [
+                    git
+                    emacs-lsp-booster
+                    dockfmt
+                    libxml2
+                    rstfmt
+                    texlive.combined.scheme-medium
+                    python3
+                    binutils
+                    (ripgrep.override { withPCRE2 = true; })
+                    fd
+                    gnutls
+                    imagemagick
+                    zstd
+                    shfmt
+                    maim
+                    shellcheck
+                    sqlite
+                    editorconfig-core-c
+                    nodePackages.mermaid-cli
+                    pandoc
+                    gcc
+                    gdb
+                    lldb
+                    graphviz-nox
+                    wordnet
+                    (writeShellScriptBin "hledger" ''
+                      # https://github.com/simonmichael/hledger/issues/367#issuecomment-956436493
+                      iargs=("$@")
+                      oargs=()
+                      j=0;
+                      date=;
+                      for((i=0; i<''${#iargs[@]}; ++i)); do
+                          case ''${iargs[i]} in
+                              --date-format)
+                                  # drop --date-format and the next arg
+                                  i=$((i+1));
+                                  ;;
+                              xact)
+                                  # convert "xact" to "print --match"
+                                  oargs[j]=print; oargs[j+1]=--match; j=$((j+2));
+                                  # drop xact argument and stash the date argument
+                                  i=$((i+1));
+                                  date=''${iargs[i]};
+                                  ;;
+                              *)
+                                  # keep any other args:
+                                  oargs[j]=''${iargs[i]};
+                                  j=$((j+1));
+                                  ;;
+                          esac
+                      done
 
-                    if test "$date"
-                    then
-                        # substitute the given date for the old date:
-                        ${lib.getBin hledger}/bin/hledger "''${oargs[@]}" | sed "1s/....-..-../$date/"
-                    else
-                        ${lib.getBin hledger}/bin/hledger "''${oargs[@]}"
-                    fi
-                  '')
-                  fava
-                  html-tidy
-                  nodejs
-                  nodePackages.bash-language-server
-                  nodePackages.stylelint
-                  nodePackages.dockerfile-language-server-nodejs
-                  nodePackages.js-beautify
-                  nodePackages.typescript-language-server
-                  nodePackages.typescript
-                  (writeScriptBin "vscode-css-language-server" ''
-                    #!${nodejs}/bin/node
-                    require('${vscodium}/lib/vscode/resources/app/extensions/css-language-features/server/dist/node/cssServerMain.js')
-                  '')
-                  (writeScriptBin "vscode-html-language-server" ''
-                    #!${nodejs}/bin/node
-                    require('${vscodium}/lib/vscode/resources/app/extensions/html-language-features/server/dist/node/htmlServerMain.js')
-                  '')
-                  (writeScriptBin "vscode-json-language-server" ''
-                    #!${nodejs}/bin/node
-                    require('${vscodium}/lib/vscode/resources/app/extensions/json-language-features/server/dist/node/jsonServerMain.js')
-                  '')
-                  (writeScriptBin "vscode-markdown-language-server" ''
-                    #!${nodejs}/bin/node
-                    require('${vscodium}/lib/vscode/resources/app/extensions/markdown-language-features/server/dist/node/workerMain.js')
-                  '')
-                  nodePackages.yaml-language-server
-                  nodePackages.unified-language-server
-                  nodePackages.prettier
-                  jq
-                  # nixfmt-classic
-                  nixfmt-rfc-style
-                  nil
-                  black
-                  isort
-                  pipenv
-                  python3Packages.pytest
-                  python3Packages.nose
-                  python3Packages.pyflakes
-                  python3Packages.python-lsp-server
-                  python3Packages.grip
-                  multimarkdown
-                  xclip
-                  xdotool
-                  xorg.xwininfo
-                  xorg.xprop
-                  watchman
-                ]);
+                      if test "$date"
+                      then
+                          # substitute the given date for the old date:
+                          ${lib.getBin hledger}/bin/hledger "''${oargs[@]}" | sed "1s/....-..-../$date/"
+                      else
+                          ${lib.getBin hledger}/bin/hledger "''${oargs[@]}"
+                      fi
+                    '')
+                    fava
+                    html-tidy
+                    nodejs
+                    nodePackages.bash-language-server
+                    nodePackages.stylelint
+                    nodePackages.dockerfile-language-server-nodejs
+                    nodePackages.js-beautify
+                    nodePackages.typescript-language-server
+                    nodePackages.typescript
+                    (writeScriptBin "vscode-css-language-server" ''
+                      #!${nodejs}/bin/node
+                      require('${vscodium}/lib/vscode/resources/app/extensions/css-language-features/server/dist/node/cssServerMain.js')
+                    '')
+                    (writeScriptBin "vscode-html-language-server" ''
+                      #!${nodejs}/bin/node
+                      require('${vscodium}/lib/vscode/resources/app/extensions/html-language-features/server/dist/node/htmlServerMain.js')
+                    '')
+                    (writeScriptBin "vscode-json-language-server" ''
+                      #!${nodejs}/bin/node
+                      require('${vscodium}/lib/vscode/resources/app/extensions/json-language-features/server/dist/node/jsonServerMain.js')
+                    '')
+                    (writeScriptBin "vscode-markdown-language-server" ''
+                      #!${nodejs}/bin/node
+                      require('${vscodium}/lib/vscode/resources/app/extensions/markdown-language-features/server/dist/node/workerMain.js')
+                    '')
+                    nodePackages.yaml-language-server
+                    nodePackages.unified-language-server
+                    nodePackages.prettier
+                    jq
+                    # nixfmt-classic
+                    nixfmt-rfc-style
+                    nil
+                    black
+                    isort
+                    pipenv
+                    python3Packages.pytest
+                    python3Packages.nose
+                    python3Packages.pyflakes
+                    python3Packages.python-lsp-server
+                    python3Packages.grip
+                    multimarkdown
+                    xclip
+                    xdotool
+                    xorg.xwininfo
+                    xorg.xprop
+                    watchman
+                  ]
+                );
               }
             }/bin") exec-path))
 
@@ -4914,19 +4971,23 @@ in {
           color15  #ECEFF4
         '';
         "Kvantum/ColloidNord".source = "${
-            pkgs.colloid-kde.overrideAttrs (oldAttrs: {
-              postInstall = (oldAttrs.postInstall or "") + ''
+          pkgs.colloid-kde.overrideAttrs (oldAttrs: {
+            postInstall =
+              (oldAttrs.postInstall or "")
+              + ''
                 rm -r $out/share/Kvantum/ColloidNord/ColloidNordDark.*
               '';
-            })
-          }/share/Kvantum/ColloidNord";
+          })
+        }/share/Kvantum/ColloidNord";
         "Kvantum/ColloidNordDark".source = "${
-            pkgs.colloid-kde.overrideAttrs (oldAttrs: {
-              postInstall = (oldAttrs.postInstall or "") + ''
+          pkgs.colloid-kde.overrideAttrs (oldAttrs: {
+            postInstall =
+              (oldAttrs.postInstall or "")
+              + ''
                 rm -r $out/share/Kvantum/ColloidNord/ColloidNord.*
               '';
-            })
-          }/share/Kvantum/ColloidNord";
+          })
+        }/share/Kvantum/ColloidNord";
         "npm/npmrc".text = ''
           init-author-name=Xandor Schiefer
           init-author-email=me@xandor.co.za
@@ -5046,10 +5107,9 @@ in {
                 channelmix.rear-delay = 12.0
             }
           '';
-          onChange =
-            "${pkgs.writeShellScript "restart-pipewire-pulse.service" ''
-              ${pkgs.systemd}/bin/systemctl --user restart pipewire-pulse.service
-            ''}";
+          onChange = "${pkgs.writeShellScript "restart-pipewire-pulse.service" ''
+            ${pkgs.systemd}/bin/systemctl --user restart pipewire-pulse.service
+          ''}";
         };
         "readline/inputrc".text = ''
           $include /etc/inputrc
@@ -5213,32 +5273,30 @@ in {
 
           " Fix clobbering of Tridactyl command line iframe
           " https://github.com/tridactyl/tridactyl/issues/4807
-          autocmd DocStart .* js -s ${
-            pkgs.writeText "restore-tridactyl-commandline.js" ''
-              const cmdlineIframe = document.getElementById("cmdline_iframe");
+          autocmd DocStart .* js -s ${pkgs.writeText "restore-tridactyl-commandline.js" ''
+            const cmdlineIframe = document.getElementById("cmdline_iframe");
 
-              let { parentElement } = cmdlineIframe;
+            let { parentElement } = cmdlineIframe;
 
-              const mutationObserver = new MutationObserver((records, mutationObserver) => {
-                if (!parentElement.isConnected) {
-                  mutationObserver.disconnect();
-                  parentElement = document.documentElement;
-                  mutationObserver.observe(parentElement, { childList: true });
-                }
+            const mutationObserver = new MutationObserver((records, mutationObserver) => {
+              if (!parentElement.isConnected) {
+                mutationObserver.disconnect();
+                parentElement = document.documentElement;
+                mutationObserver.observe(parentElement, { childList: true });
+              }
 
-                if (
-                  records.some(({ removedNodes }) =>
-                    Array.from(removedNodes).includes(cmdlineIframe),
-                  )
-                ) {
+              if (
+                records.some(({ removedNodes }) =>
+                  Array.from(removedNodes).includes(cmdlineIframe),
+                )
+              ) {
 
-                  parentElement.appendChild(cmdlineIframe);
-                }
-              });
+                parentElement.appendChild(cmdlineIframe);
+              }
+            });
 
-              mutationObserver.observe(parentElement, { childList: true });
-            ''
-          }
+            mutationObserver.observe(parentElement, { childList: true });
+          ''}
 
           " Disable Tridactyl on certain websites
           ${lib.strings.concatMapStrings (url: "blacklistadd ${url}") [
@@ -5295,12 +5353,16 @@ in {
           name = "docsets";
           paths =
             # https://kapeli.com/dash#docsets
-            map ({ name, hash }:
-              pkgs.fetchzip {
-                url = "https://kapeli.com/feeds/${name}.tgz";
-                inherit hash;
-                stripRoot = false;
-              }) [
+            map
+              (
+                { name, hash }:
+                pkgs.fetchzip {
+                  url = "https://kapeli.com/feeds/${name}.tgz";
+                  inherit hash;
+                  stripRoot = false;
+                }
+              )
+              [
                 {
                   name = "CSS";
                   hash = "sha256-mi04jBXYXyKbS5SN1DBlogPJsyiwZaSjySJDq6fWERY=";
@@ -5385,12 +5447,10 @@ in {
         file-scheme-handler = {
           name = "file:// scheme handler";
           comment = "Open file in editor";
-          exec = "${
-              pkgs.writeShellScript "file-scheme-handler" ''
-                uri="$1"
-                ${pkgs.xdg-utils}/bin/xdg-open "''${1//file:\/\//editor://}"
-              ''
-            } %u";
+          exec = "${pkgs.writeShellScript "file-scheme-handler" ''
+            uri="$1"
+            ${pkgs.xdg-utils}/bin/xdg-open "''${1//file:\/\//editor://}"
+          ''} %u";
           type = "Application";
           terminal = false;
           categories = [ "System" ];
@@ -5400,11 +5460,9 @@ in {
         editor-scheme-handler = {
           name = "editor:// scheme handler";
           comment = "Open file in editor";
-          exec = "${
-              pkgs.writeShellScript "editor-scheme-handler" ''
-                ${pkgs.xdg-utils}/bin/xdg-open "''${1//editor:\/\//emacs://}"
-              ''
-            } %u";
+          exec = "${pkgs.writeShellScript "editor-scheme-handler" ''
+            ${pkgs.xdg-utils}/bin/xdg-open "''${1//editor:\/\//emacs://}"
+          ''} %u";
           type = "Application";
           terminal = false;
           categories = [ "System" ];
@@ -5414,79 +5472,77 @@ in {
         emacs-scheme-handler = {
           name = "emacs:// scheme handler";
           comment = "Open file in Emacs";
-          exec = "${
-              pkgs.writeShellScript "emacs-scheme-handler" ''
-                # Unofficial Bash strict mode
-                set -euo pipefail
+          exec = "${pkgs.writeShellScript "emacs-scheme-handler" ''
+            # Unofficial Bash strict mode
+            set -euo pipefail
 
-                die() {
-                  echo "$@" >&2
-                  exit 1
-                }
+            die() {
+              echo "$@" >&2
+              exit 1
+            }
 
-                declare file
-                declare line
-                declare column
+            declare file
+            declare line
+            declare column
 
-                # emacs://open?file={path}&line={line}&column={column}
-                # emacs://open/?file={path}&line={line}&column={column}
-                parseLikeJetbrains() {
-                  readarray -t parsed < <(echo "$1" |
-                    awk \
-                      'match($0, /^emacs:\/\/(open|create|fix)\/?\?file=([^&]+)(&line=([0-9]+)(&column=([0-9]+))?)?$/, a) {
-                      print a[2]
-                      print a[4]
-                      print a[6]
-                    }')
-                  file="''${parsed[0]-}"
-                  line="''${parsed[1]-}"
-                  column="''${parsed[2]-}"
-                }
+            # emacs://open?file={path}&line={line}&column={column}
+            # emacs://open/?file={path}&line={line}&column={column}
+            parseLikeJetbrains() {
+              readarray -t parsed < <(echo "$1" |
+                awk \
+                  'match($0, /^emacs:\/\/(open|create|fix)\/?\?file=([^&]+)(&line=([0-9]+)(&column=([0-9]+))?)?$/, a) {
+                  print a[2]
+                  print a[4]
+                  print a[6]
+                }')
+              file="''${parsed[0]-}"
+              line="''${parsed[1]-}"
+              column="''${parsed[2]-}"
+            }
 
-                # emacs://file/{path}:{line}:{column}
-                parseLikeVSCode() {
-                  readarray -t parsed < <(echo "$1" |
-                    awk \
-                      'match($0, /^emacs:\/\/file(\/[^:]+)(:([0-9]+)(:([0-9]+))?)?$/, a) {
-                      print a[1]
-                      print a[3]
-                      print a[5]
-                    }')
-                  file="''${parsed[0]-}"
-                  line="''${parsed[1]-}"
-                  column="''${parsed[2]-}"
-                }
+            # emacs://file/{path}:{line}:{column}
+            parseLikeVSCode() {
+              readarray -t parsed < <(echo "$1" |
+                awk \
+                  'match($0, /^emacs:\/\/file(\/[^:]+)(:([0-9]+)(:([0-9]+))?)?$/, a) {
+                  print a[1]
+                  print a[3]
+                  print a[5]
+                }')
+              file="''${parsed[0]-}"
+              line="''${parsed[1]-}"
+              column="''${parsed[2]-}"
+            }
 
-                # emacs:///{path}:{line}:{column}
-                # emacs://{host}/{path}:{line}:{column}
-                parseLikeFileURL() {
-                  readarray -t parsed < <(echo "$1" |
-                    awk \
-                      'match($0, /^emacs:\/\/([^:]+)(:([0-9]+)(:([0-9]+))?)?$/, a) {
-                      print a[1]
-                      print a[3]
-                      print a[5]
-                    }')
-                  file="''${parsed[0]-}"
-                  line="''${parsed[1]-}"
-                  column="''${parsed[2]-}"
-                }
+            # emacs:///{path}:{line}:{column}
+            # emacs://{host}/{path}:{line}:{column}
+            parseLikeFileURL() {
+              readarray -t parsed < <(echo "$1" |
+                awk \
+                  'match($0, /^emacs:\/\/([^:]+)(:([0-9]+)(:([0-9]+))?)?$/, a) {
+                  print a[1]
+                  print a[3]
+                  print a[5]
+                }')
+              file="''${parsed[0]-}"
+              line="''${parsed[1]-}"
+              column="''${parsed[2]-}"
+            }
 
-                parseLikeJetbrains "$1"
-                [ -z "$file" ] && parseLikeVSCode "$1"
-                [ -z "$file" ] && parseLikeFileURL "$1"
-                [ -z "$file" ] && die "Could not parse URI"
+            parseLikeJetbrains "$1"
+            [ -z "$file" ] && parseLikeVSCode "$1"
+            [ -z "$file" ] && parseLikeFileURL "$1"
+            [ -z "$file" ] && die "Could not parse URI"
 
-                command="emacsclient --no-wait"
-                command="$command --eval '(find-file \"$file\")'"
-                [ -n "$line" ] && command="$command --eval '(goto-line $line)'"
-                [ -n "$column" ] && command="$command --eval '(move-to-column $column)'"
-                command="$command --eval '(recenter-top-bottom)'"
-                command="$command --eval '(select-frame-set-input-focus (selected-frame))'"
-                command="$command --eval '(when (functionp '\"'\"'pulse-momentary-highlight-one-line) (let ((pulse-delay 0.05)) (pulse-momentary-highlight-one-line (point) '\"'\"'highlight)))'"
-                eval $command
-              ''
-            } %u";
+            command="emacsclient --no-wait"
+            command="$command --eval '(find-file \"$file\")'"
+            [ -n "$line" ] && command="$command --eval '(goto-line $line)'"
+            [ -n "$column" ] && command="$command --eval '(move-to-column $column)'"
+            command="$command --eval '(recenter-top-bottom)'"
+            command="$command --eval '(select-frame-set-input-focus (selected-frame))'"
+            command="$command --eval '(when (functionp '\"'\"'pulse-momentary-highlight-one-line) (let ((pulse-delay 0.05)) (pulse-momentary-highlight-one-line (point) '\"'\"'highlight)))'"
+            eval $command
+          ''} %u";
           icon = "emacs";
           type = "Application";
           terminal = false;
@@ -5496,8 +5552,7 @@ in {
         };
         org-protocol = {
           name = "org-protocol";
-          exec = ''
-            ${my-emacs}/bin/emacsclient --create-frame --alternate-editor="" %u'';
+          exec = ''${my-emacs}/bin/emacsclient --create-frame --alternate-editor="" %u'';
           icon = "emacs";
           type = "Application";
           terminal = false;
@@ -5550,7 +5605,8 @@ in {
 
     xresources = {
       path = "${config.xdg.configHome}/X11/xresources";
-      properties = with lib.attrsets;
+      properties =
+        with lib.attrsets;
         {
           # fontconfig
           "Xft.autohint" = 0;
@@ -5562,41 +5618,44 @@ in {
           "Xft.dpi" = dpiScale 96;
         }
         # xterm
-        // (mapAttrs' (name: value: nameValuePair "XTerm.${name}" value) ({
-          termName = "xterm-256color";
-          buffered = true;
-          bufferedFPS = 60;
-          ttyModes = "erase ^?";
-        } // (mapAttrs' (name: value: nameValuePair "vt100.${name}" value) {
-          backarrowKey = false;
-          locale = false;
-          utf8 = true;
-          internalBorder = dpiScale 11;
-          visualbell = true;
-          bellIsUrgent = true;
-          fullscreen = "never";
-          metaSendsEscape = true;
-          alternateScroll = true;
-          scrollTtyOutput = false;
-          boldColors = false;
-          faceName = "Iosevka NFM Light";
-          faceSize = 10;
-          faceSize1 = 6;
-          faceSize2 = 8;
-          faceSize3 = 10;
-          faceSize4 = 14;
-          faceSize5 = 18;
-          translations = ''
-            #override \
-              Ctrl <Key> minus: smaller-vt-font() \n\
-              Ctrl <Key> plus: larger-vt-font() \n\
-              Ctrl <Key> 0: set-vt-font(d) \n\
-              Shift <KeyPress> Insert: insert-selection(CLIPBOARD) \n\
-              Ctrl Shift <Key>V:    insert-selection(CLIPBOARD) \n\
-              Ctrl Shift <Key>C:    copy-selection(CLIPBOARD) \n\
-              Ctrl <Btn1Up>: exec-formatted("${pkgs.xdg-utils}/bin/xdg-open '%t'", PRIMARY)
-          '';
-        })));
+        // (mapAttrs' (name: value: nameValuePair "XTerm.${name}" value) (
+          {
+            termName = "xterm-256color";
+            buffered = true;
+            bufferedFPS = 60;
+            ttyModes = "erase ^?";
+          }
+          // (mapAttrs' (name: value: nameValuePair "vt100.${name}" value) {
+            backarrowKey = false;
+            locale = false;
+            utf8 = true;
+            internalBorder = dpiScale 11;
+            visualbell = true;
+            bellIsUrgent = true;
+            fullscreen = "never";
+            metaSendsEscape = true;
+            alternateScroll = true;
+            scrollTtyOutput = false;
+            boldColors = false;
+            faceName = "Iosevka NFM Light";
+            faceSize = 10;
+            faceSize1 = 6;
+            faceSize2 = 8;
+            faceSize3 = 10;
+            faceSize4 = 14;
+            faceSize5 = 18;
+            translations = ''
+              #override \
+                Ctrl <Key> minus: smaller-vt-font() \n\
+                Ctrl <Key> plus: larger-vt-font() \n\
+                Ctrl <Key> 0: set-vt-font(d) \n\
+                Shift <KeyPress> Insert: insert-selection(CLIPBOARD) \n\
+                Ctrl Shift <Key>V:    insert-selection(CLIPBOARD) \n\
+                Ctrl Shift <Key>C:    copy-selection(CLIPBOARD) \n\
+                Ctrl <Btn1Up>: exec-formatted("${pkgs.xdg-utils}/bin/xdg-open '%t'", PRIMARY)
+            '';
+          })
+        ));
       extraConfig = ''
         #include "${
           pkgs.fetchFromGitHub {
@@ -5614,21 +5673,27 @@ in {
     gtk = {
       enable = true;
       theme = {
-        package =
-          pkgs.colloid-gtk-theme.override { tweaks = [ "nord" "rimless" ]; };
+        package = pkgs.colloid-gtk-theme.override {
+          tweaks = [
+            "nord"
+            "rimless"
+          ];
+        };
         name = "Colloid-Light-Nord";
       };
       iconTheme = {
-        package =
-          pkgs.colloid-icon-theme.override { schemeVariants = [ "nord" ]; };
+        package = pkgs.colloid-icon-theme.override { schemeVariants = [ "nord" ]; };
         name = "Colloid-nord-light";
       };
       cursorTheme = {
-        package = let version = "2024-02-28";
-        in pkgs.stdenv.mkDerivation {
-          inherit version;
-          pname = "colloid-cursor-theme";
-          src = "${
+        package =
+          let
+            version = "2024-02-28";
+          in
+          pkgs.stdenv.mkDerivation {
+            inherit version;
+            pname = "colloid-cursor-theme";
+            src = "${
               pkgs.fetchFromGitHub {
                 owner = "vinceliuice";
                 repo = "Colloid-icon-theme";
@@ -5636,73 +5701,77 @@ in {
                 hash = "sha256-bTN6x3t88yBL4WsPfOJIiNGWTywdIVi7E2VJKgMzEso=";
               }
             }/cursors";
-          nativeBuildInputs = with pkgs; [ inkscape xorg.xcursorgen jdupes ];
-          postPatch = ''
-            sed -i \
-              -e 's/#000000/#2e3440/g' \
-              -e 's/#1191f4/#5e81ac/g' \
-              -e 's/#14adf6/#88c0d0/g' \
-              -e 's/#1a1a1a/#2e3440/g' \
-              -e 's/#1b9aeb/#5e81ac/g' \
-              -e 's/#2a2a2a/#3b4252/g' \
-              -e 's/#2c2c2c/#3b4252/g' \
-              -e 's/#3bbd1c/#a3be8c/g' \
-              -e 's/#4caf50/#a3be8c/g' \
-              -e 's/#52cf30/#a3be8c/g' \
-              -e 's/#5b9bf8/#81a1c1/g' \
-              -e 's/#666666/#4c566a/g' \
-              -e 's/#6fce55/#a3be8c/g' \
-              -e 's/#ac44ca/#b48ead/g' \
-              -e 's/#b452cb/#b48ead/g' \
-              -e 's/#c7c7c7/#d8dee9/g' \
-              -e 's/#ca70e1/#b48ead/g' \
-              -e 's/#cecece/#d8dee9/g' \
-              -e 's/#d1d1d1/#d8dee9/g' \
-              -e 's/#dcdcdc/#d8dee9/g' \
-              -e 's/#ed1515/#bf616a/g' \
-              -e 's/#f5f5f5/#e5e9f0/g' \
-              -e 's/#f67400/#d08770/g' \
-              -e 's/#f83f31/#bf616a/g' \
-              -e 's/#faa91e/#d08770/g' \
-              -e 's/#fbb114/#d08770/g' \
-              -e 's/#fbd939/#ebcb8b/g' \
-              -e 's/#fdcf01/#ebcb8b/g' \
-              -e 's/#ff2a2a/#bf616a/g' \
-              -e 's/#ff4332/#bf616a/g' \
-              -e 's/#ff645d/#bf616a/g' \
-              -e 's/#ff9508/#d08770/g' \
-              -e 's/#ffaa07/#d08770/g' \
-              -e 's/#ffd305/#ebcb8b/g' \
-              -e 's/#ffffff/#eceff4/g' \
-              src/svg/*.svg \
-              src/svg-white/*.svg
+            nativeBuildInputs = with pkgs; [
+              inkscape
+              xorg.xcursorgen
+              jdupes
+            ];
+            postPatch = ''
+              sed -i \
+                -e 's/#000000/#2e3440/g' \
+                -e 's/#1191f4/#5e81ac/g' \
+                -e 's/#14adf6/#88c0d0/g' \
+                -e 's/#1a1a1a/#2e3440/g' \
+                -e 's/#1b9aeb/#5e81ac/g' \
+                -e 's/#2a2a2a/#3b4252/g' \
+                -e 's/#2c2c2c/#3b4252/g' \
+                -e 's/#3bbd1c/#a3be8c/g' \
+                -e 's/#4caf50/#a3be8c/g' \
+                -e 's/#52cf30/#a3be8c/g' \
+                -e 's/#5b9bf8/#81a1c1/g' \
+                -e 's/#666666/#4c566a/g' \
+                -e 's/#6fce55/#a3be8c/g' \
+                -e 's/#ac44ca/#b48ead/g' \
+                -e 's/#b452cb/#b48ead/g' \
+                -e 's/#c7c7c7/#d8dee9/g' \
+                -e 's/#ca70e1/#b48ead/g' \
+                -e 's/#cecece/#d8dee9/g' \
+                -e 's/#d1d1d1/#d8dee9/g' \
+                -e 's/#dcdcdc/#d8dee9/g' \
+                -e 's/#ed1515/#bf616a/g' \
+                -e 's/#f5f5f5/#e5e9f0/g' \
+                -e 's/#f67400/#d08770/g' \
+                -e 's/#f83f31/#bf616a/g' \
+                -e 's/#faa91e/#d08770/g' \
+                -e 's/#fbb114/#d08770/g' \
+                -e 's/#fbd939/#ebcb8b/g' \
+                -e 's/#fdcf01/#ebcb8b/g' \
+                -e 's/#ff2a2a/#bf616a/g' \
+                -e 's/#ff4332/#bf616a/g' \
+                -e 's/#ff645d/#bf616a/g' \
+                -e 's/#ff9508/#d08770/g' \
+                -e 's/#ffaa07/#d08770/g' \
+                -e 's/#ffd305/#ebcb8b/g' \
+                -e 's/#ffffff/#eceff4/g' \
+                src/svg/*.svg \
+                src/svg-white/*.svg
 
-            patchShebangs build.sh
+              patchShebangs build.sh
 
-            substituteInPlace build.sh \
-              --replace 'THEME="Colloid Cursors"' 'THEME="Colloid-nord-light-cursors"' \
-              --replace 'THEME="Colloid-dark Cursors"' 'THEME="Colloid-nord-dark-cursors"'
+              substituteInPlace build.sh \
+                --replace 'THEME="Colloid Cursors"' 'THEME="Colloid-nord-light-cursors"' \
+                --replace 'THEME="Colloid-dark Cursors"' 'THEME="Colloid-nord-dark-cursors"'
 
-            patchShebangs install.sh
+              patchShebangs install.sh
 
-            substituteInPlace install.sh \
-              --replace '$HOME/.local' $out \
-              --replace '$THEME_NAME-cursors' '$THEME_NAME-nord-light-cursors' \
-              --replace '$THEME_NAME-dark-cursors' '$THEME_NAME-nord-dark-cursors'
-          '';
-          buildPhase = ''
-            runHook preBuild
-            ./build.sh
-            runHook postBuild
-          '';
-          installPhase = ''
-            runHook preInstall
-            mkdir -p $out/share/icons
-            ./install.sh
-            jdupes --quiet --link-soft --recurse $out/share
-            runHook postInstall
-          '';
-        };
+              substituteInPlace install.sh \
+                --replace '$HOME/.local' $out \
+                --replace '$THEME_NAME-cursors' '$THEME_NAME-nord-light-cursors' \
+                --replace '$THEME_NAME-dark-cursors' '$THEME_NAME-nord-dark-cursors'
+            '';
+            buildPhase = ''
+              runHook preBuild
+              ./build.sh
+              runHook postBuild
+            '';
+            installPhase = ''
+              runHook preInstall
+              mkdir -p $out/share/icons
+              ./install.sh
+              jdupes --quiet --link-soft --recurse $out/share
+              runHook postInstall
+            '';
+          };
         name = "Colloid-nord-light-cursors";
         size = dpiScale 24;
       };
@@ -5722,7 +5791,8 @@ in {
 
     fonts.fontconfig.enable = true;
 
-    home.packages = with pkgs;
+    home.packages =
+      with pkgs;
       [
         moreutils
         usbutils
@@ -5733,11 +5803,13 @@ in {
         asciinema
         (symlinkJoin {
           name = "xdg-autostart-entries";
-          paths = builtins.map makeDesktopItem [{
-            name = "tailscale-systray";
-            desktopName = "tailscale-systray";
-            exec = "${tailscale-systray}/bin/tailscale-systray";
-          }];
+          paths = builtins.map makeDesktopItem [
+            {
+              name = "tailscale-systray";
+              desktopName = "tailscale-systray";
+              exec = "${tailscale-systray}/bin/tailscale-systray";
+            }
+          ];
           postBuild = ''
             files=("$out/share/applications"/*.desktop)
             mkdir -p "$out/etc/xdg/autostart"
@@ -5746,9 +5818,14 @@ in {
           '';
         })
         my-emacs
-        (writeShellScriptBin "edit"
-          (toString config.home.sessionVariables.EDITOR))
-        (aspellWithDicts (dicts: with dicts; [ en en-computers en-science ]))
+        (writeShellScriptBin "edit" (toString config.home.sessionVariables.EDITOR))
+        (aspellWithDicts (
+          dicts: with dicts; [
+            en
+            en-computers
+            en-science
+          ]
+        ))
         (hunspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
         (nuspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
         enchant
@@ -5794,8 +5871,7 @@ in {
         zathura
         sigil
         (calibre.overrideAttrs (oldAttrs: {
-          buildInputs = oldAttrs.buildInputs
-            ++ (with python3Packages; [ pycryptodome ]);
+          buildInputs = oldAttrs.buildInputs ++ (with python3Packages; [ pycryptodome ]);
         }))
         gnome.gnome-calculator
         gnome.file-roller
@@ -5818,12 +5894,14 @@ in {
         shared-mime-info
         # https://github.com/lutris/lutris/issues/3965#issuecomment-1100904672
         (lutris.overrideAttrs (oldAttrs: {
-          installPhase = (oldAttrs.installPhase or "") + ''
-            mkdir -p $out/share
-            rm $out/share/applications
-            cp -R ${lutris-unwrapped}/share/applications $out/share
-            sed -i -e 's/Exec=lutris/Exec=env WEBKIT_DISABLE_COMPOSITING_MODE=1 lutris/' $out/share/applications/*lutris*.desktop
-          '';
+          installPhase =
+            (oldAttrs.installPhase or "")
+            + ''
+              mkdir -p $out/share
+              rm $out/share/applications
+              cp -R ${lutris-unwrapped}/share/applications $out/share
+              sed -i -e 's/Exec=lutris/Exec=env WEBKIT_DISABLE_COMPOSITING_MODE=1 lutris/' $out/share/applications/*lutris*.desktop
+            '';
         }))
         vulkan-tools
         gimp
@@ -5843,184 +5921,229 @@ in {
         luakit
         surf
         (qmk.overrideAttrs (oldAttrs: {
-          propagatedBuildInputs = oldAttrs.propagatedBuildInputs
-            ++ (with python3Packages; [ pyserial pillow ]);
+          propagatedBuildInputs =
+            oldAttrs.propagatedBuildInputs
+            ++ (with python3Packages; [
+              pyserial
+              pillow
+            ]);
         }))
         dfu-programmer
         vial
         peek
-      ] ++ (let
-        firefox = config.programs.firefox.package.override (oldArgs: {
-          cfg = { };
-          # Generated by https://ffprofile.com/
-          extraPolicies = (oldArgs.extraPolicies or { }) // {
-            CaptivePortal = false;
-            DisableFirefoxStudies = true;
-            DisableTelemetry = true;
-            OverrideFirstRunPage = "";
-            OverridePostUpdatePage = "";
-            UserMessaging = {
-              WhatsNew = false;
-              ExtensionRecommendations = false;
-              FeatureRecommendations = false;
-              SkipOnboarding = true;
-              MoreFromMozilla = false;
+      ]
+      ++ (
+        let
+          firefox = config.programs.firefox.package.override (oldArgs: {
+            cfg = { };
+            # Generated by https://ffprofile.com/
+            extraPolicies = (oldArgs.extraPolicies or { }) // {
+              CaptivePortal = false;
+              DisableFirefoxStudies = true;
+              DisableTelemetry = true;
+              OverrideFirstRunPage = "";
+              OverridePostUpdatePage = "";
+              UserMessaging = {
+                WhatsNew = false;
+                ExtensionRecommendations = false;
+                FeatureRecommendations = false;
+                SkipOnboarding = true;
+                MoreFromMozilla = false;
+              };
             };
-          };
-          # Generated by https://ffprofile.com/
-          extraPrefs = (oldArgs.extraPrefs or "") + ''
-            pref("app.normandy.api_url", "");
-            pref("app.normandy.enabled", false);
-            pref("app.normandy.migrationsApplied", 12);
-            pref("app.shield.optoutstudies.enabled", false);
-            pref("app.update.auto", false);
-            pref("breakpad.reportURL", "");
-            pref("browser.aboutConfig.showWarning", false);
-            pref("browser.aboutwelcome.enabled", false);
-            pref("browser.crashReports.unsubmittedCheck.autoSubmit", false);
-            pref("browser.crashReports.unsubmittedCheck.autoSubmit2", false);
-            pref("browser.crashReports.unsubmittedCheck.enabled", false);
-            pref("browser.disableResetPrompt", true);
-            pref("browser.newtabpage.enhanced", false);
-            pref("browser.newtabpage.introShown", true);
-            pref("browser.selfsupport.url", "");
-            pref("browser.sessionstore.privacy_level", 0);
-            pref("browser.shell.checkDefaultBrowser", false);
-            pref("browser.startup.homepage_override.mstone", "ignore");
-            pref("browser.tabs.inTitlebar", 0);
-            pref("browser.tabs.crashReporting.sendReport", false);
-            pref("browser.toolbarbuttons.introduced.pocket-button", true);
-            pref("browser.toolbars.bookmarks.visibility", "never");
-            pref("browser.urlbar.trimURLs", false);
-            pref("datareporting.healthreport.service.enabled", false);
-            pref("datareporting.healthreport.uploadEnabled", false);
-            pref("datareporting.policy.dataSubmissionEnabled", false);
-            pref("doh-rollout.doneFirstRun", true);
-            pref("experiments.activeExperiment", false);
-            pref("experiments.enabled", false);
-            pref("experiments.manifest.uri", "");
-            pref("experiments.supported", false);
-            pref("extensions.getAddons.cache.enabled", false);
-            pref("extensions.getAddons.showPane", false);
-            pref("extensions.shield-recipe-client.api_url", "");
-            pref("extensions.shield-recipe-client.enabled", false);
-            pref("extensions.webservice.discoverURL", "");
-            pref("media.autoplay.default", 0);
-            pref("media.autoplay.enabled", true);
-            pref("network.allow-experiments", false);
-            pref("network.captive-portal-service.enabled", false);
-            pref("network.cookie.cookieBehavior", 1);
-            pref("network.http.referer.XOriginPolicy", 2);
-            pref("privacy.donottrackheader.enabled", true);
-            pref("privacy.donottrackheader.value", 1);
-            pref("privacy.trackingprotection.cryptomining.enabled", true);
-            pref("privacy.trackingprotection.enabled", true);
-            pref("privacy.trackingprotection.fingerprinting.enabled", true);
-            pref("privacy.trackingprotection.pbmode.enabled", true);
-            pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.showSponsoredTopSite", false);
-            pref("startup.homepage_override_url", "");
-            pref("startup.homepage_welcome_url", "");
-            pref("startup.homepage_welcome_url.additional", "");
-            pref("toolkit.telemetry.archive.enabled", false);
-            pref("toolkit.telemetry.bhrPing.enabled", false);
-            pref("toolkit.telemetry.cachedClientID", "");
-            pref("toolkit.telemetry.enabled", false);
-            pref("toolkit.telemetry.firstShutdownPing.enabled", false);
-            pref("toolkit.telemetry.hybridContent.enabled", false);
-            pref("toolkit.telemetry.newProfilePing.enabled", false);
-            pref("toolkit.telemetry.prompted", 2);
-            pref("toolkit.telemetry.rejected", true);
-            pref("toolkit.telemetry.reportingpolicy.firstRun", false);
-            pref("toolkit.telemetry.server", "");
-            pref("toolkit.telemetry.shutdownPingSender.enabled", false);
-            pref("toolkit.telemetry.unified", false);
-            pref("toolkit.telemetry.unifiedIsOptIn", false);
-            pref("toolkit.telemetry.updatePing.enabled", false);
-            pref("trailhead.firstrun.didSeeAboutWelcome", true);
-            pref("trailhead.firstrun.branches", "nofirstrun-empty");
+            # Generated by https://ffprofile.com/
+            extraPrefs =
+              (oldArgs.extraPrefs or "")
+              + ''
+                pref("app.normandy.api_url", "");
+                pref("app.normandy.enabled", false);
+                pref("app.normandy.migrationsApplied", 12);
+                pref("app.shield.optoutstudies.enabled", false);
+                pref("app.update.auto", false);
+                pref("breakpad.reportURL", "");
+                pref("browser.aboutConfig.showWarning", false);
+                pref("browser.aboutwelcome.enabled", false);
+                pref("browser.crashReports.unsubmittedCheck.autoSubmit", false);
+                pref("browser.crashReports.unsubmittedCheck.autoSubmit2", false);
+                pref("browser.crashReports.unsubmittedCheck.enabled", false);
+                pref("browser.disableResetPrompt", true);
+                pref("browser.newtabpage.enhanced", false);
+                pref("browser.newtabpage.introShown", true);
+                pref("browser.selfsupport.url", "");
+                pref("browser.sessionstore.privacy_level", 0);
+                pref("browser.shell.checkDefaultBrowser", false);
+                pref("browser.startup.homepage_override.mstone", "ignore");
+                pref("browser.tabs.inTitlebar", 0);
+                pref("browser.tabs.crashReporting.sendReport", false);
+                pref("browser.toolbarbuttons.introduced.pocket-button", true);
+                pref("browser.toolbars.bookmarks.visibility", "never");
+                pref("browser.urlbar.trimURLs", false);
+                pref("datareporting.healthreport.service.enabled", false);
+                pref("datareporting.healthreport.uploadEnabled", false);
+                pref("datareporting.policy.dataSubmissionEnabled", false);
+                pref("doh-rollout.doneFirstRun", true);
+                pref("experiments.activeExperiment", false);
+                pref("experiments.enabled", false);
+                pref("experiments.manifest.uri", "");
+                pref("experiments.supported", false);
+                pref("extensions.getAddons.cache.enabled", false);
+                pref("extensions.getAddons.showPane", false);
+                pref("extensions.shield-recipe-client.api_url", "");
+                pref("extensions.shield-recipe-client.enabled", false);
+                pref("extensions.webservice.discoverURL", "");
+                pref("media.autoplay.default", 0);
+                pref("media.autoplay.enabled", true);
+                pref("network.allow-experiments", false);
+                pref("network.captive-portal-service.enabled", false);
+                pref("network.cookie.cookieBehavior", 1);
+                pref("network.http.referer.XOriginPolicy", 2);
+                pref("privacy.donottrackheader.enabled", true);
+                pref("privacy.donottrackheader.value", 1);
+                pref("privacy.trackingprotection.cryptomining.enabled", true);
+                pref("privacy.trackingprotection.enabled", true);
+                pref("privacy.trackingprotection.fingerprinting.enabled", true);
+                pref("privacy.trackingprotection.pbmode.enabled", true);
+                pref("services.sync.prefs.sync.browser.newtabpage.activity-stream.showSponsoredTopSite", false);
+                pref("startup.homepage_override_url", "");
+                pref("startup.homepage_welcome_url", "");
+                pref("startup.homepage_welcome_url.additional", "");
+                pref("toolkit.telemetry.archive.enabled", false);
+                pref("toolkit.telemetry.bhrPing.enabled", false);
+                pref("toolkit.telemetry.cachedClientID", "");
+                pref("toolkit.telemetry.enabled", false);
+                pref("toolkit.telemetry.firstShutdownPing.enabled", false);
+                pref("toolkit.telemetry.hybridContent.enabled", false);
+                pref("toolkit.telemetry.newProfilePing.enabled", false);
+                pref("toolkit.telemetry.prompted", 2);
+                pref("toolkit.telemetry.rejected", true);
+                pref("toolkit.telemetry.reportingpolicy.firstRun", false);
+                pref("toolkit.telemetry.server", "");
+                pref("toolkit.telemetry.shutdownPingSender.enabled", false);
+                pref("toolkit.telemetry.unified", false);
+                pref("toolkit.telemetry.unifiedIsOptIn", false);
+                pref("toolkit.telemetry.updatePing.enabled", false);
+                pref("trailhead.firstrun.didSeeAboutWelcome", true);
+                pref("trailhead.firstrun.branches", "nofirstrun-empty");
+              '';
+          });
+          firefox-guest = pkgs.writeShellScriptBin "firefox-guest" ''
+            profile="$(mktemp --directory -t firefox-guest.XXXXXXXXXX)"
+            nonce="''${profile##*.}"
+            wm_class="firefox-guest.$nonce"
+
+            "${firefox}/bin/firefox" \
+              --profile "$profile" \
+              --name "$wm_class" \
+              --wait-for-browser \
+              "$@"
+
+            rm -rf "$profile"
           '';
-        });
-        firefox-guest = pkgs.writeShellScriptBin "firefox-guest" ''
-          profile="$(mktemp --directory -t firefox-guest.XXXXXXXXXX)"
-          nonce="''${profile##*.}"
-          wm_class="firefox-guest.$nonce"
+        in
+        [
+          firefox-guest
+          (firefox.desktopItem.override (oldArgs: {
+            name = "firefox-guest";
+            desktopName = "${oldArgs.desktopName} Guest Session";
+            exec = "${firefox-guest}/bin/firefox-guest %U";
+          }))
+        ]
+      )
+      ++ (
+        let
+          wrapFirefoxWithProfile =
+            { name, profile, ... }@args:
+            pkg:
+            let
+              inherit (pkg.passthru.unwrapped) binaryName;
+            in
+            pkgs.runCommandLocal "${binaryName}-with-${profile}-profile"
+              (
+                {
+                  buildInputs = with pkgs; [
+                    makeWrapper
+                    xorg.lndir
+                  ];
+                }
+                // (removeAttrs args [
+                  "name"
+                  "profile"
+                ])
+              )
+              ''
+                # Symlink everything
+                mkdir -p "$out"
+                lndir -silent "${pkg}" "$out"
 
-          "${firefox}/bin/firefox" \
-            --profile "$profile" \
-            --name "$wm_class" \
-            --wait-for-browser \
-            "$@"
+                # Remove symlink to original wrapper, if it exists, this may
+                # collide with the same file in other firefox packages.
+                # Workaround for issue fixed by
+                # https://github.com/NixOS/nixpkgs/pull/294971
+                rm -f "$out/bin/.${binaryName}-wrapper"
 
-          rm -rf "$profile"
-        '';
-      in [
-        firefox-guest
-        (firefox.desktopItem.override (oldArgs: {
-          name = "firefox-guest";
-          desktopName = "${oldArgs.desktopName} Guest Session";
-          exec = "${firefox-guest}/bin/firefox-guest %U";
-        }))
-      ]) ++ (let
-        wrapFirefoxWithProfile = { name, profile, ... }@args:
-          pkg:
-          let inherit (pkg.passthru.unwrapped) binaryName;
-          in pkgs.runCommandLocal "${binaryName}-with-${profile}-profile" ({
-            buildInputs = with pkgs; [ makeWrapper xorg.lndir ];
-          } // (removeAttrs args [ "name" "profile" ])) ''
-            # Symlink everything
-            mkdir -p "$out"
-            lndir -silent "${pkg}" "$out"
-
-            # Remove symlink to original wrapper, if it exists, this may
-            # collide with the same file in other firefox packages.
-            # Workaround for issue fixed by
-            # https://github.com/NixOS/nixpkgs/pull/294971
-            rm -f "$out/bin/.${binaryName}-wrapper"
-
-            # Make our wrapper
-            rm "$out/bin/${name}"
-            makeWrapper "${pkg}/bin/${name}" "$out/bin/${name}" \
-              --add-flags '-P "${profile}"' \
-              ''${makeWrapperArgs}
-          '';
-      in [
-        (wrapFirefoxWithProfile {
-          name = "firefox-devedition";
-          profile = "developer-edition";
-          makeWrapperArgs = [ "--add-flags" "--start-debugger-server" ];
-        } (firefox-devedition.override {
-          nativeMessagingHosts = with pkgs; [
-            browserpass
-            plasma-browser-integration
-            tridactyl-native
-            (tabfs.override {
-              mountDir = "${config.xdg.dataHome}/tabfs/developer-edition";
-            })
-          ];
-        }))
-        (wrapFirefoxWithProfile {
-          name = "firefox-beta";
-          profile = "beta";
-        } (firefox-beta.override {
-          nativeMessagingHosts = with pkgs; [
-            browserpass
-            plasma-browser-integration
-            tridactyl-native
-            (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/beta"; })
-          ];
-        }))
-        (wrapFirefoxWithProfile {
-          name = "firefox-esr";
-          profile = "esr";
-        } (firefox-esr.override {
-          nativeMessagingHosts = with pkgs; [
-            browserpass
-            plasma-browser-integration
-            tridactyl-native
-            (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/esr"; })
-          ];
-        }))
-      ]) ++ [
+                # Make our wrapper
+                rm "$out/bin/${name}"
+                makeWrapper "${pkg}/bin/${name}" "$out/bin/${name}" \
+                  --add-flags '-P "${profile}"' \
+                  ''${makeWrapperArgs}
+              '';
+        in
+        [
+          (wrapFirefoxWithProfile
+            {
+              name = "firefox-devedition";
+              profile = "developer-edition";
+              makeWrapperArgs = [
+                "--add-flags"
+                "--start-debugger-server"
+              ];
+            }
+            (
+              firefox-devedition.override {
+                nativeMessagingHosts = with pkgs; [
+                  browserpass
+                  plasma-browser-integration
+                  tridactyl-native
+                  (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/developer-edition"; })
+                ];
+              }
+            )
+          )
+          (wrapFirefoxWithProfile
+            {
+              name = "firefox-beta";
+              profile = "beta";
+            }
+            (
+              firefox-beta.override {
+                nativeMessagingHosts = with pkgs; [
+                  browserpass
+                  plasma-browser-integration
+                  tridactyl-native
+                  (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/beta"; })
+                ];
+              }
+            )
+          )
+          (wrapFirefoxWithProfile
+            {
+              name = "firefox-esr";
+              profile = "esr";
+            }
+            (
+              firefox-esr.override {
+                nativeMessagingHosts = with pkgs; [
+                  browserpass
+                  plasma-browser-integration
+                  tridactyl-native
+                  (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/esr"; })
+                ];
+              }
+            )
+          )
+        ]
+      )
+      ++ [
         ungoogled-chromium
         google-chrome
         netflix
@@ -6056,7 +6179,8 @@ in {
         mangohud
         protonup
 
-      ] ++ [
+      ]
+      ++ [
 
         #########
         # FONTS #
@@ -6118,22 +6242,27 @@ in {
         gyre-fonts
 
         # Font collections
-        ((google-fonts.overrideAttrs (oldAttrs: {
-          nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ perl ];
-          installPhase = (oldAttrs.installPhase or "") + ''
-            skip=("NotoColorEmoji")
+        (
+          (google-fonts.overrideAttrs (oldAttrs: {
+            nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ perl ];
+            installPhase =
+              (oldAttrs.installPhase or "")
+              + ''
+                skip=("NotoColorEmoji")
 
-            readarray -t fonts < <(find . -name '*.ttf' -exec basename '{}' \; | perl -pe 's/(.+?)[[.-].*/\1/g' | sort | uniq)
+                readarray -t fonts < <(find . -name '*.ttf' -exec basename '{}' \; | perl -pe 's/(.+?)[[.-].*/\1/g' | sort | uniq)
 
-            for font in "''${fonts[@]}"; do
-              [[ "_''${skip[*]}_" =~ _''${font}_ ]] && continue
-              find . -name "''${font}*.ttf" -exec install -m 444 -Dt $dest '{}' +
-            done
-          '';
-        })).override {
-          # Don't install fonts in the original `installPhase`
-          fonts = [ "__NO_FONT__" ];
-        })
+                for font in "''${fonts[@]}"; do
+                  [[ "_''${skip[*]}_" =~ _''${font}_ ]] && continue
+                  find . -name "''${font}*.ttf" -exec install -m 444 -Dt $dest '{}' +
+                done
+              '';
+          })).override
+          {
+            # Don't install fonts in the original `installPhase`
+            fonts = [ "__NO_FONT__" ];
+          }
+        )
         (league-of-moveable-type.override {
           fanwood = false;
           goudy-bookletter-1911 = false;
@@ -6175,8 +6304,7 @@ in {
           inherit (nerdfonts) version;
           pname = "nerdfonts-fontconfig";
           src = fetchurl {
-            url =
-              "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/v${nerdfonts.version}/10-nerd-font-symbols.conf";
+            url = "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/v${nerdfonts.version}/10-nerd-font-symbols.conf";
             hash = "sha256-ZgHkMcXEPYDfzjdRR7KX3ws2u01GWUj48heMHaiaznY=";
           };
           dontUnpack = true;
@@ -6196,67 +6324,69 @@ in {
         emacs-all-the-icons-fonts
 
         # Apple Fonts
-      ] ++ (let
-        mkAppleFont = { name, src }:
-          stdenv.mkDerivation {
-            inherit name src;
-            nativeBuildInputs = [ p7zip ];
-            unpackCmd = "7z x $curSrc";
-            postUnpack = ''
-              cd $sourceRoot
-              7z x *.pkg
-              7z x Payload~
-              cd ..
-            '';
-            dontConfigure = true;
-            dontBuild = true;
-            installPhase = ''
-              runHook preInstall
+      ]
+      ++ (
+        let
+          mkAppleFont =
+            { name, src }:
+            stdenv.mkDerivation {
+              inherit name src;
+              nativeBuildInputs = [ p7zip ];
+              unpackCmd = "7z x $curSrc";
+              postUnpack = ''
+                cd $sourceRoot
+                7z x *.pkg
+                7z x Payload~
+                cd ..
+              '';
+              dontConfigure = true;
+              dontBuild = true;
+              installPhase = ''
+                runHook preInstall
 
-              fontdir="$out/share/fonts/truetype"
-              install -d "$fontdir"
-              install "Library/Fonts"/* "$fontdir"
+                fontdir="$out/share/fonts/truetype"
+                install -d "$fontdir"
+                install "Library/Fonts"/* "$fontdir"
 
-              runHook postInstall
-            '';
-            preferLocalBuild = true;
-            allowSubstitutes = false;
-            meta.license = lib.licenses.unfree;
-          };
-      in [
-        (mkAppleFont {
-          name = "san-francisco-pro";
-          src = pkgs.fetchurl {
-            url =
-              "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg";
-            hash = "sha256-B8xljBAqOoRFXvSOkOKDDWeYUebtMmQLJ8lF05iFnXk=";
-          };
-        })
-        (mkAppleFont {
-          name = "san-francisco-compact";
-          src = pkgs.fetchurl {
-            url =
-              "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg";
-            hash = "sha256-L4oLQ34Epw1/wLehU9sXQwUe/LaeKjHRxQAF6u2pfTo=";
-          };
-        })
-        (mkAppleFont {
-          name = "san-francisco-mono";
-          src = pkgs.fetchurl {
-            url =
-              "https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg";
-            hash = "sha256-Uarx1TKO7g5yVBXAx6Yki065rz/wRuYiHPzzi6cTTl8=";
-          };
-        })
-        (mkAppleFont {
-          name = "new-york";
-          src = pkgs.fetchurl {
-            url =
-              "https://devimages-cdn.apple.com/design/resources/download/NY.dmg";
-            hash = "sha256-yYyqkox2x9nQ842laXCqA3UwOpUGyIfUuprX975OsLA=";
-          };
-        })
-      ]) ++ [
+                runHook postInstall
+              '';
+              preferLocalBuild = true;
+              allowSubstitutes = false;
+              meta.license = lib.licenses.unfree;
+            };
+        in
+        [
+          (mkAppleFont {
+            name = "san-francisco-pro";
+            src = pkgs.fetchurl {
+              url = "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg";
+              hash = "sha256-B8xljBAqOoRFXvSOkOKDDWeYUebtMmQLJ8lF05iFnXk=";
+            };
+          })
+          (mkAppleFont {
+            name = "san-francisco-compact";
+            src = pkgs.fetchurl {
+              url = "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg";
+              hash = "sha256-L4oLQ34Epw1/wLehU9sXQwUe/LaeKjHRxQAF6u2pfTo=";
+            };
+          })
+          (mkAppleFont {
+            name = "san-francisco-mono";
+            src = pkgs.fetchurl {
+              url = "https://devimages-cdn.apple.com/design/resources/download/SF-Mono.dmg";
+              hash = "sha256-Uarx1TKO7g5yVBXAx6Yki065rz/wRuYiHPzzi6cTTl8=";
+            };
+          })
+          (mkAppleFont {
+            name = "new-york";
+            src = pkgs.fetchurl {
+              url = "https://devimages-cdn.apple.com/design/resources/download/NY.dmg";
+              hash = "sha256-yYyqkox2x9nQ842laXCqA3UwOpUGyIfUuprX975OsLA=";
+            };
+          })
+        ]
+      )
+      ++ [
 
         # Non-latin character sets
         junicode

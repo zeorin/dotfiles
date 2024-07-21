@@ -1,4 +1,9 @@
-{ inputs, lib, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   imports = with inputs.nixos-hardware.nixosModules; [
@@ -40,7 +45,11 @@
     "/" = {
       device = "/dev/disk/by-uuid/9f5d68c6-57a4-47e0-ba15-d6cfb1e3111c";
       fsType = "ext4";
-      options = [ "noatime" "nodiratime" "discard" ];
+      options = [
+        "noatime"
+        "nodiratime"
+        "discard"
+      ];
     };
 
     "/boot" = {
@@ -82,9 +91,7 @@
 
   # Overlays
   nixpkgs.overlays = [
-    (_: prev: {
-      vaapiIntel = prev.vaapiIntel.override { enableHybridCodec = true; };
-    })
+    (_: prev: { vaapiIntel = prev.vaapiIntel.override { enableHybridCodec = true; }; })
   ];
 
   services.xserver = {
@@ -99,15 +106,19 @@
   # Sensors
   hardware.sensor.iio.enable = true;
 
-  programs.xss-lock = let
-    dim-screen = pkgs.writeShellScript "dim-screen" ''
-      min_brightness="40%"
+  programs.xss-lock =
+    let
+      dim-screen = pkgs.writeShellScript "dim-screen" ''
+        min_brightness="40%"
 
-      trap "exit 0" TERM INT
-      trap "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --restore; kill %%" EXIT
-      ${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set "$min_brightness"
-      sleep 2147483647 &
-      wait
-    '';
-  in { extraOptions = [ ''--notifier="${dim-screen}"'' ]; };
+        trap "exit 0" TERM INT
+        trap "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --restore; kill %%" EXIT
+        ${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set "$min_brightness"
+        sleep 2147483647 &
+        wait
+      '';
+    in
+    {
+      extraOptions = [ ''--notifier="${dim-screen}"'' ];
+    };
 }

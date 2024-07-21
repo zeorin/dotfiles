@@ -1,7 +1,15 @@
 # This is your system's configuration file.
 # Use this to configure your system environment (it replaces /etc/nixos/configuration.nix)
 
-{ inputs, outputs, lib, config, options, pkgs, ... }:
+{
+  inputs,
+  outputs,
+  lib,
+  config,
+  options,
+  pkgs,
+  ...
+}:
 
 {
   imports = [
@@ -24,82 +32,101 @@
   };
 
   config = {
-    nixpkgs = let
-      homePkgs = if ((options.home-manager or null) != null) then
-        (outputs.homeConfigurations."zeorin@${config.networking.hostName}".config.nixpkgs or { })
-      else
-        { };
-    in {
-      overlays = [
-        # Add overlays your own flake exports (from overlays and pkgs dir):
-        outputs.overlays.additions
-        outputs.overlays.modifications
-        outputs.overlays.unstable-packages
+    nixpkgs =
+      let
+        homePkgs =
+          if ((options.home-manager or null) != null) then
+            (outputs.homeConfigurations."zeorin@${config.networking.hostName}".config.nixpkgs or { })
+          else
+            { };
+      in
+      {
+        overlays = [
+          # Add overlays your own flake exports (from overlays and pkgs dir):
+          outputs.overlays.additions
+          outputs.overlays.modifications
+          outputs.overlays.unstable-packages
 
-        (_: prev: {
-          slock = prev.slock.overrideAttrs (oldAttrs: {
-            preBuild = "cp ${./slock-config.h} config.h";
-            patches = (oldAttrs.patches or [ ]) ++ [ ./slock-patches.diff ];
-            buildInputs = (oldAttrs.buildInputs or [ ]) ++ [ pkgs.imlib2 ];
-          });
-        })
+          (_: prev: {
+            slock = prev.slock.overrideAttrs (oldAttrs: {
+              preBuild = "cp ${./slock-config.h} config.h";
+              patches = (oldAttrs.patches or [ ]) ++ [ ./slock-patches.diff ];
+              buildInputs = (oldAttrs.buildInputs or [ ]) ++ [ pkgs.imlib2 ];
+            });
+          })
 
-        # Bugfix for steam client to not inhibit screensaver unless there's a game active
-        # https://github.com/ValveSoftware/steam-for-linux/issues/5607
-        # https://github.com/tejing1/nixos-config/blob/master/overlays/steam-fix-screensaver/default.nix
-        (final: prev: {
-          steam = (prev.steam.overrideAttrs (oldAttrs:
+          # Bugfix for steam client to not inhibit screensaver unless there's a game active
+          # https://github.com/ValveSoftware/steam-for-linux/issues/5607
+          # https://github.com/tejing1/nixos-config/blob/master/overlays/steam-fix-screensaver/default.nix
+          (final: prev: {
+            steam = (
+              prev.steam.overrideAttrs (
+                oldAttrs:
+                let
+                  inherit (builtins) concatStringsSep attrValues mapAttrs;
+                  inherit (final)
+                    stdenv
+                    stdenv_32bit
+                    runCommandWith
+                    runCommandLocal
+                    makeWrapper
+                    ;
+                  platforms = {
+                    x86_64 = 64;
+                    i686 = 32;
+                  };
+                  preloadLibFor =
+                    bits:
+                    assert bits == 64 || bits == 32;
+                    runCommandWith {
+                      stdenv = if bits == 64 then stdenv else stdenv_32bit;
+                      runLocal = false;
+                      name = "filter_SDL_DisableScreenSaver.${toString bits}bit.so";
+                      derivationArgs = { };
+                    } "gcc -shared -fPIC -ldl -m${toString bits} -o $out ${./filter_SDL_DisableScreenSaver.c}";
+                  preloadLibs = runCommandLocal "filter_SDL_DisableScreenSaver" { } (
+                    concatStringsSep "\n" (
+                      attrValues (
+                        mapAttrs (platform: bits: ''
+                          mkdir -p $out/${platform}
+                          ln -s ${preloadLibFor bits} $out/${platform}/filter_SDL_DisableScreenSaver.so
+                        '') platforms
+                      )
+                    )
+                  );
+                in
+                {
+                  nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ makeWrapper ];
+                  buildCommand =
+                    (oldAttrs.buildCommand or "")
+                    + ''
+                      steamBin="$(readlink $out/bin/steam)"
+                      rm $out/bin/steam
+                      makeWrapper $steamBin $out/bin/steam --prefix LD_PRELOAD : ${preloadLibs}/\$PLATFORM/filter_SDL_DisableScreenSaver.so
+                    '';
+                }
+              )
+            );
+          })
+        ] ++ (homePkgs.overlays or [ ]);
+
+        config = (homePkgs.config or { }) // {
+          # https://github.com/NixOS/nixpkgs/issues/197325#issuecomment-1579420085
+          allowUnfreePredicate =
+            pkg:
             let
-              inherit (builtins) concatStringsSep attrValues mapAttrs;
-              inherit (final)
-                stdenv stdenv_32bit runCommandWith runCommandLocal makeWrapper;
-              platforms = {
-                x86_64 = 64;
-                i686 = 32;
-              };
-              preloadLibFor = bits:
-                assert bits == 64 || bits == 32;
-                runCommandWith {
-                  stdenv = if bits == 64 then stdenv else stdenv_32bit;
-                  runLocal = false;
-                  name = "filter_SDL_DisableScreenSaver.${toString bits}bit.so";
-                  derivationArgs = { };
-                } "gcc -shared -fPIC -ldl -m${toString bits} -o $out ${
-                  ./filter_SDL_DisableScreenSaver.c
-                }";
-              preloadLibs = runCommandLocal "filter_SDL_DisableScreenSaver" { }
-                (concatStringsSep "\n" (attrValues (mapAttrs (platform: bits: ''
-                  mkdir -p $out/${platform}
-                  ln -s ${
-                    preloadLibFor bits
-                  } $out/${platform}/filter_SDL_DisableScreenSaver.so
-                '') platforms)));
-            in {
-              nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ])
-                ++ [ makeWrapper ];
-              buildCommand = (oldAttrs.buildCommand or "") + ''
-                steamBin="$(readlink $out/bin/steam)"
-                rm $out/bin/steam
-                makeWrapper $steamBin $out/bin/steam --prefix LD_PRELOAD : ${preloadLibs}/\$PLATFORM/filter_SDL_DisableScreenSaver.so
-              '';
-            }));
-        })
-      ] ++ (homePkgs.overlays or [ ]);
+              names = lib.filter lib.isString config.nixpkgs.allowUnfreePackages;
+              predicates = lib.filter lib.isFunction config.nixpkgs.allowUnfreePackages;
+            in
+            (builtins.elem (lib.getName pkg) names) || (lib.lists.any (p: p pkg) predicates);
+        };
 
-      config = (homePkgs.config or { }) // {
-        # https://github.com/NixOS/nixpkgs/issues/197325#issuecomment-1579420085
-        allowUnfreePredicate = pkg:
-          let
-            names = lib.filter lib.isString config.nixpkgs.allowUnfreePackages;
-            predicates =
-              lib.filter lib.isFunction config.nixpkgs.allowUnfreePackages;
-          in (builtins.elem (lib.getName pkg) names)
-          || (lib.lists.any (p: p pkg) predicates);
+        allowUnfreePackages = [
+          "steam"
+          "steam-original"
+          "steam-run"
+        ] ++ (homePkgs.allowUnfreePackages or [ ]);
       };
-
-      allowUnfreePackages = [ "steam" "steam-original" "steam-run" ]
-        ++ (homePkgs.allowUnfreePackages or [ ]);
-    };
 
     # Keep the system up-to-date automatically, also prune it from time to time.
     system.autoUpgrade.enable = true;
@@ -117,16 +144,22 @@
 
       # This will add each flake input as a registry
       # To make nix3 commands consistent with your flake
-      registry = (lib.mapAttrs (_: flake: { inherit flake; }))
-        ((lib.filterAttrs (_: lib.isType "flake")) inputs);
+      registry = (lib.mapAttrs (_: flake: { inherit flake; })) (
+        (lib.filterAttrs (_: lib.isType "flake")) inputs
+      );
       nixPath = [ "/etc/nix/path" ];
 
       settings = {
         max-jobs = 4;
-        experimental-features =
-          lib.strings.concatStringsSep " " [ "nix-command" "flakes" ];
+        experimental-features = lib.strings.concatStringsSep " " [
+          "nix-command"
+          "flakes"
+        ];
         auto-optimise-store = true;
-        trusted-users = [ "root" "@wheel" ];
+        trusted-users = [
+          "root"
+          "@wheel"
+        ];
         # keep-outputs = true;
         # keep-derivations = true;
         # https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-use-xdg-base-directories
@@ -155,11 +188,14 @@
       initrd.systemd.enable = true;
 
       # https://discourse.nixos.org/t/hibernate-doesnt-work-anymore/24673/14
-      resumeDevice = lib.mkIf (config.swapDevices != [ ]
-        && (builtins.head config.swapDevices) ? device)
-        (lib.mkDefault (builtins.head config.swapDevices).device);
+      resumeDevice = lib.mkIf (config.swapDevices != [ ] && (builtins.head config.swapDevices) ? device) (
+        lib.mkDefault (builtins.head config.swapDevices).device
+      );
 
-      kernelParams = [ "quiet" "udev.log_level=3" ];
+      kernelParams = [
+        "quiet"
+        "udev.log_level=3"
+      ];
       kernelPackages = pkgs.unstable.linuxPackages_zen;
       extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
       kernelModules = [ "v4l2loopback" ];
@@ -169,7 +205,10 @@
       supportedFilesystems.ntfs = true;
     };
 
-    services.udev.packages = with pkgs; [ alsa-utils brightnessctl ];
+    services.udev.packages = with pkgs; [
+      alsa-utils
+      brightnessctl
+    ];
     services.udev.extraRules = ''
       # https://github.com/NixOS/nixpkgs/issues/226346#issuecomment-1892314545
       # SUBSYSTEM=="input", ACTION=="add", ATTR{name}!="keyd virtual*", RUN+="${pkgs.systemd}/bin/systemctl try-restart keyd.service"
@@ -184,19 +223,20 @@
         path = [ pkgs.gst_all_1.gstreamer ];
         environment = {
           GST_DEBUG = "*:INFO";
-          GST_PLUGIN_SYSTEM_PATH_1_0 =
-            lib.strings.makeSearchPath "lib/gstreamer-1.0"
-            (lib.attrsets.attrValues {
+          GST_PLUGIN_SYSTEM_PATH_1_0 = lib.strings.makeSearchPath "lib/gstreamer-1.0" (
+            lib.attrsets.attrValues {
               inherit (pkgs.gst_all_1)
-                gst-plugins-base gst-plugins-good gst-libav gst-vaapi;
-            });
+                gst-plugins-base
+                gst-plugins-good
+                gst-libav
+                gst-vaapi
+                ;
+            }
+          );
         };
         serviceConfig = {
           Type = "oneshot";
-          ExecStart =
-            "${config.boot.kernelPackages.v4l2loopback.bin}/bin/v4l2loopback-ctl set-timeout-image -t 3000 /dev/video10 ${
-              ./test-card.png
-            }";
+          ExecStart = "${config.boot.kernelPackages.v4l2loopback.bin}/bin/v4l2loopback-ctl set-timeout-image -t 3000 /dev/video10 ${./test-card.png}";
         };
       };
     };
@@ -254,19 +294,25 @@
 
     # This will additionally add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
-    environment.etc = (lib.mapAttrs' (name: value: {
-      name = "nix/path/${name}";
-      value.source = value.flake;
-    }) config.nix.registry) // {
-      "systemd/system-sleep/post-hibernate-pkill-slock".source =
-        pkgs.writeShellScript "post-hibernate-pkill-slock" ''
+    environment.etc =
+      (lib.mapAttrs' (name: value: {
+        name = "nix/path/${name}";
+        value.source = value.flake;
+      }) config.nix.registry)
+      // {
+        "systemd/system-sleep/post-hibernate-pkill-slock".source = pkgs.writeShellScript "post-hibernate-pkill-slock" ''
           if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
             ${pkgs.procps}/bin/pkill slock
           fi
         '';
-    };
+      };
 
-    fileSystems."/boot".options = [ "uid=0" "gid=0" "fmask=0077" "dmask=0077" ];
+    fileSystems."/boot".options = [
+      "uid=0"
+      "gid=0"
+      "fmask=0077"
+      "dmask=0077"
+    ];
 
     networking = {
       # Easy network config
@@ -329,26 +375,25 @@
       xkb = {
         layout = "us,us";
         variant = "dvp,";
-        options =
-          "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
+        options = "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
       };
 
       displayManager = {
         # https://github.com/NixOS/nixpkgs/issues/174099#issuecomment-1201697954
         sessionCommands = ''
-          ${
-            lib.getBin pkgs.dbus
-          }/bin/dbus-update-activation-environment --systemd --all
+          ${lib.getBin pkgs.dbus}/bin/dbus-update-activation-environment --systemd --all
         '';
         # We need to create at least one session for auto login to work
-        session = [{
-          name = "xsession";
-          manage = "desktop";
-          start = ''
-            ${pkgs.runtimeShell} $HOME/.xsession &
-            waitPID=$!
-          '';
-        }];
+        session = [
+          {
+            name = "xsession";
+            manage = "desktop";
+            start = ''
+              ${pkgs.runtimeShell} $HOME/.xsession &
+              waitPID=$!
+            '';
+          }
+        ];
       };
     };
 
@@ -517,7 +562,10 @@
       users.zeorin = import ../../home-manager/home.nix;
     };
 
-    environment.pathsToLink = [ "/share/xdg-desktop-portal" "/share/applications" ];
+    environment.pathsToLink = [
+      "/share/xdg-desktop-portal"
+      "/share/applications"
+    ];
 
     networking = {
       iproute2.enable = true;
@@ -599,7 +647,10 @@
 
     # Enable CUPS to print documents.
     services.printing.enable = true;
-    services.printing.drivers = with pkgs; [ gutenprint gutenprintBin ];
+    services.printing.drivers = with pkgs; [
+      gutenprint
+      gutenprintBin
+    ];
 
     # Security/crypto
     services.gnome.gnome-keyring.enable = true;
@@ -652,27 +703,29 @@
     # TODO Move slock setup to home.nix (`services.screen-locker`), if possible,
     # might not be because it's run as root for OOM killer protection
     programs.slock.enable = true;
-    programs.xss-lock = let
-      dim-screen = pkgs.writeShellScript "dim-screen" ''
-        min_brightness=0
+    programs.xss-lock =
+      let
+        dim-screen = pkgs.writeShellScript "dim-screen" ''
+          min_brightness=0
 
-        brightnessctl () {
-          for device in "$("${pkgs.brightnessctl}/bin/brightnessctl" --class="backlight" --list --machine | cut -f1 -d,)"; do
-            "${pkgs.brightnessctl}/bin/brightnessctl" --exponent=4 "$@"
-          done
-        }
+          brightnessctl () {
+            for device in "$("${pkgs.brightnessctl}/bin/brightnessctl" --class="backlight" --list --machine | cut -f1 -d,)"; do
+              "${pkgs.brightnessctl}/bin/brightnessctl" --exponent=4 "$@"
+            done
+          }
 
-        trap "exit 0" TERM INT
-        trap "brightnessctl --restore; kill %%" EXIT
-        brightnessctl set "$min_brightness"
-        sleep 2147483647 &
-        wait
-      '';
-    in {
-      enable = true;
-      lockerCommand = "${config.security.wrapperDir}/slock";
-      extraOptions = [ ''--notifier="${dim-screen}"'' ];
-    };
+          trap "exit 0" TERM INT
+          trap "brightnessctl --restore; kill %%" EXIT
+          brightnessctl set "$min_brightness"
+          sleep 2147483647 &
+          wait
+        '';
+      in
+      {
+        enable = true;
+        lockerCommand = "${config.security.wrapperDir}/slock";
+        extraOptions = [ ''--notifier="${dim-screen}"'' ];
+      };
     # security.pam.services.hibernate-on-multiple-failures = {
     #   name = "hibernate-on-multiple-failures";
     #   text = ''
