@@ -550,6 +550,7 @@
         "video"
         "input"
         "i2c"
+        "wireshark"
       ];
     };
     users.groups.zeorin = { };
@@ -744,6 +745,7 @@
 
     programs.seahorse.enable = true;
     programs.dconf.enable = true;
+    programs.wireshark.enable = true;
     programs.adb.enable = true;
     programs.steam.enable = true;
     programs.gamemode.enable = true;
