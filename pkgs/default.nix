@@ -8,9 +8,13 @@
 with pkgs;
 
 {
+  codemod = callPackage ./codemod { };
+
+  modorganizer2-linux-installer = callPackage ./modorganizer2-linux-installer { };
+
+  newpipelist = callPackage ./newpipelist { };
+
   wrapTabfs = callPackage ./tabfs/wrapper.nix { };
   tabfs-unwrapped = callPackage ./tabfs { };
   tabfs = wrapTabfs tabfs-unwrapped { };
-  modorganizer2-linux-installer = callPackage ./modorganizer2-linux-installer { };
-  newpipelist = callPackage ./newpipelist { };
 }
