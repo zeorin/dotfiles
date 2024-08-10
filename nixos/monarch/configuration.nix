@@ -10,8 +10,7 @@
     common-pc-laptop
     common-pc-laptop-ssd
     common-cpu-intel
-    common-cpu-intel-kaby-lake
-    common-gpu-intel
+    common-gpu-intel-kaby-lake
     common-hidpi
     ./hardware-configuration.nix
     ../common/configuration.nix

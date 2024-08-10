@@ -8,7 +8,7 @@
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
-    nixos-hardware.url = "nixos-hardware";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     home-manager.url = "home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
