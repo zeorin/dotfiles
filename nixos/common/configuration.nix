@@ -702,15 +702,9 @@
         dim-screen = pkgs.writeShellScript "dim-screen" ''
           min_brightness=0
 
-          brightnessctl () {
-            for device in "$("${pkgs.brightnessctl}/bin/brightnessctl" --class="backlight" --list --machine | cut -f1 -d,)"; do
-              "${pkgs.brightnessctl}/bin/brightnessctl" --exponent=4 "$@"
-            done
-          }
-
           trap "exit 0" TERM INT
-          trap "brightnessctl --restore; kill %%" EXIT
-          brightnessctl set "$min_brightness"
+          trap "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --restore; kill %%" EXIT
+          ${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set "$min_brightness"
           sleep 2147483647 &
           wait
         '';
