@@ -17,6 +17,7 @@
     "xhci_pci"
     "ahci"
     "usbhid"
+    "usb_storage"
     "sd_mod"
   ];
   boot.initrd.kernelModules = [ "dm-snapshot" ];
@@ -38,6 +39,10 @@
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/F471-068C";
     fsType = "vfat";
+    options = [
+      "fmask=0077"
+      "dmask=0077"
+    ];
   };
 
   swapDevices = [ { device = "/dev/disk/by-uuid/eca45b18-eb6d-4110-8cba-af9d54cf9a17"; } ];

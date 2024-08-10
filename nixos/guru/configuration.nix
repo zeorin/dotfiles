@@ -9,33 +9,15 @@
 {
   imports = with inputs.nixos-hardware.nixosModules; [
     common-pc
-    common-pc-hdd
     common-pc-ssd
     common-cpu-amd
     common-cpu-amd-pstate
-    common-gpu-nvidia-nonprime
+    common-gpu-amd
     ./hardware-configuration.nix
     ../common/configuration.nix
   ];
 
-  nixpkgs.allowUnfreePackages = [
-    "hplip"
-    "nvidia-x11"
-    "nvidia-settings"
-    "cuda_cccl"
-    "cuda_cudart"
-    "cuda_nvcc"
-    "libcublas"
-    "libcufft"
-    "libnpp"
-  ];
-
-  nixpkgs.config = {
-    # CUDA
-    # cudaSupport = true;
-    cudaCapabilities = [ "5.2" ];
-    cudaForwardCompat = false;
-  };
+  nixpkgs.allowUnfreePackages = [ "hplip" ];
 
   hardware.firmware = with pkgs; [
     rtl8761b-firmware # for Bluetooth USB dongle
@@ -76,7 +58,7 @@
   };
   services.udev.packages = with pkgs; [ vial ];
   services.udev.extraRules = ''
-    SUBSYSTEM=="i2c-dev", ACTION=="add", ATTR{name}=="NVIDIA i2c adapter*", TAG+="ddcci", TAG+="systemd", ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
+    SUBSYSTEM=="i2c-dev", ACTION=="add", ATTR{name}=="AMDGPU DM i2c hw bus *", TAG+="ddcci", TAG+="systemd", ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
   '';
 
   systemd.services."ddcci@" = {
@@ -103,8 +85,6 @@
     };
   };
 
-  environment.etc."X11/xorg.conf.d/90-nvidia-i2c.conf".source = "${pkgs.ddcutil}/share/ddcutil/data/90-nvidia-i2c.conf";
-
   fileSystems = {
     "/".options = [
       "noatime"
@@ -124,10 +104,20 @@
   networking.hostName = "guru";
   networking.interfaces.enp4s0.wakeOnLan.enable = true;
 
-  # https://github.com/NixOS/nixpkgs/issues/30796#issuecomment-615680290
-  services.xserver.displayManager.setupCommands = "${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --auto --output DP-1 --auto --right-of HDMI-0 --primary";
+  services.xserver.xrandrHeads = [
+    "HDMI-A-0"
+    {
+      output = "DisplayPort-0";
+      primary = true;
+    }
+  ];
 
-  hardware.nvidia.modesetting.enable = true;
+  hardware.amdgpu = {
+    opencl.enable = true;
+    initrd.enable = true;
+    amdvlk.enable = true;
+    amdvlk.support32Bit.enable = true;
+  };
 
   hardware.keyboard.qmk.enable = true;
 
