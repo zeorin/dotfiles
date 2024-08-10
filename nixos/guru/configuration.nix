@@ -46,9 +46,19 @@
       };
     };
 
-    extraModulePackages = with config.boot.kernelPackages; [ ddcci-driver ];
+    extraModulePackages = with config.boot.kernelPackages; [
+      (ddcci-driver.overrideAttrs (oldAttrs: {
+        patches = (oldAttrs.patches or [ ]) ++ [
+          # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/issues/44
+          (pkgs.fetchpatch {
+            url = "https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/merge_requests/16.patch";
+            hash = "sha256-PapgP4cE2+d+YbNSEd6mQRvnumdiEfQpyR5f5Rs1YTs=";
+          })
+        ];
+      }))
+    ];
     kernelModules = [
-      "ddcci_backlight"
+      "ddcci-backlight"
       "nct6775"
     ];
     extraModprobeConfig = ''
@@ -61,6 +71,7 @@
     SUBSYSTEM=="i2c-dev", ACTION=="add", ATTR{name}=="AMDGPU DM i2c hw bus *", TAG+="ddcci", TAG+="systemd", ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
   '';
 
+  # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/issues/7#note_151296583
   systemd.services."ddcci@" = {
     description = "ddcci handler";
     after = [ "graphical.target" ];
