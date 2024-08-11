@@ -169,6 +169,8 @@
   };
   systemd.tmpfiles.rules = [ "d /var/spool/samba 1777 root root -" ];
 
+  services.openssh.settings.StreamLocalBindUnlink = true;
+
   services.hardware.openrgb.enable = true;
   services.hardware.openrgb.package = pkgs.openrgb-with-all-plugins;
 
