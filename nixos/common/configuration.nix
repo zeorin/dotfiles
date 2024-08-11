@@ -319,6 +319,7 @@
       # generated config replicates the default behaviour.
       useDHCP = false;
     };
+    systemd.network.wait-online.enable = false;
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_ZA.UTF-8";

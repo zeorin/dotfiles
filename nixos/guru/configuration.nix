@@ -24,25 +24,46 @@
   ];
 
   boot = {
-    initrd.luks.devices = {
-      cryptroot = {
-        device = "/dev/disk/by-uuid/556cb835-419a-48b6-a081-36d2998d9c57";
-        allowDiscards = true;
+    initrd = {
+      luks.devices = {
+        cryptroot = {
+          device = "/dev/disk/by-uuid/556cb835-419a-48b6-a081-36d2998d9c57";
+          allowDiscards = true;
+        };
       };
-    };
 
-    initrd.network = {
-      enable = true;
-      ssh = {
+      availableKernelModules = [ "r8169" ];
+
+      network = {
         enable = true;
-        authorizedKeys = [
-          ''command="cryptsetup-askpass; exit",no-port-forwarding,no-agent-forwarding ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJrgSMqVz6MsvsfzY4UhbKi1BZY5o0v6QXPNPCC4xX6NUfwcrkr0NxYHt03ZNAHPzPuocishL93F8JYk0alZaoxEyf9EH+Fcpdxh+RqwCUlRMlGwoKqX/IprTn+DNVtmPi+lw+O/A14GTe9kE5V6PfEmKAJ+JzGMAWmBfCqCbHgzfBFTi/kYQ7FlG/pUl6agtQJe07542nHvea+nkrZy9mcTmhOy90p4w+sttQy1ppyt287Bzc467xAvmpIs3iJTZyt3RCDrNOQUo3z73iY9wxODCIx+wk4Hc4hGgAitsGUHo+HfMJ+bEzQGaYT+Db1mCUIr9ZPsn6nlcD0Mz72scOwZblIlB318pCECOnokwP01D6KY+54r+mx9QlsMS5m3gYxLlU1l1bnaza5YZSVi3Nh05RpM9OvOS8Ap1SzY3Rx50A2WwbNtkGlKBP7gUItKpRMJVCeMlzCGJ+sP3pOTgY2982DisUg3JKkKRBXolpWiWd2VQMM1aB/4f2hL0wky0V+f1OB/ONkp5TGssuVLAYqDda+LyTaeQX4PvTF0DDCKkg55TU8hOx3YNzm7q5gDSHik8rX80FFU3kn7H5zyD18ozAwgM81yHlQgx1nFaVSxaXXViciKPGezjUX5vKHu8L9MOHBwixkIZRK8FbTFodidAmgtxooHnZeh+s7hoZiw== zeorin@monarch''
-          ''command="cryptsetup-askpass; exit",no-port-forwarding,no-agent-forwarding ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOq1E9mycw3IYVGBpwEU9Oy9iirB8d5Xyu/+6CiL+mx openpgp:0x3CBFF97B''
-        ];
-        hostKeys = [
-          "/etc/secrets/initrd/ssh_host_rsa_key"
-          "/etc/secrets/initrd/ssh_host_ed25519_key"
-        ];
+        ssh = {
+          enable = true;
+          port = 22;
+          authorizedKeys = [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOq1E9mycw3IYVGBpwEU9Oy9iirB8d5Xyu/+6CiL+mx openpgp:0x3CBFF97B"
+          ];
+          hostKeys = [
+            "/etc/secrets/initrd/ssh_host_rsa_key"
+            "/etc/secrets/initrd/ssh_host_ed25519_key"
+          ];
+        };
+      };
+
+      # Remote disk unlock
+      systemd = {
+        network = {
+          enable = true;
+          networks.ethernet = {
+            name = "en*";
+            networkConfig = {
+              DHCP = "yes";
+              MulticastDNS = "yes";
+            };
+            linkConfig.RequiredForOnline = "routable";
+          };
+          wait-online.enable = false;
+        };
+        users.root.shell = "/bin/systemd-tty-ask-password-agent";
       };
     };
 
