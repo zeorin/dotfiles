@@ -4203,7 +4203,7 @@ in
           (setq gc-cons-threshold 100000000) ;; 100mb
 
           (setq lsp-eslint-server-command '("${pkgs.nodejs}/bin/node"
-                                            "${pkgs.vscode-extensions.dbaeumer.vscode-eslint}/share/vscode/extensions/dbaeumer.vscode-eslint/server/out/eslintServer.js"
+                                            "${pkgs.unstable.vscode-extensions.dbaeumer.vscode-eslint}/share/vscode/extensions/dbaeumer.vscode-eslint/server/out/eslintServer.js"
                                             "--stdio"))
 
           (after! lsp-mode
