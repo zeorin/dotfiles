@@ -38,6 +38,7 @@ in
             with pkgs;
             [
               git
+              delta
               emacs-lsp-booster
               dockfmt
               libxml2
@@ -161,7 +162,12 @@ in
         inherit (pkgs.unstable) vscode-js-debug;
         inherit (pkgs.unstable.vscode-extensions.dbaeumer) vscode-eslint;
         inherit (pkgs.unstable.vscode-extensions.firefox-devtools) vscode-firefox-debug;
-        inherit (config.home.sessionVariables) DOOMLOCALDIR XDG_DOCUMENTS_DIR XDG_DATA_HOME;
+        inherit (config.home.sessionVariables)
+          DOOMLOCALDIR
+          XDG_DOCUMENTS_DIR
+          XDG_DATA_HOME
+          XDG_CONFIG_HOME
+          ;
       };
       onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
         ${doomScriptEnvVars}

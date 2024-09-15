@@ -576,3 +576,11 @@ tasks."
   :demand t
   :config
   (setq flycheck-hledger-strict t))
+
+(use-package! magit-delta
+  :config
+  (setq magit-delta-delta-args '("--config" "@XDG_CONFIG_HOME@/git/config"
+                                 "--max-line-distance" "0.6"
+                                 "--true-color" "always"
+                                 "--color-only"))
+  :hook (magit-mode . magit-delta-mode))

@@ -79,3 +79,5 @@
 (package! flycheck-hledger)
 
 (unpin! compat)
+
+(package! magit-delta)
