@@ -1528,7 +1528,7 @@ in
           vo = "gpu";
           profile = "gpu-hq";
           ytdl-format = "bestvideo[height<=?720][fps<=?30][vcodec!=?vp9]+bestaudio/best";
-          osd-bar = "no";
+          osd-bar = false;
         };
         bindings = {
           "space" = "cycle pause; script-binding uosc/flash-pause-indicator";
@@ -1567,12 +1567,22 @@ in
           "O" = "script-binding uosc/show-in-directory #! Utils > Show in directory";
           # "#" = "script-binding uosc/open-config-directory #! Utils > Open config directory";
           # "#" = "script-binding uosc/update #! Utils > Update uosc";
-          "R" = ''script-message-to uosc show-submenu "Utils > Aspect ratio"'';
+          "R" = ''script-message-to uosc show-submenu #! Utils > Aspect ratio'';
           "F" = "script-binding quality_menu/video_formats_toggle";
           "Alt+f" = "script-binding quality_menu/audio_formats_toggle";
         };
         scripts = with pkgs.mpvScripts; [
-          uosc
+          (uosc.overrideAttrs (
+            finalAttrs: oldAttrs: {
+              version = "5.5.0";
+              src = pkgs.fetchFromGitHub {
+                owner = "tomasklaen";
+                repo = "uosc";
+                rev = finalAttrs.version;
+                hash = "sha256-WFsqA5kGefQmvihLUuQBfMmKoUHiO7ofxpwISRygRm4=";
+              };
+            }
+          ))
           thumbfast
           sponsorblock
           mpv-playlistmanager
@@ -1584,14 +1594,14 @@ in
         ];
         scriptOpts = {
           thumbfast = {
-            network = "yes";
-            hwdec = "yes";
+            network = true;
+            hwdec = true;
           };
           playlistmanager = {
-            resolve_url_titles = "yes";
+            resolve_url_titles = true;
           };
           uosc = {
-            click_threshold = 100;
+            click_threshold = 300;
             click_command = "cycle pause; script-binding uosc/flash-pause-indicator";
           };
         };
