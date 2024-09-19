@@ -72,9 +72,6 @@
 (unpin! dap-mode)
 (package! dap-mode :recipe (:host github :repo "zeorin/dap-mode" :branch "fixed"))
 
-(unpin! apheleia)
-(package! apheleia :recipe (:host github :repo "zeorin/apheleia" :branch "fix/apheleia-npx"))
-
 (unpin! envrc)
 (package! envrc :recipe (:host github :repo "zeorin/envrc" :branch "fix-exec-path"))
 

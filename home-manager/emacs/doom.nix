@@ -13,6 +13,7 @@ let
     export PATH="${config.xdg.configHome}/doom-emacs/bin/:${emacs}/bin:$PATH"
     export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
     export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
+    export LSP_USE_PLISTS=true
   '';
 in
 {
