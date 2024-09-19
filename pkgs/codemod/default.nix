@@ -40,7 +40,7 @@ stdenv.mkDerivation (finalAttrs: {
     outputHashMode = "recursive";
     outputHash =
       {
-        x86_64-linux = "sha256-CISi0k2L3SkYnaK8myVAvah5qQyFnh+sGIO6ybygskI=";
+        x86_64-linux = "sha256-DC7dajfLoihTOK7ZMrN44Oj8dYSpMjwp+z9xTN/feBs=";
       }
       .${stdenv.system} or (throw "Unsupported system: ${stdenv.system}");
   };

@@ -99,15 +99,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1709126324,
-        "narHash": "sha256-q6EQdSeUZOG26WelxqkmR7kArjgWCdw5sfJVHPH/7j8=",
-        "path": "/nix/store/97j7mjdvbxb59jnkr97qmhlkk97mnly8-source",
-        "rev": "d465f4819400de7c8d874d50b982301f28a84605",
-        "type": "path"
+        "lastModified": 1726560853,
+        "narHash": "sha256-X6rJYSESBVr3hBoH0WbKE5KvhPU5bloyZ2L4K60/fPQ=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "c1dfcf08411b08f6b8615f7d8971a2bfa81d5e8a",
+        "type": "github"
       },
       "original": {
-        "id": "flake-utils",
-        "type": "indirect"
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
       }
     },
     "flake-utils_2": {
@@ -161,9 +163,10 @@
         "type": "github"
       },
       "original": {
-        "id": "home-manager",
+        "owner": "nix-community",
         "ref": "release-24.05",
-        "type": "indirect"
+        "repo": "home-manager",
+        "type": "github"
       }
     },
     "nix-alien": {
@@ -307,24 +310,26 @@
         "type": "github"
       },
       "original": {
-        "id": "nixpkgs",
+        "owner": "NixOS",
         "ref": "nixos-unstable",
-        "type": "indirect"
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1728067476,
-        "narHash": "sha256-/uJcVXuBt+VFCPQIX+4YnYrHaubJSx4HoNsJVNRgANM=",
+        "lastModified": 1728193676,
+        "narHash": "sha256-PbDWAIjKJdlVg+qQRhzdSor04bAPApDqIv2DofTyynk=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "6e6b3dd395c3b1eb9be9f2d096383a8d05add030",
+        "rev": "ecbc1ca8ffd6aea8372ad16be9ebbb39889e55b6",
         "type": "github"
       },
       "original": {
-        "id": "nixpkgs",
+        "owner": "NixOS",
         "ref": "nixos-24.05",
-        "type": "indirect"
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "nord-dircolors": {
@@ -345,15 +350,17 @@
     },
     "nur": {
       "locked": {
-        "lastModified": 1709547795,
-        "narHash": "sha256-W679g8klWtISDiY1y+tmhU3FtNG0gg7rbi6bwDEOroQ=",
-        "path": "/nix/store/1idb4i6l52zs62d91ynxrak2q0qgpkz0-source",
-        "rev": "65f9bf8bfd08ea9106ca14d192391b4f7ab4cd57",
-        "type": "path"
+        "lastModified": 1728233077,
+        "narHash": "sha256-WmqOQYZr9KddJ30Ro/S7B/zemKBoh0wn9O3XK8+zvbE=",
+        "owner": "nix-community",
+        "repo": "NUR",
+        "rev": "6c43cdee3fb69a31ee007a94fab07d18d813efda",
+        "type": "github"
       },
       "original": {
-        "id": "nur",
-        "type": "indirect"
+        "owner": "nix-community",
+        "repo": "NUR",
+        "type": "github"
       }
     },
     "pulseaudio-control": {
