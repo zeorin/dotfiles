@@ -4957,7 +4957,7 @@ in
         zoom-us
         element-desktop
         ferdium
-        spotify
+        unstable.spotify
         # https://github.com/NixOS/nixpkgs/issues/179323
         prismlauncher
         modorganizer2-linux-installer
