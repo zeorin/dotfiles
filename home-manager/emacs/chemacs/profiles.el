@@ -1,5 +1,0 @@
-(("default" . ((user-emacs-directory . "@my-emacs@")))
- ("doom" . ((user-emacs-directory . "@doom-emacs@")
-	    (env . (("DOOMDIR" . "@DOOMDIR@")
-		    ("DOOMLOCALDIR" . "@DOOMLOCALDIR@")
-		    ("LSP_USE_PLISTS" . "true"))))))
