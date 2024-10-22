@@ -19,6 +19,34 @@
 
   nixpkgs.allowUnfreePackages = [ "hplip" ];
 
+  nixpkgs.overlays = [
+    # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/merge_requests/17
+    (final: prev: {
+      linuxPackages_zen = prev.linuxPackages_zen.extend (
+        lpself: lpsuper: {
+          ddcci-driver = prev.linuxPackages_zen.ddcci-driver.overrideAttrs (oldAttrs: {
+            version = prev.linuxPackages_zen.ddcci-driver.version + "-FIXED";
+
+            src = pkgs.fetchFromGitLab {
+              owner = "ddcci-driver-linux";
+              repo = "ddcci-driver-linux";
+              rev = "0233e1ee5eddb4b8a706464f3097bad5620b65f4";
+              hash = "sha256-Osvojt8UE+cenOuMoSY+T+sODTAAKkvY/XmBa5bQX88=";
+            };
+
+            patches = [
+              (pkgs.fetchpatch {
+                name = "ddcci-e0605c9cdff7bf3fe9587434614473ba8b7e5f63.patch";
+                url = "https://gitlab.com/nullbytepl/ddcci-driver-linux/-/commit/e0605c9cdff7bf3fe9587434614473ba8b7e5f63.patch";
+                hash = "sha256-sTq03HtWQBd7Wy4o1XbdmMjXQE2dG+1jajx4HtwBHjM=";
+              })
+            ];
+          });
+        }
+      );
+    })
+  ];
+
   hardware.firmware = with pkgs; [
     rtl8761b-firmware # for Bluetooth USB dongle
   ];
@@ -67,17 +95,7 @@
       };
     };
 
-    extraModulePackages = with config.boot.kernelPackages; [
-      (ddcci-driver.overrideAttrs (oldAttrs: {
-        patches = (oldAttrs.patches or [ ]) ++ [
-          # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/issues/44
-          (pkgs.fetchpatch {
-            url = "https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/merge_requests/16.patch";
-            hash = "sha256-PapgP4cE2+d+YbNSEd6mQRvnumdiEfQpyR5f5Rs1YTs=";
-          })
-        ];
-      }))
-    ];
+    extraModulePackages = with config.boot.kernelPackages; [ ddcci-driver ];
     kernelModules = [
       "ddcci-backlight"
       "nct6775"

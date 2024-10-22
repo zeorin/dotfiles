@@ -1934,7 +1934,7 @@ in
             builtins.readFile (
               pkgs.fetchurl {
                 url = "https://starship.rs/presets/toml/nerd-font-symbols.toml";
-                hash = "sha256-qkwT6sw0yAaCr2RUT2CeU3MwV18IUUTroOsAhdGZPUw=";
+                hash = "sha256-9kvNshzNOfJ/TbIxrRP5ym82xO+P5X7FAmbCYL4WR80=";
               }
             )
           ))
