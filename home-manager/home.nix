@@ -3496,6 +3496,13 @@ in
                     };
                     command = "border pixel 0";
                   }
+                  {
+                    criteria = {
+                      floating_from = "auto";
+                      title = " is sharing your screen\.$";
+                    };
+                    command = "border none, sticky enable, move position 0 px -${toString (dpiScale 55)}px";
+                  }
                   (mkFloating { class = "^emacs-everywhere$"; })
                   (mkFloating { class = "^Tor Browser$"; })
                   (mkFloating { class = "^gnome-calculator$"; })
