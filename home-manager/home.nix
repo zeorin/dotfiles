@@ -4897,10 +4897,6 @@ in
             {
               name = "firefox-devedition";
               profile = "developer-edition";
-              makeWrapperArgs = [
-                "--add-flags"
-                "--start-debugger-server"
-              ];
             }
             (
               firefox-devedition.override {
