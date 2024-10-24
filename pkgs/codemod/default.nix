@@ -7,11 +7,13 @@
   makeWrapper,
   cacert,
   element-desktop,
+  pnpm_9,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "codemod-cli";
   version = "1.0.3";
+
   src = fetchFromGitHub {
     owner = "codemod-com";
     repo = "codemod";
@@ -19,34 +21,14 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-mnj6IBrAOekw6xNDS36Vwyi0t89u2ImE3RbcJZD1lCQ=";
   };
 
-  npmDeps = stdenvNoCC.mkDerivation {
-    pname = "${finalAttrs.pname}-pnpm-deps";
-    inherit (finalAttrs) src version;
-
-    nativeBuildInputs = [
-      nodePackages.pnpm
-      cacert
-    ];
-
-    installPhase = ''
-      export HOME=$(mktemp -d)
-
-      pnpm config set store-dir $out
-      pnpm install --frozen-lockfile --ignore-script
-    '';
-
-    dontBuild = true;
-    dontFixup = true;
-    outputHashMode = "recursive";
-    outputHash =
-      {
-        x86_64-linux = "sha256-QgSzSQ4zfUA1k4Vw8aqZC/E2ba1msvjB2yUg6HzQHtk=";
-      }
-      .${stdenv.system} or (throw "Unsupported system: ${stdenv.system}");
+  pnpmDeps = pnpm_9.fetchDeps {
+    inherit (finalAttrs) pname version src;
+    hash = "sha256-4vnHfdS3ZAfe9zMM+jqxyd8cFtjkufQye0j/g1BafPY=";
   };
 
   nativeBuildInputs = [
-    nodePackages.pnpm
+    nodejs
+    pnpm_9.configHook
     cacert
   ];
 
@@ -55,13 +37,8 @@ stdenv.mkDerivation (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
-    export HOME=$(mktemp -d)
-
-    pnpm config set store-dir ${finalAttrs.npmDeps}
-    pnpm install --offline --frozen-lockfile --ignore-script
-
-    rm -rf node_modules/.pnpm/keytar@7.9.0/node_modules/keytar
-    ln -s ${element-desktop.keytar} node_modules/.pnpm/keytar@7.9.0/node_modules/keytar
+    # rm -rf node_modules/.pnpm/keytar@7.9.0/node_modules/keytar
+    # ln -s ${element-desktop.keytar} node_modules/.pnpm/keytar@7.9.0/node_modules/keytar
 
     pnpm run build --filter codemod
 
