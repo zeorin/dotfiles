@@ -203,6 +203,8 @@
         options v4l2loopback devices=1 exclusive_caps=1 video_nr=10 card_label="OBS Camera"
       '';
       supportedFilesystems.ntfs = true;
+
+      binfmt.emulatedSystems = [ "aarch64-linux" ];
     };
 
     services.udev.packages = with pkgs; [
