@@ -545,6 +545,7 @@
         "input"
         "i2c"
         "wireshark"
+        "lp"
       ];
     };
     users.groups.zeorin = { };
@@ -598,27 +599,46 @@
       };
     };
 
+    services.samba.enable = true;
+    services.samba.securityType = "user";
+    services.samba.openFirewall = true;
+    services.samba.extraConfig = ''
+      workgroup = WORKGROUP
+      server string = smbnix
+      netbios name = smbnix
+      security = user
+      #use sendfile = yes
+      #max protocol = smb2
+      # note: localhost is the ipv6 localhost ::1
+      hosts allow = 192.168.0. 127.0.0.1 localhost
+      hosts deny = 0.0.0.0/0
+      guest account = nobody
+      map to guest = bad user
+    '';
+    services.samba.shares = {
+      public = {
+        "path" = "/mnt/Shares/Public";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "yes";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+        "force user" = "username";
+        "force group" = "groupname";
+      };
+      private = {
+        "path" = "/mnt/Shares/Private";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+        "force user" = "username";
+        "force group" = "groupname";
+      };
+    };
     services.samba-wsdd.enable = true;
     services.samba-wsdd.openFirewall = true;
-    services.samba = {
-      enable = true;
-      package = pkgs.sambaFull;
-      openFirewall = true;
-      securityType = "user";
-      extraConfig = ''
-        workgroup = WORKGROUP
-        server string = smbnix
-        netbios name = smbnix
-        security = user
-        #use sendfile = yes
-        #max protocol = smb2
-        # note: localhost is the ipv6 localhost ::1
-        hosts allow = 192.168.0. 127.0.0.1 localhost
-        hosts deny = 0.0.0.0/0
-        guest account = nobody
-        map to guest = bad user
-      '';
-    };
 
     services.tailscale = {
       enable = true;
@@ -668,16 +688,11 @@
       };
     };
 
-    # Enable automatic discovery of the printer from other Linux systems with avahi running.
-    services.avahi = {
-      enable = true;
-      openFirewall = true;
-      nssmdns4 = true;
-      publish = {
-        enable = true;
-        userServices = true;
-      };
-    };
+    services.avahi.enable = true;
+    services.avahi.openFirewall = true;
+    services.avahi.nssmdns4 = true;
+    services.avahi.publish.enable = true;
+    services.avahi.publish.userServices = true;
 
     services.logiops = {
       enable = true;

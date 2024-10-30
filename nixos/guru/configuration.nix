@@ -13,11 +13,10 @@
     common-cpu-amd
     common-cpu-amd-pstate
     common-gpu-amd
-    ./hardware-configuration.nix
     ../common/configuration.nix
+    ./hardware-configuration.nix
+    ./printing.nix
   ];
-
-  nixpkgs.allowUnfreePackages = [ "hplip" ];
 
   nixpkgs.overlays = [
     # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/merge_requests/17
@@ -152,7 +151,7 @@
   };
 
   networking.hostName = "guru";
-  networking.interfaces.enp4s0.wakeOnLan.enable = true;
+  networking.interfaces.enp36s0.wakeOnLan.enable = true;
 
   services.xserver.xrandrHeads = [
     "HDMI-A-0"
@@ -173,40 +172,6 @@
 
   # i2c
   hardware.i2c.enable = true;
-
-  # hardware.printers.ensureDefaultPrinter = "LaserJet";
-  # hardware.printers.ensurePrinters = [{
-  #   name = "LaserJet";
-  #   description = "HP LaserJet Professional P1102";
-  #   location = "Xandor Office";
-  #   deviceUri =
-  #     "hp:/usb/HP_LaserJet_Professional_P1102?serial=000000000Q836L72PR1a";
-  #   model = "drv:///hp/hpcups.drv/hp-laserjet_professional_p1102.ppd";
-  # }];
-  services.printing.drivers = with pkgs; [ hplipWithPlugin ];
-  # Printer sharing
-  services.printing.listenAddresses = [ "*:631" ];
-  # this gives access to anyone on the interface you might want to limit it see the official documentation
-  services.printing.allowFrom = [ "all" ];
-  services.printing.browsing = true;
-  services.printing.defaultShared = true; # If you want
-  services.printing.openFirewall = true;
-  services.samba.extraConfig = ''
-    load printers = yes
-    printing = cups
-    printcap name = cups
-  '';
-  services.samba.shares.printers = {
-    comment = "All Printers";
-    path = "/var/spool/samba";
-    public = "yes";
-    browseable = "yes";
-    "guest ok" = "yes";
-    writable = "no";
-    printable = "yes";
-    "create mode" = 700;
-  };
-  systemd.tmpfiles.rules = [ "d /var/spool/samba 1777 root root -" ];
 
   services.openssh.settings.StreamLocalBindUnlink = true;
 
