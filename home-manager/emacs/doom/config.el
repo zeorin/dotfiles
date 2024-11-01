@@ -577,6 +577,15 @@ tasks."
   :config
   (setq flycheck-hledger-strict t))
 
+;; Prevent auto scrolling
+;; https://github.com/akermu/emacs-libvterm/issues/397
+(advice-add 'set-window-vscroll :after
+	    (defun me/vterm-toggle-scroll (&rest _)
+	      (when (eq major-mode 'vterm-mode)
+		(if (> (window-end) (buffer-size))
+		    (when vterm-copy-mode (vterm-copy-mode-done nil))
+		  (vterm-copy-mode 1)))))
+
 (use-package! evil
   :config
   (setq evil-esc-delay 0))
