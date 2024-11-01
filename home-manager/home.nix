@@ -963,6 +963,10 @@ in
           function echo_prompt --on-event fish_postexec
             echo ""
           end
+
+          # Don't try to interpret Escape key sequences
+          set -g fish_escape_delay_ms 10
+          set -g fish_sequence_key_delay 0
         '';
         plugins = [
           {
@@ -2014,6 +2018,9 @@ in
           set-option -g set-clipboard on
 
           set-option -g update-environment 'DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY TERM'
+
+          # Don't try to interpret Escape key sequences
+          set-option -sg escape-time 0
         '';
 
         plugins = with pkgs.tmuxPlugins; [

@@ -576,3 +576,11 @@ tasks."
   :demand t
   :config
   (setq flycheck-hledger-strict t))
+
+(use-package! evil
+  :config
+  (setq evil-esc-delay 0))
+
+(use-package! evil-escape
+  :config
+  (setq evil-escape-delay 0))
