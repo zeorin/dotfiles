@@ -480,20 +480,6 @@ in
         # https://github.com/direnv/direnv/issues/68#issuecomment-42525172
         DIRENV_LOG_FORMAT = "";
 
-        # TODO: figure out how to fall back to regular entry if no GPG smartcard
-        # is found / no key is unlocked
-        # Use `pass` to input SSH passwords
-        SSH_ASKPASS_REQUIRE = "force";
-        SSH_ASKPASS = pkgs.writeShellScript "ssh-askpass-pass" ''
-          key="$(echo "$1" | sed -e "s/^.*\/\(.*[^']\)'\{0,1\}:.*$/\1/")"
-          ${pkgs.pass}/bin/pass "ssh/$key" | head -n1
-        '';
-        # Use `pass` to input the sudo password
-        SUDO_ASKPASS = pkgs.writeShellScript "sudo-askpass-pass" ''
-          hostname="$(${pkgs.hostname}/bin/hostname)"
-          ${pkgs.pass}/bin/pass "$hostname/$USER" | head -n1
-        '';
-
         DASHT_DOCSETS_DIR = "${config.xdg.dataFile.docsets.source}";
       };
       activation = with config.xdg; {
@@ -546,7 +532,56 @@ in
           dud = "du -d 1 -h";
           duf = "du -sh *";
           sortnr = "sort -n -r";
-          sudo = "sudo --askpass";
+          # Use `pass` to input SSH key passprases
+          # TODO: fall back to regular passphrase entry if no GPG smartcard is
+          # found / no key entry is found in the pass database
+          ssh = toString (
+            pkgs.writeShellScript "pass-ssh" ''
+              set -euo pipefail
+
+              export SSH_ASKPASS_REQUIRE=force
+              export SSH_ASKPASS="${pkgs.writeShellScript "pass-askpass" ''
+                set -euo pipefail
+
+                die() {
+                  echo "$@" >&2
+                  exit 1
+                }
+
+                keyfile="$(echo "$1" | ${pkgs.gnused}/bin/sed -ne "s/^.*\(\/.*\)['\"]*:.*$/\1/")"
+                [ -z "$keyfile" ] && die "Could not find key filename in prompt\n\"$1\""
+                echo "Extracted key filename \"$keyfile\"" >&2
+
+                comment="$(${pkgs.openssh}/bin/ssh-keygen -l -f "$keyfile" | ${pkgs.gawk}/bin/awk '{print $3}')"
+                [ -z "$comment" ] && die "Could not find comment in key \"$keyfile\""
+                echo "Comment from keyfile \"$keyfile\" is \"$comment\"" >&2
+
+                sshdir="''${PASSWORDSTORE_SSH_DIR:-ssh}"
+                passphrase="$(${pkgs.pass}/bin/pass show "$sshdir/$comment")"
+                [ -z "$passphrase" ] && die "Could not find passphrase for \"$comment\""
+                echo "Got passphrase for comment \"$comment\"" >&2
+
+                echo "$passphrase"
+              ''}"
+
+              ${pkgs.openssh}/bin/ssh "$@"
+            ''
+          );
+          # Use `pass` to input the sudo password
+          sudo = toString (
+            pkgs.writeShellScript "pass-sudo" ''
+              set -euo pipefail
+
+              export SUDO_ASKPASS="${pkgs.writeShellScript "pass-sudo-askpass" ''
+                set -euo pipefail
+                hostname="''${HOSTNAME:-"$(hostname)"}"
+                hostsdir="''${PASSWORDSTORE_HOSTS_DIR:-hosts}"
+                ${pkgs.pass}/bin/pass "$hostsdir/$hostname/$USER" | head -n1
+              ''}"
+
+              /usr/bin/env sudo --askpass "$@"
+            ''
+          );
         };
     };
 
