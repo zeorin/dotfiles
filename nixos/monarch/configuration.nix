@@ -16,7 +16,7 @@
     ../common/configuration.nix
   ];
 
-  dpi = 240; # × 2.5
+  dpi = 216; # × 2.25
 
   boot = {
     initrd.luks.devices = {
