@@ -38,6 +38,10 @@ in
 
   config = {
 
+    specialisation = {
+      "1080p".configuration.dpi = lib.mkForce 96;
+    };
+
     nixpkgs =
       let
         homePkgs =
