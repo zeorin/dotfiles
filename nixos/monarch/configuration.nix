@@ -16,13 +16,9 @@
     ../common/configuration.nix
   ];
 
-  dpi = 192;
+  dpi = 192; # × 2
 
   boot = {
-    plymouth.extraConfig = ''
-      DeviceScale=2
-    '';
-
     initrd.luks.devices = {
       cryptroot = {
         device = "/dev/disk/by-uuid/e8131b46-2208-4162-82d1-9097f9dca58a";
@@ -80,27 +76,10 @@
     font = "ter-v32b";
   };
 
-  environment.variables = {
-    # HiDPI
-    GDK_SCALE = "2";
-    GDK_DPI_SCALE = "0.5";
-    QT_AUTO_SCREEN_SCALE_FACTOR = "1";
-    _JAVA_OPTIONS = "-Dsun.java2d.uiScale=2";
-  };
-
   # Overlays
   nixpkgs.overlays = [
     (_: prev: { vaapiIntel = prev.vaapiIntel.override { enableHybridCodec = true; }; })
   ];
-
-  services.xserver = {
-    monitorSection = ''
-      DisplaySize   508 286
-    '';
-    screenSection = ''
-      Option "DPI" "192 x 192"
-    '';
-  };
 
   # Sensors
   hardware.sensor.iio.enable = true;
@@ -120,4 +99,8 @@
     {
       extraOptions = [ ''--notifier="${dim-screen}"'' ];
     };
+
+  services.xserver.monitorSection = ''
+    DisplaySize 294 166
+  '';
 }

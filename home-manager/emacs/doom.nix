@@ -4,10 +4,11 @@
   pkgs,
   inputs,
   ...
-}@moduleArgs:
+}:
 
 let
-  dpiScale = x: x * ((moduleArgs.dpi or 96) / 96);
+  round = x: if ((x / 2.0) >= 0.5) then (builtins.ceil x) else (builtins.floor x);
+  dpiScale = x: round (x * (config.dpi / 96.0));
   emacs = config.programs.emacs.finalPackage;
   doomScriptEnvVars = ''
     export PATH="${config.xdg.configHome}/doom-emacs/bin/:${emacs}/bin:$PATH"

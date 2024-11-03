@@ -11,7 +11,9 @@
 }@moduleArgs:
 
 let
-  dpiScale = x: x * ((moduleArgs.dpi or 96) / 96);
+  round = x: if ((x / 2.0) >= 0.5) then (builtins.ceil x) else (builtins.floor x);
+
+  dpiScale = x: round (x * (config.dpi / 96.0));
 
   myKey = "0x5E1C0971FE4F665A";
 
@@ -360,6 +362,12 @@ in
   ];
 
   options = with lib; {
+    dpi = mkOption {
+      type = with types; int;
+      default = moduleArgs.osConfig.dpi or 96;
+      example = 192;
+    };
+
     nixpkgs.allowUnfreePackages = mkOption {
       type = with types; (listOf (either str (functionTo bool)));
       default = [ ];
@@ -1721,7 +1729,7 @@ in
               # rofi command. Make sure to have "$@" as last argument
               _rofi () {
                   ${pkgs.rofi}/bin/rofi \
-                    -dpi ${toString (dpiScale 96)} \
+                    -dpi ${toString config.dpi} \
                     -i \
                     -kb-accept-custom "" \
                     -kb-row-down "${remove-binding "Control+n" kb-row-down}" \
@@ -2511,7 +2519,7 @@ in
             max_icon_size = 60;
             icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro-icons";
             enable_recursive_icon_lookup = "true";
-            dmenu = "${pkgs.rofi}/bin/rofi -dpi ${toString (dpiScale 96)} -dmenu -p dunst";
+            dmenu = "${pkgs.rofi}/bin/rofi -dpi ${toString config.dpi} -dmenu -p dunst";
             mouse_left_click = "close_current";
             mouse_middle_click = "context";
             mouse_right_click = "do_action";
@@ -2819,9 +2827,9 @@ in
               monitor = "\${env:MONITOR:}";
               monitor-strict = true;
               monitor-exact = true;
-              dpi = 0;
+              inherit (config) dpi;
               width = "100%";
-              height = "${toString (24.0 / 1080 * 100)}%";
+              height = "${toString (dpiScale 24)}px";
               enable-struts = true;
               double-click-interval = 150;
               override-redirect = false;
@@ -3312,7 +3320,7 @@ in
             };
             modifier = "Mod4";
             terminal = terminal-emulator;
-            menu = ''"${pkgs.rofi}/bin/rofi -dpi ${toString (dpiScale 96)} -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
+            menu = ''"${pkgs.rofi}/bin/rofi -dpi ${toString config.dpi} -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
             focus = {
               followMouse = false;
               newWindow = "urgent";
@@ -3858,7 +3866,7 @@ in
               UseDarkTheme=True
               UseAccentColor=True
               PerScreenDPI=False
-              ForceWaylandDPI=0
+              ForceWaylandDPI=${toString config.dpi}
               EnableFractionalScale=True
             '')
             (pkgs.writeTextDir "conf/keyboard.conf" ''
@@ -4455,7 +4463,7 @@ in
           "Xft.hinting" = 1;
           "Xft.antialias" = 1;
           "Xft.rgba" = "rgb";
-          "Xft.dpi" = dpiScale 96;
+          "Xft.dpi" = config.dpi;
         }
         # xterm
         // (mapAttrs' (name: value: nameValuePair "XTerm.${name}" value) (

@@ -10,6 +10,10 @@
   pkgs,
   ...
 }:
+let
+  round = x: if ((x / 2.0) >= 0.5) then (builtins.ceil x) else (builtins.floor x);
+  dpiScale = x: x * (config.dpi / 96.0);
+in
 
 {
   imports = [
@@ -32,6 +36,7 @@
   };
 
   config = {
+
     nixpkgs =
       let
         homePkgs =
@@ -183,6 +188,9 @@
       plymouth = {
         enable = true;
         theme = "breeze";
+        extraConfig = ''
+          DeviceScale=${toString (round (dpiScale 1))}
+        '';
       };
 
       initrd.systemd.enable = true;
@@ -355,10 +363,22 @@
     environment.variables = {
       # Hardware acceleration in Firefox
       MOZ_X11_EGL = "1";
+      # DPI
+      GDK_SCALE = toString (round (dpiScale 1)); # GTK 3 doesn't accept fractional values; also scales fonts
+      GDK_DPI_SCALE = toString (1.0 / (dpiScale 1.0)); # GTK 4 only; accepts fractional values, but ~GDK_SCALE~ scales UI & fonts, but so do the DPI settings, this scales just the fonts back down
+      QT_AUTO_SCREEN_SCALE_FACTOR = "1";
+      QT_ENABLE_HIGHDPI_SCALING = "1";
+      _JAVA_OPTIONS = "-Dsun.java2d.uiScale=${toString (dpiScale 1.0)}";
     };
 
     services.xserver = {
       enable = true;
+      inherit (config) dpi;
+      upscaleDefaultCursor = true;
+
+      screenSection = ''
+        # Option "DPI" "${toString config.dpi} x ${toString config.dpi}"
+      '';
 
       serverFlagsSection = ''
         Option "StandbyTime"  "5"
@@ -552,7 +572,6 @@
     home-manager = {
       extraSpecialArgs = {
         inherit inputs outputs;
-        inherit (config) dpi;
       };
       useGlobalPkgs = true;
       useUserPackages = true;
