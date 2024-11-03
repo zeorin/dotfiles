@@ -436,13 +436,10 @@ in
             enter = "overload(control, enter)";
             space = "overload(alt, space)";
             rightalt = "overload(meta, compose)";
-            leftcontrol = "overload(layer1, oneshot(layer1))";
-            rightcontrol = "overload(layer1, oneshot(layer1))";
+            leftcontrol = "layer(layer1)";
+            rightcontrol = "layer(layer1)";
           };
           layer1 = {
-            leftcontrol = "toggle(layer1)";
-            rightcontrol = "toggle(layer1)";
-
             # Like wasd, but aligned with home row
             e = "up";
             s = "left";
