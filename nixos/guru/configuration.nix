@@ -104,7 +104,10 @@
       options kvm ignore_msrs=1 report_ignored_msrs=0
     '';
   };
-  services.udev.packages = with pkgs; [ vial ];
+  services.udev.packages = with pkgs; [
+    vial
+    android-udev-rules
+  ];
   services.udev.extraRules = ''
     SUBSYSTEM=="i2c-dev", ACTION=="add", ATTR{name}=="AMDGPU DM i2c hw bus *", TAG+="ddcci", TAG+="systemd", ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
   '';
