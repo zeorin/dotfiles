@@ -734,11 +734,9 @@ in
     programs.xss-lock =
       let
         dim-screen = pkgs.writeShellScript "dim-screen" ''
-          min_brightness=0
-
-          trap "exit 0" TERM INT
-          trap "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --restore; kill %%" EXIT
-          ${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set "$min_brightness"
+          trap 'exit 0' TERM INT
+          trap "${pkgs.brightnessctl}/bin/brightnessctl --class backlight --device '*' --restore; kill %%" EXIT
+          ${pkgs.brightnessctl}/bin/brightnessctl --class backlight --device '*' --save --exponent=4 set 50%-
           sleep 2147483647 &
           wait
         '';
@@ -748,6 +746,9 @@ in
         lockerCommand = "${config.security.wrapperDir}/slock";
         extraOptions = [ ''--notifier="${dim-screen}"'' ];
       };
+    systemd.user.services.xss-lock.preStart = ''
+      ${pkgs.xorg.xset}/bin/xset s ${toString (4 * 60)} ${toString (1 * 60)}
+    '';
     # security.pam.services.hibernate-on-multiple-failures = {
     #   name = "hibernate-on-multiple-failures";
     #   text = ''
