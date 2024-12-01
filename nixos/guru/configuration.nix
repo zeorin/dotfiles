@@ -157,9 +157,9 @@
   networking.interfaces.enp36s0.wakeOnLan.enable = true;
 
   services.xserver.xrandrHeads = [
-    "HDMI-A-0"
+    "HDMI-1"
     {
-      output = "DisplayPort-0";
+      output = "DP-1";
       primary = true;
     }
   ];
