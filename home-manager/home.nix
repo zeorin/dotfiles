@@ -3170,12 +3170,17 @@ in
             };
           };
         script = ''
+          ${pkgs.coreutils}/bin/sleep 1
           # Launch bar on each monitor, tray on primary
-          polybar --list-monitors | while IFS=$'\n' read line; do
-            monitor=$(echo $line | ${pkgs.coreutils}/bin/cut -d':' -f1)
-            primary=$(echo $line | ${pkgs.coreutils}/bin/cut -d' ' -f3)
-            tray_position=$([ -n "$primary" ] && echo "right" || echo "none")
-            MONITOR=$monitor polybar --reload "top''${primary:+"-primary"}" &
+          ${pkgs.xorg.xrandr}/bin/xrandr --query | ${pkgs.gnugrep}/bin/grep " connected " | while IFS=$'\n' read line; do
+            monitor=$(echo $line | ${pkgs.coreutils}/bin/cut -d' ' -f1)
+            if [[ $line == *" primary "* ]]; then
+              export MONITOR=$monitor tray_position="right"
+              polybar top-primary &
+            else
+              export MONITOR=$monitor tray_position="none"
+              polybar top &
+            fi
           done
         '';
       };
