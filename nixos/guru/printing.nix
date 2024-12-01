@@ -24,6 +24,10 @@
             installPhase = ''
               runHook preInstall
 
+              # remove deprecated SYSFS udev rule
+              sed -i -e '/^SYSFS/d' \
+                $out/opt/brother/scanner/udev-rules/type1/NN-brother-mfp-type1.rules
+
               mkdir -p $out/lib/udev/rules.d
               ln -s $out/opt/brother/scanner/udev-rules/type1/NN-brother-mfp-type1.rules \
                 $out/lib/udev/rules.d/99-brother-mfp-type1.rules
