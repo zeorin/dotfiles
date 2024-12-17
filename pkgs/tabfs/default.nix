@@ -48,6 +48,8 @@ in
 
     patches = [ ./dont-kill-all-other-instances-on-start.patch ];
 
+    nativeBuildInputs = [ fuse ];
+
     preBuild = ''
       makeFlagsArray+=('CFLAGS+=-I${fuse}/include -L${fuse}/lib $(CFLAGS_EXTRA)')
       cd fs/

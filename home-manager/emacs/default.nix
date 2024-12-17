@@ -54,7 +54,7 @@ in
   };
 
   xdg.configFile = {
-    "chemacs/profiles.el".source = pkgs.unstable.replaceVars ./chemacs/profiles.el {
+    "chemacs/profiles.el".source = pkgs.replaceVars ./chemacs/profiles.el {
       my-emacs = "${config.xdg.configHome}/my-emacs";
       doom-emacs = "${config.xdg.configHome}/doom-emacs";
       inherit (config.home.sessionVariables) DOOMDIR DOOMLOCALDIR;
