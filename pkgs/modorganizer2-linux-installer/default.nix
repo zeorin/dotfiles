@@ -6,7 +6,7 @@
   fetchurl,
   makeDesktopItem,
   p7zip,
-  gnome,
+  zenity,
   curl,
   protontricks,
   makeWrapper,
@@ -64,7 +64,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
         lib.makeBinPath [
           p7zip
           curl
-          gnome.zenity
+          zenity
           protontricks
         ]
       }"

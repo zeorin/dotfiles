@@ -31,7 +31,7 @@ in
       ''}";
     };
     "doom/init.el" = {
-      source = pkgs.unstable.replaceVars ./doom/init.el {
+      source = pkgs.replaceVars ./doom/init.el {
         exec-path = pkgs.buildEnv {
           name = "doom-emacs-deps";
           pathsToLink = [ "/bin" ];
@@ -134,7 +134,6 @@ in
               isort
               pipenv
               python3Packages.pytest
-              python3Packages.nose
               python3Packages.pyflakes
               python3Packages.python-lsp-server
               python3Packages.grip
@@ -154,7 +153,7 @@ in
       ''}";
     };
     "doom/config.el" = {
-      source = pkgs.unstable.replaceVars ./doom/config.el {
+      source = pkgs.replaceVars ./doom/config.el {
         "12px" = toString (dpiScale 12);
         "18px" = toString (dpiScale 18);
         doom-png = ./doom.png;

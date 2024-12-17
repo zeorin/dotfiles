@@ -353,7 +353,7 @@ in
 {
   # You can import other home-manager modules here
   imports = [
-    inputs.nur.hmModules.nur
+    inputs.nur.modules.homeManager.default
     inputs.nix-index-database.hmModules.nix-index
     { programs.nix-index-database.comma.enable = true; }
     inputs.nixos-vscode-server.homeModules.default
@@ -418,7 +418,7 @@ in
       allowUnfreePackages = [
         "steam" # protontricks
         "steam-run" # protontricks
-        "steam-original" # protontricks
+        "steam-unwrapped" # protontricks
         (pkg: lib.hasPrefix "libretro-" (lib.getName pkg)) # retroarchFull
         "corefonts"
         "vista-fonts"
@@ -444,6 +444,7 @@ in
         "cudatoolkit"
         "cudatoolkit-11-cudnn"
         "cudatoolkit-11.8-tensorrt"
+        "aspell-dict-en-science"
       ];
     };
 
@@ -630,7 +631,7 @@ in
         profiles =
           let
             extensions =
-              with config.nur.repos.rycee.firefox-addons;
+              with pkgs.nur.repos.rycee.firefox-addons;
               [
                 a11ycss
                 amp2html
@@ -663,7 +664,7 @@ in
                 wallabagger
                 wayback-machine
               ]
-              ++ (with config.nur.repos.meain.firefox-addons; [ containerise ])
+              ++ (with pkgs.nur.repos.meain.firefox-addons; [ containerise ])
               ++ (with pkgs; [ tabfs ]);
             commonSettings = {
               "browser.startup.page" = 3; # resume previous session
@@ -1508,7 +1509,7 @@ in
           "kitty_mod+backspace" = "change_font_size all 0";
           "kitty_mod+u" = "input_unicode_character";
         };
-        theme = "Nord";
+        themeFile = "Nord";
         settings = {
           background_opacity = "0.95";
           clear_all_shortcuts = true;
@@ -3750,10 +3751,8 @@ in
         "flameshot/flameshot.ini" = {
           text = ''
             [General]
-            checkForUpdates=false
             contrastOpacity=127
             contrastUiColor=#4476ff
-            copyAndCloseAfterUpload=true
             copyPathAfterSave=true
             disabledTrayIcon=true
             drawColor=#1e6cc5
@@ -4732,15 +4731,15 @@ in
         (calibre.overrideAttrs (oldAttrs: {
           buildInputs = oldAttrs.buildInputs ++ (with python3Packages; [ pycryptodome ]);
         }))
-        gnome.gnome-calculator
-        gnome.file-roller
+        gnome-calculator
+        file-roller
         yt-dlp
         screenkey
         slop
         system-config-printer
         gnucash
         xournalpp
-        transmission-gtk
+        transmission_4-gtk
         newpipelist
         weechat
         yubikey-manager
@@ -5254,7 +5253,7 @@ in
         unifont
         noto-fonts
         noto-fonts-extra
-        noto-fonts-cjk
+        noto-fonts-cjk-sans
 
       ];
 
@@ -5262,6 +5261,6 @@ in
     systemd.user.startServices = "sd-switch";
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    home.stateVersion = "24.05";
+    home.stateVersion = "24.11";
   };
 }
