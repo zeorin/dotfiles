@@ -16,6 +16,8 @@ with pkgs;
 
   open-in-editor = callPackage ./open-in-editor { };
 
+  sonic3air = callPackage ./sonic3air { };
+
   wrapTabfs = callPackage ./tabfs/wrapper.nix { };
   tabfs-unwrapped = callPackage ./tabfs { };
   tabfs = wrapTabfs tabfs-unwrapped { };
