@@ -35,6 +35,8 @@ with pkgs;
 
   open-in-editor = callPackage ./open-in-editor { };
 
+  sonic3air = callPackage ./sonic3air { };
+
   tmuxPlugins =
     prev.tmuxPlugins
     // (recurseIntoAttrs (
