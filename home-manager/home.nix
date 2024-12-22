@@ -5092,6 +5092,7 @@ in
         })
         mangohud
         protonup
+        sonic3air
 
       ]
       ++ [
