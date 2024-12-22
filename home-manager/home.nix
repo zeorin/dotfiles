@@ -1033,7 +1033,8 @@ in
             conflictStyle = "zdiff3";
           };
           mergetool.prompt = false;
-          "mergetool \"nvimdiff\"".cmd = ''$VISUAL -d -c '4wincmd w | wincmd J'  "$LOCAL" "$BASE" "$REMOTE" "$MERGED"'';
+          "mergetool \"nvimdiff\"".cmd =
+            ''$VISUAL -d -c '4wincmd w | wincmd J'  "$LOCAL" "$BASE" "$REMOTE" "$MERGED"'';
           branch.autosetupmerge = true;
           rerere = {
             enabled = true;
@@ -3260,7 +3261,8 @@ in
 
             # Programs
             "super + p" = "${pkgs.rofi-pass}/bin/rofi-pass";
-            "super + shift + e" = "${config.programs.emacs.finalPackage}/bin/emacsclient –eval '(emacs-everywhere)'";
+            "super + shift + e" =
+              "${config.programs.emacs.finalPackage}/bin/emacsclient –eval '(emacs-everywhere)'";
 
             # Audio controls
             "XF86AudioRaiseVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 +5%";
@@ -3275,7 +3277,8 @@ in
 
             # Screen brightness controls
             "XF86MonBrightnessUp" = "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%+";
-            "XF86MonBrightnessDown" = "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%-";
+            "XF86MonBrightnessDown" =
+              "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%-";
           };
       };
       syncthing = {

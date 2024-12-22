@@ -308,11 +308,12 @@ in
         value.source = value.flake;
       }) config.nix.registry)
       // {
-        "systemd/system-sleep/post-hibernate-pkill-slock".source = pkgs.writeShellScript "post-hibernate-pkill-slock" ''
-          if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
-            ${pkgs.procps}/bin/pkill slock
-          fi
-        '';
+        "systemd/system-sleep/post-hibernate-pkill-slock".source =
+          pkgs.writeShellScript "post-hibernate-pkill-slock" ''
+            if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
+              ${pkgs.procps}/bin/pkill slock
+            fi
+          '';
       };
 
     networking = {
