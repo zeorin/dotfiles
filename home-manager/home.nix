@@ -355,9 +355,7 @@ in
   imports = [
     inputs.nur.modules.homeManager.default
     inputs.nix-index-database.hmModules.nix-index
-    { programs.nix-index-database.comma.enable = true; }
     inputs.nixos-vscode-server.homeModules.default
-    { services.vscode-server.enable = true; }
     ./emacs
   ];
 
@@ -1641,6 +1639,7 @@ in
         };
       };
       nix-index.enable = true;
+      nix-index-database.comma.enable = true;
       obs-studio = {
         enable = true;
         plugins = with pkgs.obs-studio-plugins; [ obs-backgroundremoval ];
