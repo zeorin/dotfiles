@@ -463,7 +463,7 @@ in
       };
       sessionVariables = with config.xdg; rec {
         LESS = "-FiRx4";
-        PAGER = "less ${LESS}";
+        MANPAGER = "${pkgs.bat-extras.batman}/bin/batman";
         # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
         TERMINAL = "${terminal-emulator}";
 
@@ -820,21 +820,6 @@ in
               && transient_execute \
               || commandline -r ""'
           '';
-          man = {
-            wraps = "man";
-            description = "man with more formatting";
-            body = ''
-              set --export MANWIDTH ([ "$COLUMNS" -gt "80" ] && echo "80" || echo "$COLUMNS")
-              set --export LESS_TERMCAP_mb (printf '\e[5m')
-              set --export LESS_TERMCAP_md (printf '\e[1;38;5;7m')
-              set --export LESS_TERMCAP_me (printf '\e[0m')
-              set --export LESS_TERMCAP_so (printf '\e[7;38;5;3m')
-              set --export LESS_TERMCAP_se (printf '\e[27;39m')
-              set --export LESS_TERMCAP_us (printf '\e[4;38;5;4m')
-              set --export LESS_TERMCAP_ue (printf '\e[24;39m')
-              command man $argv
-            '';
-          };
           mkcd = {
             description = "Create a directory and change into it";
             body = "mkdir -p $argv[1] && cd $argv[1]";
