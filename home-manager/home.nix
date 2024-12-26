@@ -5018,7 +5018,11 @@ in
         # For dark mode toggling
         xfce.xfconf
 
-        retroarchFull
+        (retroarch.override {
+          cores = lib.filter (
+            c: (c ? libretroCore) && (lib.meta.availableOn stdenv.hostPlatform c) && (!c.meta.unfree)
+          ) (lib.attrValues libretro);
+        })
         mangohud
         protonup
 
