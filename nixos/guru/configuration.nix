@@ -15,7 +15,6 @@
     common-gpu-amd
     ../common/configuration.nix
     ./hardware-configuration.nix
-    ./printing.nix
   ];
 
   nixpkgs.overlays = [
