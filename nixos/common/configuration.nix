@@ -584,8 +584,9 @@ in
       firewall = {
         allowPing = true;
         allowedTCPPorts = [
-          # Calibre wireless
+          # Calibre wireless connection
           9090
+
           # Syncthing
           22000
         ];
@@ -597,8 +598,14 @@ in
           }
         ];
         allowedUDPPorts = [
-          # Calibre wireless
-          9090
+          # Calibre wireless `BROADCAST_PORTS` for their ZeroConf wireless connection setup
+          # https://github.com/kovidgoyal/calibre/blob/bdb77a370fa2f0ea2cde3b994bd7469322bfd065/src/calibre/devices/smart_device_app/driver.py#L251
+          54982
+          48123
+          39001
+          44044
+          59678
+
           # Syncthing
           21027
           22000
