@@ -460,10 +460,11 @@ in
         ];
       };
       sessionVariables = with config.xdg; rec {
-        LESS = "-FiRx4";
-        MANPAGER = "${pkgs.bat-extras.batman}/bin/batman";
+        LESS = "-FRXix2$";
         # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
         TERMINAL = "${terminal-emulator}";
+        BATDIFF_USE_DELTA = "true";
+        DELTA_FEATURES = "+side-by-side";
 
         # Help some tools actually adhere to XDG Base Dirs
         CURL_HOME = "${configHome}/curl";
@@ -522,23 +523,17 @@ in
           d = "docker";
           j = "journalctl -xe";
           ls = "${pkgs.lsd}/bin/lsd";
-          l = "ls -lFh"; # size,show type,human readable
-          la = "ls -lAFh"; # long list,show almost all,show type,human readable
-          lr = "ls -tRFh"; # sorted by date,recursive,show type,human readable
-          lt = "ls -ltFh"; # long list,sorted by date,show type,human readable
-          ll = "ls -l"; # long list
-          ldot = "ls -ld .*";
-          lS = "ls -1FSsh";
-          lart = "ls -1Fcart";
-          lrt = "ls -1Fcrt";
+          l = "ls -l";
+          la = "ls -a";
+          lla = "ls -la";
+          lt = "ls --tree";
           tree = "${pkgs.lsd}/bin/lsd --tree";
-          cat = "${pkgs.bat}/bin/bat";
+          cat = "bat";
+          rg = "batgrep";
+          ip = "ip -color=auto";
           grep = "grep --color=auto";
-          sgrep = "grep -R -n -H -C 5 --exclude-dir={.git,.svn,CVS}";
-          hgrep = "fc -El 0 | grep";
-          dud = "du -d 1 -h";
-          duf = "du -sh *";
-          sortnr = "sort -n -r";
+          diff = "batdiff";
+          fd = "fd --exec-batch bat";
           # Use `pass` to input SSH key passprases
           # TODO: fall back to regular passphrase entry if no GPG smartcard is
           # found / no key entry is found in the pass database
@@ -594,7 +589,27 @@ in
 
     programs = {
       home-manager.enable = true;
-      bash.enable = true;
+      bash = {
+        enable = true;
+        initExtra = ''
+          eval "$(batman --export-env)"
+          eval "$(batpipe)"
+        '';
+      };
+      bat = {
+        enable = true;
+        extraPackages = with pkgs.bat-extras; [
+          batgrep
+          batman
+          batpipe
+          batdiff
+        ];
+        config = {
+          theme = "Nord";
+          italic-text = "always";
+          map-syntax = [ ".ignore:Git Ignore" ];
+        };
+      };
       browserpass = {
         enable = true;
         browsers = [
@@ -915,6 +930,36 @@ in
               end
             '';
           };
+          # https://dandavison.github.io/delta/tips-and-tricks/toggling-delta-features.html
+          delta-toggle = {
+            description = "Toggle delta features such as side-by-side";
+            body = ''
+              set --export --global DELTA_FEATURES "$(${
+                pkgs.stdenvNoCC.mkDerivation {
+                  pname = "-delta-features-toggle";
+                  version = "unstable-2024-12-28";
+                  preferLocalBuild = true;
+                  allowSubstitutes = false;
+                  src = pkgs.fetchurl {
+                    url = "https://raw.githubusercontent.com/dandavison/tools/b9522d5ed542bf08c0cb62adddcfaf61a6876873/python/-delta-features-toggle";
+                    hash = "sha256-c0/Cqp4giyp+oZ3LD+44qDmqzBNM16ezoAqVV7UKxLo=";
+                  };
+                  dontUnpack = true;
+                  dontConfigure = true;
+                  dontBuild = true;
+                  installPhase = ''
+                    runHook preInstall
+
+                    substitute $src $out \
+                      --replace "/usr/bin/python3" "${pkgs.python3}/bin/python"
+                    chmod +x $out
+
+                    runHook postInstall
+                  '';
+                }
+              } $argv[1] | tee /dev/stderr)"
+            '';
+          };
         };
         interactiveShellInit = ''
           # Clear greeting message
@@ -932,16 +977,6 @@ in
 
           fish_nord_theme dark
 
-          # Determine whether to use side-by-side mode for delta
-          function delta_sidebyside --on-signal WINCH
-            if test "$COLUMNS" -ge 170; and ! contains side-by-side "$DELTA_FEATURES"
-              set --global --export --append DELTA_FEATURES side-by-side
-            else if test "$COLUMNS" -lt 170; and contains side-by-side "$DELTA_FEATURES"
-              set --erase DELTA_FEATURES[(contains --index side-by-side "$DELTA_FEATURES")]
-            end
-          end
-          delta_sidebyside
-
           # Put a newline under the last command
           # https://github.com/starship/starship/issues/560#issuecomment-1465630645
           function echo_prompt --on-event fish_postexec
@@ -951,6 +986,9 @@ in
           # Don't try to interpret Escape key sequences
           set -g fish_escape_delay_ms 10
           set -g fish_sequence_key_delay 0
+
+          batman --export-env | source
+          eval (batpipe)
         '';
         plugins = [
           {
@@ -973,6 +1011,17 @@ in
       git = {
         enable = true;
         userName = "Xandor Schiefer";
+        includes = [
+          {
+            path = "${pkgs.delta.src}/themes.gitconfig";
+          }
+        ];
+        maintenance = {
+          enable = true;
+          repositories = [
+            "${config.home.homeDirectory}/Code/nixpkgs"
+          ];
+        };
         extraConfig = {
           user.useConfigOnly = true;
           github.user = "zeorin";
@@ -1004,8 +1053,7 @@ in
             renames = "copies";
             mnemonicprefix = true;
             tool = "nvimdiff";
-            colormoved = "dimmed-zebra";
-            colormovedws = "allow-indentation-change";
+            colorMoved = "default";
           };
           difftool.prompt = false;
           "difftool \"nvimdiff\"".cmd = ''$VISUAL -d "$LOCAL" "$REMOTE"'';
@@ -1025,6 +1073,9 @@ in
           };
           log.abbrevCommit = true;
           blame.ignoreRevsFile = ".git-blame-ignore-revs";
+          "delta \"magit-delta\"" = {
+            line-numbers = false;
+          };
         };
         signing = {
           key = myKey;
@@ -1033,15 +1084,14 @@ in
         delta = {
           enable = true;
           options = {
-            features = "line-numbers decorations";
-            white-space-error-style = "22 reverse";
-            syntax-theme = "Nord";
-            decorations = {
-              commit-decoration-style = "bold yellow box ul";
-              file-style = "bold yellow ul";
-              file-decoration-style = "none";
-              hunk-header-decoration-style = "cyan box ul";
-            };
+            hyperlinks = true;
+            hyperlinks-file-link-format = "emacs:///{path}:{line}:{column}";
+            features = lib.concatStringsSep " " [
+              "line-numbers"
+              "navigate"
+              "zebra-dark"
+              "collared-trogon"
+            ];
           };
         };
         aliases =
@@ -1551,7 +1601,6 @@ in
           ^N  down
         '';
       };
-      lesspipe.enable = true;
       mpv = {
         enable = true;
         config = {
@@ -3725,11 +3774,6 @@ in
       enable = true;
       userDirs.enable = true;
       configFile = with config.xdg; {
-        "bat/config".text = ''
-          --theme="Nord"
-          --italic-text=always
-          --map-syntax='.ignore:Git Ignore'
-        '';
         "curl/.curlrc".text = ''
           write-out "\n"
           silent

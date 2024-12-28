@@ -50,6 +50,8 @@
 ;; (unpin! t)
 
 
+(package! magit-delta)
+
 (package! org-super-agenda)
 
 (package! mermaid-mode)
