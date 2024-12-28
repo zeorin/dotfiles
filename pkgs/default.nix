@@ -14,6 +14,8 @@ with pkgs;
 
   newpipelist = callPackage ./newpipelist { };
 
+  open-in-editor = callPackage ./open-in-editor { };
+
   wrapTabfs = callPackage ./tabfs/wrapper.nix { };
   tabfs-unwrapped = callPackage ./tabfs { };
   tabfs = wrapTabfs tabfs-unwrapped { };

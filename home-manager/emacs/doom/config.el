@@ -99,6 +99,14 @@
 (setq-default vterm-shell (executable-find "fish"))
 (setq-default explicit-shell-file-name (executable-find "fish"))
 
+(use-package! with-editor
+  :demand t
+  :hook ((shell-mode . with-editor-export-editor)
+	 (eshell-mode . with-editor-export-editor)
+	 (term-exec . with-editor-export-editor)
+	 (vterm-mode . with-editor-export-editor))
+  :config (shell-command-with-editor-mode))
+
 (use-package! magit-delta
   :hook ((magit-mode . magit-delta-mode))
   :config

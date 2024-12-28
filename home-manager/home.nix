@@ -459,12 +459,25 @@ in
           "terminate:ctrl_alt_bksp"
         ];
       };
-      sessionVariables = with config.xdg; rec {
+      sessionVariables = with config.xdg; {
         LESS = "-FRXix2$";
         # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
         TERMINAL = "${terminal-emulator}";
         BATDIFF_USE_DELTA = "true";
         DELTA_FEATURES = "+side-by-side";
+
+        EDITOR_URL = "editor://{path}:{line}";
+        # Non-standard env var, found in https://github.com/yyx990803/launch-editor
+        LAUNCH_EDITOR = pkgs.writeShellScript "launch-editor" ''
+          file="$1"
+          line="$2"
+          column="$3"
+          command="${pkgs.xdg-utils}/bin/xdg-open \"editor://$file\""
+          [ -n "$line" ] && command="$command:$line"
+          [ -n "$column" ] && command="$command:$column"
+          eval $command
+        '';
+        OPEN_IN_EDITOR = config.home.sessionVariables.VISUAL or config.home.sessionVariables.EDITOR;
 
         # Help some tools actually adhere to XDG Base Dirs
         CURL_HOME = "${configHome}/curl";
@@ -482,13 +495,13 @@ in
         DOOMDIR = "${configHome}/doom";
         DOOMLOCALDIR = "${dataHome}/doom";
 
-        LEDGER_FILE = "${config.xdg.userDirs.documents}/2. Areas/Finances/hledger.journal";
+        LEDGER_FILE = "${userDirs.documents}/2. Areas/Finances/hledger.journal";
 
         # Suppress direnv's verbose output
         # https://github.com/direnv/direnv/issues/68#issuecomment-42525172
         DIRENV_LOG_FORMAT = "";
 
-        DASHT_DOCSETS_DIR = "${config.xdg.dataFile.docsets.source}";
+        DASHT_DOCSETS_DIR = "${dataFile.docsets.source}";
       };
       activation = with config.xdg; {
         createXdgCacheAndDataDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -1085,7 +1098,7 @@ in
           enable = true;
           options = {
             hyperlinks = true;
-            hyperlinks-file-link-format = "emacs:///{path}:{line}:{column}";
+            hyperlinks-file-link-format = "editor://{path}:{line}:{column}";
             features = lib.concatStringsSep " " [
               "line-numbers"
               "navigate"
@@ -1831,13 +1844,6 @@ in
 
               # delay between keypresses when typing (in ms)
               xdotool_delay=12
-
-              ## Programs to be used
-              # Editor
-              EDITOR='${config.home.sessionVariables.EDITOR}'
-
-              # Browser
-              BROWSER='${pkgs.xdg-utils}/bin/xdg-open'
 
               ## Misc settings
 
@@ -4707,7 +4713,9 @@ in
             rm -rf "$out/share"
           '';
         })
-        (writeShellScriptBin "edit" (toString config.home.sessionVariables.EDITOR))
+        (writeShellScriptBin "edit" ''
+          exec $EDITOR "$@"
+        '')
         (aspellWithDicts (
           dicts: with dicts; [
             en
@@ -4739,6 +4747,7 @@ in
         wireshark
         websocat
         vim
+        open-in-editor
         universal-ctags
         zip
         unzip
