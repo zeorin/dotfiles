@@ -3261,6 +3261,8 @@ in
             "Print" = "${pkgs.flameshot}/bin/flameshot gui";
             "super + Print" = "${flameshot-region} activewindow";
             "super + shift + Print" = "${flameshot-region}";
+            "super + o" =
+              "${pkgs.flameshot}/bin/flameshot gui --accept-on-select --raw | ${pkgs.imagemagick}/bin/convert -resize 400% png:- png:- | ${pkgs.tesseract}/bin/tesseract -l eng --psm 6 - - | ${pkgs.xsel}/bin/xsel -bi; ${pkgs.libnotify}/bin/notify-send --icon Clipboard --urgency low --expire-time 5000 'OCR result copied to clipboard'";
 
             # Notifications
             "super + dollar" = "${pkgs.dunst}/bin/dunstctl close";
