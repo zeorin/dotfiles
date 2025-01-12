@@ -2017,20 +2017,11 @@ in
       starship = {
         enable = true;
         enableTransience = true;
-        settings =
-          (builtins.fromTOML (
-            builtins.readFile (
-              pkgs.fetchurl {
-                url = "https://starship.rs/presets/toml/nerd-font-symbols.toml";
-                hash = "sha256-9kvNshzNOfJ/TbIxrRP5ym82xO+P5X7FAmbCYL4WR80=";
-              }
-            )
-          ))
-          // {
-            add_newline = false;
-            format = "$character";
-            right_format = "$all";
-          };
+        settings = {
+          add_newline = false;
+          format = "$character";
+          right_format = "$all";
+        };
       };
       tmux = {
         enable = true;
@@ -4189,6 +4180,31 @@ in
               "\C-n": history-search-forward
           $endif
         '';
+        "starship.toml" =
+          let
+            tomlFormat = pkgs.formats.toml { };
+            cfg = config.programs.starship;
+            settings = tomlFormat.generate "starship-config" (cfg.settings);
+            nerdFonts = pkgs.runCommandLocal "nerd-font-symbols.toml" { } ''
+              ${cfg.package}/bin/starship preset nerd-font-symbols -o $out
+            '';
+          in
+          lib.mkForce (
+            lib.mkIf cfg.enable {
+              source = lib.mkMerge [
+                (lib.mkIf (cfg.settings != null) (
+                  pkgs.concatTextFile {
+                    name = "starship.toml";
+                    files = [
+                      settings
+                      nerdFonts
+                    ];
+                  }
+                ))
+                (lib.mkIf (cfg.settings == null) nerdFonts)
+              ];
+            }
+          );
         "todo/config".text = ''
           export TODO_DIR="${userDirs.documents}/todo"
           export TODO_FILE="$TODO_DIR/todo.txt"
