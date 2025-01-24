@@ -54,6 +54,7 @@
 (package! magit-delta)
 
 (package! org-super-agenda)
+(package! org-web-tools)
 
 (package! mermaid-mode)
 

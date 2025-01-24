@@ -119,6 +119,9 @@
   :config
   (setq org-return-follows-link t))
 
+(use-package! org-web-tools
+  :after org)
+
 ;; Boris Buliga - Task management with org-roam Vol. 5: Dynamic and fast agenda
 ;; https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
 (use-package! vulpea
