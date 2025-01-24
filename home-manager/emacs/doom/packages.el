@@ -55,6 +55,7 @@
 
 (package! org-super-agenda)
 (package! org-web-tools)
+(package! ox-clip)
 
 (package! mermaid-mode)
 
