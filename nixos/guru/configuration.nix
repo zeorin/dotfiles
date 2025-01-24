@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  modulesPath,
   ...
 }:
 
@@ -106,6 +107,7 @@
   services.udev.packages = with pkgs; [
     vial
     android-udev-rules
+    sane-airscan
   ];
   services.udev.extraRules = ''
     SUBSYSTEM=="i2c-dev", ACTION=="add", ATTR{name}=="AMDGPU DM i2c hw bus *", TAG+="ddcci", TAG+="systemd", ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
@@ -170,7 +172,10 @@
     amdvlk.support32Bit.enable = true;
   };
 
-  environment.systemPackages = with pkgs; [ lact ];
+  environment.systemPackages = with pkgs; [
+    lact
+    (xsane.override { gimpSupport = true; })
+  ];
   systemd.packages = with pkgs; [ lact ];
   systemd.services.lactd.wantedBy = [ "multi-user.target" ];
 
@@ -190,6 +195,16 @@
     ];
 
   hardware.keyboard.qmk.enable = true;
+
+  hardware.sane = {
+    enable = true;
+    openFirewall = true;
+    extraBackends = with pkgs; [ sane-airscan ];
+    disabledDefaultBackends = [ "escl" ];
+  };
+  services.saned.enable = true;
+
+  users.users.zeorin.extraGroups = [ "scanner" ];
 
   # i2c
   hardware.i2c.enable = true;
