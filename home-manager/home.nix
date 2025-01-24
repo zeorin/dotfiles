@@ -1062,7 +1062,7 @@ in
             pushNonFastForward = false;
           };
           diff = {
-            algorithm = "patience";
+            algorithm = "histogram";
             renames = "copies";
             mnemonicprefix = true;
             tool = "nvimdiff";
