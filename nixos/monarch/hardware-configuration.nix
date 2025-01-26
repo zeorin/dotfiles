@@ -15,7 +15,10 @@
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "nvme"
+    "ahci"
+    "usbhid"
     "rtsx_pci_sdmmc"
+    "usb_storage"
   ];
   boot.initrd.kernelModules = [ "dm-snapshot" ];
   boot.kernelModules = [ "kvm-intel" ];
