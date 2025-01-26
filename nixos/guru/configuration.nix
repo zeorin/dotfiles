@@ -206,6 +206,8 @@
 
   users.users.zeorin.extraGroups = [ "scanner" ];
 
+  users.groups.uinput.gid = lib.mkForce 987;
+
   # i2c
   hardware.i2c.enable = true;
 
