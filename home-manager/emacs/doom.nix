@@ -130,6 +130,7 @@ in
               # nixfmt-classic
               nixfmt-rfc-style
               nixd
+              elixir-ls
               black
               isort
               pipenv
