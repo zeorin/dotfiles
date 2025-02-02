@@ -463,9 +463,6 @@ tasks."
   ;; https://github.com/doomemacs/doomemacs/issues/4483#issuecomment-910698739
   (ispell-check-version))
 
-;; Don't use language servers to auto-format
-(setq +format-with-lsp nil)
-
 ;; LSP perf tweaks
 ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
 (setq read-process-output-max (* 1024 1024 3)) ;; 3mb
@@ -478,7 +475,8 @@ tasks."
 
 (after! lsp-mode
   (setq lsp-enable-suggest-server-download nil
-	lsp-clients-typescript-prefer-use-project-ts-server t)
+	lsp-clients-typescript-prefer-use-project-ts-server t
+	+format-with-lsp nil)
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."
     (or
@@ -507,7 +505,33 @@ tasks."
 	    (message "Using emacs-lsp-booster for %s!" orig-result)
 	    (cons "emacs-lsp-booster" orig-result))
 	orig-result)))
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+
+  ;; https://github.com/emacs-lsp/lsp-mode/issues/713#issuecomment-985653873
+  (advice-add 'lsp--get-ignored-regexes-for-workspace-root
+	      :around (lambda (fn workspace-root)
+			(let* ((ignored-things (funcall fn workspace-root))
+			       (ignored-files-regex-list (car ignored-things))
+			       (ignored-directories-regex-list (cadr ignored-things))
+			       (cmd (format "git clean --dry-run -X '%s' | cut -d' ' -f3" workspace-root))
+			       (gitignored-things (split-string (shell-command-to-string cmd) "\n" t))
+			       (gitignored-files (seq-remove (lambda (line) (string-match "[/\\\\]\\'" line)) gitignored-things))
+			       (gitignored-directories (seq-filter (lambda (line) (string-match "[/\\\\]\\'" line)) gitignored-things))
+			       (gitignored-files-regex-list
+				(mapcar (lambda (file) (concat "[/\\\\]" (regexp-quote file) "\\'"))
+					gitignored-files))
+			       (gitignored-directories-regex-list
+				(mapcar (lambda (directory)
+					  (concat "[/\\\\]"
+						  (regexp-quote (replace-regexp-in-string "[/\\\\]\\'" "" directory))
+						  "\\'"))
+					gitignored-directories)))
+			  (list
+			   (append ignored-files-regex-list gitignored-files-regex-list)
+			   (append ignored-directories-regex-list gitignored-directories-regex-list)))))
+
+  ;; https://emacs-lsp.github.io/lsp-mode/page/faq/#how-do-i-force-lsp-mode-to-forget-the-workspace-folders-for-multi-root-servers-so-the-workspace-folders-are-added-on-demand
+  (advice-add 'lsp :before (lambda (&rest _args) (eval '(setf (lsp-session-server-id->folders (lsp-session)) (ht))))))
 
 (add-hook! 'typescript-tsx-mode-hook
   (setq comment-start "//"
