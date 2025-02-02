@@ -129,7 +129,7 @@ in
               jq
               # nixfmt-classic
               nixfmt-rfc-style
-              nil
+              nixd
               black
               isort
               pipenv
