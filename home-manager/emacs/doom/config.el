@@ -623,3 +623,5 @@ tasks."
 (use-package! evil-escape
   :config
   (setq evil-escape-delay 0))
+
+(setq +latex-viewers '(zathura))

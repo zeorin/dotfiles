@@ -44,6 +44,8 @@ in
               libxml2
               rstfmt
               texlive.combined.scheme-medium
+              zathura
+              texlab
               python3
               binutils
               (ripgrep.override { withPCRE2 = true; })
