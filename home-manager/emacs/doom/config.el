@@ -121,6 +121,15 @@
 
 (use-package! org-web-tools
   :after org)
+
+(use-package! org-transclusion
+  :after org
+  :init
+  (map!
+   :leader
+   :prefix "n"
+   :desc "Org Transclusion Mode" "t" #'org-transclusion-mode))
+
 (use-package! ox-clip
   :after org)
 
