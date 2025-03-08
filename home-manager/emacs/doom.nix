@@ -133,6 +133,7 @@ in
               nixfmt-rfc-style
               nixd
               elixir-ls
+              marksman
               black
               isort
               pipenv
