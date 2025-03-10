@@ -381,8 +381,6 @@ in
         outputs.overlays.modifications
         outputs.overlays.unstable-packages
 
-        inputs.nix-alien.overlays.default
-
         (final: prev: {
           fcitx5-with-addons = prev.fcitx5-with-addons.overrideAttrs (oldAttrs: {
             postBuild = ''
@@ -4712,7 +4710,6 @@ in
         usbutils
         pciutils
         inetutils
-        nix-alien
         brightnessctl
         asciinema
         (symlinkJoin {
