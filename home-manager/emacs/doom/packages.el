@@ -51,8 +51,6 @@
 
 (package! with-editor)
 
-(package! magit-delta)
-
 (package! org-super-agenda)
 (package! org-web-tools)
 (package! org-transclusion)

@@ -161,7 +161,7 @@ in
         "12px" = toString (dpiScale 12);
         "18px" = toString (dpiScale 18);
         doom-png = ./doom.png;
-        inherit (pkgs) nodejs delta;
+        inherit (pkgs) nodejs;
         inherit (pkgs.unstable) vscode-js-debug;
         inherit (pkgs.unstable.vscode-extensions.dbaeumer) vscode-eslint;
         inherit (pkgs.unstable.vscode-extensions.firefox-devtools) vscode-firefox-debug;

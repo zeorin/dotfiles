@@ -107,14 +107,6 @@
 	 (vterm-mode . with-editor-export-editor))
   :config (shell-command-with-editor-mode))
 
-(use-package! magit-delta
-  :hook ((magit-mode . magit-delta-mode))
-  :config
-  (setq magit-delta-executable "@delta@/bin/delta"
-	magit-delta-default-dark-theme "Nord")
-  (add-to-list 'magit-delta-delta-args "--features" t)
-  (add-to-list 'magit-delta-delta-args "magit-delta" t))
-
 (use-package! org
   :config
   (setq org-return-follows-link t))
