@@ -25,10 +25,7 @@ in
     };
   };
 
-  programs.emacs = {
-    enable = true;
-    package = pkgs.emacs29;
-  };
+  programs.emacs.enable = true;
 
   services.emacs = {
     enable = true;
