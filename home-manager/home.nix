@@ -544,7 +544,6 @@ in
           ip = "ip -color=auto";
           grep = "grep --color=auto";
           diff = "batdiff";
-          fd = "fd --exec-batch bat";
           # Use `pass` to input SSH key passprases
           # TODO: fall back to regular passphrase entry if no GPG smartcard is
           # found / no key entry is found in the pass database
