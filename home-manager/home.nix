@@ -5076,6 +5076,7 @@ in
         cachix
         nix-prefetch-git
         nix-prefetch
+        expect
         nix-output-monitor
         keybase
         zeal
