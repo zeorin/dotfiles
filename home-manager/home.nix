@@ -5062,6 +5062,7 @@ in
         quickemu
         slack
         zulip
+        whatsapp-for-linux
         discord
         tdesktop
         skypeforlinux
