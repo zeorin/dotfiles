@@ -5061,6 +5061,7 @@ in
         qemu_full
         quickemu
         slack
+        zulip
         discord
         tdesktop
         skypeforlinux
