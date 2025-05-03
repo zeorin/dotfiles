@@ -16,8 +16,6 @@
     ../common/configuration.nix
   ];
 
-  dpi = 216; # × 2.25
-
   users.groups.uinput.gid = lib.mkForce 984;
 
   boot = {

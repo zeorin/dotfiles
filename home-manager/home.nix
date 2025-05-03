@@ -11,10 +11,6 @@
 }@moduleArgs:
 
 let
-  round = x: if ((x / 2.0) >= 0.5) then (builtins.ceil x) else (builtins.floor x);
-
-  dpiScale = x: round (x * (config.dpi / 96.0));
-
   myKey = "0x5E1C0971FE4F665A";
 
   colors = {
@@ -360,12 +356,6 @@ in
   ];
 
   options = with lib; {
-    dpi = mkOption {
-      type = with types; int;
-      default = moduleArgs.osConfig.dpi or 96;
-      example = 192;
-    };
-
     nixpkgs.allowUnfreePackages = mkOption {
       type = with types; (listOf (either str (functionTo bool)));
       default = [ ];
@@ -1745,7 +1735,6 @@ in
               # rofi command. Make sure to have "$@" as last argument
               _rofi () {
                   ${pkgs.rofi}/bin/rofi \
-                    -dpi ${toString config.dpi} \
                     -i \
                     -kb-accept-custom "" \
                     -kb-row-down "${remove-binding "Control+n" kb-row-down}" \
@@ -1891,7 +1880,7 @@ in
             window = {
               location = mkLiteral "north";
               anchor = mkLiteral "north";
-              y-offset = mkLiteral "${toString (dpiScale 280)}px";
+              y-offset = mkLiteral "280px";
               width = mkLiteral "40em";
               background-color = mkLiteral "@bg0";
             };
@@ -2522,7 +2511,7 @@ in
             max_icon_size = 60;
             icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro-icons";
             enable_recursive_icon_lookup = "true";
-            dmenu = "${pkgs.rofi}/bin/rofi -dpi ${toString config.dpi} -dmenu -p dunst";
+            dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst";
             mouse_left_click = "close_current";
             mouse_middle_click = "context";
             mouse_right_click = "do_action";
@@ -2667,7 +2656,7 @@ in
             method = "dual_kawase";
             strength = 5;
           };
-          corner-radius = dpiScale 8;
+          corner-radius = 8;
           rounded-corners-exclude = [
             "window_type = 'dock'"
             "window_type = 'desktop'"
@@ -2798,9 +2787,8 @@ in
               monitor = "\${env:MONITOR:}";
               monitor-strict = true;
               monitor-exact = true;
-              inherit (config) dpi;
               width = "100%";
-              height = "${toString (dpiScale 24)}px";
+              height = "24px";
               enable-struts = true;
               double-click-interval = 150;
               override-redirect = false;
@@ -3300,7 +3288,7 @@ in
             };
             modifier = "Mod4";
             terminal = terminal-emulator;
-            menu = ''"${pkgs.rofi}/bin/rofi -dpi ${toString config.dpi} -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
+            menu = ''"${pkgs.rofi}/bin/rofi -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
             focus = {
               followMouse = false;
               newWindow = "urgent";
@@ -3523,7 +3511,7 @@ in
                       floating_from = "auto";
                       title = " is sharing your screen\.$";
                     };
-                    command = "border none, sticky enable, move position 0 px -${toString (dpiScale 55)}px";
+                    command = "border none, sticky enable, move position 0 px -55px";
                   }
                   (mkFloating { class = "^emacs-everywhere$"; })
                   (mkFloating { class = "^Tor Browser$"; })
@@ -3838,7 +3826,6 @@ in
               UseDarkTheme=True
               UseAccentColor=True
               PerScreenDPI=False
-              ForceWaylandDPI=${toString config.dpi}
               EnableFractionalScale=True
             '')
             (pkgs.writeTextDir "conf/keyboard.conf" ''
@@ -4407,7 +4394,6 @@ in
           "Xft.hinting" = 1;
           "Xft.antialias" = 1;
           "Xft.rgba" = "rgb";
-          "Xft.dpi" = config.dpi;
         }
         # xterm
         // (mapAttrs' (name: value: nameValuePair "XTerm.${name}" value) (
@@ -4421,7 +4407,7 @@ in
             backarrowKey = false;
             locale = false;
             utf8 = true;
-            internalBorder = dpiScale 11;
+            internalBorder = 11;
             visualbell = true;
             bellIsUrgent = true;
             fullscreen = "never";
@@ -4568,7 +4554,7 @@ in
             '';
           };
         name = "Colloid-nord-light-cursors";
-        size = dpiScale 24;
+        size = 24;
       };
       font = {
         package = pkgs.geist-font;
