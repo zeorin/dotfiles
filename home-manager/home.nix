@@ -432,7 +432,6 @@ in
         "enhancer-for-youtube"
         "slack"
         "discord"
-        "skypeforlinux"
         "zoom"
         "code"
         "vscode"
@@ -3561,7 +3560,6 @@ in
               "${workspace10}" = [
                 { class = "^TelegramDesktop$"; }
                 { class = "^Slack$"; }
-                { class = "^Skype$"; }
                 { class = "^Signal$"; }
                 { class = "^Ferdium$"; }
               ];
@@ -5065,7 +5063,6 @@ in
         whatsapp-for-linux
         discord
         tdesktop
-        skypeforlinux
         signal-desktop
         zoom-us
         element-desktop
