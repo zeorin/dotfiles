@@ -23,27 +23,6 @@
 
     nixos-vscode-server.url = "github:nix-community/nixos-vscode-server";
     nixos-vscode-server.inputs.nixpkgs.follows = "nixpkgs";
-
-    doomemacs.url = "github:zeorin/doomemacs/feat/dap-js";
-    doomemacs.flake = false;
-
-    nord-dircolors.url = "github:nordtheme/dircolors";
-    nord-dircolors.flake = false;
-
-    firefox-csshacks.url = "github:MrOtherGuy/firefox-csshacks";
-    firefox-csshacks.flake = false;
-
-    pulseaudio-control.url = "github:marioortizmanero/polybar-pulseaudio-control";
-    pulseaudio-control.flake = false;
-
-    chemacs.url = "github:plexus/chemacs2";
-    chemacs.flake = false;
-
-    base16-tridactyl.url = "github:tridactyl/base16-tridactyl";
-    base16-tridactyl.flake = false;
-
-    emoji-variation-sequences.url = "https://www.unicode.org/Public/15.0.0/ucd/emoji/emoji-variation-sequences.txt";
-    emoji-variation-sequences.flake = false;
   };
 
   outputs =

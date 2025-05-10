@@ -8,13 +8,27 @@
 with pkgs;
 
 {
+  base16-tridactyl = callPackage ./base16-tridactyl { };
+
   codemod = callPackage ./codemod { };
+
+  chemacs2 = callPackage ./chemacs2 { };
+
+  doomemacs = callPackage ./doomemacs { };
+
+  emoji-variation-sequences = callPackage ./emoji-variation-sequences { };
+
+  firefox-csshacks = callPackage ./firefox-csshacks { };
 
   modorganizer2-linux-installer = callPackage ./modorganizer2-linux-installer { };
 
   newpipelist = callPackage ./newpipelist { };
 
+  nord-dircolors = callPackage ./nord-dircolors { };
+
   open-in-editor = callPackage ./open-in-editor { };
+
+  polybar-pulseaudio-control = callPackage ./polybar-pulseaudio-control { };
 
   wrapTabfs = callPackage ./tabfs/wrapper.nix { };
   tabfs-unwrapped = callPackage ./tabfs { };

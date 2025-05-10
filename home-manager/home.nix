@@ -628,7 +628,7 @@ in
       };
       dircolors = {
         enable = true;
-        extraConfig = builtins.readFile "${inputs.nord-dircolors}/src/dir_colors";
+        extraConfig = builtins.readFile "${pkgs.nord-dircolors}/src/dir_colors";
       };
       direnv = {
         enable = true;
@@ -791,9 +791,9 @@ in
               settings =
                 commonSettings // noNoiseSuppression // performanceSettings // enableUserChrome // saneNewTab;
               userChrome = ''
-                @import url('${inputs.firefox-csshacks}/chrome/window_control_placeholder_support.css');
-                @import url('${inputs.firefox-csshacks}/chrome/hide_tabs_toolbar.css');
-                @import url('${inputs.firefox-csshacks}/chrome/autohide_toolbox.css');
+                @import url('${pkgs.firefox-csshacks}/chrome/window_control_placeholder_support.css');
+                @import url('${pkgs.firefox-csshacks}/chrome/hide_tabs_toolbar.css');
+                @import url('${pkgs.firefox-csshacks}/chrome/autohide_toolbox.css');
               '';
               inherit extensions;
             };
@@ -1572,7 +1572,7 @@ in
             with builtins;
             with lib;
             with strings;
-            trivial.pipe (fileContents (toString (inputs.emoji-variation-sequences))) [
+            trivial.pipe (fileContents (toString (pkgs.emoji-variation-sequences))) [
               (splitString "\n")
               (filter (line: (stringLength line) > 0 && (substring 0 1 line) != "#"))
               (map (line: elemAt (splitString " " line) 0))
@@ -2786,38 +2786,6 @@ in
               urgent = colors.nord12;
               alert = colors.nord13;
             };
-            pulseaudio-control =
-              with pkgs;
-              stdenv.mkDerivation {
-                name = "pulseaudio-control";
-                src = inputs.pulseaudio-control;
-                buildInputs = [
-                  bash
-                  pulseaudio
-                  libnotify
-                  gnugrep
-                  gawk
-                  gnused
-                  coreutils
-                ];
-                nativeBuildInputs = [ makeWrapper ];
-                installPhase = ''
-                  mkdir -p $out/bin
-                  mv pulseaudio-control $out/bin/pulseaudio-control
-                  wrapProgram $out/bin/pulseaudio-control \
-                    --prefix PATH : ${
-                      lib.makeBinPath [
-                        bash
-                        pulseaudio
-                        libnotify
-                        gnugrep
-                        gawk
-                        gnused
-                        coreutils
-                      ]
-                    }
-                '';
-              };
             mkFormats =
               let
                 formats = [
@@ -3072,12 +3040,12 @@ in
               separator = "${mkAlpha colors.nord0}";
               type = "custom/script";
               tail = true;
-              exec = ''${pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "󰍬" --icon-muted "󰍭" --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-blacklist "*.monitor" --notifications listen'';
+              exec = ''${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "󰍬" --icon-muted "󰍭" --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-blacklist "*.monitor" --notifications listen'';
               click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-              click-left = "${pulseaudio-control}/bin/pulseaudio-control --node-type input togmute";
-              click-middle = "${pulseaudio-control}/bin/pulseaudio-control --node-type input next-node";
-              scroll-up = "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 up";
-              scroll-down = "${pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 down";
+              click-left = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input togmute";
+              click-middle = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input next-node";
+              scroll-up = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 up";
+              scroll-down = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 down";
             };
             "module/audio-output" = {
               "inherit" = "powerline/right-section-separator";
@@ -3087,12 +3055,12 @@ in
               separator = "${mkAlpha colors.nord0}";
               type = "custom/script";
               tail = true;
-              exec = ''${pulseaudio-control}/bin/pulseaudio-control --icons-volume "󰕿 ,󰖀 ,󰕾 " --icon-muted "󰖁 " --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-nicknames-from "device.description" --notifications listen'';
+              exec = ''${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --icons-volume "󰕿 ,󰖀 ,󰕾 " --icon-muted "󰖁 " --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-nicknames-from "device.description" --notifications listen'';
               click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-              click-left = "${pulseaudio-control}/bin/pulseaudio-control togmute";
-              click-middle = "${pulseaudio-control}/bin/pulseaudio-control next-node";
-              scroll-up = "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 up";
-              scroll-down = "${pulseaudio-control}/bin/pulseaudio-control --volume-max 130 down";
+              click-left = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control togmute";
+              click-middle = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control next-node";
+              scroll-up = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --volume-max 130 up";
+              scroll-down = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --volume-max 130 down";
             };
             "module/xkeyboard" = {
               "inherit" = "powerline/right-section-separator";
@@ -4345,7 +4313,7 @@ in
         "tridactyl/themes".source = pkgs.symlinkJoin {
           name = "tridactyl-themes";
           paths = [
-            inputs.base16-tridactyl
+            pkgs.base16-tridactyl
             (pkgs.writeTextDir "zeorin.css" ''
               /* Same as default theme, but move the tridactyl console to the top */
               .TridactylOwnNamespace body {
@@ -5005,7 +4973,7 @@ in
               profile = "developer-edition";
             }
             (
-              firefox-devedition.override {
+              unstable.firefox-devedition.override {
                 nativeMessagingHosts = with pkgs; [
                   browserpass
                   plasma-browser-integration

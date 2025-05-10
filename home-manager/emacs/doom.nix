@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   ...
 }:
 
@@ -20,7 +19,7 @@ in
 {
   xdg.configFile = {
     doom-emacs = {
-      source = inputs.doomemacs;
+      source = pkgs.doomemacs;
       onChange = "${pkgs.writeShellScript "doom-change" ''
         ${doomScriptEnvVars}
         if [ ! -d "$DOOMLOCALDIR" ]; then

@@ -1,8 +1,6 @@
 {
   config,
-  lib,
   pkgs,
-  inputs,
   ...
 }:
 
@@ -39,7 +37,7 @@ in
       inherit (config.home.sessionVariables) DOOMDIR DOOMLOCALDIR;
     };
     "chemacs/profile".text = "doom";
-    emacs.source = inputs.chemacs;
+    emacs.source = pkgs.chemacs2;
   };
 
   xdg.desktopEntries = {
