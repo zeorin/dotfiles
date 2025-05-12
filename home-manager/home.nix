@@ -4959,6 +4959,9 @@ in
                 # https://github.com/NixOS/nixpkgs/pull/294971
                 rm -f "$out/bin/.${binaryName}-wrapper"
 
+                # remove links to colliding files
+                rm -f "$out"/lib/firefox/browser/features/*.xpi
+
                 # Make our wrapper
                 rm "$out/bin/${name}"
                 makeWrapper "${pkg}/bin/${name}" "$out/bin/${name}" \
