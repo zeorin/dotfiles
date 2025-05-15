@@ -15,6 +15,10 @@ stdenvNoCC.mkDerivation {
     hash = "sha256-sO9eB4l3DKkvC2PRY1njGVw5SN6DO28nKg9eAIR7QL4=";
   };
 
+  patches = [
+    ./dap-js.patch
+  ];
+
   dontConfigure = true;
   dontBuild = true;
 
