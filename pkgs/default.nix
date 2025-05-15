@@ -16,6 +16,8 @@ with pkgs;
 
   doomemacs = callPackage ./doomemacs { };
 
+  et-book = callPackage ./et-book { };
+
   emoji-variation-sequences = callPackage ./emoji-variation-sequences { };
 
   firefox-csshacks = callPackage ./firefox-csshacks { };

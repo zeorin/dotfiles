@@ -5071,6 +5071,7 @@ in
         # FONTS #
         #########
 
+        et-book
         geist-font
 
         # Emoji
