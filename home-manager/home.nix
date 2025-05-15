@@ -5046,6 +5046,7 @@ in
         cachix
         nix-prefetch-git
         nix-prefetch
+        nix-update
         expect
         nix-output-monitor
         keybase
