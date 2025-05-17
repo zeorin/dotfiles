@@ -2415,9 +2415,9 @@ in
     };
 
     services = {
-      blueman-applet.enable = true;
+      blueman-applet.enable = false;
       darkman = {
-        enable = true;
+        enable = false;
         settings = {
           lat = -26.2;
           lng = 28.0;
@@ -2493,7 +2493,7 @@ in
         };
       };
       dunst = {
-        enable = true;
+        enable = false;
         settings = {
           global = {
             follow = "keyboard";
@@ -2533,7 +2533,7 @@ in
           };
         };
       };
-      flameshot.enable = true;
+      flameshot.enable = false;
       git-sync = {
         enable = true;
         repositories = {
@@ -2558,10 +2558,10 @@ in
         indicator = true;
       };
       mpris-proxy.enable = true;
-      network-manager-applet.enable = true;
+      network-manager-applet.enable = false;
       nextcloud-client.enable = true;
       picom = {
-        enable = true;
+        enable = false;
         package =
           let
             picomPkg = pkgs.picom-next;
@@ -2726,7 +2726,7 @@ in
         };
       };
       polybar = {
-        enable = true;
+        enable = false;
         package = pkgs.polybar.override {
           i3Support = true;
           mpdSupport = true;
@@ -3137,13 +3137,13 @@ in
         '';
       };
       redshift = {
-        enable = true;
+        enable = false;
         tray = true;
         provider = "geoclue2";
         settings.redshift.adjustment-method = "randr";
       };
       sxhkd = {
-        enable = true;
+        enable = false;
         keybindings =
           let
             flameshot-region = (
@@ -3250,11 +3250,11 @@ in
 
     xsession = {
       enable = true;
-      initExtra = ''
-        ${scripts.setDesktopBackground} &
-      '';
+      # initExtra = ''
+      #   ${scripts.setDesktopBackground} &
+      # '';
       windowManager.i3 = {
-        enable = true;
+        enable = false;
         package = pkgs.i3-gaps;
         config =
           let
@@ -3558,16 +3558,16 @@ in
 
     systemd.user = {
       services = {
-        batsignal = {
-          Unit.Description = "Battery monitor daemon";
-          Service = {
-            Type = "simple";
-            ExecStart = "${pkgs.batsignal}/bin/batsignal -i";
-            Restart = "on-failure";
-            RestartSec = 1;
-          };
-          Install.WantedBy = [ "graphical-session.target" ];
-        };
+        # batsignal = {
+        #   Unit.Description = "Battery monitor daemon";
+        #   Service = {
+        #     Type = "simple";
+        #     ExecStart = "${pkgs.batsignal}/bin/batsignal -i";
+        #     Restart = "on-failure";
+        #     RestartSec = 1;
+        #   };
+        #   Install.WantedBy = [ "graphical-session.target" ];
+        # };
         languagetool =
           let
             settingsFormat = pkgs.formats.javaProperties { };
@@ -3612,25 +3612,25 @@ in
                 }
             '';
           };
-        picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
-        polkit-authentication-agent = {
-          Unit = {
-            Description = "Polkit authentication agent";
-            Documentation = "https://gitlab.freedesktop.org/polkit/polkit/";
-            After = [ "graphical-session-pre.target" ];
-            PartOf = [ "graphical-session.target" ];
-          };
-          Install.WantedBy = [ "graphical-session.target" ];
-          Service = {
-            ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-            Restart = "on-failure";
-          };
-        };
+        # picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
+        # polkit-authentication-agent = {
+        #   Unit = {
+        #     Description = "Polkit authentication agent";
+        #     Documentation = "https://gitlab.freedesktop.org/polkit/polkit/";
+        #     After = [ "graphical-session-pre.target" ];
+        #     PartOf = [ "graphical-session.target" ];
+        #   };
+        #   Install.WantedBy = [ "graphical-session.target" ];
+        #   Service = {
+        #     ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        #     Restart = "on-failure";
+        #   };
+        # };
         # https://github.com/nix-community/home-manager/issues/213#issuecomment-829743999
-        polybar = {
-          Unit.After = [ "graphical-session-i3.target" ];
-          Install.WantedBy = lib.mkForce [ "graphical-session-i3.target" ];
-        };
+        # polybar = {
+        #   Unit.After = [ "graphical-session-i3.target" ];
+        #   Install.WantedBy = lib.mkForce [ "graphical-session-i3.target" ];
+        # };
         tmux = {
           Unit.Description = "tmux server";
           Install.WantedBy = [ "default.target" ];
@@ -3640,19 +3640,19 @@ in
             Restart = "on-failure";
           };
         };
-        xfsettingsd = {
-          Unit = {
-            Description = "xfsettingsd";
-            After = [ "graphical-session-pre.target" ];
-            PartOf = [ "graphical-session.target" ];
-          };
-          Install.WantedBy = [ "graphical-session.target" ];
-          Service = {
-            Environment = "PATH=${config.home.profileDirectory}/bin";
-            ExecStart = "${pkgs.xfce.xfce4-settings}/bin/xfsettingsd";
-            Restart = "on-failure";
-          };
-        };
+        # xfsettingsd = {
+        #   Unit = {
+        #     Description = "xfsettingsd";
+        #     After = [ "graphical-session-pre.target" ];
+        #     PartOf = [ "graphical-session.target" ];
+        #   };
+        #   Install.WantedBy = [ "graphical-session.target" ];
+        #   Service = {
+        #     Environment = "PATH=${config.home.profileDirectory}/bin";
+        #     ExecStart = "${pkgs.xfce.xfce4-settings}/bin/xfsettingsd";
+        #     Restart = "on-failure";
+        #   };
+        # };
         yubikey-touch-detector = {
           Unit = {
             Description = "A tool to detect when your YubiKey is waiting for a touch";
@@ -3667,24 +3667,24 @@ in
         };
       };
       targets = {
-        graphical-session-i3.Unit = {
-          Description = "i3 X session";
-          BindsTo = [ "graphical-session.target" ];
-          Requisite = [ "graphical-session.target" ];
-          Wants = [ "xdg-autostart.target" ];
-        };
-        xdg-autostart.Unit = {
-          Description = "Run XDG autostart files";
-          Requires = [
-            "xdg-desktop-autostart.target"
-            "graphical-session.target"
-          ];
-          Before = [
-            "xdg-desktop-autostart.target"
-            "graphical-session.target"
-          ];
-          BindsTo = [ "graphical-session.target" ];
-        };
+        # graphical-session-i3.Unit = {
+        #   Description = "i3 X session";
+        #   BindsTo = [ "graphical-session.target" ];
+        #   Requisite = [ "graphical-session.target" ];
+        #   Wants = [ "xdg-autostart.target" ];
+        # };
+        # xdg-autostart.Unit = {
+        #   Description = "Run XDG autostart files";
+        #   Requires = [
+        #     "xdg-desktop-autostart.target"
+        #     "graphical-session.target"
+        #   ];
+        #   Before = [
+        #     "xdg-desktop-autostart.target"
+        #     "graphical-session.target"
+        #   ];
+        #   BindsTo = [ "graphical-session.target" ];
+        # };
       };
     };
 
@@ -3697,171 +3697,171 @@ in
           silent
           dump-header /dev/stderr
         '';
-        "flameshot/flameshot.ini" = {
-          text = ''
-            [General]
-            contrastOpacity=127
-            contrastUiColor=#4476ff
-            copyPathAfterSave=true
-            disabledTrayIcon=true
-            drawColor=#1e6cc5
-            drawThickness=2
-            saveAfterCopy=true
-            ; saveAfterCopyPath=/home/zeorin/Screenshots
-            savePath=/home/zeorin/Screenshots
-            savePathFixed=false
-            showHelp=false
-            showStartupLaunchMessage=true
-            startupLaunch=false
-            uiColor=#003396
+        # "flameshot/flameshot.ini" = {
+        #   text = ''
+        #     [General]
+        #     contrastOpacity=127
+        #     contrastUiColor=#4476ff
+        #     copyPathAfterSave=true
+        #     disabledTrayIcon=true
+        #     drawColor=#1e6cc5
+        #     drawThickness=2
+        #     saveAfterCopy=true
+        #     ; saveAfterCopyPath=/home/zeorin/Screenshots
+        #     savePath=/home/zeorin/Screenshots
+        #     savePathFixed=false
+        #     showHelp=false
+        #     showStartupLaunchMessage=true
+        #     startupLaunch=false
+        #     uiColor=#003396
 
-            [Shortcuts]
-            TYPE_ARROW=A
-            TYPE_CIRCLE=C
-            TYPE_CIRCLECOUNT=
-            TYPE_COMMIT_CURRENT_TOOL=Ctrl+Return
-            TYPE_COPY=Ctrl+C
-            TYPE_DRAWER=D
-            TYPE_EXIT=Ctrl+Q
-            TYPE_IMAGEUPLOADER=Return
-            TYPE_MARKER=M
-            TYPE_MOVESELECTION=Ctrl+M
-            TYPE_MOVE_DOWN=Down
-            TYPE_MOVE_LEFT=Left
-            TYPE_MOVE_RIGHT=Right
-            TYPE_MOVE_UP=Up
-            TYPE_OPEN_APP=Ctrl+O
-            TYPE_PENCIL=P
-            TYPE_PIN=
-            TYPE_PIXELATE=B
-            TYPE_RECTANGLE=R
-            TYPE_REDO=Ctrl+Shift+Z
-            TYPE_RESIZE_DOWN=Shift+Down
-            TYPE_RESIZE_LEFT=Shift+Left
-            TYPE_RESIZE_RIGHT=Shift+Right
-            TYPE_RESIZE_UP=Shift+Up
-            TYPE_SAVE=Ctrl+S
-            TYPE_SELECTION=S
-            TYPE_SELECTIONINDICATOR=
-            TYPE_SELECT_ALL=Ctrl+A
-            TYPE_TEXT=T
-            TYPE_TOGGLE_PANEL=Space
-            TYPE_UNDO=Ctrl+Z
-          '';
-          onChange = "${pkgs.writeShellScript "restart flameshot.service" ''
-            ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
-          ''}";
-        };
-        "fcitx5".source = pkgs.symlinkJoin {
-          name = "config-fcitx5";
-          paths = [
-            (pkgs.writeTextDir "config" ''
-              [Hotkey]
-              TriggerKeys=
-              EnumerateWithTriggerKeys=False
-              AltTriggerKeys=
-              EnumerateForwardKeys=
-              EnumerateBackwardKeys=
-              EnumerateSkipFirst=False
-              EnumerateGroupForwardKeys=
-              EnumerateGroupBackwardKeys=
-              ActivateKeys=
-              DeactivateKeys=
-              [Hotkey/PrevPage]
-              0=Up
-              [Hotkey/NextPage]
-              0=Down
-              [Hotkey/PrevCandidate]
-              0=Shift+Tab
-              [Hotkey/NextCandidate]
-              0=Tab
-              [Hotkey/TogglePreedit]
-              0=
-              [Behavior]
-              ActiveByDefault=False
-              ShareInputState=No
-              PreeditEnabledByDefault=False
-              ShowInputMethodInformation=False
-              showInputMethodInformationWhenFocusIn=False
-              CompactInputMethodInformation=False
-              ShowFirstInputMethodInformation=False
-              DefaultPageSize=5
-              OverrideXkbOption=False
-              CustomXkbOption=
-              EnabledAddons=
-              PreloadInputMethod=True
-              AllowInputMethodForPassword=False
-              ShowPreeditForPassword=False
-              [Behavior/DisabledAddons]
-              0=clipboard
-              1=emoji
-              2=imselector
-              3=kimpanel
-              4=notificationitem
-              5=notifications
-              6=spell
-            '')
-            (pkgs.writeTextDir "profile" ''
-              [Groups/0]
-              Name=Default
-              Default Layout=us-dvp
-              DefaultIM=keyboard-us
-              [Groups/0/Items/0]
-              Name=keyboard-us-dvp
-              Layout=
-              [Groups/0/Items/1]
-              Name=keyboard-us
-              Layout=
-              [GroupOrder]
-              0=Default
-            '')
-            (pkgs.writeTextDir "conf/classicui.conf" ''
-              Vertical Candidate List=True
-              WheelForPaging=True
-              PreferTextIcon=False
-              ShowLayoutNameInIcon=False
-              UseInputMethodLanguageToDisplayText=False
-              Theme=Nord-Light
-              DarkTheme=Nord-Dark
-              UseDarkTheme=True
-              UseAccentColor=True
-              PerScreenDPI=False
-              EnableFractionalScale=True
-            '')
-            (pkgs.writeTextDir "conf/keyboard.conf" ''
-              PageSize=5
-              EnableEmoji=False
-              EnableQuickPhraseEmoji=True
-              Choose Modifier=None
-              EnableHintByDefault=False
-              Hint Trigger=
-              One Time Hint Trigger=
-              UseNewComposeBehavior=True
-              EnableLongPress=False
-              [PrevCandidate]
-              0=Shift+Tab
-              [NextCandidate]
-              0=Tab
-            '')
-            (pkgs.writeTextDir "conf/quickphrase.conf" ''
-              Choose Modifier=None
-              Spell=False
-              FallbackSpellLanguage=en
-              [TriggerKey]
-              0=Super+period
-            '')
-            (pkgs.writeTextDir "conf/unicode.conf" ''
-              [TriggerKey]
-              0=Control+Alt+Shift+U
-              [DirectUnicodeMode]
-              0=Control+Shift+U
-            '')
-            (pkgs.writeTextDir "conf/xcb.conf" ''
-              Allow Overriding System XKB Settings=False
-              AlwaysSetToGroupLayout=False
-            '')
-          ];
-        };
+        #     [Shortcuts]
+        #     TYPE_ARROW=A
+        #     TYPE_CIRCLE=C
+        #     TYPE_CIRCLECOUNT=
+        #     TYPE_COMMIT_CURRENT_TOOL=Ctrl+Return
+        #     TYPE_COPY=Ctrl+C
+        #     TYPE_DRAWER=D
+        #     TYPE_EXIT=Ctrl+Q
+        #     TYPE_IMAGEUPLOADER=Return
+        #     TYPE_MARKER=M
+        #     TYPE_MOVESELECTION=Ctrl+M
+        #     TYPE_MOVE_DOWN=Down
+        #     TYPE_MOVE_LEFT=Left
+        #     TYPE_MOVE_RIGHT=Right
+        #     TYPE_MOVE_UP=Up
+        #     TYPE_OPEN_APP=Ctrl+O
+        #     TYPE_PENCIL=P
+        #     TYPE_PIN=
+        #     TYPE_PIXELATE=B
+        #     TYPE_RECTANGLE=R
+        #     TYPE_REDO=Ctrl+Shift+Z
+        #     TYPE_RESIZE_DOWN=Shift+Down
+        #     TYPE_RESIZE_LEFT=Shift+Left
+        #     TYPE_RESIZE_RIGHT=Shift+Right
+        #     TYPE_RESIZE_UP=Shift+Up
+        #     TYPE_SAVE=Ctrl+S
+        #     TYPE_SELECTION=S
+        #     TYPE_SELECTIONINDICATOR=
+        #     TYPE_SELECT_ALL=Ctrl+A
+        #     TYPE_TEXT=T
+        #     TYPE_TOGGLE_PANEL=Space
+        #     TYPE_UNDO=Ctrl+Z
+        #   '';
+        #   onChange = "${pkgs.writeShellScript "restart flameshot.service" ''
+        #     ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
+        #   ''}";
+        # };
+        # "fcitx5".source = pkgs.symlinkJoin {
+        #   name = "config-fcitx5";
+        #   paths = [
+        #     (pkgs.writeTextDir "config" ''
+        #       [Hotkey]
+        #       TriggerKeys=
+        #       EnumerateWithTriggerKeys=False
+        #       AltTriggerKeys=
+        #       EnumerateForwardKeys=
+        #       EnumerateBackwardKeys=
+        #       EnumerateSkipFirst=False
+        #       EnumerateGroupForwardKeys=
+        #       EnumerateGroupBackwardKeys=
+        #       ActivateKeys=
+        #       DeactivateKeys=
+        #       [Hotkey/PrevPage]
+        #       0=Up
+        #       [Hotkey/NextPage]
+        #       0=Down
+        #       [Hotkey/PrevCandidate]
+        #       0=Shift+Tab
+        #       [Hotkey/NextCandidate]
+        #       0=Tab
+        #       [Hotkey/TogglePreedit]
+        #       0=
+        #       [Behavior]
+        #       ActiveByDefault=False
+        #       ShareInputState=No
+        #       PreeditEnabledByDefault=False
+        #       ShowInputMethodInformation=False
+        #       showInputMethodInformationWhenFocusIn=False
+        #       CompactInputMethodInformation=False
+        #       ShowFirstInputMethodInformation=False
+        #       DefaultPageSize=5
+        #       OverrideXkbOption=False
+        #       CustomXkbOption=
+        #       EnabledAddons=
+        #       PreloadInputMethod=True
+        #       AllowInputMethodForPassword=False
+        #       ShowPreeditForPassword=False
+        #       [Behavior/DisabledAddons]
+        #       0=clipboard
+        #       1=emoji
+        #       2=imselector
+        #       3=kimpanel
+        #       4=notificationitem
+        #       5=notifications
+        #       6=spell
+        #     '')
+        #     (pkgs.writeTextDir "profile" ''
+        #       [Groups/0]
+        #       Name=Default
+        #       Default Layout=us-dvp
+        #       DefaultIM=keyboard-us
+        #       [Groups/0/Items/0]
+        #       Name=keyboard-us-dvp
+        #       Layout=
+        #       [Groups/0/Items/1]
+        #       Name=keyboard-us
+        #       Layout=
+        #       [GroupOrder]
+        #       0=Default
+        #     '')
+        #     (pkgs.writeTextDir "conf/classicui.conf" ''
+        #       Vertical Candidate List=True
+        #       WheelForPaging=True
+        #       PreferTextIcon=False
+        #       ShowLayoutNameInIcon=False
+        #       UseInputMethodLanguageToDisplayText=False
+        #       Theme=Nord-Light
+        #       DarkTheme=Nord-Dark
+        #       UseDarkTheme=True
+        #       UseAccentColor=True
+        #       PerScreenDPI=False
+        #       EnableFractionalScale=True
+        #     '')
+        #     (pkgs.writeTextDir "conf/keyboard.conf" ''
+        #       PageSize=5
+        #       EnableEmoji=False
+        #       EnableQuickPhraseEmoji=True
+        #       Choose Modifier=None
+        #       EnableHintByDefault=False
+        #       Hint Trigger=
+        #       One Time Hint Trigger=
+        #       UseNewComposeBehavior=True
+        #       EnableLongPress=False
+        #       [PrevCandidate]
+        #       0=Shift+Tab
+        #       [NextCandidate]
+        #       0=Tab
+        #     '')
+        #     (pkgs.writeTextDir "conf/quickphrase.conf" ''
+        #       Choose Modifier=None
+        #       Spell=False
+        #       FallbackSpellLanguage=en
+        #       [TriggerKey]
+        #       0=Super+period
+        #     '')
+        #     (pkgs.writeTextDir "conf/unicode.conf" ''
+        #       [TriggerKey]
+        #       0=Control+Alt+Shift+U
+        #       [DirectUnicodeMode]
+        #       0=Control+Shift+U
+        #     '')
+        #     (pkgs.writeTextDir "conf/xcb.conf" ''
+        #       Allow Overriding System XKB Settings=False
+        #       AlwaysSetToGroupLayout=False
+        #     '')
+        #   ];
+        # };
         "kitty/themes/Nord light.conf".text = ''
           # From: https://github.com/ayamir/nord-and-light/blob/master/.config/kitty/polar.conf
           foreground            #2E3440
@@ -4319,23 +4319,23 @@ in
               }
             )
             {
-              CSS = "sha256-mi04jBXYXyKbS5SN1DBlogPJsyiwZaSjySJDq6fWERY=";
-              Docker = "sha256-X8CwEDxabU2gpyAtng4ij++8LaJBvMEQDhZSVSA/q20=";
-              Emacs_Lisp = "sha256-sTXNYv64F5whATuha6StMoBJRYtZau1WQYTWEu2Nd2I=";
-              Emmet = "sha256-bTn7dJJ4fc+e4OzaWj4z0eeAZ7+wlutM3c2JTKU34QU=";
-              Express = "sha256-E7+35AHVEG/wLyqRr7W+xbmdt0+n3VGm4wp57REPuhM=";
-              ExtJS = "sha256-l8drgOXanSk1V8p5eoUCt8WInyIGfFH3XQE7AOYCcYs=";
-              Font_Awesome = "sha256-5ERZC5oUtYRGVS7/Z7T72Nyvf6ZG3u0iqlPYjp04PsU=";
-              HTML = "sha256-Cc0Ms59nY7+yFRZSt+6D8xQpaFukj4NVzjL8Lv0VuIE=";
-              JavaScript = "sha256-U/sAcmLmlfyXMBEAQ33uLagl0myBtyMWr8tcAAHtXZ4=";
-              Lo-Dash = "sha256-irVO2nDTbqlLVBaqkTR5MfxHyuoDQda3dfXs64bcqS8=";
-              Markdown = "sha256-WRjWe1frF9Ys68a1jVJPqZkzEWQNr5OGaHnWbBijRGc=";
-              MySQL = "sha256-BrmCvM019s5tJjcmGNMG/JayJJAyQ74s1fJb6M3y53g=";
-              Nginx = "sha256-f/PHK6/35ts3EePaPqr+a4Zrvq8lCazo5PRIaAQwj54=";
-              NodeJS = "sha256-7bTSwazAHctx4psUtUgKI8J23ptbm51dsfvSiv2gN1g=";
-              PostgreSQL = "sha256-xN/OmUtK5SrRM6M0+GbHRLMb3S0kjHgTnXywwJHzeTs=";
-              Python_3 = "sha256-rRu6tYTalHwv4ita5CzjSCrpHu150OyNGFj5wNUpXOQ=";
-              React = "sha256-oGSms/Bi07bee19Lq8f/+2cAfb0/0D+c1YKErGZe4wM";
+                  CSS = "sha256-n0Ol5IJ3kmZhbqgcsp8hlxYD/l/TdCVpmrn0p3dzR3o=";
+                  Docker = "sha256-69W497dypApA8cS6MbTGFiDq8qYX+D9vGoh/qFESFRA=";
+                  Emacs_Lisp = "sha256-tvfcCThxyvJ84USc4vBolrEIefjs4EQw/CnVTifXDXs=";
+                  Emmet = "sha256-bTn7dJJ4fc+e4OzaWj4z0eeAZ7+wlutM3c2JTKU34QU=";
+                  Express = "sha256-8QfWHZeVwW219+PGerHWWu7Vzz7fRjXRsF2cZnreFTg=";
+                  ExtJS = "sha256-l8drgOXanSk1V8p5eoUCt8WInyIGfFH3XQE7AOYCcYs=";
+                  Font_Awesome = "sha256-V5A/EIloIvU5MoOMUgJ9mCSoBXnCI+qiX+giFydipp4=";
+                  HTML = "sha256-X1zGwycrVYl0+GqjBl/cI5wE82BjGfYjJz0FIYkRCgs=";
+                  JavaScript = "sha256-PtpLSsrwXjWEz+OJrGvTROVcH7ADFa/ln8rPbYpWuY4=";
+                  Lo-Dash = "sha256-irVO2nDTbqlLVBaqkTR5MfxHyuoDQda3dfXs64bcqS8=";
+                  Markdown = "sha256-WRjWe1frF9Ys68a1jVJPqZkzEWQNr5OGaHnWbBijRGc=";
+                  MySQL = "sha256-+5DgF2ODy+ha16IrY+5thmn/dv8b6uRDqswHSQrv1/A=";
+                  Nginx = "sha256-T3QzwUf2BwJwL2kwRsfCArcjpFn/ks8bFtXFC3Y25nA=";
+                  NodeJS = "sha256-h6Xc0Neo3aN/sjdN7g0MApxN4qvJzSx/t0wzSvVCJuo=";
+                  PostgreSQL = "sha256-DCSVOQMIQZsSsKghtQearwsFkQeCGI654ERox4iDXk8=";
+                  Python_3 = "sha256-u5LNRLzIyZ5UtRatGMtp/9o45YlbeR/oZwDWUguEEL8=";
+                  React = "sha256-34mzNVbd+/OKKAzURyRgTOiHUDRSkOdUe6QTW2XvwUo=";
             }
         );
         "fcitx5/data/quickphrase.d/emoji.mb".source = ./emoji.mb;
@@ -4446,13 +4446,13 @@ in
       '';
     };
 
-    i18n.inputMethod = {
-      enable = true;
-      type = "fcitx5";
-    };
+    # i18n.inputMethod = {
+    #   enable = true;
+    #   type = "fcitx5";
+    # };
 
     gtk = {
-      enable = true;
+      enable = false;
       theme = {
         package = pkgs.colloid-gtk-theme.override {
           tweaks = [
@@ -4565,7 +4565,7 @@ in
     };
 
     qt = {
-      enable = true;
+      enable = false;
       platformTheme.name = "qtct";
       style.name = "kvantum";
     };

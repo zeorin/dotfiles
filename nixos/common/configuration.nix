@@ -187,7 +187,7 @@
         "quiet"
         "udev.log_level=3"
       ];
-      kernelPackages = pkgs.unstable.linuxPackages_zen;
+      kernelPackages = lib.mkDefault pkgs.unstable.linuxPackages_zen;
       extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
       kernelModules = [ "v4l2loopback" ];
       extraModprobeConfig = ''
@@ -267,7 +267,7 @@
       cpuFreqGovernor = lib.mkDefault "performance";
     };
     services.tlp = {
-      enable = true;
+      enable = lib.mkDefault true;
       settings = {
         CPU_SCALING_GOVERNOR_ON_AC = "performance";
         CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
@@ -286,19 +286,20 @@
 
     # This will additionally add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
-    environment.etc =
-      (lib.mapAttrs' (name: value: {
+    environment.etc = (
+      lib.mapAttrs' (name: value: {
         name = "nix/path/${name}";
         value.source = value.flake;
-      }) config.nix.registry)
-      // {
-        "systemd/system-sleep/post-hibernate-pkill-slock".source =
-          pkgs.writeShellScript "post-hibernate-pkill-slock" ''
-            if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
-              ${pkgs.procps}/bin/pkill slock
-            fi
-          '';
-      };
+      }) config.nix.registry
+    );
+    # // {
+    #   "systemd/system-sleep/post-hibernate-pkill-slock".source =
+    #     pkgs.writeShellScript "post-hibernate-pkill-slock" ''
+    #       if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
+    #         ${pkgs.procps}/bin/pkill slock
+    #       fi
+    #     '';
+    # };
 
     networking = {
       # Easy network config
@@ -351,40 +352,40 @@
     services.xserver = {
       enable = true;
 
-      serverFlagsSection = ''
-        Option "StandbyTime"  "5"
-        Option "SuspendTime"  "5"
-        Option "OffTime"      "5"
-        Option "BlankTime"    "5"
-      '';
+      # serverFlagsSection = ''
+      #   Option "StandbyTime"  "5"
+      #   Option "SuspendTime"  "5"
+      #   Option "OffTime"      "5"
+      #   Option "BlankTime"    "5"
+      # '';
 
       # Configure keymap in X11
-      xkb = {
-        layout = "us,us";
-        variant = "dvp,";
-        options = "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
-      };
+      # xkb = lib.mkdefault {
+      #   layout = "us,us";
+      #   variant = "dvp,";
+      #   options = "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
+      # };
 
       displayManager = {
         # https://github.com/NixOS/nixpkgs/issues/174099#issuecomment-1201697954
-        sessionCommands = ''
-          ${lib.getBin pkgs.dbus}/bin/dbus-update-activation-environment --systemd --all
-        '';
+        # sessionCommands = ''
+        #   ${lib.getBin pkgs.dbus}/bin/dbus-update-activation-environment --systemd --all
+        # '';
         # We need to create at least one session for auto login to work
-        session = [
-          {
-            name = "xsession";
-            manage = "desktop";
-            start = ''
-              ${pkgs.runtimeShell} $HOME/.xsession &
-              waitPID=$!
-            '';
-          }
-        ];
+        # session = [
+        #   {
+        #     name = "xsession";
+        #     manage = "desktop";
+        #     start = ''
+        #       ${pkgs.runtimeShell} $HOME/.xsession &
+        #       waitPID=$!
+        #     '';
+        #   }
+        # ];
       };
     };
 
-    services.displayManager.autoLogin.user = "zeorin";
+    # services.displayManager.autoLogin.user = "zeorin";
 
     services.libinput.touchpad = {
       accelProfile = "adaptive";
@@ -498,18 +499,18 @@
       };
       pulse.enable = true;
     };
-    systemd.services.alsa-store = {
-      description = "Store Sound Card State";
-      wantedBy = [ "multi-user.target" ];
-      unitConfig.RequiresMountsFor = "/var/lib/alsa";
-      unitConfig.ConditionVirtualization = "!systemd-nspawn";
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = "${pkgs.coreutils}/bin/mkdir -p /var/lib/alsa";
-        ExecStop = "${pkgs.alsa-utils}/sbin/alsactl store --ignore";
-      };
-    };
+    # systemd.services.alsa-store = {
+    #   description = "Store Sound Card State";
+    #   wantedBy = [ "multi-user.target" ];
+    #   unitConfig.RequiresMountsFor = "/var/lib/alsa";
+    #   unitConfig.ConditionVirtualization = "!systemd-nspawn";
+    #   serviceConfig = {
+    #     Type = "oneshot";
+    #     RemainAfterExit = true;
+    #     ExecStart = "${pkgs.coreutils}/bin/mkdir -p /var/lib/alsa";
+    #     ExecStop = "${pkgs.alsa-utils}/sbin/alsactl store --ignore";
+    #   };
+    # };
 
     # Location-based stuff
     services.geoclue2.enable = true;
@@ -685,45 +686,45 @@
     services.avahi.publish.enable = true;
     services.avahi.publish.userServices = true;
 
-    services.logiops = {
-      enable = true;
-      extraConfig = ''
-        devices: ({
-          name: "Wireless Mouse MX Master 3";
-          smartshift: {
-            on: false;
-            threshold: 10;
-          };
-          dpi: 2000;
-          thumbwheel: {
-            invert: true;
-          };
-        });
-      '';
-    };
+    # services.logiops = {
+    #   enable = true;
+    #   extraConfig = ''
+    #     devices: ({
+    #       name: "Wireless Mouse MX Master 3";
+    #       smartshift: {
+    #         on: false;
+    #         threshold: 10;
+    #       };
+    #       dpi: 2000;
+    #       thumbwheel: {
+    #         invert: true;
+    #       };
+    #     });
+    #   '';
+    # };
 
     programs.fish.enable = true;
     # TODO Move slock setup to home.nix (`services.screen-locker`), if possible,
     # might not be because it's run as root for OOM killer protection
-    programs.slock.enable = true;
-    programs.xss-lock =
-      let
-        dim-screen = pkgs.writeShellScript "dim-screen" ''
-          trap 'exit 0' TERM INT
-          trap "${pkgs.brightnessctl}/bin/brightnessctl --class backlight --device '*' --restore; kill %%" EXIT
-          ${pkgs.brightnessctl}/bin/brightnessctl --class backlight --device '*' --save --exponent=4 set 50%-
-          sleep 2147483647 &
-          wait
-        '';
-      in
-      {
-        enable = true;
-        lockerCommand = "${config.security.wrapperDir}/slock";
-        extraOptions = [ ''--notifier="${dim-screen}"'' ];
-      };
-    systemd.user.services.xss-lock.preStart = ''
-      ${pkgs.xorg.xset}/bin/xset s ${toString (4 * 60)} ${toString (1 * 60)}
-    '';
+    # programs.slock.enable = true;
+    # programs.xss-lock =
+    #   let
+    #     dim-screen = pkgs.writeShellScript "dim-screen" ''
+    #       trap 'exit 0' TERM INT
+    #       trap "${pkgs.brightnessctl}/bin/brightnessctl --class backlight --device '*' --restore; kill %%" EXIT
+    #       ${pkgs.brightnessctl}/bin/brightnessctl --class backlight --device '*' --save --exponent=4 set 50%-
+    #       sleep 2147483647 &
+    #       wait
+    #     '';
+    #   in
+    #   {
+    #     enable = true;
+    #     lockerCommand = "${config.security.wrapperDir}/slock";
+    #     extraOptions = [ ''--notifier="${dim-screen}"'' ];
+    #   };
+    # systemd.user.services.xss-lock.preStart = ''
+    #   ${pkgs.xorg.xset}/bin/xset s ${toString (4 * 60)} ${toString (1 * 60)}
+    # '';
     # security.pam.services.hibernate-on-multiple-failures = {
     #   name = "hibernate-on-multiple-failures";
     #   text = ''

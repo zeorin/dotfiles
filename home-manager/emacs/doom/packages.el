@@ -82,4 +82,12 @@
 (package! flycheck-ledger :disable t)
 (package! flycheck-hledger)
 
+;;; https://github.com/doomemacs/doomemacs/issues/8333
+(package! ws-butler
+  :recipe (:host github
+           :repo "emacsmirror/nongnu_elpa"
+           :branch "elpa/ws-butler"
+           :local-repo "ws-butler")
+  :pin "9ee5a7657a22e836618813c2e2b64a548d27d2ff")
+
 (unpin! compat)

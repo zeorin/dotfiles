@@ -23,6 +23,12 @@
 
     nixos-vscode-server.url = "github:nix-community/nixos-vscode-server";
     nixos-vscode-server.inputs.nixpkgs.follows = "nixpkgs";
+
+    nix-software-center.url = "github:snowfallorg/nix-software-center";
+    nix-software-center.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
+    nixos-conf-editor.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -79,6 +85,12 @@
           };
           modules = [ ./nixos/monarch ];
         };
+        ruby = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs outputs;
+          };
+          modules = [ ./nixos/ruby ];
+        };
       };
 
       # Standalone home-manager configuration entrypoint
@@ -96,6 +108,13 @@
             modules = [ ./home-manager/home.nix ];
           };
           "zeorin@monarch" = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit inputs outputs;
+            };
+            modules = [ ./home-manager/home.nix ];
+          };
+          "zeorin@ruby" = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             extraSpecialArgs = {
               inherit inputs outputs;

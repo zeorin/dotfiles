@@ -11,7 +11,6 @@
     common-pc-laptop-ssd
     common-cpu-intel-cpu-only
     common-gpu-intel-kaby-lake
-    common-hidpi
     ./hardware-configuration.nix
     ../common/configuration.nix
   ];
