@@ -4352,90 +4352,37 @@ in
       dataFile = {
         # TODO: This should be a systemd service that periodically checks for
         # updates to the files on disk and downloads new ones if there are.
-        docsets.source = pkgs.symlinkJoin {
-          name = "docsets";
-          paths =
-            # https://kapeli.com/dash#docsets
-            map
-              (
-                { name, hash }:
-                pkgs.fetchzip {
-                  url = "https://kapeli.com/feeds/${name}.tgz";
-                  inherit hash;
-                  stripRoot = false;
-                }
-              )
-              [
-                {
-                  name = "CSS";
-                  hash = "sha256-mi04jBXYXyKbS5SN1DBlogPJsyiwZaSjySJDq6fWERY=";
-                }
-                {
-                  name = "Docker";
-                  hash = "sha256-X8CwEDxabU2gpyAtng4ij++8LaJBvMEQDhZSVSA/q20=";
-                }
-                {
-                  name = "Emacs_Lisp";
-                  hash = "sha256-sTXNYv64F5whATuha6StMoBJRYtZau1WQYTWEu2Nd2I=";
-                }
-                {
-                  name = "Emmet";
-                  hash = "sha256-bTn7dJJ4fc+e4OzaWj4z0eeAZ7+wlutM3c2JTKU34QU=";
-                }
-                {
-                  name = "Express";
-                  hash = "sha256-E7+35AHVEG/wLyqRr7W+xbmdt0+n3VGm4wp57REPuhM=";
-                }
-                {
-                  name = "ExtJS";
-                  hash = "sha256-l8drgOXanSk1V8p5eoUCt8WInyIGfFH3XQE7AOYCcYs=";
-                }
-                {
-                  name = "Font_Awesome";
-                  hash = "sha256-5ERZC5oUtYRGVS7/Z7T72Nyvf6ZG3u0iqlPYjp04PsU=";
-                }
-                {
-                  name = "HTML";
-                  hash = "sha256-Cc0Ms59nY7+yFRZSt+6D8xQpaFukj4NVzjL8Lv0VuIE=";
-                }
-                {
-                  name = "JavaScript";
-                  hash = "sha256-U/sAcmLmlfyXMBEAQ33uLagl0myBtyMWr8tcAAHtXZ4=";
-                }
-                {
-                  name = "Lo-Dash";
-                  hash = "sha256-irVO2nDTbqlLVBaqkTR5MfxHyuoDQda3dfXs64bcqS8=";
-                }
-                {
-                  name = "Markdown";
-                  hash = "sha256-WRjWe1frF9Ys68a1jVJPqZkzEWQNr5OGaHnWbBijRGc=";
-                }
-                {
-                  name = "MySQL";
-                  hash = "sha256-BrmCvM019s5tJjcmGNMG/JayJJAyQ74s1fJb6M3y53g=";
-                }
-                {
-                  name = "Nginx";
-                  hash = "sha256-f/PHK6/35ts3EePaPqr+a4Zrvq8lCazo5PRIaAQwj54=";
-                }
-                {
-                  name = "NodeJS";
-                  hash = "sha256-7bTSwazAHctx4psUtUgKI8J23ptbm51dsfvSiv2gN1g=";
-                }
-                {
-                  name = "PostgreSQL";
-                  hash = "sha256-xN/OmUtK5SrRM6M0+GbHRLMb3S0kjHgTnXywwJHzeTs=";
-                }
-                {
-                  name = "Python_3";
-                  hash = "sha256-rRu6tYTalHwv4ita5CzjSCrpHu150OyNGFj5wNUpXOQ=";
-                }
-                {
-                  name = "React";
-                  hash = "sha256-oGSms/Bi07bee19Lq8f/+2cAfb0/0D+c1YKErGZe4wM";
-                }
-              ];
-        };
+        docsets.source = pkgs.linkFarm "docsets" (
+          # https://kapeli.com/dash#docsets
+          lib.mapAttrs
+            (
+              name: hash:
+              pkgs.fetchzip {
+                url = "https://kapeli.com/feeds/${name}.tgz";
+                inherit hash;
+                stripRoot = false;
+              }
+            )
+            {
+              CSS = "sha256-mi04jBXYXyKbS5SN1DBlogPJsyiwZaSjySJDq6fWERY=";
+              Docker = "sha256-X8CwEDxabU2gpyAtng4ij++8LaJBvMEQDhZSVSA/q20=";
+              Emacs_Lisp = "sha256-sTXNYv64F5whATuha6StMoBJRYtZau1WQYTWEu2Nd2I=";
+              Emmet = "sha256-bTn7dJJ4fc+e4OzaWj4z0eeAZ7+wlutM3c2JTKU34QU=";
+              Express = "sha256-E7+35AHVEG/wLyqRr7W+xbmdt0+n3VGm4wp57REPuhM=";
+              ExtJS = "sha256-l8drgOXanSk1V8p5eoUCt8WInyIGfFH3XQE7AOYCcYs=";
+              Font_Awesome = "sha256-5ERZC5oUtYRGVS7/Z7T72Nyvf6ZG3u0iqlPYjp04PsU=";
+              HTML = "sha256-Cc0Ms59nY7+yFRZSt+6D8xQpaFukj4NVzjL8Lv0VuIE=";
+              JavaScript = "sha256-U/sAcmLmlfyXMBEAQ33uLagl0myBtyMWr8tcAAHtXZ4=";
+              Lo-Dash = "sha256-irVO2nDTbqlLVBaqkTR5MfxHyuoDQda3dfXs64bcqS8=";
+              Markdown = "sha256-WRjWe1frF9Ys68a1jVJPqZkzEWQNr5OGaHnWbBijRGc=";
+              MySQL = "sha256-BrmCvM019s5tJjcmGNMG/JayJJAyQ74s1fJb6M3y53g=";
+              Nginx = "sha256-f/PHK6/35ts3EePaPqr+a4Zrvq8lCazo5PRIaAQwj54=";
+              NodeJS = "sha256-7bTSwazAHctx4psUtUgKI8J23ptbm51dsfvSiv2gN1g=";
+              PostgreSQL = "sha256-xN/OmUtK5SrRM6M0+GbHRLMb3S0kjHgTnXywwJHzeTs=";
+              Python_3 = "sha256-rRu6tYTalHwv4ita5CzjSCrpHu150OyNGFj5wNUpXOQ=";
+              React = "sha256-oGSms/Bi07bee19Lq8f/+2cAfb0/0D+c1YKErGZe4wM";
+            }
+        );
         "fcitx5/data/quickphrase.d/emoji.mb".source = ./emoji.mb;
         "fcitx5/data/quickphrase.d/kaomoji.mb".source = ./kaomoji.mb;
         "fcitx5/data/quickphrase.d/latex.mb".source = ./latex.mb;
