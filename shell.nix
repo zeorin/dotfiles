@@ -12,6 +12,7 @@
       nix
       home-manager
       git
+      nix-update
     ];
   };
 }
