@@ -31,8 +31,4 @@ with pkgs;
   open-in-editor = callPackage ./open-in-editor { };
 
   polybar-pulseaudio-control = callPackage ./polybar-pulseaudio-control { };
-
-  wrapTabfs = callPackage ./tabfs/wrapper.nix { };
-  tabfs-unwrapped = callPackage ./tabfs { };
-  tabfs = wrapTabfs tabfs-unwrapped { };
 }

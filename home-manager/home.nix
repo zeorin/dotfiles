@@ -647,7 +647,6 @@ in
             browserpass
             plasma-browser-integration
             tridactyl-native
-            (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/personal"; })
           ];
         };
         profiles =
@@ -686,8 +685,7 @@ in
                 wallabagger
                 wayback-machine
               ]
-              ++ (with pkgs.nur.repos.meain.firefox-addons; [ containerise ])
-              ++ (with pkgs; [ tabfs ]);
+              ++ (with pkgs.nur.repos.meain.firefox-addons; [ containerise ]);
             commonSettings = {
               "browser.startup.page" = 3; # resume previous session
               "browser.startup.homepage" = "about:blank";
@@ -4928,7 +4926,6 @@ in
                   browserpass
                   plasma-browser-integration
                   tridactyl-native
-                  (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/developer-edition"; })
                 ];
               }
             )
@@ -4944,7 +4941,6 @@ in
                   browserpass
                   plasma-browser-integration
                   tridactyl-native
-                  (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/beta"; })
                 ];
               }
             )
@@ -4960,7 +4956,6 @@ in
                   browserpass
                   plasma-browser-integration
                   tridactyl-native
-                  (tabfs.override { mountDir = "${config.xdg.dataHome}/tabfs/esr"; })
                 ];
               }
             )

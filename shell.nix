@@ -12,7 +12,6 @@
       nix
       home-manager
       git
-      tabfs.passthru.sign-unlisted-extension
     ];
   };
 }
