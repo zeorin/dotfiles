@@ -489,8 +489,6 @@ in
         NODE_REPL_HISTORY = "${dataHome}/node_repl_history";
         STACK_ROOT = "${dataHome}/stack";
         WINEPREFIX = "${dataHome}/wineprefixes/default";
-        DOOMDIR = "${configHome}/doom";
-        DOOMLOCALDIR = "${dataHome}/doom";
 
         LEDGER_FILE = "${userDirs.documents}/2. Areas/Finances/hledger.journal";
 

@@ -8,31 +8,25 @@
 let
   round = x: if ((x / 2.0) >= 0.5) then (builtins.ceil x) else (builtins.floor x);
   dpiScale = x: round (x * (config.dpi / 96.0));
+  inherit (pkgs) doomemacs;
   emacs = config.programs.emacs.finalPackage;
   doomScriptEnvVars = ''
-    export PATH="${config.xdg.configHome}/doom-emacs/bin/:${emacs}/bin:$PATH"
     export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
     export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
-    export LSP_USE_PLISTS=true
+    export PATH="${lib.makeBinPath [ doomemacs emacs ] }:$PATH"
   '';
 in
 {
+  home.sessionPath = [ "${doomemacs}/bin" ];
+  home.sessionVariables = {
+    DOOMDIR = "${config.xdg.configHome}/doom";
+    DOOMLOCALDIR = "${config.xdg.dataHome}/doom";
+  };
   xdg.configFile = {
-    doom-emacs = {
-      source = pkgs.doomemacs;
-      onChange = "${pkgs.writeShellScript "doom-change" ''
-        ${doomScriptEnvVars}
-        if [ ! -d "$DOOMLOCALDIR" ]; then
-          doom --force install
-        else
-          doom --force sync -u
-        fi
-      ''}";
-    };
     "doom/init.el" = {
       source = pkgs.replaceVars ./doom/init.el {
         exec-path = pkgs.buildEnv {
-          name = "doom-emacs-deps";
+          name = "doomemacs-deps";
           pathsToLink = [ "/bin" ];
           paths = map lib.getBin (
             with pkgs;
@@ -150,7 +144,7 @@ in
           );
         };
       };
-      onChange = "${pkgs.writeShellScript "doom-config-init-change" ''
+      onChange = "${pkgs.writeShellScript "on-doomemacs-init-el-change" ''
         ${doomScriptEnvVars}
         doom --force sync
       ''}";
@@ -166,12 +160,14 @@ in
         inherit (pkgs.unstable.vscode-extensions.firefox-devtools) vscode-firefox-debug;
         inherit (config.home.sessionVariables) DOOMLOCALDIR XDG_DOCUMENTS_DIR XDG_DATA_HOME;
       };
-      onChange = "${pkgs.writeShellScript "doom-config-packages-change" ''
+    };
+    "doom/packages.el" = {
+      source = ./doom/packages.el;
+      onChange = "${pkgs.writeShellScript "on-doomemacs-packages-el-change" ''
         ${doomScriptEnvVars}
-        doom --force sync -u
+        doom --force sync
       ''}";
     };
-    "doom/packages.el".source = ./doom/packages.el;
   };
 
   home.packages = with pkgs; [ emacs-all-the-icons-fonts ];
