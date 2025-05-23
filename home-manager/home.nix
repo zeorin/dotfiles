@@ -654,32 +654,15 @@ in
             extensions =
               with pkgs.nur.repos.rycee.firefox-addons;
               [
-                a11ycss
-                amp2html
-                auto-tab-discard
                 browserpass
-                canvasblocker
-                clearurls
-                cookies-txt
                 darkreader
-                enhancer-for-youtube
-                fediact
                 ghosttext
-                mailvelope
-                metamask
-                octolinker
-                octotree
                 org-capture
                 plasma-integration
-                privacy-badger
                 react-devtools
-                reddit-enhancement-suite
                 reduxdevtools
-                refined-github
                 sponsorblock
                 tab-session-manager
-                terms-of-service-didnt-read
-                tree-style-tab
                 tridactyl
                 ublock-origin
                 wallabagger
@@ -4924,7 +4907,6 @@ in
               unstable.firefox-devedition.override {
                 nativeMessagingHosts = with pkgs; [
                   browserpass
-                  plasma-browser-integration
                   tridactyl-native
                 ];
               }
@@ -4939,7 +4921,6 @@ in
               firefox-beta.override {
                 nativeMessagingHosts = with pkgs; [
                   browserpass
-                  plasma-browser-integration
                   tridactyl-native
                 ];
               }
@@ -4954,7 +4935,6 @@ in
               firefox-esr.override {
                 nativeMessagingHosts = with pkgs; [
                   browserpass
-                  plasma-browser-integration
                   tridactyl-native
                 ];
               }
