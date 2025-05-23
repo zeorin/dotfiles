@@ -14,13 +14,10 @@ in
     ./doom.nix
   ];
 
-  home = {
-    sessionPath = [ "${config.xdg.configHome}/doom-emacs/bin" ];
-    sessionVariables = {
-      ALTERNATE_EDITOR = "";
-      EDITOR = "emacsclient --tty --quiet";
-      VISUAL = "emacsclient --create-frame --alternate-editor=emacs --quiet";
-    };
+  home.sessionVariables = {
+    ALTERNATE_EDITOR = "";
+    EDITOR = "emacsclient --tty --quiet";
+    VISUAL = "emacsclient --create-frame --alternate-editor=emacs --quiet";
   };
 
   programs.emacs.enable = true;
@@ -33,7 +30,7 @@ in
   xdg.configFile = {
     "chemacs/profiles.el".source = pkgs.replaceVars ./chemacs/profiles.el {
       my-emacs = "${config.xdg.configHome}/my-emacs";
-      doom-emacs = "${config.xdg.configHome}/doom-emacs";
+      DOOMEMACSDIR = toString pkgs.doomemacs;
       inherit (config.home.sessionVariables) DOOMDIR DOOMLOCALDIR;
     };
     "chemacs/profile".text = "doom";
