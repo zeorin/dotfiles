@@ -11,25 +11,6 @@
     # example = prev.example.overrideAttrs (oldAttrs: rec {
     # ...
     # });
-    brightnessctl = prev.brightnessctl.overrideAttrs (
-      finalAttrs: oldAttrs: {
-        version = builtins.substring 0 7 finalAttrs.src.rev;
-        src = final.fetchFromGitHub {
-          owner = "andeston";
-          repo = "brightnessctl";
-          rev = "9fdbfa53bcd75373e77c95ae59f683674b28709a";
-          hash = "sha256-Ab+H2YIzmNZ47Nk61Maeo4se4GonpqIW0lnqcWhU8qc=";
-        };
-        postInstall =
-          (oldAttrs.postInstall or "")
-          + ''
-            mkdir -p $out/lib/udev/rules.d
-            substitute ${finalAttrs.src}/90-brightnessctl.rules $out/lib/udev/rules.d/90-brightnessctl.rules \
-              --replace /bin/chgrp ${final.coreutils}/bin/chgrp \
-              --replace /bin/chmod ${final.coreutils}/bin/chmod
-          '';
-      }
-    );
   };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will
