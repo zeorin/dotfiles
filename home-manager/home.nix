@@ -415,7 +415,6 @@ in
         "steam" # protontricks
         "steam-run" # protontricks
         "steam-unwrapped" # protontricks
-        (pkg: lib.hasPrefix "libretro-" (lib.getName pkg)) # retroarchFull
         "corefonts"
         "vista-fonts"
         "joypixels"
@@ -643,7 +642,7 @@ in
         package = pkgs.firefox.override {
           nativeMessagingHosts = with pkgs; [
             browserpass
-            plasma-browser-integration
+            kdePackages.plasma-browser-integration
             tridactyl-native
           ];
         };
@@ -774,22 +773,22 @@ in
                 @import url('${pkgs.firefox-csshacks}/chrome/hide_tabs_toolbar.css');
                 @import url('${pkgs.firefox-csshacks}/chrome/autohide_toolbox.css');
               '';
-              inherit extensions;
+              extensions.packages = extensions;
             };
             developer-edition = {
               id = 1;
               settings = commonSettings // noNoiseSuppression;
-              inherit extensions;
+              extensions.packages = extensions;
             };
             beta = {
               id = 2;
               settings = commonSettings // noNoiseSuppression;
-              inherit extensions;
+              extensions.packages = extensions;
             };
             esr = {
               id = 3;
               settings = commonSettings // noNoiseSuppression;
-              inherit extensions;
+              extensions.packages = extensions;
             };
           };
       };
@@ -1641,17 +1640,7 @@ in
           "Alt+f" = "script-binding quality_menu/audio_formats_toggle";
         };
         scripts = with pkgs.mpvScripts; [
-          (uosc.overrideAttrs (
-            finalAttrs: oldAttrs: {
-              version = "5.5.0";
-              src = pkgs.fetchFromGitHub {
-                owner = "tomasklaen";
-                repo = "uosc";
-                rev = finalAttrs.version;
-                hash = "sha256-WFsqA5kGefQmvihLUuQBfMmKoUHiO7ofxpwISRygRm4=";
-              };
-            }
-          ))
+          uosc
           thumbfast
           sponsorblock
           mpv-playlistmanager
@@ -2396,7 +2385,7 @@ in
       vscode = with pkgs; {
         enable = true;
         package = vscode-fhs;
-        extensions =
+        profiles.default.extensions =
           (with vscode-extensions; [
             bbenoist.nix
             vscodevim.vim
@@ -2569,7 +2558,7 @@ in
         enable = true;
         enableSshSupport = true;
         enableExtraSocket = true;
-        pinentryPackage = pkgs.pinentry-gnome3;
+        pinentry.package = pkgs.pinentry-gnome3;
         defaultCacheTtl = 0;
         maxCacheTtl = 0;
         defaultCacheTtlSsh = 0;
@@ -4471,7 +4460,10 @@ in
       '';
     };
 
-    i18n.inputMethod.enabled = "fcitx5";
+    i18n.inputMethod = {
+      enable = true;
+      type = "fcitx5";
+    };
 
     gtk = {
       enable = true;
@@ -4634,7 +4626,7 @@ in
         enchant
         languagetool
         webcamoid
-        kdenlive
+        kdePackages.kdenlive
         blender
         libnotify
         file
@@ -4689,7 +4681,6 @@ in
         newpipelist
         weechat
         yubikey-manager
-        yubikey-manager-qt
         yubikey-personalization
         yubikey-personalization-gui
         yubioath-flutter
@@ -4977,11 +4968,14 @@ in
         # For dark mode toggling
         xfce.xfconf
 
-        (retroarch.override {
-          cores = lib.filter (
-            c: (c ? libretroCore) && (lib.meta.availableOn stdenv.hostPlatform c) && (!c.meta.unfree)
-          ) (lib.attrValues libretro);
-        })
+        (retroarch.withCores (
+          cores:
+          lib.filter (
+            core:
+            (core ? libretroCore) && (lib.meta.availableOn stdenv.hostPlatform core) && (!core.meta.unfree)
+          ) (lib.attrValues cores)
+        ))
+
         mangohud
         protonup
 
@@ -5070,20 +5064,25 @@ in
             fonts = [ "__NO_FONT__" ];
           }
         )
-        (league-of-moveable-type.override {
-          fanwood = false;
-          goudy-bookletter-1911 = false;
-          knewave = false;
-          league-gothic = false;
-          league-script-number-one = false;
-          league-spartan = false;
-          linden-hill = false;
-          orbitron = false;
-          prociono = false;
-          raleway = false;
-          sniglet = false;
-          sorts-mill-goudy = false;
-        })
+
+        # The League of Movable Type
+        the-neue-black
+        blackout
+        chunk
+        # fanwood
+        # goudy-bookletter-1911
+        junction-font
+        knewave
+        # league-gothic
+        # league-script-number-one
+        # league-spartan
+        # linden-hill
+        # orbitron
+        ostrich-sans
+        # prociono
+        # raleway
+        # sniglet
+        # sorts-mill-goudy
 
         # Iosevka and friends
         iosevka
@@ -5100,19 +5099,19 @@ in
         # fantasque-sans-mono
 
         # Nerd Fonts
-        (nerdfonts.override { fonts = [ "Iosevka" ]; })
+        nerd-fonts.iosevka
         # Set FontConfig to use the symbols only font as a fallback for most
         # monospaced fonts, this gives us the symbols even for fonts that we
         # didn't install Nerd Fonts versions of. The Symbols may not be perfectly
         # suited to that font (the patched fonts usually have adjustments to the
         # Symbols specifically for that font), but it's better than nothing.
-        (nerdfonts.override { fonts = [ "NerdFontsSymbolsOnly" ]; })
-        (stdenv.mkDerivation {
-          inherit (nerdfonts) version;
+        nerd-fonts.symbols-only
+        (stdenv.mkDerivation (finalAttrs: {
+          inherit (nerd-fonts.symbols-only) version;
           pname = "nerdfonts-fontconfig";
           src = fetchurl {
-            url = "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/v${nerdfonts.version}/10-nerd-font-symbols.conf";
-            hash = "sha256-ZgHkMcXEPYDfzjdRR7KX3ws2u01GWUj48heMHaiaznY=";
+            url = "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/v${finalAttrs.version}/10-nerd-font-symbols.conf";
+            hash = "sha256-g7cLf3BqztHc7V0K7Gfgtu96f+6fyzcTVxfrdoeGjNM=";
           };
           dontUnpack = true;
           dontConfigure = true;
@@ -5127,7 +5126,7 @@ in
             runHook postInstall
           '';
           enableParallelBuilding = true;
-        })
+        }))
 
         # Apple Fonts
       ]
@@ -5213,6 +5212,6 @@ in
     systemd.user.startServices = "sd-switch";
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    home.stateVersion = "24.11";
+    home.stateVersion = "25.05";
   };
 }
