@@ -148,6 +148,7 @@ in
         ${doomScriptEnvVars}
         doom --force sync
       ''}";
+      mode = "0644";
     };
     "doom/config.el" = {
       source = pkgs.replaceVars ./doom/config.el {
@@ -160,6 +161,7 @@ in
         inherit (pkgs.unstable.vscode-extensions.firefox-devtools) vscode-firefox-debug;
         inherit (config.home.sessionVariables) DOOMLOCALDIR XDG_DOCUMENTS_DIR XDG_DATA_HOME;
       };
+      mode = "0644";
     };
     "doom/packages.el" = {
       source = ./doom/packages.el;
@@ -167,6 +169,7 @@ in
         ${doomScriptEnvVars}
         doom --force sync
       ''}";
+      mode = "0644";
     };
   };
 
