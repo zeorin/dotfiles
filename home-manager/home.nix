@@ -4959,6 +4959,7 @@ in
         nix-prefetch
         nix-update
         expect
+        nh
         nix-output-monitor
         keybase
         zeal
