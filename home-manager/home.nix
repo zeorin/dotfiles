@@ -1666,10 +1666,7 @@ in
       };
       nix-index.enable = true;
       nix-index-database.comma.enable = true;
-      obs-studio = {
-        enable = true;
-        plugins = with pkgs.obs-studio-plugins; [ obs-backgroundremoval ];
-      };
+      obs-studio.enable = true;
       password-store = {
         enable = true;
         package = pkgs.pass.withExtensions (
