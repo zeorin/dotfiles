@@ -523,24 +523,12 @@ in
     # Enable sound.
     security.rtkit.enable = true;
     services.pipewire = {
-      alsa = {
-        enable = true;
-        support32Bit = true;
-      };
+      audio.enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
       pulse.enable = true;
     };
-    systemd.services.alsa-store = {
-      description = "Store Sound Card State";
-      wantedBy = [ "multi-user.target" ];
-      unitConfig.RequiresMountsFor = "/var/lib/alsa";
-      unitConfig.ConditionVirtualization = "!systemd-nspawn";
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = "${pkgs.coreutils}/bin/mkdir -p /var/lib/alsa";
-        ExecStop = "${pkgs.alsa-utils}/sbin/alsactl store --ignore";
-      };
-    };
+    hardware.alsa.enablePersistence = true;
 
     # Location-based stuff
     services.geoclue2.enable = true;
