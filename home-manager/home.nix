@@ -2652,11 +2652,18 @@ in
         opacityRules =
           # Only apply these opacity rules if the windows are not hidden
           map (str: str + " && !(_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN')") [
-            "100:class_g *?= 'zoom' && name *?= 'meeting'"
+            "100:class_g *?= 'obs' && name *= 'Projector'"
+            "100:class_g *?= 'zoom' && name *= 'Meeting'"
             "100:role = 'browser' && name ^= 'Meet -'"
             "100:role = 'browser' && name ^= 'Netflix'"
           ]
-          ++ [ "0:_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'" ];
+          ++ [
+            "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
+            "0:_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
+            "0:_NET_WM_STATE@[2]:32a *= '_NET_WM_STATE_HIDDEN'"
+            "0:_NET_WM_STATE@[3]:32a *= '_NET_WM_STATE_HIDDEN'"
+            "0:_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
+          ];
         vSync = true;
         settings = {
           inactive-dim = 0.2;
@@ -2673,7 +2680,11 @@ in
             # shaped windows
             "bounding_shaped && !rounded_corners"
             # hidden windows
-            "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN'"
+            "_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
+            "_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
+            "_NET_WM_STATE@[2]:32a *= '_NET_WM_STATE_HIDDEN'"
+            "_NET_WM_STATE@[3]:32a *= '_NET_WM_STATE_HIDDEN'"
+            "_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
             # stacked / tabbed windows
             "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
             "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
@@ -2690,6 +2701,7 @@ in
             "name = 'cpt_frame_xcb_window'"
             "class_g *?= 'zoom' && name *?= 'meeting'"
             "class_g = 'Peek'"
+            "name = 'rect-overlay'"
           ];
           mark-wmwin-focused = true;
           mark-ovredir-focused = true;
@@ -2704,9 +2716,13 @@ in
           focus-exclude = [
             "name = 'Picture-in-Picture'"
             "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_FULLSCREEN'"
-            "class_g *?= 'zoom' && name *?= 'meeting'"
+            "name = 'cpt_frame_xcb_window'"
+            "name = 'rect-overlay'"
+            "class_g *?= 'zoom' && name *= 'Meeting'"
+            "class_g *?= 'obs' && name *= 'Projector'"
             "role = 'browser' && name ^= 'Netflix'"
-            "role = 'browser' && name ^= 'Meet -'"
+            "role = 'browser' && name ^= 'Meet'"
+            "role = 'browser' && name *= 'Jitsi Meet'"
           ];
           detect-rounded-corners = true;
           win-types = {
@@ -3518,9 +3534,16 @@ in
                   {
                     criteria = {
                       floating_from = "auto";
-                      title = " is sharing your screen\.$";
+                      title = " is sharing your screen";
                     };
-                    command = "border none, sticky enable, move position 0 px -${toString (dpiScale 55)}px";
+                    command = "border none; sticky enable; move position 0 px -${toString (dpiScale 55)} px";
+                  }
+                  {
+                    criteria = {
+                      class = "^(?i)obs$";
+                      title = ".*Projector.*";
+                    };
+                    command = "fullscreen disable; floating enable; sticky enable; move position 0 px -${toString (dpiScale 1080)} px";
                   }
                   (mkFloating { class = "^emacs-everywhere$"; })
                   (mkFloating { class = "^Tor Browser$"; })
