@@ -1843,7 +1843,7 @@ in
               copy_url="Alt+l"
               copy_pass="Alt+p"
               show="Control+o"
-              copy_menu="Control+c"
+              # copy_menu="Control+c"
               action_menu="Control+a"
               type_menu="Control+t"
               help="Control+h"
