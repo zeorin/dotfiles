@@ -1461,7 +1461,24 @@ in
       };
       nix-index.enable = true;
       nix-index-database.comma.enable = true;
-      obs-studio.enable = true;
+      obs-studio = {
+        enable = true;
+        package = pkgs.symlinkJoin {
+          inherit (pkgs.obs-studio) name meta passthru;
+          paths = [ pkgs.obs-studio ];
+          buildInputs = [ pkgs.makeWrapper ];
+          postBuild = ''
+            wrapProgram $out/bin/obs \
+              --add-flags "--startvirtualcam"
+          '';
+        };
+        plugins = with pkgs.obs-studio-plugins; [
+          obs-pipewire-audio-capture
+          obs-vaapi
+          obs-gstreamer
+          obs-vkcapture
+        ];
+      };
       password-store = {
         enable = true;
         package = pkgs.pass.withExtensions (
