@@ -259,6 +259,7 @@ in
       inetutils
       mtr
       config.boot.kernelPackages.v4l2loopback.bin
+      v4l-utils
       alsa-utils
       virtiofsd
 
