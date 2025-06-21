@@ -520,6 +520,8 @@ in
       };
     };
 
+    security.polkit.enable = true;
+
     # Enable sound.
     security.rtkit.enable = true;
     services.pipewire = {
