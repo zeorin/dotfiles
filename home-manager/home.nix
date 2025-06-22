@@ -121,31 +121,7 @@ let
         end
       '';
     };
-    setDesktopBackground = pkgs.writeShellScript "set-desktop-background" ''
-      color_scheme="$(${pkgs.darkman}/bin/darkman get)"
-
-      if [ -f "${config.xdg.dataHome}/picom/env" ]; then
-        source "${config.xdg.dataHome}/picom/env"
-      fi
-
-      if [ "$PICOM_SHADER" = "grayscale" ]; then
-        color_scheme="''${color_scheme}-gray"
-      fi
-
-      if [ "$color_scheme" = "light" ]; then
-        background_image="${./backgrounds/martian-terrain-light.jpg}"
-      elif [ "$color_scheme" = "light-gray" ]; then
-        background_image="${./backgrounds/martian-terrain-light-gray.jpg}"
-      elif [ "$color_scheme" = "dark" ]; then
-        background_image="${./backgrounds/martian-terrain-dark.jpg}"
-      elif [ "$color_scheme" = "dark-gray" ]; then
-        background_image="${./backgrounds/martian-terrain-dark-gray.jpg}"
-      fi
-
-      ${pkgs.feh}/bin/feh --no-fehbg --no-xinerama --bg-fill "$background_image"
-    '';
   };
-  terminal-emulator = "${config.programs.kitty.package}/bin/kitty";
 in
 {
   # You can import other home-manager modules here
@@ -177,22 +153,6 @@ in
         outputs.overlays.additions
         outputs.overlays.modifications
         outputs.overlays.unstable-packages
-
-        (final: prev: {
-          fcitx5-with-addons = prev.fcitx5-with-addons.overrideAttrs (oldAttrs: {
-            postBuild = ''
-              ${oldAttrs.postBuild or ""}
-              # Don't install bundled phrases
-              rm $out/share/fcitx5/data/quickphrase.d/*.mb
-              # Don't install desktop files
-              desktop=share/applications/org.fcitx.Fcitx5.desktop
-              autostart=etc/xdg/autostart/org.fcitx.Fcitx5.desktop
-              rm $out/$autostart
-              mv $out/$desktop $out/$autostart
-              rm -rf $out/share/applications
-            '';
-          });
-        })
       ];
 
       # Configure your nixpkgs instance
@@ -255,7 +215,7 @@ in
       sessionVariables = with config.xdg; {
         LESS = "-FRXix2$";
         # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
-        TERMINAL = "${terminal-emulator}";
+        TERMINAL = "${pkgs.unstable.app2unit}/bin/app2unit-term";
         BATDIFF_USE_DELTA = "true";
         DELTA_FEATURES = "+side-by-side";
 
@@ -265,12 +225,17 @@ in
           file="$1"
           line="$2"
           column="$3"
-          command="${pkgs.xdg-utils}/bin/xdg-open \"editor://$file\""
+          command="${pkgs.unstable.app2unit}/bin/app2unit-open \"editor://$file\""
           [ -n "$line" ] && command="$command:$line"
           [ -n "$column" ] && command="$command:$column"
           eval $command
         '';
         OPEN_IN_EDITOR = config.home.sessionVariables.VISUAL or config.home.sessionVariables.EDITOR;
+
+        APP2UNIT_SLICES = "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice";
+
+        # Hint electron apps to use wayland:
+        NIXOS_OZONE_WL = "1";
 
         # Help some tools actually adhere to XDG Base Dirs
         CURL_HOME = "${configHome}/curl";
@@ -303,23 +268,19 @@ in
           done
 
           # Data dirs
-          for dir in bash go pass stack wineprefixes picom; do
+          for dir in bash go pass stack wineprefixes; do
             run mkdir --parents $VERBOSE_ARG \
               ${dataHome}/$dir
           done
           run mkdir --parents $VERBOSE_ARG \
             --mode=700 ${dataHome}/gnupg
-
-          # Flameshot dir
-          run mkdir --parents $VERBOSE_ARG \
-            ${config.home.homeDirectory}/Screenshots
         '';
       };
       shellAliases = {
         g = "git";
         e = "edit";
         m = "neomutt";
-        o = "xdg-open";
+        o = "${pkgs.unstable.app2unit}/bin/app2unit-open";
         s = "systemctl";
         t = "tail -f";
         d = "docker";
@@ -1341,6 +1302,8 @@ in
         extraConfig = ''
           include theme.conf
 
+          clipboard_control write-primary write-clipboard no-append
+
           # symbol_map ${
             with builtins;
             with lib;
@@ -1473,6 +1436,7 @@ in
           '';
         };
         plugins = with pkgs.obs-studio-plugins; [
+          wlrobs
           obs-pipewire-audio-capture
           obs-vaapi
           obs-gstreamer
@@ -1535,8 +1499,10 @@ in
       };
       rofi = {
         enable = true;
+        package = pkgs.rofi-wayland;
         pass = {
           enable = true;
+          package = pkgs.rofi-pass-wayland;
           extraConfig =
             let
               remove-binding =
@@ -1553,7 +1519,7 @@ in
             ''
               # rofi command. Make sure to have "$@" as last argument
               _rofi () {
-                  ${pkgs.rofi}/bin/rofi \
+                  ${config.programs.rofi.package}/bin/rofi \
                     -dpi ${toString config.dpi} \
                     -i \
                     -kb-accept-custom "" \
@@ -1585,23 +1551,19 @@ in
               # and comment the xclip lines
               #
               _clip_in_primary() {
-                ${pkgs.xclip}/bin/xclip
-                # wl-copy-p
+                ${pkgs.wl-clipboard}/bin/wl-copy --primary
               }
 
               _clip_in_clipboard() {
-                ${pkgs.xclip}/bin/xclip -selection clipboard
-                # wl-copy
+                ${pkgs.wl-clipboard}/bin/wl-copy
               }
 
               _clip_out_primary() {
-                ${pkgs.xclip}/bin/xclip -o
-                # wl-paste -p
+                ${pkgs.wl-clipboard}/bin/wl-paste --primary
               }
 
               _clip_out_clipboard() {
-                ${pkgs.xclip}/bin/xclip --selection clipboard -o
-                # wl-paste
+                ${pkgs.wl-clipboard}/bin/wl-paste
               }
 
               # fields to be used
@@ -1664,7 +1626,7 @@ in
             '';
         };
         font = "Iosevka Nerd Font 12";
-        terminal = terminal-emulator;
+        terminal = "${pkgs.unstable.app2unit}/bin/app2unit-term";
         extraConfig = {
           show-icons = true;
           # Remove some keys from the default bindings
@@ -1673,6 +1635,9 @@ in
           # Set our custom bindings
           kb-row-down = "Down,Control+n,Control+j";
           kb-row-up = "Up,Control+p,Control+k";
+          # Unit-awareness
+          run-command = "${pkgs.unstable.app2unit}/bin/app2unit -- {cmd}";
+          run-shell-command = ''{terminal} -e "${pkgs.fish}/bin/fish" -ic "{cmd} && read"'';
         };
         theme =
           let
@@ -2173,24 +2138,6 @@ in
           }
         ];
       };
-      urxvt = {
-        enable = true;
-        fonts = [ "xft:Iosevka NFM Light:size=11" ];
-        keybindings = {
-          "Shift-Control-C" = "eval:selection_to_clipboard";
-          "Shift-Control-V" = "eval:paste_clipboard";
-        };
-        scroll.bar.enable = false;
-        extraConfig = {
-          internalBorder = 11;
-          scrollWithBuffer = true;
-          secondaryScreen = 1;
-          secondaryScroll = 0;
-          letterSpace = -1;
-          iso14755 = false;
-          iso14755_52 = false;
-        };
-      };
       vscode = with pkgs; {
         enable = true;
         package = vscode-fhs;
@@ -2215,6 +2162,10 @@ in
             }
           ];
       };
+      waybar = {
+        enable = true;
+        systemd.enable = true;
+      };
       zathura = {
         enable = true;
         options = {
@@ -2236,82 +2187,6 @@ in
 
     services = {
       blueman-applet.enable = true;
-      darkman = {
-        enable = true;
-        settings = {
-          lat = -26.2;
-          lng = 28.0;
-          usegeoclue = true;
-          dbusserver = true;
-          portal = true;
-        };
-        darkModeScripts = {
-          notify = ''
-            ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear-night "Switching to dark mode"
-          '';
-          gtk-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${
-              builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
-            }"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${
-              builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
-            }'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
-            ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
-          '';
-          kvantum-theme = ''
-            ${pkgs.kdePackages.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNordDark
-          '';
-          icon-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.iconTheme.name
-            }"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.iconTheme.name
-            }'"
-          '';
-          cursor-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
-            }"
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${toString config.gtk.cursorTheme.size}
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
-            }'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${toString config.gtk.cursorTheme.size}
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
-            }/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
-          '';
-          inherit (scripts) setDesktopBackground;
-        };
-        lightModeScripts = {
-          notify = ''
-            ${pkgs.libnotify}/bin/notify-send --app-name="darkman" --urgency=low --icon=weather-clear "Switching to light mode"
-          '';
-          gtk-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${config.gtk.theme.name}"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${config.gtk.theme.name}'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
-            ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
-          '';
-          kvantum-theme = ''
-            ${pkgs.kdePackages.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNord
-          '';
-          icon-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${config.gtk.iconTheme.name}"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${config.gtk.iconTheme.name}'"
-          '';
-          cursor-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name}"
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${toString config.gtk.cursorTheme.size}
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name}'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${toString config.gtk.cursorTheme.size}
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${config.gtk.cursorTheme.name}/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
-          '';
-          inherit (scripts) setDesktopBackground;
-        };
-      };
       dunst = {
         enable = true;
         settings = {
@@ -2331,7 +2206,7 @@ in
             max_icon_size = 60;
             icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro-icons";
             enable_recursive_icon_lookup = "true";
-            dmenu = "${pkgs.rofi}/bin/rofi -dpi ${toString config.dpi} -dmenu -p dunst";
+            dmenu = "${config.programs.rofi.package}/bin/rofi -dpi ${toString config.dpi} -dmenu -p dunst";
             mouse_left_click = "close_current";
             mouse_middle_click = "context";
             mouse_right_click = "do_action";
@@ -2353,7 +2228,6 @@ in
           };
         };
       };
-      flameshot.enable = true;
       git-sync = {
         enable = true;
         repositories = {
@@ -2373,6 +2247,7 @@ in
         defaultCacheTtlSsh = 0;
         maxCacheTtlSsh = 0;
       };
+      hyprpolkitagent.enable = true;
       kdeconnect = {
         enable = true;
         indicator = true;
@@ -2380,696 +2255,6 @@ in
       mpris-proxy.enable = true;
       network-manager-applet.enable = true;
       nextcloud-client.enable = true;
-      picom = {
-        enable = true;
-        package =
-          let
-            picomPkg = pkgs.picom-next;
-          in
-          pkgs.symlinkJoin {
-            name = "picom";
-            paths = [
-              (pkgs.writeShellScriptBin "picom" (
-                let
-                  grayscale-glsl = pkgs.writeText "grayscale.glsl" ''
-                    #version 330
-
-                    in vec2 texcoord;
-                    uniform sampler2D tex;
-                    uniform float opacity;
-
-                    vec4 default_post_processing(vec4 c);
-
-                    vec4 window_shader() {
-                      vec2 texsize = textureSize(tex, 0);
-                      vec4 color = texture2D(tex, texcoord / texsize, 0);
-
-                      color = vec4(vec3(0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) * opacity, color.a * opacity);
-
-                      return default_post_processing(color);
-                    }
-                  '';
-                in
-                ''
-                  if [ "$PICOM_SHADER" = "grayscale" ]; then
-                    "${picomPkg}/bin/picom" \
-                      --window-shader-fg="${grayscale-glsl}" \
-                      "$@"
-                  else
-                    "${picomPkg}/bin/picom" "$@"
-                  fi
-                ''
-              ))
-              pkgs.picom
-            ];
-          }
-          // {
-            inherit (pkgs.picom) meta;
-          };
-        backend = "glx";
-        fade = true;
-        fadeDelta = 3;
-        inactiveOpacity = 0.95;
-        menuOpacity = 0.95;
-        shadow = true;
-        shadowOffsets = [
-          (-7)
-          (-7)
-        ];
-        shadowExclude = [
-          # unknown windows
-          "! name~=''"
-          # shaped windows
-          "bounding_shaped && !rounded_corners"
-          # no shadow on i3 frames
-          "class_g = 'i3-frame'"
-          # hidden windows
-          "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
-          # stacked / tabbed windows
-          "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
-          "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
-          # GTK
-          "_GTK_FRAME_EXTENTS@:c"
-          "class_g ~= 'xdg-desktop-portal' && _NET_FRAME_EXTENTS@:c && window_type = 'dialog'"
-          "class_g ~= 'xdg-desktop-portal' && window_type = 'menu'"
-          "_NET_FRAME_EXTENTS@:c && WM_WINDOW_ROLE@:s = 'Popup'"
-          # Mozilla fixes
-          "(class_g *?= 'firefox' || class_g = 'thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
-          # notifications
-          "_NET_WM_WINDOW_TYPE@:32a *= '_NET_WM_WINDOW_TYPE_NOTIFICATION'"
-          # Zoom
-          "name = 'cpt_frame_xcb_window'"
-          "class_g *?= 'zoom' && name *?= 'meeting'"
-        ];
-        opacityRules =
-          # Only apply these opacity rules if the windows are not hidden
-          map (str: str + " && !(_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_HIDDEN')") [
-            "100:class_g *?= 'obs' && name *= 'Projector'"
-            "100:class_g *?= 'zoom' && name *= 'Meeting'"
-            "100:role = 'browser' && name ^= 'Meet -'"
-            "100:role = 'browser' && name ^= 'Netflix'"
-          ]
-          ++ [
-            "0:_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
-            "0:_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
-            "0:_NET_WM_STATE@[2]:32a *= '_NET_WM_STATE_HIDDEN'"
-            "0:_NET_WM_STATE@[3]:32a *= '_NET_WM_STATE_HIDDEN'"
-            "0:_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
-          ];
-        vSync = true;
-        settings = {
-          inactive-dim = 0.2;
-          blur = {
-            method = "dual_kawase";
-            strength = 5;
-          };
-          corner-radius = dpiScale 8;
-          rounded-corners-exclude = [
-            "window_type = 'dock'"
-            "window_type = 'desktop'"
-          ];
-          blur-background-exclude = [
-            # shaped windows
-            "bounding_shaped && !rounded_corners"
-            # hidden windows
-            "_NET_WM_STATE@[0]:32a *= '_NET_WM_STATE_HIDDEN'"
-            "_NET_WM_STATE@[1]:32a *= '_NET_WM_STATE_HIDDEN'"
-            "_NET_WM_STATE@[2]:32a *= '_NET_WM_STATE_HIDDEN'"
-            "_NET_WM_STATE@[3]:32a *= '_NET_WM_STATE_HIDDEN'"
-            "_NET_WM_STATE@[4]:32a *= '_NET_WM_STATE_HIDDEN'"
-            # stacked / tabbed windows
-            "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_VERT'"
-            "_NET_WM_STATE@[0]:a = '_NET_WM_STATE@_MAXIMIZED_HORZ'"
-            # i3 borders
-            "class_g = 'i3-frame'"
-            # GTK
-            "_GTK_FRAME_EXTENTS@:c"
-            "class_g ~= 'xdg-desktop-portal' && _NET_FRAME_EXTENTS@:c && window_type = 'dialog'"
-            "class_g ~= 'xdg-desktop-portal' && window_type = 'menu'"
-            "_NET_FRAME_EXTENTS@:c && WM_WINDOW_ROLE@:s = 'Popup'"
-            # Mozilla fixes
-            "(class_g *?= 'firefox' || class_g = 'thunderbird') && (window_type = 'utility' || window_type = 'popup_menu') && argb"
-            # Zoom
-            "name = 'cpt_frame_xcb_window'"
-            "class_g *?= 'zoom' && name *?= 'meeting'"
-            "class_g = 'Peek'"
-            "name = 'rect-overlay'"
-          ];
-          mark-wmwin-focused = true;
-          mark-ovredir-focused = true;
-          detect-client-opacity = true;
-          detect-transient = true;
-          glx-no-stencil = true;
-          glx-no-rebind-pixmap = true;
-          use-damage = true;
-          shadow-radius = 7;
-          xinerama-shadow-crop = true;
-          xrender-sync-fence = true;
-          focus-exclude = [
-            "name = 'Picture-in-Picture'"
-            "_NET_WM_STATE@[*]:a *= '_NET_WM_STATE_FULLSCREEN'"
-            "name = 'cpt_frame_xcb_window'"
-            "name = 'rect-overlay'"
-            "class_g *?= 'zoom' && name *= 'Meeting'"
-            "class_g *?= 'obs' && name *= 'Projector'"
-            "role = 'browser' && name ^= 'Netflix'"
-            "role = 'browser' && name ^= 'Meet'"
-            "role = 'browser' && name *= 'Jitsi Meet'"
-          ];
-          detect-rounded-corners = true;
-          win-types = {
-            tooltip = {
-              fade = true;
-              shadow = true;
-              opacity = 0.8;
-              focus = true;
-              full-shadow = false;
-            };
-            dock = {
-              shadow = false;
-              clip-shadow-above = true;
-            };
-            dnd = {
-              shadow = false;
-            };
-            popup_menu = {
-              opacity = 0.9;
-            };
-            dropdown_menu = {
-              opacity = 0.9;
-            };
-          };
-        };
-      };
-      polybar = {
-        enable = true;
-        package = pkgs.polybar.override {
-          i3Support = true;
-          mpdSupport = true;
-        };
-        settings =
-          let
-            superColors = colors;
-          in
-          let
-            colors = superColors // {
-              background = colors.nord0;
-              foreground = colors.nord9;
-              foreground-alt = colors.nord10;
-              urgent = colors.nord12;
-              alert = colors.nord13;
-            };
-            mkFormats =
-              let
-                formats = [
-                  "format"
-                  # "format-volume"
-                  # "format-muted"
-                  # "format-mounted"
-                  # "format-unmounted"
-                  # "format-connected"
-                  # "format-disconnected"
-                  # "format-charging"
-                  # "format-discharging"
-                  # "format-full"
-                  # "format-low"
-                ];
-              in
-              attrset:
-              lib.lists.foldr (
-                format: acc:
-                acc
-                // (lib.attrsets.mapAttrs' (name: value: {
-                  inherit value;
-                  name = "${format}-${name}";
-                }) attrset)
-              ) { } formats;
-            mkAlpha = str: "#cc${lib.strings.removePrefix "#" str}";
-          in
-          {
-            settings = {
-              screenchange-reload = true;
-              # https://www.cairographics.org/manual/cairo-cairo-t.html#cairo-operator-t
-              compositing-background = "source";
-              compositing-foreground = "source";
-              compositing-overline = "over";
-              compositing-underline = "over";
-              compositing-border = "over";
-              pseudo-transparency = false;
-            };
-            "bar/top" = {
-              inherit (colors) foreground;
-              background = "${mkAlpha colors.background}";
-              monitor = "\${env:MONITOR:}";
-              monitor-strict = true;
-              monitor-exact = true;
-              inherit (config) dpi;
-              width = "100%";
-              height = "${toString (dpiScale 24)}px";
-              enable-struts = true;
-              double-click-interval = 150;
-              override-redirect = false;
-              wm-restack = "i3";
-
-              fixed-center = true;
-
-              # For symbols
-              font-0 = "Symbols Nerd Font Mono:size=10;2";
-              # For Powerline glyphs
-              font-1 = "Symbols Nerd Font Mono:size=18;3";
-              # If it's not a symbol, it falls back to this
-              font-2 = "Iosevka:size=8;2";
-
-              format-foreground = colors.foreground;
-              format-background = "${mkAlpha colors.background}";
-
-              modules-left = "i3 title";
-              # modules-center = "yubikey mpd";
-              modules-center = "yubikey";
-              modules-right = "audio-input audio-output xkeyboard battery date";
-            };
-            "bar/top-primary" = {
-              "inherit" = "bar/top";
-              modules-right = "audio-input audio-output xkeyboard battery date tray";
-            };
-            "powerline/right-facing-arrow" = {
-              type = "custom/text";
-              label = "";
-              label-font = 2;
-              label-foreground = "\${self.background}";
-              label-background = "\${self.background-next}";
-            };
-            "powerline/right-facing-separator" = {
-              type = "custom/text";
-              label = "";
-              label-font = 2;
-              label-foreground = "\${self.separator}";
-              label-background = "\${self.background}";
-            };
-            "powerline/left-facing-arrow" = {
-              type = "custom/text";
-              label = "";
-              label-font = 2;
-              label-foreground = "\${self.background}";
-              label-background = "\${self.background-next}";
-            };
-            "powerline/left-facing-separator" = {
-              type = "custom/text";
-              label = "";
-              label-font = 2;
-              label-foreground = "\${self.separator}";
-              label-background = "\${self.background}";
-            };
-            "powerline/left-section-arrow" = mkFormats {
-              suffix = "\${powerline/right-facing-arrow.label}";
-              suffix-font = "\${powerline/right-facing-arrow.label-font}";
-              suffix-foreground = "\${self.background}";
-              suffix-background = "\${self.background-next}";
-            };
-            "powerline/left-section-separator" = mkFormats {
-              prefix = "\${powerline/right-facing-separator.label}";
-              prefix-font = "\${powerline/right-facing-separator.label-font}";
-              prefix-foreground = "\${self.separator}";
-              prefix-background = "\${self.background}";
-            };
-            "powerline/right-section-arrow" = mkFormats {
-              prefix = "\${powerline/left-facing-arrow.label}";
-              prefix-font = "\${powerline/left-facing-arrow.label-font}";
-              prefix-foreground = "\${self.background}";
-              prefix-background = "\${self.background-next}";
-            };
-            "powerline/right-section-separator" = mkFormats {
-              suffix = "\${powerline/left-facing-separator.label}";
-              suffix-font = "\${powerline/left-facing-separator.label-font}";
-              suffix-foreground = "\${self.separator}";
-              suffix-background = "\${self.background}";
-            };
-            "module/i3" = {
-              "inherit" = "powerline/left-section-arrow";
-              type = "internal/i3";
-              strip-wsnumbers = true;
-              pin-workspaces = true;
-              show-urgent = true;
-              index-sort = true;
-              enable-scroll = false;
-              wrapping-scroll = false;
-
-              format = "<label-mode> <label-state> ";
-              format-foreground = colors.nord0;
-              format-background = "${mkAlpha colors.nord3}";
-              format-prefix = "  ";
-              format-prefix-background = "${mkAlpha colors.nord3}";
-              background = "${mkAlpha colors.nord3}";
-              background-next = "${mkAlpha colors.nord1}";
-
-              label-mode-foreground = colors.alert;
-              label-mode-padding = 1;
-
-              label-separator = "​"; # zero-width space
-              label-separator-padding = 1;
-
-              # unfocused = Inactive workspace on any monitor
-              label-unfocused = "%name%";
-
-              # focused = Active workspace on focused monitor
-              label-focused = "%name%";
-              label-focused-foreground = colors.nord6;
-
-              # visible = Active workspace on unfocused monitor
-              label-visible = "%name%";
-
-              # urgent = Workspace with urgency hint set
-              label-urgent = "%name%";
-              label-urgent-foreground = colors.urgent;
-            };
-            "module/title" = {
-              "inherit" = "powerline/left-section-arrow";
-              type = "internal/xwindow";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              background = "${mkAlpha colors.nord1}";
-              background-next = "${mkAlpha colors.nord0}";
-              # Prepend a zero-width space to keep rendering
-              # the suffix even on an empty workspace
-              label = " %title:0:120:…% ";
-              label-empty = " ";
-            };
-            "module/mpd" = {
-              type = "internal/mpd";
-              format-online = "<label-song> <bar-progress> <label-time>  <icon-prev> <icon-seekb> <icon-stop> <toggle> <icon-seekf> <icon-next>  <icon-repeat> <icon-random>";
-              format-online-foreground = colors.nord1;
-
-              icon-foreground = "\${self.format-online-foreground}";
-
-              icon-play = "⏵";
-              icon-pause = "⏸";
-              icon-stop = "⏹";
-              icon-prev = "⏮";
-              icon-next = "⏭";
-              icon-seekb = "⏪";
-              icon-seekf = "⏩";
-              icon-random = "🔀";
-              icon-repeat = "🔁";
-
-              icon-play-foreground = "\${self.icon-foreground}";
-              icon-pause-foreground = "\${self.icon-foreground}";
-              icon-stop-foreground = "\${self.icon-foreground}";
-              icon-prev-foreground = "\${self.icon-foreground}";
-              icon-next-foreground = "\${self.icon-foreground}";
-              icon-seekb-foreground = "\${self.icon-foreground}";
-              icon-seekf-foreground = "\${self.icon-foreground}";
-              icon-random-foreground = "\${self.icon-foreground}";
-              icon-repeat-foreground = "\${self.icon-foreground}";
-
-              toggle-off-foreground = "\${self.icon-foreground}";
-              toggle-on-foreground = colors.nord4;
-
-              label-song-maxlen = 50;
-              label-song-ellipsis = true;
-              label-song-foreground = colors.nord4;
-
-              label-time-foreground = colors.nord4;
-
-              bar-progress-width = 30;
-              bar-progress-indicator = "|";
-              bar-progress-indicator-foreground = colors.nord2;
-              bar-progress-fill = "─";
-              bar-progress-fill-foreground = colors.nord4;
-              bar-progress-empty = "─";
-              bar-progress-empty-foreground = colors.nord3;
-            };
-            "module/yubikey" =
-              let
-                indicator-script = pkgs.writeShellScript "yubikey-indicator" ''
-                  ${pkgs.nmap}/bin/ncat --unixsock $XDG_RUNTIME_DIR/yubikey-touch-detector.socket | while read -n5 message; do
-                    [[ $message = *1 ]] && echo "                " || echo ""
-                  done
-                '';
-              in
-              {
-                type = "custom/script";
-                exec = indicator-script;
-                tail = true;
-                format-background = colors.urgent;
-                format-foreground = "${mkAlpha colors.background}";
-                format-prefix = "\${powerline/left-facing-arrow.label}";
-                format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
-                format-prefix-foreground = colors.urgent;
-                format-prefix-background = "${mkAlpha colors.background}";
-                format-suffix = "\${powerline/right-facing-arrow.label}";
-                format-suffix-font = "\${powerline/right-facing-arrow.label-font}";
-                format-suffix-foreground = colors.urgent;
-                format-suffix-background = "${mkAlpha colors.background}";
-              };
-            "module/audio-input" = {
-              "inherit" = "powerline/right-section-separator";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              format-prefix = "\${powerline/left-facing-arrow.label}";
-              format-prefix-font = "\${powerline/left-facing-arrow.label-font}";
-              format-prefix-foreground = "${mkAlpha colors.nord1}";
-              format-prefix-background = "${mkAlpha colors.nord0}";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-              type = "custom/script";
-              tail = true;
-              exec = ''${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input --icons-volume "󰍬" --icon-muted "󰍭" --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-blacklist "*.monitor" --notifications listen'';
-              click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-              click-left = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input togmute";
-              click-middle = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input next-node";
-              scroll-up = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 up";
-              scroll-down = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --node-type input --volume-max 130 down";
-            };
-            "module/audio-output" = {
-              "inherit" = "powerline/right-section-separator";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-              type = "custom/script";
-              tail = true;
-              exec = ''${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --icons-volume "󰕿 ,󰖀 ,󰕾 " --icon-muted "󰖁 " --color-muted ${lib.strings.removePrefix "#" colors.nord0} --node-nicknames-from "device.description" --notifications listen'';
-              click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-              click-left = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control togmute";
-              click-middle = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control next-node";
-              scroll-up = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --volume-max 130 up";
-              scroll-down = "${pkgs.polybar-pulseaudio-control}/bin/pulseaudio-control --volume-max 130 down";
-            };
-            "module/xkeyboard" = {
-              "inherit" = "powerline/right-section-separator";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-
-              type = "internal/xkeyboard";
-
-              label-layout = " 󰌓 %icon%";
-              layout-icon-0 = "us;programmer Dvorak;DVP";
-              layout-icon-1 = "us;US;US";
-
-              indicator-icon-default = "";
-              indicator-icon-0 = "caps lock;;󰌎";
-              indicator-icon-1 = "scroll lock;;󱅜";
-              indicator-icon-2 = "num lock;;󰎠";
-
-              label-indicator-on = "%icon%";
-              label-indicator-off = "";
-            };
-            "module/battery" = {
-              "inherit" = "powerline/right-section-separator";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-
-              type = "internal/battery";
-              battery = "BAT0";
-              adapter = "ADP1";
-
-              format-charging = "<animation-charging> <label-charging>";
-              format-charging-foreground = colors.nord4;
-              format-charging-background = "${mkAlpha colors.nord1}";
-
-              format-discharging = "<ramp-capacity> <label-discharging>";
-              format-discharging-foreground = colors.nord4;
-              format-discharging-background = "${mkAlpha colors.nord1}";
-
-              format-full = "<ramp-capacity> <label-full>";
-              format-full-foreground = colors.nord4;
-              format-full-background = "${mkAlpha colors.nord1}";
-
-              low-at = 15;
-              format-low = "<animation-low> <label-low>";
-              format-low-foreground = colors.urgent;
-              format-low-background = "${mkAlpha colors.nord1}";
-
-              ramp-capacity-0 = " ";
-              ramp-capacity-1 = " ";
-              ramp-capacity-2 = " ";
-              ramp-capacity-3 = " ";
-              ramp-capacity-4 = " ";
-
-              animation-charging-0 = " ";
-              animation-charging-1 = " ";
-              animation-charging-2 = " ";
-              animation-charging-3 = " ";
-              animation-charging-4 = " ";
-              animation-charging-framerate = 750;
-
-              animation-low-0 = " ";
-              animation-low-1 = " ";
-              animation-low-framerate = 200;
-
-            };
-            "module/date" = {
-              "inherit" = "powerline/right-section-separator";
-              format = "󱑃 <label>";
-              format-foreground = colors.nord4;
-              format-background = "${mkAlpha colors.nord1}";
-              format-prefix = " ";
-              format-suffix = "";
-              background = "${mkAlpha colors.nord1}";
-              separator = "${mkAlpha colors.nord0}";
-
-              type = "internal/date";
-              interval = 1;
-
-              date = "";
-              date-alt = " %Y-%m-%d";
-
-              time = "%H:%M";
-              time-alt = "%H:%M:%S";
-
-              label = "%time%%date%";
-            };
-            "module/tray" = {
-              "inherit" = "powerline/right-section-arrow";
-              background = "${mkAlpha colors.nord3}";
-              background-next = "${mkAlpha colors.nord1}";
-              format-foreground = colors.nord0;
-              format-background = "${mkAlpha colors.nord3}";
-              label-tray-padding = "8px";
-
-              type = "internal/tray";
-
-              tray-background = "${mkAlpha colors.nord3}";
-              tray-foreground = colors.nord4;
-              tray-padding = 2;
-            };
-          };
-        script = ''
-          ${pkgs.coreutils}/bin/sleep 1
-          # Launch bar on each monitor, tray on primary
-          ${pkgs.xorg.xrandr}/bin/xrandr --query | ${pkgs.gnugrep}/bin/grep " connected " | while IFS=$'\n' read line; do
-            monitor=$(echo $line | ${pkgs.coreutils}/bin/cut -d' ' -f1)
-            if [[ $line == *" primary "* ]]; then
-              export MONITOR=$monitor tray_position="right"
-              polybar top-primary &
-            else
-              export MONITOR=$monitor tray_position="none"
-              polybar top &
-            fi
-          done
-        '';
-      };
-      redshift = {
-        enable = true;
-        tray = true;
-        provider = "geoclue2";
-        settings.redshift.adjustment-method = "randr";
-      };
-      sxhkd = {
-        enable = true;
-        keybindings =
-          let
-            flameshot-region = (
-              pkgs.writeShellScript "flameshot-region" ''
-                if [ "$1" = "activewindow" ]; then
-                  # Get active window geometry
-                  eval $(${pkgs.xdotool}/bin/xdotool getactivewindow getwindowgeometry --shell)
-                  REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
-                elif [ "$1" = "selectwindow" ]; then
-                  # Let the user select a window and get its geometry
-                  eval $(${pkgs.xdotool}/bin/xdotool selectwindow getwindowgeometry --shell)
-                  REGION="''${WIDTH}x''${HEIGHT}+''${X}+''${Y}"
-                else
-                  # Get current screen
-                  SCREEN=$(${pkgs.xdotool}/bin/xdotool get_desktop)
-                  REGION="screen''${SCREEN}"
-                fi
-
-                # Launch the screenshot gui
-                ${pkgs.flameshot}/bin/flameshot gui --region "$REGION"
-              ''
-            );
-          in
-          {
-            # Screenshot
-            "Print" = "${pkgs.flameshot}/bin/flameshot gui";
-            "super + Print" = "${flameshot-region} activewindow";
-            "super + shift + Print" = "${flameshot-region}";
-            "super + o" =
-              "${pkgs.flameshot}/bin/flameshot gui --accept-on-select --raw | ${pkgs.imagemagick}/bin/convert -resize 400% png:- png:- | ${pkgs.tesseract}/bin/tesseract -l eng --psm 6 - - | ${pkgs.xsel}/bin/xsel -bi; ${pkgs.libnotify}/bin/notify-send --icon Clipboard --urgency low --expire-time 5000 'OCR result copied to clipboard'";
-
-            # Notifications
-            "super + dollar" = "${pkgs.dunst}/bin/dunstctl close";
-            "super + shift + dollar" = "${pkgs.dunst}/bin/dunstctl close-all";
-            "super + ampersand" = "${pkgs.dunst}/bin/dunstctl history-pop";
-            "super + m" = "${pkgs.dunst}/bin/dunstctl action 0";
-            "super + shift + m" = "${pkgs.dunst}/bin/dunstctl context";
-
-            # Toggle grayscale
-            "super + shift + g" = "${pkgs.writeShellScript "toggle-grayscale" ''
-              if [ -f ${config.xdg.dataHome}/picom/env ]; then
-                rm ${config.xdg.dataHome}/picom/env
-                ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to colour mode"
-              else
-                ln -s ${config.xdg.configHome}/picom/env-grayscale ${config.xdg.dataHome}/picom/env
-                ${pkgs.libnotify}/bin/notify-send --app-name="picom" --urgency=low "Switching to grayscale mode"
-              fi
-              ${scripts.setDesktopBackground}
-              ${pkgs.systemd}/bin/systemctl --user restart picom.service
-            ''}";
-
-            # Toggle dark mode
-            "super + shift + d" = "${pkgs.darkman}/bin/darkman toggle";
-
-            # Transparency controls
-            "super + Home" = "${pkgs.picom}/bin/picom-trans --current --delete";
-            "super + button2" = "${pkgs.picom}/bin/picom-trans --current --delete";
-            "super + Prior" = "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
-            "super + button5" = "${pkgs.picom}/bin/picom-trans --current --opacity=-5";
-            "super + Next" = "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
-            "super + button4" = "${pkgs.picom}/bin/picom-trans --current --opacity=+5";
-            "super + End" = "${pkgs.picom}/bin/picom-trans --current --opacity=100";
-            "super + shift + button2" = "${pkgs.picom}/bin/picom-trans --current --opacity=100";
-
-            # Lock screen
-            "super + x" = "${pkgs.systemd}/bin/loginctl lock-session";
-
-            # Programs
-            "super + p" = "${pkgs.rofi-pass}/bin/rofi-pass";
-            "super + shift + e" =
-              "${config.programs.emacs.finalPackage}/bin/emacsclient –eval '(emacs-everywhere)'";
-
-            # Audio controls
-            "XF86AudioRaiseVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 +5%";
-            "XF86AudioLowerVolume" = "${pkgs.pulseaudio}/bin/pactl set-sink-volume 0 -5%";
-            "XF86AudioMute" = "${pkgs.pulseaudio}/bin/pactl set-sink-mute 0 toggle";
-            "XF86AudioPlay" = "${pkgs.playerctl}/bin/playerctl play-pause";
-            "XF86AudioPause" = "${pkgs.playerctl}/bin/playerctl pause";
-            "XF86AudioNext" = "${pkgs.playerctl}/bin/playerctl next";
-            "XF86AudioPrev" = "${pkgs.playerctl}/bin/playerctl previous";
-            "XF86AudioForward" = "${pkgs.playerctl}/bin/playerctl position 5+";
-            "XF86AudioRewind" = "${pkgs.playerctl}/bin/playerctl position 5-";
-
-            # Screen brightness controls
-            "XF86MonBrightnessUp" = "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%+";
-            "XF86MonBrightnessDown" =
-              "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 5%-";
-          };
-      };
       syncthing = {
         enable = true;
         tray = {
@@ -3078,325 +2263,232 @@ in
         };
       };
       vscode-server.enable = true;
-      unclutter = {
-        enable = true;
-        threshold = 10;
-        extraOptions = [ "ignore-scrolling" ];
-      };
     };
 
-    xsession = {
+    wayland.windowManager.hyprland = {
       enable = true;
-      initExtra = ''
-        ${scripts.setDesktopBackground} &
-      '';
-      windowManager.i3 = {
-        enable = true;
-        package = pkgs.i3-gaps;
-        config =
-          let
-            # Define workspace names
-            workspace1 = ''number "1: "'';
-            workspace2 = ''number "2: "'';
-            workspace3 = ''number "3: "'';
-            workspace4 = ''number "4: "'';
-            workspace5 = ''number "5: "'';
-            workspace6 = ''number "6: 6"'';
-            workspace7 = ''number "7: 7"'';
-            workspace8 = ''number "8: 8"'';
-            workspace9 = ''number "9: "'';
-            workspace10 = ''number "10: "'';
-            # Gaps modes
-            mode-gaps = "Gaps: (o) outer, (i) inner";
-            mode-gaps-inner = "Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)";
-            mode-gaps-outer = "Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)";
-          in
-          {
-            bars = [ ];
-            gaps = {
-              inner = 10;
-              outer = 5;
-              smartGaps = true;
-            };
-            fonts = {
-              names = [ "DejaVu Sans Mono" ];
-              style = "Regular";
-              size = 0.0;
-            };
-            modifier = "Mod4";
-            terminal = terminal-emulator;
-            menu = ''"${pkgs.rofi}/bin/rofi -dpi ${toString config.dpi} -show drun -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"'';
-            focus = {
-              followMouse = false;
-              newWindow = "urgent";
-              wrapping = "workspace";
-            };
-            startup = [
-              {
-                command = "${pkgs.writeShellScript "i3-session-start" ''
-                  ${pkgs.systemd}/bin/systemctl --user set-environment I3SOCK=$(${config.xsession.windowManager.i3.package}/bin/i3 --get-socketpath)
-                  ${pkgs.systemd}/bin/systemctl --user start graphical-session-i3.target
-                ''}";
-                notification = false;
-              }
-              {
-                command =
-                  let
-                    i3-session-exit = pkgs.writeShellScript "i3-session-exit" ''
-                      ${pkgs.systemd}/bin/systemctl --user stop graphical-session-i3.target
-                    '';
-                  in
-                  "${pkgs.writeScript "i3-on-exit" ''
-                    #!${pkgs.python3.withPackages (ps: with ps; [ i3ipc ])}/bin/python
-                    from subprocess import Popen
-                    from i3ipc.aio import Connection, Event
 
-                    def on_exit(i3, e):
-                        if e.change == "exit":
-                          Popen(['${i3-session-exit}'])
+      # NixOS Hyprland integration options
+      package = null;
+      portalPackage = null;
+      systemd.enable = false;
 
-                    i3 = await Connection().connect()
-
-                    i3.on(Event.SHUTDOWN_EXIT, on_exit)
-
-                    await i3.main()
-                  ''}";
-                notification = false;
-              }
-            ];
-            colors = {
-              # Nord theme
-              focused = {
-                border = colors.nord9;
-                background = colors.nord9;
-                text = "#ffffff";
-                indicator = colors.nord9;
-                childBorder = colors.nord9;
-              };
-              unfocused = {
-                border = colors.nord0;
-                background = "#1f222d";
-                text = "#888888";
-                indicator = "#1f222d";
-                childBorder = colors.nord0;
-              };
-              focusedInactive = {
-                border = colors.nord0;
-                background = "#1f222d";
-                text = "#888888";
-                indicator = "#1f222d";
-                childBorder = colors.nord0;
-              };
-              placeholder = {
-                border = colors.nord0;
-                background = "#1f222d";
-                text = "#888888";
-                indicator = "#1f222d";
-                childBorder = colors.nord0;
-              };
-              urgent = {
-                border = "#900000";
-                background = "#900000";
-                text = "#ffffff";
-                indicator = "#900000";
-                childBorder = "#900000";
-              };
-              background = "#242424";
-            };
-            keybindings =
-              let
-                mod = config.xsession.windowManager.i3.config.modifier;
-              in
-              lib.mkOptionDefault {
-                "${mod}+1" = "workspace ${workspace1}";
-                "${mod}+2" = "workspace ${workspace2}";
-                "${mod}+3" = "workspace ${workspace3}";
-                "${mod}+4" = "workspace ${workspace4}";
-                "${mod}+5" = "workspace ${workspace5}";
-                "${mod}+6" = "workspace ${workspace6}";
-                "${mod}+7" = "workspace ${workspace7}";
-                "${mod}+8" = "workspace ${workspace8}";
-                "${mod}+9" = "workspace ${workspace9}";
-                "${mod}+0" = "workspace ${workspace10}";
-                "${mod}+Shift+1" = "move container to workspace ${workspace1}; workspace ${workspace1}";
-                "${mod}+Shift+2" = "move container to workspace ${workspace2}; workspace ${workspace2}";
-                "${mod}+Shift+3" = "move container to workspace ${workspace3}; workspace ${workspace3}";
-                "${mod}+Shift+4" = "move container to workspace ${workspace4}; workspace ${workspace4}";
-                "${mod}+Shift+5" = "move container to workspace ${workspace5}; workspace ${workspace5}";
-                "${mod}+Shift+6" = "move container to workspace ${workspace6}; workspace ${workspace6}";
-                "${mod}+Shift+7" = "move container to workspace ${workspace7}; workspace ${workspace7}";
-                "${mod}+Shift+8" = "move container to workspace ${workspace8}; workspace ${workspace8}";
-                "${mod}+Shift+9" = "move container to workspace ${workspace9}; workspace ${workspace9}";
-                "${mod}+Shift+0" = "move container to workspace ${workspace10}; workspace ${workspace10}";
-
-                "${mod}+Shift+f" = "sticky toggle";
-
-                # change focus (Vi keybindings)
-                "${mod}+h" = "focus left";
-                "${mod}+j" = "focus down";
-                "${mod}+k" = "focus up";
-                "${mod}+l" = "focus right";
-                "${mod}+Shift+h" = "move left";
-                "${mod}+Shift+j" = "move down";
-                "${mod}+Shift+k" = "move up";
-                "${mod}+Shift+l" = "move right";
-
-                # split in horizontal orientation
-                "${mod}+backslash" = "split h";
-                "${mod}+Shift+backslash" = "split h";
-                # split in vertical orientation
-                "${mod}+minus" = "split v";
-                "${mod}+Shift+minus" = "split v";
-
-                # Toggle scratchpad
-                "${mod}+numbersign" = "scratchpad show";
-                # Move window to scratchpad
-                "${mod}+Shift+numbersign" = "move scratchpad";
-
-                # focus the parent container
-                "${mod}+a" = "focus parent";
-                # focus the child container
-                "${mod}+Shift+a" = "focus child";
-                "${mod}+apostrophe" = "focus child";
-
-                # Move focus/workspace/window to different monitor
-                "${mod}+at" = "focus output left";
-                "${mod}+Shift+at" = "move container to output left; focus output left";
-                "${mod}+Shift+Ctrl+at" = "move workspace to output left";
-                "${mod}+slash" = "focus output right";
-                "${mod}+Shift+slash" = "move container to output right; focus output right";
-                "${mod}+Shift+Ctrl+slash" = "move workspace to output right";
-
-                # Gaps mode
-                "${mod}+g" = ''mode "${mode-gaps}"'';
-              };
-            modes = {
-              resize = {
-                "h" = "resize shrink width 20 px or 10 ppt";
-                "j" = "resize grow height 20 px or 10 ppt";
-                "k" = "resize shrink height 20 px or 10 ppt";
-                "l" = "resize grow width 20 px or 10 ppt";
-                "Shift+h" = "resize shrink width 200 px or 20 ppt";
-                "Shift+j" = "resize grow height 200 px or 20 ppt";
-                "Shift+k" = "resize shrink height 200 px or 20 ppt";
-                "Shift+l" = "resize grow width 200 px or 20 ppt";
-                "Return" = "mode default";
-                "Escape" = "mode default";
-              };
-              "${mode-gaps}" = {
-                "o" = ''mode "${mode-gaps-outer}"'';
-                "i" = ''mode "${mode-gaps-inner}"'';
-                "Return" = "mode default";
-                "Escape" = "mode default";
-              };
-              "${mode-gaps-inner}" = {
-                "plus" = "gaps inner current plus 5";
-                "minus" = "gaps inner current minus 5";
-                "asterisk" = "gaps inner current set 0";
-                "Shift+plus" = "gaps inner all plus 5";
-                "Shift+minus" = "gaps inner all minus 5";
-                "Shift+asterisk" = "gaps inner all set 0";
-                "Return" = "mode default";
-                "Escape" = "mode default";
-              };
-              "${mode-gaps-outer}" = {
-                "plus" = "gaps outer current plus 5";
-                "minus" = "gaps outer current minus 5";
-                "asterisk" = "gaps outer current set 0";
-                "Shift+plus" = "gaps outer all plus 5";
-                "Shift+minus" = "gaps outer all minus 5";
-                "Shift+asterisk" = "gaps outer all set 0";
-                "Return" = "mode default";
-                "Escape" = "mode default";
-              };
-            };
-            assigns = {
-              "${workspace2}" = [
-                {
-                  class = "^firefox";
-                  instance = "^Navigator$";
-                }
-              ];
-              "${workspace9}" = [ { class = "^thunderbird$"; } ];
-              "${workspace10}" = [
-                { class = "^TelegramDesktop$"; }
-                { class = "^Slack$"; }
-                { class = "^Signal$"; }
-                { class = "^Ferdium$"; }
-              ];
-            };
-            floating.titlebar = false;
-            window = {
-              border = 0;
-              hideEdgeBorders = "both";
-              titlebar = false;
-              commands =
-                let
-                  mkCommand = command: criteria: { inherit command criteria; };
-                  mkFloating = mkCommand "floating enable";
-                  mkSticky = mkCommand "sticky enable";
-                in
-                [
-                  {
-                    criteria = {
-                      class = ".*";
-                    };
-                    command = "border pixel 0";
-                  }
-                  {
-                    criteria = {
-                      floating_from = "auto";
-                      title = " is sharing your screen";
-                    };
-                    command = "border none; sticky enable; move position 0 px -${toString (dpiScale 55)} px";
-                  }
-                  {
-                    criteria = {
-                      class = "^(?i)obs$";
-                      title = ".*Projector.*";
-                    };
-                    command = "fullscreen disable; floating enable; sticky enable; move position 0 px -${toString (dpiScale 1080)} px";
-                  }
-                  (mkFloating { class = "^emacs-everywhere$"; })
-                  (mkFloating { class = "^Tor Browser$"; })
-                  (mkFloating { class = "^gnome-calculator$"; })
-                  (mkFloating { class = "^feh$"; })
-                  (mkFloating { class = "^Sxiv$"; })
-                  (mkFloating {
-                    class = "^Thunderbird$";
-                    instance = "^Calendar$";
-                  })
-                  (mkFloating {
-                    class = "^Steam$";
-                    instance = "Steam Guard";
-                  })
-                  (mkFloating { class = "^(?i)zoom$"; })
-                  (mkFloating { class = "(?i)blueman-manager"; })
-                  (mkFloating {
-                    class = "^Steam$";
-                    title = "^Steam Guard";
-                  })
-                  (mkFloating { class = "(?i)protonvpn"; })
-                  (mkFloating { title = "Preferences$"; })
-                  (mkFloating { window_role = "About"; })
-                  (mkFloating { window_role = "Preferences"; })
-                  (mkFloating { window_role = "Organizer"; })
-                  (mkFloating { window_role = "bubble"; })
-                  (mkFloating { window_role = "page-info"; })
-                  (mkFloating { window_role = "pop-up"; })
-                  (mkFloating { window_role = "task_dialog"; })
-                  (mkFloating { window_role = "toolbox"; })
-                  (mkFloating { window_role = "webconsole"; })
-                  (mkFloating { window_type = "dialog"; })
-                  (mkFloating { window_type = "menu"; })
-                  (mkSticky { title = "Picture-in-Picture"; })
-                  (mkSticky { title = "AlarmWindow"; })
-                ];
-            };
+      settings = {
+        "$mod" = "SUPER";
+        monitor = [
+          "HDMI-A-1, highres@highrr, 0x0, 1"
+          "DP-1, highres@highrr, auto-right, 1"
+          ", preferred, auto, 1"
+        ];
+        # NB: use `~/.config/uwsm/env*` files instead
+        # https://wiki.hypr.land/Configuring/Environment-variables/#:~:text=uwsm%20users%20should%20avoid%20placing%20environment%20variables%20in%20the%20hyprland.conf%20file.
+        # env = [];
+        ecosystem = {
+          enforce_permissions = 1;
+        };
+        permission = [
+          "${moduleArgs.osConfig.programs.hyprland.portalPackage}/libexec/.xdg-desktop-portal-hyprland-wrapped, screencopy, allow"
+          "${pkgs.hyprland-preview-share-picker}/bin/hyprland-preview-share-picker, screencopy, allow"
+        ];
+        general = {
+          gaps_in = 5;
+          gaps_out = 20;
+          border_size = 2;
+          "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
+          "col.inactive_border" = "rgba(595959aa)";
+          resize_on_border = true;
+          # layout = "dwindle";
+        };
+        decoration = {
+          rounding = 4;
+          rounding_power = 2;
+          active_opacity = 1.0;
+          inactive_opacity = 0.9;
+          shadow = {
+            enabled = true;
+            range = 4;
+            render_power = 3;
+            color = "rgba(1a1a1aee)";
           };
-        extraConfig = ''
-          popup_during_fullscreen leave_fullscreen
-        '';
+          blur = {
+            enabled = true;
+            size = 3;
+            passes = 1;
+            vibrancy = 0.1696;
+          };
+        };
+        animations = {
+          enabled = "yes, please :)";
+          bezier = [
+            "easeOutQuint,0.23,1,0.32,1"
+            "easeInOutCubic,0.65,0.05,0.36,1"
+            "linear,0,0,1,1"
+            "almostLinear,0.5,0.5,0.75,1.0"
+            "quick,0.15,0,0.1,1"
+          ];
+          animation = [
+            "global, 1, 10, default"
+            "border, 1, 5.39, easeOutQuint"
+            "windows, 1, 4.79, easeOutQuint"
+            "windowsIn, 1, 4.1, easeOutQuint, popin 87%"
+            "windowsOut, 1, 1.49, linear, popin 87%"
+            "fadeIn, 1, 1.73, almostLinear"
+            "fadeOut, 1, 1.46, almostLinear"
+            "fade, 1, 3.03, quick"
+            "layers, 1, 3.81, easeOutQuint"
+            "layersIn, 1, 4, easeOutQuint, fade"
+            "layersOut, 1, 1.5, linear, fade"
+            "fadeLayersIn, 1, 1.79, almostLinear"
+            "fadeLayersOut, 1, 1.39, almostLinear"
+            "workspaces, 1, 1.94, almostLinear, fade"
+            "workspacesIn, 1, 1.21, almostLinear, fade"
+            "workspacesOut, 1, 1.94, almostLinear, fade"
+          ];
+        };
+        dwindle = {
+          pseudotile = true;
+          preserve_split = true;
+        };
+        master = {
+          new_status = "master";
+        };
+        misc = {
+          force_default_wallpaper = 0;
+          disable_hyprland_logo = true;
+        };
+        input = {
+          kb_layout = "us,us";
+          kb_variant = "dvp,";
+        };
+        bind =
+          let
+            changegroupactiveormovefocus = pkgs.writeShellScript "changegroupactiveormovefocus" ''
+              activewindow="$(hyprctl activewindow -j)"
+              readonly activewindow
+              if ! ${pkgs.jq}/bin/jq -e '.grouped[]' <<< "$activewindow" >/dev/null; then
+                hyprctl dispatch movefocus "$1"
+              elif [[ "$1" == l ]] && ${pkgs.jq}/bin/jq -e '.address == .grouped[0]' <<< "$activewindow" >/dev/null; then
+                hyprctl dispatch movefocus l
+              elif [[ "$1" == l ]]; then
+                hyprctl dispatch changegroupactive b
+              elif [[ "$1" == r ]] && ${pkgs.jq}/bin/jq -e '.address == .grouped[-1]' <<< "$activewindow" >/dev/null; then
+                hyprctl dispatch movefocus r
+              else
+                hyprctl dispatch changegroupactive f
+              fi
+            '';
+            movegroupwindowormovewindoworgroup = pkgs.writeShellScript "movegroupwindowormovewindoworgroup" ''
+              activewindow="$(hyprctl activewindow -j)"
+              readonly activewindow
+              if ! ${pkgs.jq}/bin/jq -e '.grouped[]' <<< "$activewindow" >/dev/null; then
+                hyprctl dispatch movewindoworgroup "$1"
+              elif [[ "$1" == l ]] && ${pkgs.jq}/bin/jq -e '.address == .grouped[0]' <<< "$activewindow" >/dev/null; then
+                hyprctl dispatch movewindoworgroup l
+              elif [[ "$1" == l ]]; then
+                hyprctl dispatch movegroupwindow b
+              elif [[ "$1" == r ]] && ${pkgs.jq}/bin/jq -e '.address == .grouped[-1]' <<< "$activewindow" >/dev/null; then
+                hyprctl dispatch movewindoworgroup r
+              else
+                hyprctl dispatch movegroupwindow f
+              fi
+            '';
+          in
+          [
+            "$mod, D, exec, ${pkgs.unstable.app2unit}/bin/app2unit -- ${config.programs.rofi.package}/bin/rofi -show combi -combi-modes window,drun,run -combi-hide-mode-prefix -hide-active-window"
+            "$mod, P, exec, ${pkgs.unstable.app2unit}/bin/app2unit -- ${config.programs.rofi.pass.package}/bin/rofi-pass"
+            ''$mod, X, exec, ${pkgs.systemd}/bin/loginctl lock-session "$XDG_SESSION_ID"''
+            ''$mod SHIFT, X, exec, ${pkgs.systemd}/bin/loginctl terminate-session "$XDG_SESSION_ID"''
+
+            # XXX
+            "$mod, Return, exec, ${pkgs.unstable.app2unit}/bin/app2unit -T"
+            "$mod SHIFT, Q, killactive,"
+            "$mod SHIFT, space, togglefloating,"
+            "$mod, F, fullscreen,"
+            "$mod SHIFT, F, pin,"
+            "$mod, E, pseudo," # dwindle
+            "$mod, backslash, togglesplit," # dwindle
+            "$mod, W, togglegroup,"
+
+            # Move focus with mainMod + arrow keys
+            "$mod, H, exec, ${changegroupactiveormovefocus} l"
+            "$mod SHIFT, H, exec, ${movegroupwindowormovewindoworgroup} l"
+            "$mod, L, exec, ${changegroupactiveormovefocus} r"
+            "$mod SHIFT, L, exec, ${movegroupwindowormovewindoworgroup} r"
+            "$mod, K, movefocus, u"
+            "$mod SHIFT, K, movewindoworgroup, u"
+            "$mod, J, movefocus, d"
+            "$mod SHIFT, J, movewindoworgroup, d"
+
+            # Move focus/workspace/window to different monitor
+            "$mod, slash, focusmonitor, l"
+            "$mod SHIFT, slash, movewindow, mon:l"
+            "$mod CTRL_SHIFT, slash, movecurrentworkspacetomonitor, l"
+            "$mod, at, focusmonitor, r"
+            "$mod SHIFT, at, movewindow, mon:r"
+            "$mod CTRL_SHIFT, at, movecurrentworkspacetomonitor, r"
+
+            # Example special workspace (scratchpad)
+            "$mod, code:21, togglespecialworkspace,"
+            "$mod SHIFT, code:21, movetoworkspace, special"
+
+            # workspaces
+            "$mod, code:16, workspace, 10"
+            "$mod SHIFT, code:16, movetoworkspace, 10"
+            "$mod, code:14, workspace, 1"
+            "$mod SHIFT, code:14, movetoworkspace, 1"
+            "$mod, code:17, workspace, 2"
+            "$mod SHIFT, code:17, movetoworkspace, 2"
+            "$mod, code:13, workspace, 3"
+            "$mod SHIFT, code:13, movetoworkspace, 3"
+            "$mod, code:18, workspace, 4"
+            "$mod SHIFT, code:18, movetoworkspace, 4"
+            "$mod, code:12, workspace, 5"
+            "$mod SHIFT, code:12, movetoworkspace, 5"
+            "$mod, code:19, workspace, 6"
+            "$mod SHIFT, code:19, movetoworkspace, 6"
+            "$mod, code:11, workspace, 7"
+            "$mod SHIFT, code:11, movetoworkspace, 7"
+            "$mod, code:20, workspace, 8"
+            "$mod SHIFT, code:20, movetoworkspace, 8"
+            "$mod, code:15, workspace, 9"
+            "$mod SHIFT, code:15, movetoworkspace, 9"
+          ];
+        bindm = [
+          "$mod, mouse:272, movewindow"
+          "$mod, mouse:273, resizewindow"
+        ];
+        bindel = [
+          ",XF86AudioRaiseVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
+          ",XF86AudioLowerVolume, exec, ${pkgs.wireplumber}/bin/wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+          ",XF86AudioMute, exec, ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          ",XF86AudioMicMute, exec, ${pkgs.wireplumber}/bin/wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+          ",XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl -e4 -n2 set 5%+"
+          ",XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl -e4 -n2 set 5%-"
+        ];
+        bindl = [
+          ", XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl next"
+          ", XF86AudioPause, exec, ${pkgs.playerctl}/bin/playerctl play-pause"
+          ", XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl play-pause"
+          ", XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl previous"
+        ];
+        workspace = [
+          # "Smart gaps" / "No gaps when only"
+          "w[tv1], gapsout:0, gapsin:0"
+          "f[1], gapsout:0, gapsin:0"
+        ];
+        windowrule = [
+          # "Smart gaps" / "No gaps when only"
+          "bordersize 0, floating:0, onworkspace:w[tv1]"
+          "rounding 0, floating:0, onworkspace:w[tv1]"
+          "bordersize 0, floating:0, onworkspace:f[1]"
+          "rounding 0, floating:0, onworkspace:f[1]"
+          # Fix some dragging issues with XWayland
+          "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
+          # Fix IBus
+          # https://github.com/hyprwm/Hyprland/issues/288
+          "nofocus, class:^(ibus-ui-gtk3)$"
+          "float, class:^(ibus-ui-gtk3)$"
+        ];
       };
     };
 
@@ -3456,25 +2548,6 @@ in
                 }
             '';
           };
-        picom.Service.EnvironmentFile = "-${config.xdg.dataHome}/picom/env";
-        polkit-authentication-agent = {
-          Unit = {
-            Description = "Polkit authentication agent";
-            Documentation = "https://gitlab.freedesktop.org/polkit/polkit/";
-            After = [ "graphical-session-pre.target" ];
-            PartOf = [ "graphical-session.target" ];
-          };
-          Install.WantedBy = [ "graphical-session.target" ];
-          Service = {
-            ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-            Restart = "on-failure";
-          };
-        };
-        # https://github.com/nix-community/home-manager/issues/213#issuecomment-829743999
-        polybar = {
-          Unit.After = [ "graphical-session-i3.target" ];
-          Install.WantedBy = lib.mkForce [ "graphical-session-i3.target" ];
-        };
         tmux = {
           Unit.Description = "tmux server";
           Install.WantedBy = [ "default.target" ];
@@ -3510,203 +2583,25 @@ in
           };
         };
       };
-      targets = {
-        graphical-session-i3.Unit = {
-          Description = "i3 X session";
-          BindsTo = [ "graphical-session.target" ];
-          Requisite = [ "graphical-session.target" ];
-          Wants = [ "xdg-autostart.target" ];
-        };
-        xdg-autostart.Unit = {
-          Description = "Run XDG autostart files";
-          Requires = [
-            "xdg-desktop-autostart.target"
-            "graphical-session.target"
-          ];
-          Before = [
-            "xdg-desktop-autostart.target"
-            "graphical-session.target"
-          ];
-          BindsTo = [ "graphical-session.target" ];
-        };
-      };
     };
 
     xdg = {
       enable = true;
       userDirs.enable = true;
+      portal.xdgOpenUsePortal = true;
       configFile = with config.xdg; {
         "curl/.curlrc".text = ''
           write-out "\n"
           silent
           dump-header /dev/stderr
         '';
-        "flameshot/flameshot.ini" = {
-          text = ''
-            [General]
-            contrastOpacity=127
-            contrastUiColor=#4476ff
-            copyPathAfterSave=true
-            disabledTrayIcon=true
-            drawColor=#1e6cc5
-            drawThickness=2
-            saveAfterCopy=true
-            ; saveAfterCopyPath=/home/zeorin/Screenshots
-            savePath=/home/zeorin/Screenshots
-            savePathFixed=false
-            showHelp=false
-            showStartupLaunchMessage=true
-            startupLaunch=false
-            uiColor=#003396
-
-            [Shortcuts]
-            TYPE_ARROW=A
-            TYPE_CIRCLE=C
-            TYPE_CIRCLECOUNT=
-            TYPE_COMMIT_CURRENT_TOOL=Ctrl+Return
-            TYPE_COPY=Ctrl+C
-            TYPE_DRAWER=D
-            TYPE_EXIT=Ctrl+Q
-            TYPE_IMAGEUPLOADER=Return
-            TYPE_MARKER=M
-            TYPE_MOVESELECTION=Ctrl+M
-            TYPE_MOVE_DOWN=Down
-            TYPE_MOVE_LEFT=Left
-            TYPE_MOVE_RIGHT=Right
-            TYPE_MOVE_UP=Up
-            TYPE_OPEN_APP=Ctrl+O
-            TYPE_PENCIL=P
-            TYPE_PIN=
-            TYPE_PIXELATE=B
-            TYPE_RECTANGLE=R
-            TYPE_REDO=Ctrl+Shift+Z
-            TYPE_RESIZE_DOWN=Shift+Down
-            TYPE_RESIZE_LEFT=Shift+Left
-            TYPE_RESIZE_RIGHT=Shift+Right
-            TYPE_RESIZE_UP=Shift+Up
-            TYPE_SAVE=Ctrl+S
-            TYPE_SELECTION=S
-            TYPE_SELECTIONINDICATOR=
-            TYPE_SELECT_ALL=Ctrl+A
-            TYPE_TEXT=T
-            TYPE_TOGGLE_PANEL=Space
-            TYPE_UNDO=Ctrl+Z
-          '';
-          onChange = "${pkgs.writeShellScript "restart flameshot.service" ''
-            ${pkgs.systemd}/bin/systemctl --user restart flameshot.service
-          ''}";
-        };
-        "fcitx5".source = pkgs.symlinkJoin {
-          name = "config-fcitx5";
-          paths = [
-            (pkgs.writeTextDir "config" ''
-              [Hotkey]
-              TriggerKeys=
-              EnumerateWithTriggerKeys=False
-              AltTriggerKeys=
-              EnumerateForwardKeys=
-              EnumerateBackwardKeys=
-              EnumerateSkipFirst=False
-              EnumerateGroupForwardKeys=
-              EnumerateGroupBackwardKeys=
-              ActivateKeys=
-              DeactivateKeys=
-              [Hotkey/PrevPage]
-              0=Up
-              [Hotkey/NextPage]
-              0=Down
-              [Hotkey/PrevCandidate]
-              0=Shift+Tab
-              [Hotkey/NextCandidate]
-              0=Tab
-              [Hotkey/TogglePreedit]
-              0=
-              [Behavior]
-              ActiveByDefault=False
-              ShareInputState=No
-              PreeditEnabledByDefault=False
-              ShowInputMethodInformation=False
-              showInputMethodInformationWhenFocusIn=False
-              CompactInputMethodInformation=False
-              ShowFirstInputMethodInformation=False
-              DefaultPageSize=5
-              OverrideXkbOption=False
-              CustomXkbOption=
-              EnabledAddons=
-              PreloadInputMethod=True
-              AllowInputMethodForPassword=False
-              ShowPreeditForPassword=False
-              [Behavior/DisabledAddons]
-              0=clipboard
-              1=emoji
-              2=imselector
-              3=kimpanel
-              4=notificationitem
-              5=notifications
-              6=spell
-            '')
-            (pkgs.writeTextDir "profile" ''
-              [Groups/0]
-              Name=Default
-              Default Layout=us-dvp
-              DefaultIM=keyboard-us
-              [Groups/0/Items/0]
-              Name=keyboard-us-dvp
-              Layout=
-              [Groups/0/Items/1]
-              Name=keyboard-us
-              Layout=
-              [GroupOrder]
-              0=Default
-            '')
-            (pkgs.writeTextDir "conf/classicui.conf" ''
-              Vertical Candidate List=True
-              WheelForPaging=True
-              PreferTextIcon=False
-              ShowLayoutNameInIcon=False
-              UseInputMethodLanguageToDisplayText=False
-              Theme=Nord-Light
-              DarkTheme=Nord-Dark
-              UseDarkTheme=True
-              UseAccentColor=True
-              PerScreenDPI=False
-              ForceWaylandDPI=${toString config.dpi}
-              EnableFractionalScale=True
-            '')
-            (pkgs.writeTextDir "conf/keyboard.conf" ''
-              PageSize=5
-              EnableEmoji=False
-              EnableQuickPhraseEmoji=True
-              Choose Modifier=None
-              EnableHintByDefault=False
-              Hint Trigger=
-              One Time Hint Trigger=
-              UseNewComposeBehavior=True
-              EnableLongPress=False
-              [PrevCandidate]
-              0=Shift+Tab
-              [NextCandidate]
-              0=Tab
-            '')
-            (pkgs.writeTextDir "conf/quickphrase.conf" ''
-              Choose Modifier=None
-              Spell=False
-              FallbackSpellLanguage=en
-              [TriggerKey]
-              0=Super+period
-            '')
-            (pkgs.writeTextDir "conf/unicode.conf" ''
-              [TriggerKey]
-              0=Control+Alt+Shift+U
-              [DirectUnicodeMode]
-              0=Control+Shift+U
-            '')
-            (pkgs.writeTextDir "conf/xcb.conf" ''
-              Allow Overriding System XKB Settings=False
-              AlwaysSetToGroupLayout=False
-            '')
-          ];
-        };
+        "hypr/xdph.conf".text = ''
+          screencopy {
+            max_fps = 60
+            custom_picker_binary = ${pkgs.hyprland-preview-share-picker}/bin/hyprland-preview-share-picker
+            allow_token_by_default = true
+          }
+        '';
         "kitty/themes/Nord light.conf".text = ''
           # From: https://github.com/ayamir/nord-and-light/blob/master/.config/kitty/polar.conf
           foreground            #2E3440
@@ -3773,9 +2668,6 @@ in
           init-license=LGPL-3.0
           prefix=${dataHome}/npm
           cache=${cacheHome}/npm
-        '';
-        "picom/env-grayscale".text = ''
-          PICOM_SHADER="grayscale"
         '';
         "pipewire/pipewire.conf.d/10-source-rnnoise.conf" = {
           text = ''
@@ -4007,7 +2899,7 @@ in
           bind yg composite js "${pkgs.git}/bin/git clone " + document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git") | clipboard yank
 
           " As above but execute it and open terminal in folder
-          bind ,g js let uri = document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git"); tri.native.run("cd ~/projects; ${pkgs.git}/bin/git clone " + uri + "; cd \"$(${pkgs.coreutils}/bin/basename \"" + uri + "\" .git)\"; ${terminal-emulator}")
+          bind ,g js let uri = document.location.href.replace(/https?:\/\//,"git@").replace("/",":").replace(/$/,".git"); tri.native.run("cd ~/projects; ${pkgs.git}/bin/git clone " + uri + "; cd \"$(${pkgs.coreutils}/bin/basename \"" + uri + "\" .git)\"; ${pkgs.unstable.app2unit}/bin/app2unit-term")
 
           " Handy multiwindow/multitasking binds
           bind gd tabdetach
@@ -4137,6 +3029,7 @@ in
             '')
           ];
         };
+        "uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
         "wireplumber/bluetooth.lua.d/51-bluez-config.lua".text = ''
           bluez_monitor.properties = {
             ["bluez5.enable-sbc-xq"] = true,
@@ -4183,21 +3076,6 @@ in
               React = "sha256-oGSms/Bi07bee19Lq8f/+2cAfb0/0D+c1YKErGZe4wM";
             }
         );
-        "fcitx5/data/quickphrase.d/emoji.mb".source = ./emoji.mb;
-        "fcitx5/data/quickphrase.d/kaomoji.mb".source = ./kaomoji.mb;
-        "fcitx5/data/quickphrase.d/latex.mb".source = ./latex.mb;
-        "fcitx5/themes".source = pkgs.fetchFromGitHub {
-          owner = "tonyfettes";
-          repo = "fcitx5-nord";
-          rev = "bdaa8fb723b8d0b22f237c9a60195c5f9c9d74d1";
-          hash = "sha256-qVo/0ivZ5gfUP17G29CAW0MrRFUO0KN1ADl1I/rvchE=";
-        };
-      };
-      portal = {
-        enable = true;
-        extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
-        xdgOpenUsePortal = true;
-        config.common.default = [ "gtk" ];
       };
     };
 
@@ -4276,7 +3154,7 @@ in
                 Shift <KeyPress> Insert: insert-selection(CLIPBOARD) \n\
                 Ctrl Shift <Key>V:    insert-selection(CLIPBOARD) \n\
                 Ctrl Shift <Key>C:    copy-selection(CLIPBOARD) \n\
-                Ctrl <Btn1Up>: exec-formatted("${pkgs.xdg-utils}/bin/xdg-open '%t'", PRIMARY)
+                Ctrl <Btn1Up>: exec-formatted("${pkgs.unstable.app2unit}/bin/app2unit-open '%t'", PRIMARY)
             '';
           })
         ));
@@ -4290,11 +3168,6 @@ in
           }
         }/src/nord"
       '';
-    };
-
-    i18n.inputMethod = {
-      enable = true;
-      type = "fcitx5";
     };
 
     gtk = {
@@ -4418,6 +3291,29 @@ in
 
     fonts.fontconfig.enable = true;
 
+    dconf.settings = {
+      "desktop/ibus/general" = {
+        embed-preedit-text = true;
+        use-global-engine = true;
+        use-system-keyboard-layout = true;
+        switcher-delay-time = -1;
+      };
+      "desktop/ibus/general/hotkey" = {
+        triggers = [ "ISO_Next_Group" ];
+      };
+      "desktop/ibus/panel" = {
+        show = 0;
+        show-icon-on-systray = true;
+      };
+      "desktop/ibus/panel/emoji" = {
+        hotkey = [
+          "<Control><Shift>e"
+          "XF86EmojiPicker"
+        ];
+        unicode-hotkey = [ "<Control><Shift>u" ];
+      };
+    };
+
     home.packages =
       with pkgs;
       [
@@ -4429,20 +3325,32 @@ in
         asciinema
         (symlinkJoin {
           name = "xdg-autostart-entries";
-          paths = builtins.map makeDesktopItem [
-            {
-              name = "tailscale-systray";
-              desktopName = "tailscale-systray";
-              exec = "${tailscale-systray}/bin/tailscale-systray";
-            }
-          ];
-          postBuild = ''
-            files=("$out/share/applications"/*.desktop)
-            mkdir -p "$out/etc/xdg/autostart"
-            mv "''${files[@]}" "$out/etc/xdg/autostart"
-            rm -rf "$out/share"
-          '';
+          paths =
+            let
+              makeAutostartItem = args: makeDesktopItem (args // { destination = "/etc/xdg/autostart"; });
+            in
+            builtins.map makeAutostartItem [
+              {
+                name = "tailscale-systray";
+                desktopName = "Tailscale SysTray";
+                exec = "${tailscale-systray}/bin/tailscale-systray";
+              }
+              {
+                name = "ibus-daemon";
+                desktopName = "Ibus";
+                type = "Application";
+                exec = "ibus start --type wayland";
+                notShowIn = [
+                  # GNOME will launch ibus using systemd
+                  "GNOME"
+                ];
+              }
+            ];
         })
+        unstable.xdg-terminal-exec
+        unstable.app2unit
+        wev
+        wl-clipboard
         (writeShellScriptBin "edit" ''
           exec $EDITOR "$@"
         '')
@@ -4463,8 +3371,6 @@ in
         libnotify
         file
         tree
-        xsel
-        xclip
         curl
         httpie
         unstable.devenv

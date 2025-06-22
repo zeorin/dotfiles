@@ -19,6 +19,7 @@ in
   imports = [
     inputs.nur.modules.nixos.default
     inputs.home-manager.nixosModules.home-manager
+    outputs.nixosModules.ibus
     ./cachix.nix
     ./logiops.nix
   ];
@@ -56,14 +57,6 @@ in
           outputs.overlays.additions
           outputs.overlays.modifications
           outputs.overlays.unstable-packages
-
-          (_: prev: {
-            slock = prev.slock.overrideAttrs (oldAttrs: {
-              preBuild = "cp ${./slock-config.h} config.h";
-              patches = (oldAttrs.patches or [ ]) ++ [ ./slock-patches.diff ];
-              buildInputs = (oldAttrs.buildInputs or [ ]) ++ [ pkgs.imlib2 ];
-            });
-          })
 
           # Bugfix for steam client to not inhibit screensaver unless there's a game active
           # https://github.com/ValveSoftware/steam-for-linux/issues/5607
@@ -306,19 +299,12 @@ in
 
     # This will additionally add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
-    environment.etc =
-      (lib.mapAttrs' (name: value: {
+    environment.etc = (
+      lib.mapAttrs' (name: value: {
         name = "nix/path/${name}";
         value.source = value.flake;
-      }) config.nix.registry)
-      // {
-        "systemd/system-sleep/post-hibernate-pkill-slock".source =
-          pkgs.writeShellScript "post-hibernate-pkill-slock" ''
-            if [ "$1-$SYSTEMD_SLEEP_ACTION" = "post-hibernate" ]; then
-              ${pkgs.procps}/bin/pkill slock
-            fi
-          '';
-      };
+      }) config.nix.registry
+    );
 
     networking = {
       # Easy network config
@@ -383,12 +369,7 @@ in
         # Option "DPI" "${toString config.dpi} x ${toString config.dpi}"
       '';
 
-      serverFlagsSection = ''
-        Option "StandbyTime"  "5"
-        Option "SuspendTime"  "5"
-        Option "OffTime"      "5"
-        Option "BlankTime"    "5"
-      '';
+      displayManager.gdm.enable = true;
 
       # Configure keymap in X11
       xkb = {
@@ -396,27 +377,27 @@ in
         variant = "dvp,";
         options = "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
       };
-
-      displayManager = {
-        # https://github.com/NixOS/nixpkgs/issues/174099#issuecomment-1201697954
-        sessionCommands = ''
-          ${lib.getBin pkgs.dbus}/bin/dbus-update-activation-environment --systemd --all
-        '';
-        # We need to create at least one session for auto login to work
-        session = [
-          {
-            name = "xsession";
-            manage = "desktop";
-            start = ''
-              ${pkgs.runtimeShell} $HOME/.xsession &
-              waitPID=$!
-            '';
-          }
-        ];
-      };
     };
 
-    services.displayManager.autoLogin.user = "zeorin";
+    i18n.inputMethod = {
+      enable = true;
+      type = "ibus";
+      ibus.package = pkgs.unstable.ibus.overrideAttrs (oldAttrs: {
+        src = pkgs.fetchFromGitHub {
+          owner = "ibus";
+          repo = "ibus";
+          rev = "2a3f38079b63c0023b3647edbf1a22a423b26728";
+          hash = "sha256-HXipYXLKOsoIMvvN64/RLRzIMBmC6YnuKFhgSgpUzCA=";
+        };
+      });
+      ibus.engines = with pkgs.unstable.ibus-engines; [
+        table
+        table-others
+      ];
+    };
+
+    programs.hyprland.enable = true;
+    programs.hyprland.withUWSM = true;
 
     services.libinput.touchpad = {
       accelProfile = "adaptive";
@@ -725,27 +706,6 @@ in
     };
 
     programs.fish.enable = true;
-    # TODO Move slock setup to home.nix (`services.screen-locker`), if possible,
-    # might not be because it's run as root for OOM killer protection
-    programs.slock.enable = true;
-    programs.xss-lock =
-      let
-        dim-screen = pkgs.writeShellScript "dim-screen" ''
-          trap 'exit 0' TERM INT
-          trap "${pkgs.brightnessctl}/bin/brightnessctl --class backlight --device '*' --restore; kill %%" EXIT
-          ${pkgs.brightnessctl}/bin/brightnessctl --class backlight --device '*' --save --exponent=4 set 50%-
-          sleep 2147483647 &
-          wait
-        '';
-      in
-      {
-        enable = true;
-        lockerCommand = "${config.security.wrapperDir}/slock";
-        extraOptions = [ ''--notifier="${dim-screen}"'' ];
-      };
-    systemd.user.services.xss-lock.preStart = ''
-      ${pkgs.xorg.xset}/bin/xset s ${toString (4 * 60)} ${toString (1 * 60)}
-    '';
     # security.pam.services.hibernate-on-multiple-failures = {
     #   name = "hibernate-on-multiple-failures";
     #   text = ''
@@ -755,10 +715,6 @@ in
     # };
     # security.pam.services.login.text =
     #   lib.mkDefault (lib.mkBefore "auth include hibernate-on-multiple-failures");
-    # security.pam.services.slock = {
-    #   name = "slock";
-    #   text = "auth substack login";
-    # };
 
     programs.seahorse.enable = true;
     programs.dconf.enable = true;
