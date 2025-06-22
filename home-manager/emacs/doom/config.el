@@ -20,11 +20,11 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
-(setq doom-font (font-spec :family "Iosevka Nerd Font" :size @12px@ :weight 'light)
-      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size @12px@ :weight 'light)
-      doom-big-font (font-spec :family "Iosevka Nerd Font" :size @18px@ :weight 'light)
-      doom-symbol-font (font-spec :family "Symbols Nerd Font" :size @12px@)
-      doom-serif-font (font-spec :family "Iosevka Nerd Font" :size @12px@ :weight 'light)
+(setq doom-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
+      doom-variable-pitch-font (font-spec :family "Iosevka Aile" :size 12 :weight 'light)
+      doom-big-font (font-spec :family "Iosevka Nerd Font" :size 18 :weight 'light)
+      doom-symbol-font (font-spec :family "Symbols Nerd Font" :size 12)
+      doom-serif-font (font-spec :family "Iosevka Nerd Font" :size 12 :weight 'light)
       nerd-icons-font-family "Iosevka NF Light")
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them

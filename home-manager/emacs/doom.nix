@@ -6,14 +6,17 @@
 }:
 
 let
-  round = x: if ((x / 2.0) >= 0.5) then (builtins.ceil x) else (builtins.floor x);
-  dpiScale = x: round (x * (config.dpi / 96.0));
   inherit (pkgs) doomemacs;
   emacs = config.programs.emacs.finalPackage;
   doomScriptEnvVars = ''
     export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
     export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
-    export PATH="${lib.makeBinPath [ doomemacs emacs ] }:$PATH"
+    export PATH="${
+      lib.makeBinPath [
+        doomemacs
+        emacs
+      ]
+    }:$PATH"
   '';
 in
 {
@@ -151,8 +154,6 @@ in
     };
     "doom/config.el" = {
       source = pkgs.replaceVars ./doom/config.el {
-        "12px" = toString (dpiScale 12);
-        "18px" = toString (dpiScale 18);
         doom-png = ./doom.png;
         inherit (pkgs) nodejs;
         inherit (pkgs.unstable) vscode-js-debug;

@@ -10,10 +10,6 @@
   pkgs,
   ...
 }:
-let
-  round = x: if ((x / 2.0) >= 0.5) then (builtins.ceil x) else (builtins.floor x);
-  dpiScale = x: x * (config.dpi / 96.0);
-in
 
 {
   imports = [
@@ -25,12 +21,6 @@ in
   ];
 
   options = with lib; {
-    dpi = mkOption {
-      type = with types; int;
-      default = 96;
-      example = 192;
-    };
-
     nixpkgs.allowUnfreePackages = mkOption {
       type = with types; (listOf (either str (functionTo bool)));
       default = [ ];
@@ -38,11 +28,6 @@ in
   };
 
   config = {
-
-    specialisation = {
-      "1080p".configuration.dpi = lib.mkForce 96;
-    };
-
     nixpkgs =
       let
         homePkgs =
@@ -100,18 +85,17 @@ in
                 in
                 {
                   nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ makeWrapper ];
-                  buildCommand =
-                    (oldAttrs.buildCommand or "")
-                    + ''
-                      steamBin="$(readlink $out/bin/steam)"
-                      rm $out/bin/steam
-                      makeWrapper $steamBin $out/bin/steam --prefix LD_PRELOAD : ${preloadLibs}/\$PLATFORM/filter_SDL_DisableScreenSaver.so
-                    '';
+                  buildCommand = (oldAttrs.buildCommand or "") + ''
+                    steamBin="$(readlink $out/bin/steam)"
+                    rm $out/bin/steam
+                    makeWrapper $steamBin $out/bin/steam --prefix LD_PRELOAD : ${preloadLibs}/\$PLATFORM/filter_SDL_DisableScreenSaver.so
+                  '';
                 }
               )
             );
           })
-        ] ++ (homePkgs.overlays or [ ]);
+        ]
+        ++ (homePkgs.overlays or [ ]);
 
         config = (homePkgs.config or { }) // {
           # https://github.com/NixOS/nixpkgs/issues/197325#issuecomment-1579420085
@@ -128,7 +112,8 @@ in
           "steam"
           "steam-original"
           "steam-run"
-        ] ++ (homePkgs.allowUnfreePackages or [ ]);
+        ]
+        ++ (homePkgs.allowUnfreePackages or [ ]);
       };
 
     nix = {
@@ -183,9 +168,6 @@ in
       plymouth = {
         enable = true;
         theme = "breeze";
-        extraConfig = ''
-          DeviceScale=${toString (round (dpiScale 1))}
-        '';
       };
 
       initrd.systemd.enable = true;
@@ -349,23 +331,8 @@ in
       useXkbConfig = true;
     };
 
-    environment.variables = {
-      # DPI
-      GDK_SCALE = toString (round (dpiScale 1)); # GTK 3 doesn't accept fractional values; also scales fonts
-      GDK_DPI_SCALE = toString (1.0 / (dpiScale 1.0)); # GTK 4 only; accepts fractional values, but ~GDK_SCALE~ scales UI & fonts, but so do the DPI settings, this scales just the fonts back down
-      QT_AUTO_SCREEN_SCALE_FACTOR = "1";
-      QT_ENABLE_HIGHDPI_SCALING = "1";
-      _JAVA_OPTIONS = "-Dsun.java2d.uiScale=${toString (dpiScale 1.0)}";
-    };
-
     services.xserver = {
       enable = true;
-      inherit (config) dpi;
-      upscaleDefaultCursor = true;
-
-      screenSection = ''
-        # Option "DPI" "${toString config.dpi} x ${toString config.dpi}"
-      '';
 
       displayManager.gdm.enable = true;
 
