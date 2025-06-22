@@ -86,22 +86,6 @@
   # Sensors
   hardware.sensor.iio.enable = true;
 
-  programs.xss-lock =
-    let
-      dim-screen = pkgs.writeShellScript "dim-screen" ''
-        min_brightness="40%"
-
-        trap "exit 0" TERM INT
-        trap "${pkgs.brightnessctl}/bin/brightnessctl --device='*' --restore; kill %%" EXIT
-        ${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set "$min_brightness"
-        sleep 2147483647 &
-        wait
-      '';
-    in
-    {
-      extraOptions = [ ''--notifier="${dim-screen}"'' ];
-    };
-
   services.xserver.monitorSection = ''
     DisplaySize 294 166
   '';
