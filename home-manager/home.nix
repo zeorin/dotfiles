@@ -11,10 +11,6 @@
 }@moduleArgs:
 
 let
-  round = x: if ((x / 2.0) >= 0.5) then (builtins.ceil x) else (builtins.floor x);
-
-  dpiScale = x: round (x * (config.dpi / 96.0));
-
   myKey = "0x5E1C0971FE4F665A";
 
   colors = {
@@ -133,12 +129,6 @@ in
   ];
 
   options = with lib; {
-    dpi = mkOption {
-      type = with types; int;
-      default = moduleArgs.osConfig.dpi or 96;
-      example = 192;
-    };
-
     nixpkgs.allowUnfreePackages = mkOption {
       type = with types; (listOf (either str (functionTo bool)));
       default = [ ];
@@ -1520,7 +1510,6 @@ in
               # rofi command. Make sure to have "$@" as last argument
               _rofi () {
                   ${config.programs.rofi.package}/bin/rofi \
-                    -dpi ${toString config.dpi} \
                     -i \
                     -kb-accept-custom "" \
                     -kb-row-down "${remove-binding "Control+n" kb-row-down}" \
@@ -1665,7 +1654,7 @@ in
             window = {
               location = mkLiteral "north";
               anchor = mkLiteral "north";
-              y-offset = mkLiteral "${toString (dpiScale 280)}px";
+              y-offset = mkLiteral "280px";
               width = mkLiteral "40em";
               background-color = mkLiteral "@bg0";
             };
@@ -2206,7 +2195,7 @@ in
             max_icon_size = 60;
             icon_path = "${pkgs.zafiro-icons}/share/icons/Zafiro-icons";
             enable_recursive_icon_lookup = "true";
-            dmenu = "${config.programs.rofi.package}/bin/rofi -dpi ${toString config.dpi} -dmenu -p dunst";
+            dmenu = "${config.programs.rofi.package}/bin/rofi -dmenu -p dunst";
             mouse_left_click = "close_current";
             mouse_middle_click = "context";
             mouse_right_click = "do_action";
@@ -3117,7 +3106,6 @@ in
           "Xft.hinting" = 1;
           "Xft.antialias" = 1;
           "Xft.rgba" = "rgb";
-          "Xft.dpi" = config.dpi;
         }
         # xterm
         // (mapAttrs' (name: value: nameValuePair "XTerm.${name}" value) (
@@ -3131,7 +3119,7 @@ in
             backarrowKey = false;
             locale = false;
             utf8 = true;
-            internalBorder = dpiScale 11;
+            internalBorder = 11;
             visualbell = true;
             bellIsUrgent = true;
             fullscreen = "never";
@@ -3273,7 +3261,7 @@ in
             '';
           };
         name = "Colloid-nord-light-cursors";
-        size = dpiScale 24;
+        size = 24;
       };
       font = {
         package = pkgs.geist-font;
