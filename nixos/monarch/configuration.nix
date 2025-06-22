@@ -1,22 +1,24 @@
 {
   inputs,
   lib,
-  pkgs,
+  config,
   ...
 }:
 
 {
   imports = with inputs.nixos-hardware.nixosModules; [
-    common-pc-laptop
-    common-pc-laptop-ssd
-    common-cpu-intel-cpu-only
-    common-gpu-intel-kaby-lake
-    common-hidpi
+    common-pc
+    common-pc-ssd
+    common-cpu-amd
     ./hardware-configuration.nix
     ../common/configuration.nix
   ];
 
-  dpi = 216; # × 2.25
+  nixpkgs.config.allowUnfree = true;
+
+  services.xserver.videoDrivers = lib.mkForce [ "nvidia" ];
+  hardware.nvidia.open = false;
+  hardware.nvidia.powerManagement.enable = true;
 
   users.groups.uinput.gid = lib.mkForce 984;
 
@@ -28,14 +30,16 @@
       };
     };
 
-    extraModprobeConfig = ''
-      # Fix wifi/bluetooth interference
-      # https://askubuntu.com/a/1135543/425119
-      options iwlwifi bt_coex_active=Y
-
-      # Fix speakers
-      options snd_hda_intel index=1 model=alc285-hp-spectre-x360
-    '';
+    # Uncomment for early KMS (better resolution for Plymouth)
+    # Requires large boot partition
+    # initrd.kernelModules = [
+    #   "nvidia"
+    #   "nvidia_modeset"
+    #   "nvidia_uvm"
+    #   "nvidia_drm"
+    # ];
+    # extraModulePackages = [ config.hardware.nvidia.package ];
+    blacklistedKernelModules = [ "nouveau" ];
   };
 
   fileSystems = {
@@ -55,38 +59,5 @@
     };
   };
 
-  powerManagement.cpuFreqGovernor = "powersave";
-
-  services.thermald = {
-    enable = true;
-    # Generated using https://github.com/intel/dptfxtract
-    configFile = ./thermal-conf.xml.auto;
-  };
-  services.udev.extraRules = ''
-    # Adjust screen brightness when AC power is [un]plugged
-    SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 50%-"
-    SUBSYSTEM=="power_supply", ATTR{online}=="1", RUN+="${pkgs.brightnessctl}/bin/brightnessctl --device='*' --exponent=4 set 50%+"
-    # Suspend the system when battery level drops to 5% or lower
-    SUBSYSTEM=="power_supply", ATTR{status}=="Discharging", ATTR{capacity}=="[0-5]", RUN+="${pkgs.systemd}/bin/systemctl hibernate"
-  '';
-
   networking.hostName = "monarch";
-  networking.interfaces.wlp2s0.useDHCP = true;
-
-  console = {
-    packages = with pkgs; [ terminus_font ];
-    font = "ter-v32b";
-  };
-
-  # Overlays
-  nixpkgs.overlays = [
-    (_: prev: { vaapiIntel = prev.vaapiIntel.override { enableHybridCodec = true; }; })
-  ];
-
-  # Sensors
-  hardware.sensor.iio.enable = true;
-
-  services.xserver.monitorSection = ''
-    DisplaySize 294 166
-  '';
 }
