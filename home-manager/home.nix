@@ -146,209 +146,6 @@ let
     '';
   };
   terminal-emulator = "${config.programs.kitty.package}/bin/kitty";
-
-  collectPathArgs = ''
-    paths=()
-    while [ "$#" -gt 0 ]; do
-      arg="$1"
-      [[ "$arg" =~ ^--?.+ ]] && break
-      paths+=("$arg"); shift
-    done
-  '';
-  pathArgs = ''"''${paths[@]}"'';
-  collectFlakeFlags = ''
-    flakeFlags=()
-    while [ "$#" -gt 0 ]; do
-      arg="$1"
-      case "$arg" in
-        ${
-          builtins.concatStringsSep "|" [
-            "build"
-            "bundle"
-            "copy"
-            "daemon"
-            "derivation"
-            "develop"
-            "doctor"
-            "edit"
-            "eval"
-            "flake"
-            "fmt"
-            "hash"
-            "help"
-            "help-stores"
-            "key"
-            "log"
-            "nar"
-            "path-info"
-            "print-dev-env"
-            "profile"
-            "realisation"
-            "registry"
-            "repl"
-            "run"
-            "search"
-            "shell"
-            "show-config"
-            "store"
-            "upgrade-nix"
-            "why-depends"
-          ]
-        })
-          break
-          ;;
-        *)
-          flakeFlags+=("$arg"); shift
-          ;;
-      esac
-    done
-  '';
-  flakeFlags = ''"''${flakeFlags[@]}"'';
-  nixNomArgs = "--log-format internal-json --verbose";
-  nixBuildCmdWithNomArgs = buildCmd: ''
-    ${collectPathArgs}
-    ${buildCmd} ${pathArgs} ${nixNomArgs} "$@"
-  '';
-  nixShellCmdWithNomArgs = shellCmd: ''
-    ${shellCmd} ${nixNomArgs} "$@"
-  '';
-  nixStoreCmdWithNomArgs = storeCmd: ''
-    operation="$1"; shift
-    case "$operation" in
-      --realise|-r)
-        ${collectPathArgs}
-        ${storeCmd} "$operation" ${pathArgs} ${nixNomArgs} "$@"
-        ;;
-      *)
-        ${storeCmd} "$operation" "$@"
-        ;;
-    esac
-  '';
-  nixWithNomArgs =
-    nix:
-    pkgs.symlinkJoin {
-      name = "nix-with-nom-args-${nix.version}";
-      paths =
-        (lib.attrsets.mapAttrsToList pkgs.writeShellScriptBin {
-          nix = ''
-            program="$(basename $0)"
-            case "$program" in
-              nix)
-                ${collectFlakeFlags}
-                command="$1"; shift
-                case "$command" in
-                  build)
-                    ${nixBuildCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} build"}
-                    ;;
-                  shell)
-                    ${nixShellCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} shell"}
-                    ;;
-                  store)
-                    ${nixStoreCmdWithNomArgs "${nix}/bin/nix ${flakeFlags} store"}
-                    ;;
-                  *)
-                    ${nix}/bin/nix ${flakeFlags} "$command" "$@"
-                    ;;
-                esac
-                ;;
-              *)
-                "${nix}/bin/$program" "$@"
-                ;;
-            esac
-          '';
-          nix-build = nixBuildCmdWithNomArgs "${nix}/bin/nix-build";
-          nix-shell = nixShellCmdWithNomArgs "${nix}/bin/nix-shell";
-          nix-store = nixStoreCmdWithNomArgs "${nix}/bin/nix-store";
-        })
-        ++ [ nix ];
-    };
-  nixNomPkgs =
-    {
-      nix ? null,
-      nixos-rebuild ? null,
-      home-manager ? null,
-    }:
-    lib.attrsets.mapAttrs pkgs.writeShellScriptBin (
-      (
-        if nix != null then
-          {
-            nix = ''
-              program="$(basename $0)"
-              case "$program" in
-                nix)
-                  ${collectFlakeFlags}
-                  command="$1"; shift
-                  case "$command" in
-                    build|shell|develop)
-                      ${pkgs.nix-output-monitor}/bin/nom ${flakeFlags} "$command" "$@"
-                      ;;
-                    *)
-                      ${nix}/bin/nix ${flakeFlags} "$command" "$@"
-                      ;;
-                  esac
-                  ;;
-                *)
-                  "${nix}/bin/$program" "$@"
-                  ;;
-              esac
-            '';
-            nix-build = ''
-              ${pkgs.nix-output-monitor}/bin/nom-build "$@"
-            '';
-            nix-shell = ''
-              ${pkgs.nix-output-monitor}/bin/nom-shell "$@"
-            '';
-            nix-store = ''
-              ${nixWithNomArgs nix}/bin/nix-store "$@" \
-                |& ${pkgs.nix-output-monitor}/bin/nom --json
-            '';
-          }
-        else
-          { }
-      )
-      // (
-        if nixos-rebuild != null then
-          {
-            nixos-rebuild = ''
-              ${pkgs.expect}/bin/unbuffer \
-                ${
-                  nixos-rebuild.override (old: {
-                    nix = nixWithNomArgs old.nix;
-                  })
-                }/bin/nixos-rebuild "$@" \
-                |& ${pkgs.nix-output-monitor}/bin/nom --json
-            '';
-          }
-        else
-          { }
-      )
-      // (
-        if home-manager != null then
-          {
-            home-manager = ''
-              PATH="${nixWithNomArgs pkgs.nix}/bin:$PATH" \
-                ${pkgs.expect}/bin/unbuffer \
-                ${home-manager}/bin/home-manager "$@" \
-                |& ${pkgs.nix-output-monitor}/bin/nom --json
-            '';
-          }
-        else
-          { }
-      )
-    );
-  nomAliases = pkgs: lib.attrsets.mapAttrs (name: pkg: "${pkg}/bin/${name}") (nixNomPkgs pkgs);
-  wrapWithNom =
-    let
-      inherit (pkgs) symlinkJoin;
-    in
-    (
-      pkgs:
-      symlinkJoin {
-        name = "wrapped-with-nom";
-        paths = (builtins.attrValues (nixNomPkgs pkgs)) ++ (builtins.attrValues pkgs);
-      }
-    );
-
 in
 {
   # You can import other home-manager modules here
@@ -518,79 +315,77 @@ in
             ${config.home.homeDirectory}/Screenshots
         '';
       };
-      shellAliases =
-        # (nomAliases { inherit (pkgs) nix nixos-rebuild home-manager; }) // {
-        {
-          g = "git";
-          e = "edit";
-          m = "neomutt";
-          o = "xdg-open";
-          s = "systemctl";
-          t = "tail -f";
-          d = "docker";
-          j = "journalctl -xe";
-          ls = "${pkgs.lsd}/bin/lsd";
-          l = "ls -l";
-          la = "ls -a";
-          lla = "ls -la";
-          lt = "ls --tree";
-          tree = "${pkgs.lsd}/bin/lsd --tree";
-          cat = "bat";
-          rg = "batgrep";
-          ip = "ip -color=auto";
-          grep = "grep --color=auto";
-          diff = "batdiff";
-          # Use `pass` to input SSH key passprases
-          # TODO: fall back to regular passphrase entry if no GPG smartcard is
-          # found / no key entry is found in the pass database
-          ssh = toString (
-            pkgs.writeShellScript "pass-ssh" ''
+      shellAliases = {
+        g = "git";
+        e = "edit";
+        m = "neomutt";
+        o = "xdg-open";
+        s = "systemctl";
+        t = "tail -f";
+        d = "docker";
+        j = "journalctl -xe";
+        ls = "${pkgs.lsd}/bin/lsd";
+        l = "ls -l";
+        la = "ls -a";
+        lla = "ls -la";
+        lt = "ls --tree";
+        tree = "${pkgs.lsd}/bin/lsd --tree";
+        cat = "bat";
+        rg = "batgrep";
+        ip = "ip -color=auto";
+        grep = "grep --color=auto";
+        diff = "batdiff";
+        # Use `pass` to input SSH key passprases
+        # TODO: fall back to regular passphrase entry if no GPG smartcard is
+        # found / no key entry is found in the pass database
+        ssh = toString (
+          pkgs.writeShellScript "pass-ssh" ''
+            set -euo pipefail
+
+            export SSH_ASKPASS_REQUIRE=force
+            export SSH_ASKPASS="${pkgs.writeShellScript "pass-askpass" ''
               set -euo pipefail
 
-              export SSH_ASKPASS_REQUIRE=force
-              export SSH_ASKPASS="${pkgs.writeShellScript "pass-askpass" ''
-                set -euo pipefail
+              die() {
+                echo "$@" >&2
+                exit 1
+              }
 
-                die() {
-                  echo "$@" >&2
-                  exit 1
-                }
+              keyfile="$(echo "$1" | ${pkgs.gnused}/bin/sed -ne "s/^.*\(\/.*\)['\"]*:.*$/\1/")"
+              [ -z "$keyfile" ] && die "Could not find key filename in prompt\n\"$1\""
+              echo "Extracted key filename \"$keyfile\"" >&2
 
-                keyfile="$(echo "$1" | ${pkgs.gnused}/bin/sed -ne "s/^.*\(\/.*\)['\"]*:.*$/\1/")"
-                [ -z "$keyfile" ] && die "Could not find key filename in prompt\n\"$1\""
-                echo "Extracted key filename \"$keyfile\"" >&2
+              comment="$(${pkgs.openssh}/bin/ssh-keygen -l -f "$keyfile" | ${pkgs.gawk}/bin/awk '{print $3}')"
+              [ -z "$comment" ] && die "Could not find comment in key \"$keyfile\""
+              echo "Comment from keyfile \"$keyfile\" is \"$comment\"" >&2
 
-                comment="$(${pkgs.openssh}/bin/ssh-keygen -l -f "$keyfile" | ${pkgs.gawk}/bin/awk '{print $3}')"
-                [ -z "$comment" ] && die "Could not find comment in key \"$keyfile\""
-                echo "Comment from keyfile \"$keyfile\" is \"$comment\"" >&2
+              sshdir="''${PASSWORDSTORE_SSH_DIR:-ssh}"
+              passphrase="$(${pkgs.pass}/bin/pass show "$sshdir/$comment")"
+              [ -z "$passphrase" ] && die "Could not find passphrase for \"$comment\""
+              echo "Got passphrase for comment \"$comment\"" >&2
 
-                sshdir="''${PASSWORDSTORE_SSH_DIR:-ssh}"
-                passphrase="$(${pkgs.pass}/bin/pass show "$sshdir/$comment")"
-                [ -z "$passphrase" ] && die "Could not find passphrase for \"$comment\""
-                echo "Got passphrase for comment \"$comment\"" >&2
+              echo "$passphrase"
+            ''}"
 
-                echo "$passphrase"
-              ''}"
+            ${pkgs.openssh}/bin/ssh "$@"
+          ''
+        );
+        # Use `pass` to input the sudo password
+        sudo = toString (
+          pkgs.writeShellScript "pass-sudo" ''
+            set -euo pipefail
 
-              ${pkgs.openssh}/bin/ssh "$@"
-            ''
-          );
-          # Use `pass` to input the sudo password
-          sudo = toString (
-            pkgs.writeShellScript "pass-sudo" ''
+            export SUDO_ASKPASS="${pkgs.writeShellScript "pass-sudo-askpass" ''
               set -euo pipefail
+              hostname="''${HOSTNAME:-"$(hostname)"}"
+              hostsdir="''${PASSWORDSTORE_HOSTS_DIR:-hosts}"
+              ${pkgs.pass}/bin/pass "$hostsdir/$hostname/$USER" | head -n1
+            ''}"
 
-              export SUDO_ASKPASS="${pkgs.writeShellScript "pass-sudo-askpass" ''
-                set -euo pipefail
-                hostname="''${HOSTNAME:-"$(hostname)"}"
-                hostsdir="''${PASSWORDSTORE_HOSTS_DIR:-hosts}"
-                ${pkgs.pass}/bin/pass "$hostsdir/$hostname/$USER" | head -n1
-              ''}"
-
-              /usr/bin/env sudo --askpass "$@"
-            ''
-          );
-        };
+            /usr/bin/env sudo --askpass "$@"
+          ''
+        );
+      };
     };
 
     programs = {
