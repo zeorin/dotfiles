@@ -505,10 +505,10 @@ tasks."
 			(let* ((ignored-things (funcall fn workspace-root))
 			       (ignored-files-regex-list (car ignored-things))
 			       (ignored-directories-regex-list (cadr ignored-things))
-			       (cmd (format "git clean --dry-run -X '%s' | cut -d' ' -f3" workspace-root))
+			       (cmd (format "cd '%s'; git clean --dry-run -Xd | cut -d' ' -f3" workspace-root))
 			       (gitignored-things (split-string (shell-command-to-string cmd) "\n" t))
-			       (gitignored-files (seq-remove (lambda (line) (string-match "[/\\\\]\\'" line)) gitignored-things))
-			       (gitignored-directories (seq-filter (lambda (line) (string-match "[/\\\\]\\'" line)) gitignored-things))
+			       (gitignored-files (seq-remove (lambda (line) (string-match-p "[/\\\\]\\'" line)) gitignored-things))
+			       (gitignored-directories (seq-filter (lambda (line) (string-match-p "[/\\\\]\\'" line)) gitignored-things))
 			       (gitignored-files-regex-list
 				(mapcar (lambda (file) (concat "[/\\\\]" (regexp-quote file) "\\'"))
 					gitignored-files))
