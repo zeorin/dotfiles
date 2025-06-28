@@ -366,23 +366,23 @@
       #   options = "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
       # };
 
-      displayManager = {
-        # https://github.com/NixOS/nixpkgs/issues/174099#issuecomment-1201697954
-        # sessionCommands = ''
-        #   ${lib.getBin pkgs.dbus}/bin/dbus-update-activation-environment --systemd --all
-        # '';
-        # We need to create at least one session for auto login to work
-        # session = [
-        #   {
-        #     name = "xsession";
-        #     manage = "desktop";
-        #     start = ''
-        #       ${pkgs.runtimeShell} $HOME/.xsession &
-        #       waitPID=$!
-        #     '';
-        #   }
-        # ];
-      };
+      # displayManager = {
+      #   https://github.com/NixOS/nixpkgs/issues/174099#issuecomment-1201697954
+      #   sessionCommands = ''
+      #     ${lib.getBin pkgs.dbus}/bin/dbus-update-activation-environment --systemd --all
+      #   '';
+      #   We need to create at least one session for auto login to work
+      #   session = [
+      #     {
+      #       name = "xsession";
+      #       manage = "desktop";
+      #       start = ''
+      #         ${pkgs.runtimeShell} $HOME/.xsession &
+      #         waitPID=$!
+      #       '';
+      #     }
+      #   ];
+      # };
     };
 
     # services.displayManager.autoLogin.user = "zeorin";
@@ -399,7 +399,7 @@
 
     # Rebind some keys
     services.keyd = {
-      enable = true;
+      enable = false;
       keyboards.default = {
         ids = [ "*" ];
         settings = {

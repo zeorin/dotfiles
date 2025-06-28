@@ -7,10 +7,11 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-24_11.url = "github:NixOS/nixpkgs/nixos-24.11";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
-    home-manager.url = "github:zeorin/home-manager/release-25.05-file-mode";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     nur.url = "github:nix-community/NUR";
@@ -25,7 +26,7 @@
     nixos-vscode-server.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-software-center.url = "github:snowfallorg/nix-software-center";
-    nix-software-center.inputs.nixpkgs.follows = "nixpkgs";
+    nix-software-center.inputs.nixpkgs.follows = "nixpkgs-24_11";
 
     nixos-conf-editor.url = "github:snowfallorg/nixos-conf-editor";
     nixos-conf-editor.inputs.nixpkgs.follows = "nixpkgs";

@@ -4319,23 +4319,23 @@ in
               }
             )
             {
-                  CSS = "sha256-n0Ol5IJ3kmZhbqgcsp8hlxYD/l/TdCVpmrn0p3dzR3o=";
-                  Docker = "sha256-69W497dypApA8cS6MbTGFiDq8qYX+D9vGoh/qFESFRA=";
-                  Emacs_Lisp = "sha256-tvfcCThxyvJ84USc4vBolrEIefjs4EQw/CnVTifXDXs=";
-                  Emmet = "sha256-bTn7dJJ4fc+e4OzaWj4z0eeAZ7+wlutM3c2JTKU34QU=";
-                  Express = "sha256-8QfWHZeVwW219+PGerHWWu7Vzz7fRjXRsF2cZnreFTg=";
-                  ExtJS = "sha256-l8drgOXanSk1V8p5eoUCt8WInyIGfFH3XQE7AOYCcYs=";
-                  Font_Awesome = "sha256-V5A/EIloIvU5MoOMUgJ9mCSoBXnCI+qiX+giFydipp4=";
-                  HTML = "sha256-X1zGwycrVYl0+GqjBl/cI5wE82BjGfYjJz0FIYkRCgs=";
-                  JavaScript = "sha256-PtpLSsrwXjWEz+OJrGvTROVcH7ADFa/ln8rPbYpWuY4=";
-                  Lo-Dash = "sha256-irVO2nDTbqlLVBaqkTR5MfxHyuoDQda3dfXs64bcqS8=";
-                  Markdown = "sha256-WRjWe1frF9Ys68a1jVJPqZkzEWQNr5OGaHnWbBijRGc=";
-                  MySQL = "sha256-+5DgF2ODy+ha16IrY+5thmn/dv8b6uRDqswHSQrv1/A=";
-                  Nginx = "sha256-T3QzwUf2BwJwL2kwRsfCArcjpFn/ks8bFtXFC3Y25nA=";
-                  NodeJS = "sha256-h6Xc0Neo3aN/sjdN7g0MApxN4qvJzSx/t0wzSvVCJuo=";
-                  PostgreSQL = "sha256-DCSVOQMIQZsSsKghtQearwsFkQeCGI654ERox4iDXk8=";
-                  Python_3 = "sha256-u5LNRLzIyZ5UtRatGMtp/9o45YlbeR/oZwDWUguEEL8=";
-                  React = "sha256-34mzNVbd+/OKKAzURyRgTOiHUDRSkOdUe6QTW2XvwUo=";
+              CSS = "sha256-n0Ol5IJ3kmZhbqgcsp8hlxYD/l/TdCVpmrn0p3dzR3o=";
+              Docker = "sha256-69W497dypApA8cS6MbTGFiDq8qYX+D9vGoh/qFESFRA=";
+              Emacs_Lisp = "sha256-tvfcCThxyvJ84USc4vBolrEIefjs4EQw/CnVTifXDXs=";
+              Emmet = "sha256-bTn7dJJ4fc+e4OzaWj4z0eeAZ7+wlutM3c2JTKU34QU=";
+              Express = "sha256-8QfWHZeVwW219+PGerHWWu7Vzz7fRjXRsF2cZnreFTg=";
+              ExtJS = "sha256-l8drgOXanSk1V8p5eoUCt8WInyIGfFH3XQE7AOYCcYs=";
+              Font_Awesome = "sha256-V5A/EIloIvU5MoOMUgJ9mCSoBXnCI+qiX+giFydipp4=";
+              HTML = "sha256-X1zGwycrVYl0+GqjBl/cI5wE82BjGfYjJz0FIYkRCgs=";
+              JavaScript = "sha256-PtpLSsrwXjWEz+OJrGvTROVcH7ADFa/ln8rPbYpWuY4=";
+              Lo-Dash = "sha256-irVO2nDTbqlLVBaqkTR5MfxHyuoDQda3dfXs64bcqS8=";
+              Markdown = "sha256-WRjWe1frF9Ys68a1jVJPqZkzEWQNr5OGaHnWbBijRGc=";
+              MySQL = "sha256-+5DgF2ODy+ha16IrY+5thmn/dv8b6uRDqswHSQrv1/A=";
+              Nginx = "sha256-T3QzwUf2BwJwL2kwRsfCArcjpFn/ks8bFtXFC3Y25nA=";
+              NodeJS = "sha256-h6Xc0Neo3aN/sjdN7g0MApxN4qvJzSx/t0wzSvVCJuo=";
+              PostgreSQL = "sha256-DCSVOQMIQZsSsKghtQearwsFkQeCGI654ERox4iDXk8=";
+              Python_3 = "sha256-u5LNRLzIyZ5UtRatGMtp/9o45YlbeR/oZwDWUguEEL8=";
+              React = "sha256-34mzNVbd+/OKKAzURyRgTOiHUDRSkOdUe6QTW2XvwUo=";
             }
         );
         "fcitx5/data/quickphrase.d/emoji.mb".source = ./emoji.mb;
