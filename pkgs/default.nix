@@ -10,6 +10,8 @@ with pkgs;
 {
   base16-tridactyl = callPackage ./base16-tridactyl { };
 
+  big-bag-kbd-trix-xkb = callPackage ./big-bag-kbd-trix-xkb { };
+
   codemod = callPackage ./codemod { };
 
   chemacs2 = callPackage ./chemacs2 { };
