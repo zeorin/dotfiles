@@ -1784,15 +1784,31 @@ in
       };
       tmux = {
         enable = true;
-        clock24 = true;
-        keyMode = "vi";
+
+        sensibleOnTop = true;
         mouse = true;
+        focusEvents = true;
+        aggressiveResize = true;
+        clock24 = true;
+        escapeTime = 0;
+        historyLimit = 50000;
+
+        keyMode = "vi";
         shortcut = "Space";
         terminal = "tmux-256color";
 
         extraConfig = ''
           # Vim-style selection
+          unbind-key -T copy-mode-vi Space
           bind-key -T copy-mode-vi v send-keys -X begin-selection
+          bind-key -T copy-mode-vi y send-keys -X copy-selection
+
+          # Don't cancel copy mode on mouse selection
+          bind -T copy-mode MouseDragEnd1Pane send -X copy-selection
+          bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
+
+          # Don't start a login shell
+          set -g default-command "''${SHELL}"
 
           # Show session selector (default to showing only unattached sessions)
           bind-key s choose-tree -sZ -f '#{?session_attached,0,1}'
@@ -1806,36 +1822,95 @@ in
           set-option -g set-titles-string '#{window_name}'
 
           # Clipboard integration
-          set-option -g set-clipboard on
+          set-option -g set-clipboard external
 
+          # XXX GPG env vars?
           set-option -g update-environment 'DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY TERM'
 
-          # Don't try to interpret Escape key sequences
-          set-option -sg escape-time 0
+          # Set the RGB capability if the environment variable COLORTERM is truecolor or 24 bit
+          # https://github.com/tmux/tmux/issues/4300#issuecomment-2967808922
+          %if "#{==:#{COLORTERM},truecolor}"
+            set -as terminal-features ",*-:RGB"
+          %elif "#{==:#{COLORTERM},24bit}"
+            set -as terminal-features ",*-:RGB"
+          %endif
         '';
 
         plugins = with pkgs.tmuxPlugins; [
           pain-control
           nord
           {
-            plugin = better-mouse-mode;
+            plugin = mighty-scroll;
             extraConfig = ''
-              set-option -g @scroll-without-changing-pane 'on'
-              set-option -g @emulate-scroll-for-no-mouse-alternate-buffer 'on'
+              set -g @mighty-scroll-interval 3
+              set -g @mighty-scroll-show-indicator on
+              set -g @mighty-scroll-select-pane off
             '';
           }
           {
-            plugin = mkTmuxPlugin {
-              pluginName = "transient-status";
-              version = "unstable-2024-07-07";
-              rtpFilePath = "main.tmux";
-              src = pkgs.fetchFromGitHub {
-                owner = "TheSast";
-                repo = "tmux-transient-status";
-                rev = "c3fcd5180999a7afc075d2dd37d37d1b1b82f7e8";
-                sha256 = "sha256-fOIn8hVVBDFVLwzmPZP+Bf3ccxy/hsAnKIXYD9yv3BE=";
+            plugin = tmux-which-key.overrideAttrs (oldAttrs: {
+              configYaml = lib.generators.toYAML { } {
+                # The starting index to use for the command-alias option, used for macros
+                # (required). This value must be at least 200
+                command_alias_start_index = 200;
+                # The keybindings that open the action menu (required)
+                keybindings = {
+                  prefix_table = "Space"; # The keybinding for the prefix key table (required)
+                  root_table = "C-Space"; # The keybinding for the root key table (optional)
+                };
+                # The menu title config (optional)
+                title = {
+                  style = "align=centre,bold"; # The title style
+                  prefix = "tmux"; # A prefix added to every menu title
+                  prefix_style = "fg=green,align=centre,bold"; # The prefix style
+                };
+                # The menu position (optional)
+                position = {
+                  x = "R";
+                  y = "P";
+                };
+                # The root menu items (required)
+                items = [
+                  {
+                    name = "Next pane";
+                    key = "space"; # The key that triggers this action
+                    command = "next-pane"; # A command to run
+                  }
+                  {
+                    name = "Respawn pane";
+                    key = "R";
+                    macro = "restart-pane"; # A custom macro (defined above)
+                  }
+                  {
+                    separator = true; # A menu separator
+                  }
+                  {
+                    name = "+Layout"; # A submenu
+                    key = "l";
+                    # The submenu items
+                    menu = [
+                      {
+                        name = "Next";
+                        key = "l";
+                        command = "nextl";
+                        transient = true; # Whether to keep the menu open until ESC is pressed
+                      }
+                    ];
+                  }
+                ];
               };
-            };
+              passAsFile = (oldAttrs.passAsFile or [ ]) ++ [ "configYaml" ];
+              preInstall = (oldAttrs.preInstall or "") + ''
+                mkdir -p $out/plugin
+                cp $configYamlPath $out/plugin/config.yaml
+              '';
+            });
+            extraConfig = ''
+              set -g @tmux-which-key-disable-autobuild 1
+            '';
+          }
+          {
+            plugin = transient-status;
             extraConfig = ''
               set-option -g status 'off'
             '';
