@@ -3,6 +3,7 @@
 
 {
   pkgs ? (import ../nixpkgs.nix) { },
+  prev ? (import <nixpkgs>) { },
 }:
 
 with pkgs;
@@ -37,4 +38,12 @@ with pkgs;
   nord-dircolors = callPackage ./nord-dircolors { };
 
   open-in-editor = callPackage ./open-in-editor { };
+
+  tmuxPlugins =
+    prev.tmuxPlugins
+    // (recurseIntoAttrs (
+      prev.callPackage ./tmux-plugins {
+        pkgs = prev.__splicedPackages;
+      }
+    ));
 }
