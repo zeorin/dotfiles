@@ -6,7 +6,7 @@
 
 stdenvNoCC.mkDerivation {
   pname = "base16-tridactyl";
-  version = "0-unstable-2025-05-10";
+  version = "0-unstable-2023-01-13";
 
   src = fetchFromGitHub {
     owner = "tridactyl";
@@ -22,9 +22,5 @@ stdenvNoCC.mkDerivation {
     cp -R $src $out
   '';
 
-  passthru.updateScript = nix-update-script {
-    extraArgs = [
-      "--version=branch=master"
-    ];
-  };
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 }

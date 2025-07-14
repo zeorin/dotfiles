@@ -151,7 +151,7 @@ in
   # You can import other home-manager modules here
   imports = [
     inputs.nur.modules.homeManager.default
-    inputs.nix-index-database.hmModules.nix-index
+    inputs.nix-index-database.homeModules.nix-index
     inputs.nixos-vscode-server.homeModules.default
     ./emacs
   ];
@@ -2205,13 +2205,13 @@ in
               name = "direnv";
               publisher = "mkhl";
               version = "0.6.1";
-              sha256 = "sha256-5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
+              hash = "sha256-5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
             }
             {
               name = "remote-containers";
               publisher = "ms-vscode-remote";
               version = "0.247.0";
-              sha256 = "sha256-gWFNjkx2+zjkpKDC5a1qIZ5SbcDN8ahtXDPX1upWUg8=";
+              hash = "sha256-gWFNjkx2+zjkpKDC5a1qIZ5SbcDN8ahtXDPX1upWUg8=";
             }
           ];
       };
@@ -4998,14 +4998,14 @@ in
             name = "san-francisco-pro";
             src = pkgs.fetchurl {
               url = "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg";
-              hash = "sha256-IccB0uWWfPCidHYX6sAusuEZX906dVYo8IaqeX7/O88=";
+              hash = "sha256-090HwtgILtK/KGoOzcwz1iAtoiShKAVjiNhUDQtO+gQ=";
             };
           })
           (mkAppleFont {
             name = "san-francisco-compact";
             src = pkgs.fetchurl {
               url = "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg";
-              hash = "sha256-PlraM6SwH8sTxnVBo6Lqt9B6tAZDC//VCPwr/PNcnlk=";
+              hash = "sha256-z70mts7oFaMTt4q7p6M7PzSw4auOEaiaJPItYqUpN0A=";
             };
           })
           (mkAppleFont {

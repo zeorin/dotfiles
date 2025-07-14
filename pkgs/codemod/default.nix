@@ -1,29 +1,30 @@
 {
+  lib,
   fetchFromGitHub,
   stdenv,
-  stdenvNoCC,
   nodejs,
-  nodePackages,
   makeWrapper,
   cacert,
   element-desktop,
   pnpm_9,
+  prisma-engines,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "codemod-cli";
-  version = "1.0.3";
+  pname = "codemod";
+  version = "0.18.9";
 
   src = fetchFromGitHub {
     owner = "codemod-com";
     repo = "codemod";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-mnj6IBrAOekw6xNDS36Vwyi0t89u2ImE3RbcJZD1lCQ=";
+    rev = "codemod@${finalAttrs.version}";
+    hash = "sha256-DkR1EYwC1uHcagZAVNNiw8p26uxmTYvSGYTaeWRVCnA=";
   };
 
   pnpmDeps = pnpm_9.fetchDeps {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-y5HISy1FCrYgbhNOEwdOSuQMaxJcrCv7tX9NdctyZJk=";
+    hash = "sha256-aNnPOh7bZ3BGJHzLBykqz5e+9aUHgIh7olva0NvtTeA=";
   };
 
   nativeBuildInputs = [
@@ -33,6 +34,12 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [ makeWrapper ];
+
+  PRISMA_SCHEMA_ENGINE_BINARY = lib.getExe' prisma-engines "schema-engine";
+  PRISMA_QUERY_ENGINE_BINARY = lib.getExe' prisma-engines "query-engine";
+  PRISMA_QUERY_ENGINE_LIBRARY = "${prisma-engines}/lib/libquery_engine.node";
+  PRISMA_INTROSPECTION_ENGINE_BINARY = lib.getExe' prisma-engines "introspection-engine";
+  PRISMA_FMT_BINARY = lib.getExe' prisma-engines "prisma-fmt";
 
   buildPhase = ''
     runHook preBuild
@@ -60,4 +67,11 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   dontFixup = true;
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version-regex"
+      "codemod@(.*)"
+    ];
+  };
 })

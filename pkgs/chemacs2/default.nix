@@ -6,7 +6,7 @@
 
 stdenvNoCC.mkDerivation {
   pname = "chemacs2";
-  version = "unstable-2025-05-10";
+  version = "0-unstable-2023-01-20";
 
   src = fetchFromGitHub {
     owner = "plexus";
@@ -22,9 +22,5 @@ stdenvNoCC.mkDerivation {
     cp -R $src $out
   '';
 
-  passthru.updateScript = nix-update-script {
-    extraArgs = [
-      "--version=branch=main"
-    ];
-  };
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 }

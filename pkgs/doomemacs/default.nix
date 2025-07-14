@@ -7,13 +7,13 @@
 
 stdenvNoCC.mkDerivation {
   pname = "doomemacs";
-  version = "2.0.9-unstable-2025-05-22";
+  version = "2.0.9-unstable-2025-07-13";
 
   src = fetchFromGitHub {
     owner = "doomemacs";
     repo = "doomemacs";
-    rev = "cfea950e60961e45fc43a820d855eb6212856126";
-    hash = "sha256-hPaLeu/1CoWADviDwcBxV7VTRFb831TF2ND7ArLzpfQ=";
+    rev = "ed9190ef005829c7a2331e12fb36207794c5ad75";
+    hash = "sha256-nU/UmyYQAcPHGJEC1mVm40LY3LlA7df9khckbvMB5x8=";
   };
 
   patches = [
@@ -28,7 +28,7 @@ stdenvNoCC.mkDerivation {
     mkdir $out
 
     install -m644 -t $out $src/.dir-locals.el
-    install -m644 -t $out $src/.doomrc
+    install -m644 -t $out $src/.doom
     install -m644 -t $out $src/README.md
     install -m644 -t $out $src/early-init.el
 
@@ -46,9 +46,5 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
-  passthru.updateScript = nix-update-script {
-    extraArgs = [
-      "--version=branch=master"
-    ];
-  };
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 }
