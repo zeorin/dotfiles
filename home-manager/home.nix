@@ -473,6 +473,7 @@ in
               "gfx.font_rendering.fontconfig.max_generic_substitutions" = 127;
               # Use system emoji
               "font.name-list.emoji" = "emoji";
+              "gfx.font_rendering.opentype_svg.enabled" = false;
               # HTTPS-only
               "dom.security.https_only_mode" = true;
               "dom.security.https_only_mode_ever_enabled" = true;
@@ -1434,7 +1435,7 @@ in
               ))
               (concatMapStringsSep "," (codepoint: "U+${codepoint}"))
             ]
-          } Noto Color Emoji
+          } Twitter Color Emoji
         '';
       };
       less = {
@@ -3948,7 +3949,12 @@ in
       style.name = "kvantum";
     };
 
-    fonts.fontconfig.enable = true;
+    fonts.fontconfig = {
+      enable = true;
+      defaultFonts = {
+        emoji = [ "Twitter Color Emoji" ];
+      };
+    };
 
     dconf.settings = {
       "desktop/ibus/general" = {
@@ -4387,11 +4393,11 @@ in
 
         # Emoji
         # emojione
-        # twitter-color-emoji
+        twitter-color-emoji
         # twemoji-color-font
-        noto-fonts-emoji
+        # noto-fonts-emoji
         # noto-fonts-emoji-blob-bin
-        joypixels
+        # joypixels
 
         # Classic fonts
         eb-garamond
