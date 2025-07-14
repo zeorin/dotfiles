@@ -61,7 +61,7 @@
       spotify
       telegram-desktop
       zoom-us
-      teams
+      teams-for-linux
     ];
   };
   users.users.kids = {
