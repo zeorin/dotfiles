@@ -327,7 +327,6 @@
         "B48EAD"
       ];
       earlySetup = true;
-      keyMap = lib.mkDefault "dvorak-programmer";
       useXkbConfig = true;
     };
 
@@ -336,17 +335,22 @@
       MOZ_X11_EGL = "1";
     };
 
+    environment.sessionVariables = {
+      XKB_CONFIG_ROOT = config.services.xserver.xkb.dir;
+    };
+
     services.xserver = {
       enable = true;
-
       displayManager.gdm.enable = true;
 
       # Configure keymap in X11
       xkb = {
+        dir = "${pkgs.big-bag-kbd-trix-xkb}/etc/X11/xkb";
         layout = "us,us";
         variant = "dvp,";
-        options = "grp:alt_space_toggle,grp_led:scroll,shift:both_capslock_cancel,compose:menu,terminate:ctrl_alt_bksp";
+        options = "grp:alt_space_toggle,shift:both_capslock";
       };
+      exportConfiguration = true;
     };
 
     i18n.inputMethod = {
