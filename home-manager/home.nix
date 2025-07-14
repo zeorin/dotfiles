@@ -209,12 +209,7 @@ in
       keyboard = {
         layout = "us,us";
         variant = "dvp,";
-        options = [
-          "grp:alt_space_toggle"
-          "grp_led:scroll"
-          "compose:menu"
-          "terminate:ctrl_alt_bksp"
-        ];
+        options = "grp:alt_space_toggle,shift:both_capslock";
       };
       sessionVariables = with config.xdg; {
         LESS = "-FRXix2$";
@@ -2535,6 +2530,7 @@ in
         input = {
           kb_layout = "us,us";
           kb_variant = "dvp,";
+          kb_options = "grp:alt_space_toggle,shift:both_capslock";
         };
         bind =
           let
@@ -3227,6 +3223,7 @@ in
         "wget/wgetrc".text = ''
           hsts-file = ${cacheHome}/wget-hsts
         '';
+        "xkb".source = "${pkgs.big-bag-kbd-trix-xkb}/share/X11/xkb";
       };
       dataFile = {
         # TODO: This should be a systemd service that periodically checks for
