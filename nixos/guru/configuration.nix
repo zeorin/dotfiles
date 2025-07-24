@@ -3,7 +3,6 @@
   config,
   lib,
   pkgs,
-  modulesPath,
   ...
 }:
 
@@ -94,6 +93,7 @@
       };
     };
 
+    kernelPackages = pkgs.unstable.linuxPackages_zen;
     extraModulePackages = with config.boot.kernelPackages; [ ddcci-driver ];
     kernelModules = [
       "ddcci-backlight"
@@ -103,6 +103,7 @@
       options kvm_amd nested=1
       options kvm ignore_msrs=1 report_ignored_msrs=0
     '';
+    binfmt.emulatedSystems = [ "aarch64-linux" ];
   };
   services.udev.packages = with pkgs; [
     vial
@@ -144,14 +145,6 @@
       "nodiratime"
       "discard"
     ];
-  };
-
-  services.tlp.settings = {
-    SOUND_POWER_SAVE_ON_AC = 0;
-    USB_EXCLUDE_PHONE = 1;
-    USB_EXCLUDE_BTUSB = 1;
-    USB_DENYLIST = lib.concatStringsSep " " [ "03f0:002a" ];
-    WOL_DISABLE = "N";
   };
 
   networking.hostName = "guru";

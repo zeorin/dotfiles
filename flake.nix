@@ -7,6 +7,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     # Also see the 'unstable-packages' overlay at 'overlays/default.nix'.
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-24_11.url = "github:NixOS/nixpkgs/nixos-24.11";
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
@@ -24,6 +25,9 @@
 
     nixos-vscode-server.url = "github:nix-community/nixos-vscode-server";
     nixos-vscode-server.inputs.nixpkgs.follows = "nixpkgs";
+
+    nix-software-center.url = "github:zeorin/nix-software-center";
+    nix-software-center.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -80,6 +84,12 @@
           };
           modules = [ ./nixos/monarch ];
         };
+        ruby = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs outputs;
+          };
+          modules = [ ./nixos/ruby ];
+        };
       };
 
       # Standalone home-manager configuration entrypoint
@@ -97,6 +107,13 @@
             modules = [ ./home-manager/home.nix ];
           };
           "zeorin@monarch" = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit inputs outputs;
+            };
+            modules = [ ./home-manager/home.nix ];
+          };
+          "zeorin@ruby" = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
             extraSpecialArgs = {
               inherit inputs outputs;

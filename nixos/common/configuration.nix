@@ -181,15 +181,12 @@
         "quiet"
         "udev.log_level=3"
       ];
-      kernelPackages = pkgs.unstable.linuxPackages_zen;
       extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
       kernelModules = [ "v4l2loopback" ];
       extraModprobeConfig = ''
         options v4l2loopback devices=1 exclusive_caps=1 video_nr=10 card_label="OBS Camera"
       '';
       supportedFilesystems.ntfs = true;
-
-      binfmt.emulatedSystems = [ "aarch64-linux" ];
     };
 
     services.udev.packages = with pkgs; [
@@ -261,14 +258,6 @@
       enable = true;
       cpuFreqGovernor = lib.mkDefault "performance";
     };
-    services.tlp = {
-      enable = true;
-      settings = {
-        CPU_SCALING_GOVERNOR_ON_AC = "performance";
-        CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-        NMI_WATCHDOG = 0;
-      };
-    };
 
     systemd.sleep.extraConfig = "HibernateDelaySec=4h";
     services.logind.lidSwitch = "suspend-then-hibernate";
@@ -304,6 +293,18 @@
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_ZA.UTF-8";
+
+    i18n.extraLocaleSettings = {
+      LC_ADDRESS = "en_ZA.UTF-8";
+      LC_IDENTIFICATION = "en_ZA.UTF-8";
+      LC_MEASUREMENT = "en_ZA.UTF-8";
+      LC_MONETARY = "en_ZA.UTF-8";
+      LC_NAME = "en_ZA.UTF-8";
+      LC_NUMERIC = "en_ZA.UTF-8";
+      LC_PAPER = "en_ZA.UTF-8";
+      LC_TELEPHONE = "en_ZA.UTF-8";
+      LC_TIME = "en_ZA.UTF-8";
+    };
 
     console = {
       font = lib.mkDefault "Lat2-Terminus16";
@@ -342,7 +343,7 @@
       xkb = {
         dir = "${pkgs.big-bag-kbd-trix-xkb}/etc/X11/xkb";
         layout = "us,us";
-        variant = "dvp,";
+        variant = ",dvp";
         options = "grp:alt_space_toggle,shift:both_capslock";
       };
       exportConfiguration = true;
@@ -474,6 +475,7 @@
     security.polkit.enable = true;
 
     # Enable sound.
+    hardware.alsa.enablePersistence = true;
     security.rtkit.enable = true;
     services.pipewire = {
       audio.enable = true;
@@ -481,7 +483,8 @@
       alsa.support32Bit = true;
       pulse.enable = true;
     };
-    hardware.alsa.enablePersistence = true;
+
+    services.flatpak.enable = true;
 
     # Location-based stuff
     services.geoclue2.enable = true;
@@ -492,6 +495,7 @@
     # Define a user account. Don't forget to set a password with ‘passwd’.
     users.users.zeorin = {
       isNormalUser = true;
+      description = "Xandor Schiefer";
       shell = pkgs.fish;
       group = "zeorin";
       extraGroups = [
