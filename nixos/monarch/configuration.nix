@@ -2,6 +2,7 @@
   inputs,
   lib,
   config,
+  pkgs,
   ...
 }:
 
@@ -14,14 +15,6 @@
     ../common/configuration.nix
   ];
 
-  nixpkgs.config.allowUnfree = true;
-
-  services.xserver.videoDrivers = lib.mkForce [ "nvidia" ];
-  hardware.nvidia.open = false;
-  hardware.nvidia.powerManagement.enable = true;
-
-  users.groups.uinput.gid = lib.mkForce 984;
-
   boot = {
     initrd.luks.devices = {
       cryptroot = {
@@ -30,6 +23,7 @@
       };
     };
 
+    kernelPackages = pkgs.linuxPackages;
     # Uncomment for early KMS (better resolution for Plymouth)
     # Requires large boot partition
     # initrd.kernelModules = [
@@ -60,4 +54,59 @@
   };
 
   networking.hostName = "monarch";
+
+  # Enable the GNOME Desktop Environment.
+  services.xserver.desktopManager.gnome.enable = true;
+
+  # Don't autostart `keyd`
+  systemd.services.keyd.wantedBy = lib.mkForce [ ];
+
+  # Web browsers
+  programs.firefox.enable = true;
+  programs.chromium.enable = true;
+
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+
+  # List packages installed in system profile. To search, run:
+  # $ nix search wget
+  environment.systemPackages = with pkgs; [
+    inputs.nix-software-center.packages.${system}.nix-software-center
+  ];
+
+  environment.sessionVariables = {
+    LIBVA_DRIVER_NAME = "nvidia";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+  };
+
+  services.xserver.videoDrivers = lib.mkForce [ "nvidia" ];
+  hardware.nvidia.open = false;
+  hardware.nvidia.powerManagement.enable = true;
+  hardware.graphics.extraPackages = with pkgs; [ nvidia-vaapi-driver ];
+  hardware.graphics.extraPackages32 = with pkgs.pkgsi686Linux; [ nvidia-vaapi-driver ];
+
+  users.groups.uinput.gid = lib.mkForce 984;
+
+  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.users.emily = {
+    isNormalUser = true;
+    description = "Emily Dyer-Schiefer";
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "lp"
+    ];
+    packages = with pkgs; [
+      audacity
+      davinci-resolve
+      google-chrome
+      maestral-gui
+      notion-app-enhanced
+      openshot-qt
+      spotify
+      telegram-desktop
+      zoom-us
+      teams
+    ];
+  };
 }
