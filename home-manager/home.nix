@@ -4073,6 +4073,25 @@ in
         sigil
         (calibre.overrideAttrs (oldAttrs: {
           buildInputs = oldAttrs.buildInputs ++ (with python3Packages; [ pycryptodome ]);
+          # https://github.com/NixOS/nixpkgs/issues/420293
+          installCheckPhase = ''
+            runHook preInstallCheck
+
+            ETN='--exclude-test-name'
+            EXCLUDED_FLAGS=(
+              $ETN 'test_7z'  # we don't include 7z support
+              $ETN 'test_zstd'  # we don't include zstd support
+              $ETN 'test_qt'  # we don't include svg or webp support
+              $ETN 'test_import_of_all_python_modules'  # explores actual file paths, gets confused
+              $ETN 'test_websocket_basic'  # flakey
+              $ETN 'test_recipe_browser_webengine'  # QRhiGles2: Failed to create temporary context
+              $ETN 'test_unrar'
+            )
+
+            python setup.py test ''${EXCLUDED_FLAGS[@]}
+
+            runHook postInstallCheck
+          '';
         }))
         gnome-calculator
         file-roller
