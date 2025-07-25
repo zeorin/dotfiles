@@ -101,7 +101,7 @@
       davinci-resolve
       google-chrome
       maestral-gui
-      notion-app-enhanced
+      notion-app
       openshot-qt
       spotify
       telegram-desktop
