@@ -30,6 +30,8 @@ with pkgs;
 
   newpipelist = callPackage ./newpipelist { };
 
+  notion-app = callPackage ./notion-app { };
+
   nord-dircolors = callPackage ./nord-dircolors { };
 
   open-in-editor = callPackage ./open-in-editor { };
