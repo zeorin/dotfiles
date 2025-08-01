@@ -6,6 +6,7 @@
   config,
   pkgs,
   inputs,
+  outputs,
   ...
 }@moduleArgs:
 
@@ -136,9 +137,10 @@ let
 in
 {
   # You can import other home-manager modules here
-  imports = [
+  imports = (builtins.attrValues outputs.homeModules) ++ [
     inputs.nix-index-database.homeModules.nix-index
     ./emacs
+    ./oama
   ];
 
   config = {
