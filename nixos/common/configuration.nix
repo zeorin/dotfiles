@@ -225,6 +225,7 @@
     };
 
     environment.systemPackages = with pkgs; [
+      inputs.nix-software-center.packages.${system}.nix-software-center
       moreutils
       usbutils
       pciutils
@@ -348,6 +349,13 @@
       };
       exportConfiguration = true;
     };
+
+    # Enable the GNOME Desktop Environment.
+    services.xserver.desktopManager.gnome.enable = true;
+
+    # Web browsers
+    programs.firefox.enable = true;
+    programs.chromium.enable = true;
 
     i18n.inputMethod = {
       enable = true;
