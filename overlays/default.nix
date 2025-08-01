@@ -11,6 +11,19 @@
     # example = prev.example.overrideAttrs (oldAttrs: rec {
     # ...
     # });
+    oama = prev.oama.overrideAttrs (old: {
+      nativeBuildInputs = [ final.makeBinaryWrapper ];
+      postInstall = ''
+        wrapProgram $out/bin/oama \
+          --prefix PATH : ${
+            final.lib.makeBinPath [
+              final.coreutils
+              final.libsecret
+              final.gnupg
+            ]
+          }
+      '';
+    });
   };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will
