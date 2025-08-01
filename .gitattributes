@@ -1,1 +1,3 @@
 flake.lock	binary
+secrets/**	binary
+keys/**		binary
