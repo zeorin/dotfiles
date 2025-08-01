@@ -11,11 +11,10 @@
 }:
 
 {
-  imports = [
+  imports = (builtins.attrValues outputs.nixosModules) ++ [
     inputs.nur.modules.nixos.default
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
-    outputs.nixosModules.ibus
     ./cachix.nix
     ./logiops.nix
   ];
