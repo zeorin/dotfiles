@@ -6,7 +6,6 @@
   outputs,
   lib,
   config,
-  options,
   pkgs,
   ...
 }:
@@ -20,101 +19,69 @@
     ./logiops.nix
   ];
 
-  options = with lib; {
-    nixpkgs.allowUnfreePackages = mkOption {
-      type = with types; (listOf (either str (functionTo bool)));
-      default = [ ];
-    };
-  };
-
   config = {
-    nixpkgs =
-      let
-        homePkgs =
-          if ((options.home-manager or null) != null) then
-            (outputs.homeConfigurations."zeorin@${config.networking.hostName}".config.nixpkgs or { })
-          else
-            { };
-      in
-      {
-        overlays = [
-          # Add overlays your own flake exports (from overlays and pkgs dir):
-          outputs.overlays.additions
-          outputs.overlays.modifications
-          outputs.overlays.unstable-packages
+    nixpkgs = {
+      config.allowUnfree = true;
 
-          # Bugfix for steam client to not inhibit screensaver unless there's a game active
-          # https://github.com/ValveSoftware/steam-for-linux/issues/5607
-          # https://github.com/tejing1/nixos-config/blob/master/overlays/steam-fix-screensaver/default.nix
-          (final: prev: {
-            steam = (
-              prev.steam.overrideAttrs (
-                oldAttrs:
-                let
-                  inherit (builtins) concatStringsSep attrValues mapAttrs;
-                  inherit (final)
-                    stdenv
-                    stdenv_32bit
-                    runCommandWith
-                    runCommandLocal
-                    makeWrapper
-                    ;
-                  platforms = {
-                    x86_64 = 64;
-                    i686 = 32;
-                  };
-                  preloadLibFor =
-                    bits:
-                    assert bits == 64 || bits == 32;
-                    runCommandWith {
-                      stdenv = if bits == 64 then stdenv else stdenv_32bit;
-                      runLocal = false;
-                      name = "filter_SDL_DisableScreenSaver.${toString bits}bit.so";
-                      derivationArgs = { };
-                    } "gcc -shared -fPIC -ldl -m${toString bits} -o $out ${./filter_SDL_DisableScreenSaver.c}";
-                  preloadLibs = runCommandLocal "filter_SDL_DisableScreenSaver" { } (
-                    concatStringsSep "\n" (
-                      attrValues (
-                        mapAttrs (platform: bits: ''
-                          mkdir -p $out/${platform}
-                          ln -s ${preloadLibFor bits} $out/${platform}/filter_SDL_DisableScreenSaver.so
-                        '') platforms
-                      )
+      overlays = [
+        # Add overlays your own flake exports (from overlays and pkgs dir):
+        outputs.overlays.additions
+        outputs.overlays.modifications
+        outputs.overlays.unstable-packages
+
+        # Bugfix for steam client to not inhibit screensaver unless there's a game active
+        # https://github.com/ValveSoftware/steam-for-linux/issues/5607
+        # https://github.com/tejing1/nixos-config/blob/master/overlays/steam-fix-screensaver/default.nix
+        (final: prev: {
+          steam = (
+            prev.steam.overrideAttrs (
+              oldAttrs:
+              let
+                inherit (builtins) concatStringsSep attrValues mapAttrs;
+                inherit (final)
+                  stdenv
+                  stdenv_32bit
+                  runCommandWith
+                  runCommandLocal
+                  makeWrapper
+                  ;
+                platforms = {
+                  x86_64 = 64;
+                  i686 = 32;
+                };
+                preloadLibFor =
+                  bits:
+                  assert bits == 64 || bits == 32;
+                  runCommandWith {
+                    stdenv = if bits == 64 then stdenv else stdenv_32bit;
+                    runLocal = false;
+                    name = "filter_SDL_DisableScreenSaver.${toString bits}bit.so";
+                    derivationArgs = { };
+                  } "gcc -shared -fPIC -ldl -m${toString bits} -o $out ${./filter_SDL_DisableScreenSaver.c}";
+                preloadLibs = runCommandLocal "filter_SDL_DisableScreenSaver" { } (
+                  concatStringsSep "\n" (
+                    attrValues (
+                      mapAttrs (platform: bits: ''
+                        mkdir -p $out/${platform}
+                        ln -s ${preloadLibFor bits} $out/${platform}/filter_SDL_DisableScreenSaver.so
+                      '') platforms
                     )
-                  );
-                in
-                {
-                  nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ makeWrapper ];
-                  buildCommand = (oldAttrs.buildCommand or "") + ''
-                    steamBin="$(readlink $out/bin/steam)"
-                    rm $out/bin/steam
-                    makeWrapper $steamBin $out/bin/steam --prefix LD_PRELOAD : ${preloadLibs}/\$PLATFORM/filter_SDL_DisableScreenSaver.so
-                  '';
-                }
-              )
-            );
-          })
-        ]
-        ++ (homePkgs.overlays or [ ]);
-
-        config = (homePkgs.config or { }) // {
-          # https://github.com/NixOS/nixpkgs/issues/197325#issuecomment-1579420085
-          allowUnfreePredicate =
-            pkg:
-            let
-              names = lib.filter lib.isString config.nixpkgs.allowUnfreePackages;
-              predicates = lib.filter lib.isFunction config.nixpkgs.allowUnfreePackages;
-            in
-            (builtins.elem (lib.getName pkg) names) || (lib.lists.any (p: p pkg) predicates);
-        };
-
-        allowUnfreePackages = [
-          "steam"
-          "steam-original"
-          "steam-run"
-        ]
-        ++ (homePkgs.allowUnfreePackages or [ ]);
-      };
+                  )
+                );
+              in
+              {
+                nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [ makeWrapper ];
+                buildCommand = (oldAttrs.buildCommand or "") + ''
+                  steamBin="$(readlink $out/bin/steam)"
+                  rm $out/bin/steam
+                  makeWrapper $steamBin $out/bin/steam --prefix LD_PRELOAD : ${preloadLibs}/\$PLATFORM/filter_SDL_DisableScreenSaver.so
+                '';
+              }
+            )
+          );
+        })
+      ];
+    };
 
     nix = {
       daemonCPUSchedPolicy = "idle";
