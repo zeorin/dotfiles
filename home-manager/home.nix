@@ -6,7 +6,6 @@
   config,
   pkgs,
   inputs,
-  outputs,
   ...
 }@moduleArgs:
 
@@ -142,67 +141,7 @@ in
     ./emacs
   ];
 
-  options = with lib; {
-    nixpkgs.allowUnfreePackages = mkOption {
-      type = with types; (listOf (either str (functionTo bool)));
-      default = [ ];
-    };
-  };
-
   config = {
-    nixpkgs = lib.mkIf (!(moduleArgs.osConfig.home-manager.useGlobalPkgs or false)) {
-      # You can add overlays here
-      overlays = [
-        # Add overlays your own flake exports (from overlays and pkgs dir):
-        outputs.overlays.additions
-        outputs.overlays.modifications
-        outputs.overlays.unstable-packages
-      ];
-
-      # Configure your nixpkgs instance
-      config = {
-        joypixels.acceptLicense = true;
-        # https://github.com/NixOS/nixpkgs/issues/197325#issuecomment-1579420085
-        allowUnfreePredicate =
-          pkg:
-          let
-            names = lib.filter lib.isString config.nixpkgs.allowUnfreePackages;
-            predicates = lib.filter lib.isFunction config.nixpkgs.allowUnfreePackages;
-          in
-          (builtins.elem (lib.getName pkg) names) || (lib.lists.any (p: p pkg) predicates);
-      };
-
-      allowUnfreePackages = [
-        "steam" # protontricks
-        "steam-run" # protontricks
-        "steam-unwrapped" # protontricks
-        "corefonts"
-        "vista-fonts"
-        "joypixels"
-        "xkcd-font"
-        "san-francisco-pro"
-        "san-francisco-compact"
-        "san-francisco-mono"
-        "new-york"
-        "symbola"
-        "spotify"
-        "google-chrome"
-        "netflix-via-google-chrome"
-        "netflix-icon"
-        "enhancer-for-youtube"
-        "slack"
-        "discord"
-        "zoom"
-        "code"
-        "vscode"
-        "vscode-extension-ms-vscode-remote-remote-ssh"
-        "cudatoolkit"
-        "cudatoolkit-11-cudnn"
-        "cudatoolkit-11.8-tensorrt"
-        "aspell-dict-en-science"
-      ];
-    };
-
     home = {
       username = "zeorin";
       homeDirectory = "/home/${config.home.username}";
