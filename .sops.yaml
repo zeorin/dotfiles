@@ -1,0 +1,9 @@
+keys:
+  - &admin_zeorin 863f093acf82d2c86fd7fb745e1c0971fe4f665a
+  - &server_guru 308eb76c8ef44442ab2a345b27764535545f05b9
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+    - pgp:
+      - *admin_zeorin
+      - *server_guru

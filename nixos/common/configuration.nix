@@ -14,6 +14,7 @@
   imports = [
     inputs.nur.modules.nixos.default
     inputs.home-manager.nixosModules.home-manager
+    inputs.sops-nix.nixosModules.sops
     outputs.nixosModules.ibus
     ./cachix.nix
     ./logiops.nix
@@ -495,6 +496,11 @@
       useUserPackages = true;
       backupFileExtension = "bak";
       users.zeorin = import ../../home-manager/home.nix;
+    };
+
+    sops = {
+      defaultSopsFile = ./secrets/secrets.yaml;
+      secrets = { };
     };
 
     environment.pathsToLink = [

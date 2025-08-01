@@ -14,6 +14,9 @@
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+
     nur.url = "github:nix-community/NUR";
     nur.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
@@ -53,7 +56,9 @@
         # Devshell for bootstrapping
         # Acessible through 'nix develop' or 'nix-shell' (legacy)
         devShells = import ./shell.nix {
-          pkgs = pkgs.appendOverlays (builtins.attrValues outputs.overlays);
+          pkgs = pkgs.appendOverlays (
+            (builtins.attrValues outputs.overlays) ++ [ inputs.sops-nix.overlays.default ]
+          );
         };
       }
     )
