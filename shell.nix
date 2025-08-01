@@ -20,6 +20,7 @@
       nix-update
       sops
       sops-import-keys-hook
+      oama
     ];
   };
 }
