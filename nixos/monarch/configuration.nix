@@ -23,7 +23,6 @@
       };
     };
 
-    kernelPackages = pkgs.linuxPackages;
     # Uncomment for early KMS (better resolution for Plymouth)
     # Requires large boot partition
     # initrd.kernelModules = [
@@ -55,24 +54,11 @@
 
   networking.hostName = "monarch";
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.desktopManager.gnome.enable = true;
-
   # Don't autostart `keyd`
   systemd.services.keyd.wantedBy = lib.mkForce [ ];
 
-  # Web browsers
-  programs.firefox.enable = true;
-  programs.chromium.enable = true;
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    inputs.nix-software-center.packages.${system}.nix-software-center
-  ];
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";

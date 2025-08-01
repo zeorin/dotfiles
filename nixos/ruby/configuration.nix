@@ -19,28 +19,13 @@
     ../common/configuration.nix
   ];
 
-  boot.kernelPackages = pkgs.linuxPackages;
-
   networking.hostName = "ruby"; # Define your hostname.
-
-  # Enable the GNOME Desktop Environment.
-  services.xserver.desktopManager.gnome.enable = true;
 
   # Don't autostart `keyd`
   systemd.services.keyd.wantedBy = lib.mkForce [ ];
 
-  # Web browsers
-  programs.firefox.enable = true;
-  programs.chromium.enable = true;
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    inputs.nix-software-center.packages.${system}.nix-software-center
-  ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.emily = {
