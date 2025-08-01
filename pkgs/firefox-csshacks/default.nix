@@ -6,13 +6,13 @@
 
 stdenvNoCC.mkDerivation {
   pname = "firefox-csshacks";
-  version = "0-unstable-2025-06-29";
+  version = "0-unstable-2025-07-27";
 
   src = fetchFromGitHub {
     owner = "MrOtherGuy";
     repo = "firefox-csshacks";
-    rev = "bedf5da5134360f5031dbd5ea78f0ccb2937c99b";
-    hash = "sha256-XmBzgKFCHz3uE45NhUpbAYi4OP939wE8biufgudDzrc=";
+    rev = "14d2fa0d0320fa98f7c4334e901d2b34adfc8090";
+    hash = "sha256-etgH1ugB6+KGeNFKik2ArE/yU1uryjE+fkJ0RMyWiJo=";
   };
 
   dontConfigure = true;
