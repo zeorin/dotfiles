@@ -3501,6 +3501,7 @@ in
         wireshark
         websocat
         vim
+        qtpass
         open-in-editor
         universal-ctags
         zip
