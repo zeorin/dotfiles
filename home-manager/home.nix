@@ -54,7 +54,8 @@ let
         EOF
       '';
       sessionChooser = pkgs.writeShellScript "tmux-session-chooser" ''
-        if [ -z "$TMUX" ] && \
+        if [ "$TERM" != "dumb" ] && \
+          [ -z "$TMUX" ] && \
           [ -z "$EMACS" ] && \
           [ -z "$VIM" ] && \
           [ -z "$INSIDE_EMACS" ] && \
@@ -86,7 +87,8 @@ let
       sessionChooserFish = pkgs.writeScript "tmux-session-chooser.fish" ''
         #!${pkgs.fish}/bin/fish
 
-        if [ -z "$TMUX" ] && \
+        if [ "$TERM" != "dumb" ] && \
+          [ -z "$TMUX" ] && \
           [ -z "$EMACS" ] && \
           [ -z "$VIM" ] && \
           [ -z "$INSIDE_EMACS" ] && \
