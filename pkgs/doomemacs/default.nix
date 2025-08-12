@@ -7,18 +7,14 @@
 
 stdenvNoCC.mkDerivation {
   pname = "doomemacs";
-  version = "2.0.9-unstable-2025-07-13";
+  version = "2.0.9-unstable-2025-09-19";
 
   src = fetchFromGitHub {
     owner = "doomemacs";
     repo = "doomemacs";
-    rev = "ed9190ef005829c7a2331e12fb36207794c5ad75";
-    hash = "sha256-nU/UmyYQAcPHGJEC1mVm40LY3LlA7df9khckbvMB5x8=";
+    rev = "ba189678558efe0ae6b9a56a45d7935f4698ddc8";
+    hash = "sha256-ZNFtkMQMVlWBrvQWnHtY/Iry+em6Fr2Ug5ZvFPONEm4=";
   };
-
-  patches = [
-    ./dap-js.patch
-  ];
 
   nativeBuildInputs = [ makeWrapper ];
 
