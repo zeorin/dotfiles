@@ -137,7 +137,6 @@ in
 {
   # You can import other home-manager modules here
   imports = [
-    inputs.nur.modules.homeManager.default
     inputs.nix-index-database.homeModules.nix-index
     ./emacs
   ];
