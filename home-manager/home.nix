@@ -139,7 +139,6 @@ in
   imports = [
     inputs.nur.modules.homeManager.default
     inputs.nix-index-database.homeModules.nix-index
-    inputs.nixos-vscode-server.homeModules.default
     ./emacs
   ];
 
@@ -2162,30 +2161,6 @@ in
           }
         ];
       };
-      vscode = with pkgs; {
-        enable = true;
-        package = vscode-fhs;
-        profiles.default.extensions =
-          (with vscode-extensions; [
-            bbenoist.nix
-            vscodevim.vim
-            ms-vscode-remote.remote-ssh
-          ])
-          ++ vscode-utils.extensionsFromVscodeMarketplace [
-            {
-              name = "direnv";
-              publisher = "mkhl";
-              version = "0.6.1";
-              hash = "sha256-5/Tqpn/7byl+z2ATflgKV1+rhdqj+XMEZNbGwDmGwLQ=";
-            }
-            {
-              name = "remote-containers";
-              publisher = "ms-vscode-remote";
-              version = "0.247.0";
-              hash = "sha256-gWFNjkx2+zjkpKDC5a1qIZ5SbcDN8ahtXDPX1upWUg8=";
-            }
-          ];
-      };
       waybar = {
         enable = true;
         systemd.enable = true;
@@ -2849,7 +2824,6 @@ in
           command = "syncthingtray --wait";
         };
       };
-      vscode-server.enable = true;
     };
 
     wayland.windowManager.hyprland = {
