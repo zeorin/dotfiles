@@ -224,4 +224,7 @@
   virtualisation.docker.daemon.settings = {
     dns = [ "192.168.0.1" ];
   };
+
+  # `hostctl` needs to be able to write to this file
+  environment.etc.hosts.mode = "0644";
 }
