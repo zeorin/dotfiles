@@ -26,9 +26,6 @@
     nix-index-database.url = "github:Mic92/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
-    nixos-vscode-server.url = "github:nix-community/nixos-vscode-server";
-    nixos-vscode-server.inputs.nixpkgs.follows = "nixpkgs";
-
     nix-software-center.url = "github:zeorin/nix-software-center";
     nix-software-center.inputs.nixpkgs.follows = "nixpkgs";
   };
