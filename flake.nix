@@ -34,7 +34,6 @@
     {
       self,
       nixpkgs,
-      home-manager,
       flake-utils,
       ...
     }@inputs:
@@ -93,35 +92,5 @@
           modules = [ ./nixos/ruby ];
         };
       };
-
-      # Standalone home-manager configuration entrypoint
-      # Available through 'home-manager --flake .#your-username@your-hostname'
-      homeConfigurations =
-        let
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        in
-        {
-          "zeorin@guru" = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit inputs outputs;
-            };
-            modules = [ ./home-manager/home.nix ];
-          };
-          "zeorin@monarch" = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit inputs outputs;
-            };
-            modules = [ ./home-manager/home.nix ];
-          };
-          "zeorin@ruby" = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit inputs outputs;
-            };
-            modules = [ ./home-manager/home.nix ];
-          };
-        };
     };
 }
