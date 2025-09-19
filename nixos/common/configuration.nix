@@ -110,7 +110,8 @@
         ];
         auto-optimise-store = true;
         trusted-users = [
-          "root"
+          # Devenv needs the users to be mentioned by name
+          "zeorin"
           "@wheel"
         ];
         # keep-outputs = true;
