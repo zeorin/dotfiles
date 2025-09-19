@@ -20,6 +20,8 @@ with pkgs;
 
   emoji-variation-sequences = callPackage ./emoji-variation-sequences { };
 
+  hyprland-preview-share-picker = callPackage ./hyprland-preview-share-picker { };
+
   firefox-csshacks = callPackage ./firefox-csshacks { };
 
   modorganizer2-linux-installer = callPackage ./modorganizer2-linux-installer { };
@@ -29,6 +31,4 @@ with pkgs;
   nord-dircolors = callPackage ./nord-dircolors { };
 
   open-in-editor = callPackage ./open-in-editor { };
-
-  polybar-pulseaudio-control = callPackage ./polybar-pulseaudio-control { };
 }
