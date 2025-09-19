@@ -135,7 +135,7 @@ in
               python3Packages.python-lsp-server
               python3Packages.grip
               multimarkdown
-              xclip
+              wl-clipboard
               xdotool
               xorg.xwininfo
               xorg.xprop
