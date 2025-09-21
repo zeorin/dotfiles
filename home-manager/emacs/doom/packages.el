@@ -51,27 +51,11 @@
 
 (package! with-editor)
 
-(package! org-super-agenda)
-(package! org-web-tools)
-(package! org-transclusion)
-(package! ox-clip)
-
-(package! mermaid-mode)
-
 (package! all-the-icons-nerd-fonts)
-
-(package! atomic-chrome)
 
 (package! vulpea)
 
 (package! langtool-popup)
-
-(package! evil-little-word
-  :recipe (:host github :repo "tarao/evil-plugins"
-           :files ("evil-little-word.el")))
-
-(package! org-modern)
-(package! org-appear)
 
 (unpin! dap-mode)
 (package! dap-mode :recipe (:host github :repo "zeorin/dap-mode" :branch "fixed"))
@@ -81,5 +65,3 @@
 
 (package! flycheck-ledger :disable t)
 (package! flycheck-hledger)
-
-(unpin! compat)
