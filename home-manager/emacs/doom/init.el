@@ -1,5 +1,7 @@
 ;;; init.el -*- lexical-binding: t; -*-
 
+(setenv "LSP_USE_PLISTS" "true")
+
 (setq exec-path (append '("@exec-path@/bin") exec-path))
 
 ;; This file controls what Doom modules are enabled and what order they load
