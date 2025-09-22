@@ -15,6 +15,7 @@
     inputs.nur.modules.nixos.default
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
+    inputs.niri.nixosModules.niri
     ./cachix.nix
     ./logiops.nix
   ];
@@ -30,6 +31,8 @@
         outputs.overlays.unstable-packages
 
         inputs.devenv.overlays.default
+
+        inputs.niri.overlays.niri
 
         # Bugfix for steam client to not inhibit screensaver unless there's a game active
         # https://github.com/ValveSoftware/steam-for-linux/issues/5607
@@ -343,6 +346,8 @@
         table-others
       ];
     };
+
+    programs.niri.enable = true;
 
     programs.hyprland.enable = true;
     programs.hyprland.withUWSM = true;
