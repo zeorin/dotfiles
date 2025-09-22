@@ -24,7 +24,7 @@
 
     devenv.url = "github:cachix/devenv/latest";
 
-    hyprland.url = "github:hyprwm/Hyprland";
+    niri.url = "github:sodiboo/niri-flake";
 
     nix-index-database.url = "github:Mic92/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";

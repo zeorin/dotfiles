@@ -11,7 +11,7 @@
   sops-nix,
   devenv,
   nix-software-center,
-  hyprland,
+  niri,
   nixpkgs-unstable,
   ...
 }@moduleArgs:
@@ -19,15 +19,14 @@
 {
   imports = (builtins.attrValues self.outputs.nixosModules) ++ [
     "${nixpkgs-unstable}/nixos/modules/programs/wayland/uwsm.nix"
-    "${nixpkgs-unstable}/nixos/modules/programs/wayland/hyprland.nix"
     home-manager.nixosModules.home-manager
     sops-nix.nixosModules.sops
+    niri.nixosModules.niri
     ./cachix.nix
     ./logiops.nix
   ];
   disabledModules = [
     "programs/wayland/uwsm.nix"
-    "programs/wayland/hyprland.nix"
   ];
 
   config = {
@@ -42,6 +41,8 @@
 
         nur.overlays.default
         devenv.overlays.default
+
+        niri.overlays.niri
 
         # Bugfix for steam client to not inhibit screensaver unless there's a game active
         # https://github.com/ValveSoftware/steam-for-linux/issues/5607
@@ -362,31 +363,7 @@
       ];
     };
 
-    programs.hyprland.enable = true;
-    programs.hyprland.package = hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    programs.hyprland.portalPackage =
-      hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-    programs.hyprland.withUWSM = true;
-    programs.uwsm.package = pkgs.unstable.uwsm;
-    xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
-    services.displayManager.sessionPackages = [
-      (pkgs.writeTextFile {
-        name = "hyprland-uwsm-fixed";
-        text = ''
-          [Desktop Entry]
-          Name=Hyprland (UWSM)
-          Comment=Hyprland compositor managed by UWSM
-          Exec=${lib.getExe config.programs.uwsm.package} start -F -- /run/current-system/sw/bin/start-hyprland
-          Type=Application
-          DesktopNames=Hyprland
-          Keywords=tiling;wayland;compositor;
-        '';
-        destination = "/share/wayland-sessions/hyprland-uwsm-fixed.desktop";
-        derivationArgs = {
-          passthru.providedSessions = [ "hyprland-uwsm-fixed" ];
-        };
-      })
-    ];
+    programs.niri.enable = true;
 
     services.libinput.touchpad = {
       accelProfile = "adaptive";
@@ -657,11 +634,7 @@
 
     # Accelerated Video Playback
     hardware.graphics.enable = true;
-    hardware.graphics.package =
-      hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.mesa;
     hardware.graphics.enable32Bit = true;
-    hardware.graphics.package32 =
-      hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.pkgsi686Linux.mesa;
 
     virtualisation = {
       containers.enable = true;
@@ -728,7 +701,6 @@
 
     programs.fish.enable = true;
 
-    security.pam.services.hyprlock = { };
     # security.pam.services.hibernate-on-multiple-failures = {
     #   name = "hibernate-on-multiple-failures";
     #   text = ''
