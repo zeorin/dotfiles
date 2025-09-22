@@ -11,7 +11,6 @@
   sops-nix,
   devenv,
   nix-software-center,
-  hyprland,
   determinate,
   nixpkgs-unstable,
   ...
@@ -19,17 +18,12 @@
 
 {
   imports = (builtins.attrValues self.outputs.nixosModules) ++ [
-    "${nixpkgs-unstable}/nixos/modules/programs/wayland/uwsm.nix"
-    "${nixpkgs-unstable}/nixos/modules/programs/wayland/hyprland.nix"
     home-manager.nixosModules.home-manager
     sops-nix.nixosModules.sops
     determinate.nixosModules.default
     ./caches.nix
     ./logiops.nix
-  ];
-  disabledModules = [
-    "programs/wayland/uwsm.nix"
-    "programs/wayland/hyprland.nix"
+    ./niri.nix
   ];
 
   config = {
@@ -277,6 +271,47 @@
       # generated config replicates the default behaviour.
       useDHCP = false;
     };
+
+    networking = {
+      iproute2.enable = true;
+      firewall = {
+        allowPing = true;
+        allowedTCPPorts = [
+          # Calibre wireless connection
+          9090
+
+          # Syncthing
+          22000
+        ];
+        allowedTCPPortRanges = [
+          # KDEConnect
+          {
+            from = 1714;
+            to = 1764;
+          }
+        ];
+        allowedUDPPorts = [
+          # Calibre wireless `BROADCAST_PORTS` for their ZeroConf wireless connection setup
+          # https://github.com/kovidgoyal/calibre/blob/bdb77a370fa2f0ea2cde3b994bd7469322bfd065/src/calibre/devices/smart_device_app/driver.py#L251
+          54982
+          48123
+          39001
+          44044
+          59678
+
+          # Syncthing
+          21027
+          22000
+        ];
+        allowedUDPPortRanges = [
+          # KDEConnect
+          {
+            from = 1714;
+            to = 1764;
+          }
+        ];
+      };
+    };
     systemd.network.wait-online.enable = false;
     systemd.services.NetworkManager-wait-online.enable = false;
 
@@ -363,32 +398,6 @@
         table
       ];
     };
-
-    programs.hyprland.enable = true;
-    programs.hyprland.package = hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    programs.hyprland.portalPackage =
-      hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-    programs.hyprland.withUWSM = true;
-    programs.uwsm.package = pkgs.unstable.uwsm;
-    xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
-    services.displayManager.sessionPackages = [
-      (pkgs.writeTextFile {
-        name = "hyprland-uwsm-fixed";
-        text = ''
-          [Desktop Entry]
-          Name=Hyprland (UWSM)
-          Comment=Hyprland compositor managed by UWSM
-          Exec=${lib.getExe config.programs.uwsm.package} start -F -- /run/current-system/sw/bin/start-hyprland
-          Type=Application
-          DesktopNames=Hyprland
-          Keywords=tiling;wayland;compositor;
-        '';
-        destination = "/share/wayland-sessions/hyprland-uwsm-fixed.desktop";
-        derivationArgs = {
-          passthru.providedSessions = [ "hyprland-uwsm-fixed" ];
-        };
-      })
-    ];
 
     services.libinput.touchpad = {
       accelProfile = "adaptive";
@@ -566,47 +575,6 @@
       "/share/applications"
     ];
 
-    networking = {
-      iproute2.enable = true;
-      firewall = {
-        allowPing = true;
-        allowedTCPPorts = [
-          # Calibre wireless connection
-          9090
-
-          # Syncthing
-          22000
-        ];
-        allowedTCPPortRanges = [
-          # KDEConnect
-          {
-            from = 1714;
-            to = 1764;
-          }
-        ];
-        allowedUDPPorts = [
-          # Calibre wireless `BROADCAST_PORTS` for their ZeroConf wireless connection setup
-          # https://github.com/kovidgoyal/calibre/blob/bdb77a370fa2f0ea2cde3b994bd7469322bfd065/src/calibre/devices/smart_device_app/driver.py#L251
-          54982
-          48123
-          39001
-          44044
-          59678
-
-          # Syncthing
-          21027
-          22000
-        ];
-        allowedUDPPortRanges = [
-          # KDEConnect
-          {
-            from = 1714;
-            to = 1764;
-          }
-        ];
-      };
-    };
-
     services.samba = {
       enable = true;
       openFirewall = true;
@@ -667,11 +635,7 @@
 
     # Accelerated Video Playback
     hardware.graphics.enable = true;
-    hardware.graphics.package =
-      hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.mesa;
     hardware.graphics.enable32Bit = true;
-    hardware.graphics.package32 =
-      hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.pkgsi686Linux.mesa;
 
     virtualisation = {
       containers.enable = true;
@@ -738,7 +702,6 @@
 
     programs.fish.enable = true;
 
-    security.pam.services.hyprlock = { };
     # security.pam.services.hibernate-on-multiple-failures = {
     #   name = "hibernate-on-multiple-failures";
     #   text = ''
