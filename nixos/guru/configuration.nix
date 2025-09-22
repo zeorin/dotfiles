@@ -93,14 +93,6 @@
   networking.hostName = "guru";
   networking.interfaces.enp36s0.wakeOnLan.enable = true;
 
-  services.xserver.xrandrHeads = [
-    "HDMI-1"
-    {
-      output = "DP-1";
-      primary = true;
-    }
-  ];
-
   hardware.amdgpu = {
     opencl.enable = true;
     initrd.enable = true;
