@@ -163,18 +163,6 @@
 
   hardware.keyboard.qmk.enable = true;
 
-  hardware.printers = {
-    ensureDefaultPrinter = "Brother_MFC-2340DW";
-    ensurePrinters = [
-      {
-        deviceUri = "ipp://BRN94DDF82613D1.lan/ipp";
-        location = "office";
-        name = "Brother_MFC-2340DW";
-        model = "everywhere";
-      }
-    ];
-  };
-
   hardware.sane = {
     enable = true;
     openFirewall = true;

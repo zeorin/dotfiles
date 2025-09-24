@@ -682,6 +682,28 @@
 
     environment.shells = [ pkgs.fish ];
 
+    hardware.printers = {
+      ensureDefaultPrinter = "MFC-2340DW";
+      ensurePrinters = [
+        {
+          deviceUri = "ipps://brn94ddf82613d1.lan:443/ipp";
+          location = "Xandor's Office";
+          name = "MFC-2340DW";
+          description = "Brother MFC-2340DW Inkjet Printer";
+          model = "everywhere";
+          ppdOptions = {
+            PageSize = "A4"; # 215x345mm 3.5x5 3.5x5.Borderless 4x6 4x6.Borderless 5x7 5x7.Borderless 5x8 5x8.Borderless A3 A3.Borderless A4 A4.Borderless A5 A6 A6.Borderless Env10 EnvC5 EnvDL EnvMonarch Executive FanFoldGermanLegal Legal Letter Letter.Borderless Oficio Tabloid Tabloid.Borderless Custom.WIDTHxHEIGHT
+            InputSlot = "Auto"; # Auto Main
+            MediaType = "StationeryInkjet"; # Stationery PhotographicGlossy StationeryInkjet Com.brotherBp71
+            cupsPrintQuality = "Draft"; # Draft Normal High
+            ColorModel = "Gray"; # RGB Gray
+            Duplex = "None"; # None DuplexNoTumble DuplexTumble
+            OutputBin = "Faceup"; # FaceUp
+          };
+        }
+      ];
+    };
+
     # Compatibility for binaries
     services.envfs.enable = true;
     programs.nix-ld = {
