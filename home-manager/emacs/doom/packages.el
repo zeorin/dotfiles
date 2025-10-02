@@ -65,3 +65,5 @@
 
 (package! flycheck-ledger :disable t)
 (package! flycheck-hledger)
+
+(package! magit-tbdiff)
