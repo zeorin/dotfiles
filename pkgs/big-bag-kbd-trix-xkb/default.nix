@@ -69,13 +69,13 @@ in
 
 stdenvNoCC.mkDerivation {
   pname = "big-bag-kbd-trix-xkb";
-  version = "0-unstable-2025-05-16";
+  version = "0-unstable-2025-10-01";
 
   src = fetchFromGitHub {
     owner = "DreymaR";
     repo = "BigBagKbdTrixXKB";
-    rev = "d01cfc801fea7118001482b7b2c4184b3aac960e";
-    hash = "sha256-xprAHNzNdRFuvjzQWMLa+yrqJx0E2Rwkzn9L+KzF27k=";
+    rev = "00d563c92598eb72a9beb0aa527e06577a77d70b";
+    hash = "sha256-812AC9HUixKEHPQDfe1orYWnQskCgltCCgkqNGKnLAo=";
   };
 
   postPatch = ''
