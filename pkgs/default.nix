@@ -16,6 +16,8 @@ with pkgs;
 
   chemacs2 = callPackage ./chemacs2 { };
 
+  dedrm_tools = callPackage ./dedrm_tools { };
+
   doomemacs = callPackage ./doomemacs { };
 
   et-book = callPackage ./et-book { };
