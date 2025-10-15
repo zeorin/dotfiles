@@ -30,6 +30,8 @@
         outputs.overlays.modifications
         outputs.overlays.unstable-packages
 
+        inputs.devenv.overlays.default
+
         # Bugfix for steam client to not inhibit screensaver unless there's a game active
         # https://github.com/ValveSoftware/steam-for-linux/issues/5607
         # https://github.com/tejing1/nixos-config/blob/master/overlays/steam-fix-screensaver/default.nix
