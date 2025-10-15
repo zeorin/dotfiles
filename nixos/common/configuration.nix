@@ -481,6 +481,7 @@
         "wheel"
         "networkmanager"
         "docker"
+        "podman"
         "adbusers"
         "libvirtd"
         "video"
@@ -614,8 +615,15 @@
     hardware.graphics.enable = true;
     hardware.graphics.enable32Bit = true;
 
-    virtualisation.docker.enable = true;
-    virtualisation.libvirtd.enable = true;
+    virtualisation = {
+      containers.enable = true;
+      podman = {
+        enable = true;
+        dockerCompat = true;
+        defaultNetwork.settings.dns_enabled = true;
+      };
+      libvirtd.enable = true;
+    };
 
     # Enable CUPS to print documents.
     services.printing.enable = true;
