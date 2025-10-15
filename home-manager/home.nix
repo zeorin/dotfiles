@@ -3954,7 +3954,7 @@ in
         tree
         curl
         httpie
-        unstable.devenv
+        devenv
         xdg-user-dirs
         wineWowPackages.stableFull
         winetricks
