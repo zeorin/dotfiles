@@ -148,7 +148,7 @@ in
       keyboard = {
         layout = "us,us";
         variant = "dvp,";
-        options = "grp:alt_space_toggle,shift:both_capslock";
+        options = "grp:win_space_toggle,shift:both_capslock";
       };
       sessionVariables = with config.xdg; {
         LESS = "-FRXix2$";
@@ -2922,7 +2922,7 @@ in
         input = {
           kb_layout = "us,us";
           kb_variant = "dvp,";
-          kb_options = "grp:alt_space_toggle,shift:both_capslock";
+          kb_options = "grp:win_space_toggle,shift:both_capslock";
         };
         bind =
           let

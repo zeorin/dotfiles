@@ -316,7 +316,7 @@
         dir = "${pkgs.big-bag-kbd-trix-xkb}/etc/X11/xkb";
         layout = "us,us";
         variant = ",dvp";
-        options = "grp:alt_space_toggle,shift:both_capslock";
+        options = "grp:win_space_toggle,shift:both_capslock";
       };
       exportConfiguration = true;
     };
