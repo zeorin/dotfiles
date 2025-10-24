@@ -331,15 +331,7 @@
     i18n.inputMethod = {
       enable = true;
       type = "ibus";
-      ibus.package = pkgs.unstable.ibus.overrideAttrs (oldAttrs: {
-        src = pkgs.fetchFromGitHub {
-          owner = "ibus";
-          repo = "ibus";
-          rev = "2a3f38079b63c0023b3647edbf1a22a423b26728";
-          hash = "sha256-HXipYXLKOsoIMvvN64/RLRzIMBmC6YnuKFhgSgpUzCA=";
-        };
-      });
-      ibus.engines = with pkgs.unstable.ibus-engines; [
+      ibus.engines = with pkgs.ibus-engines; [
         table
         table-others
       ];
