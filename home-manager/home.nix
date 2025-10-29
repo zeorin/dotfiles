@@ -2519,6 +2519,7 @@ in
       };
       zathura = {
         enable = true;
+        package = pkgs.zathura.override { useMupdf = true; };
         options = {
           # Use the title bar for status
           guioptions = "";
@@ -2532,6 +2533,9 @@ in
           # Better selection
           selection-clipboard = "clipboard";
           selection-notification = false;
+
+          # Database
+          database = "sqlite";
         };
       };
     };
