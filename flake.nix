@@ -1,6 +1,15 @@
 {
   description = "Xandor Schiefer's system configs";
 
+  nixConfig = {
+    extra-substituters = [
+      "https://nixos-raspberrypi.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+    ];
+  };
+
   inputs = {
     systems.url = "github:nix-systems/x86_64-linux";
 
@@ -30,6 +39,8 @@
 
     nix-software-center.url = "github:zeorin/nix-software-center";
     nix-software-center.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
   outputs =
@@ -84,6 +95,41 @@
           specialArgs = inputs;
           modules = [ ./nixos/ruby ];
         };
+        tv = inputs.nixos-raspberrypi.lib.nixosSystem {
+          specialArgs = inputs;
+          modules = [ ./nixos/tv ];
+        };
+      };
+
+      installerImages = {
+        tv =
+          (inputs.nixos-raspberrypi.lib.nixosInstaller {
+            specialArgs = inputs;
+            modules = [
+              inputs.nixos-raspberrypi.inputs.nixos-images.nixosModules.sdimage-installer
+              (
+                {
+                  config,
+                  lib,
+                  modulesPath,
+                  ...
+                }:
+                {
+                  disabledModules = [
+                    # disable the sd-image module that nixos-images uses
+                    (modulesPath + "/installer/sd-card/sd-image-aarch64-installer.nix")
+                  ];
+                  # nixos-images sets this with `mkForce`, thus `mkOverride 40`
+                  image.baseName =
+                    let
+                      cfg = config.boot.loader.raspberryPi;
+                    in
+                    lib.mkOverride 40 "nixos-installer-rpi${cfg.variant}-${cfg.bootloader}";
+                }
+              )
+              ./nixos/tv
+            ];
+          }).config.system.build.sdImage;
       };
     };
 }
