@@ -481,6 +481,9 @@
         "wireshark"
         "lp"
       ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOq1E9mycw3IYVGBpwEU9Oy9iirB8d5Xyu/+6CiL+mx openpgp:0x3CBFF97B"
+      ];
     };
     users.groups.zeorin = { };
     home-manager = {
