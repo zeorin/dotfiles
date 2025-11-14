@@ -341,11 +341,10 @@
     programs.chromium.enable = true;
 
     i18n.inputMethod = {
-      enable = true;
+      enable = false;
       type = "ibus";
       ibus.engines = with pkgs.ibus-engines; [
         table
-        table-others
       ];
     };
 

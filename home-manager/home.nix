@@ -3955,9 +3955,6 @@ in
         use-system-keyboard-layout = true;
         switcher-delay-time = -1;
       };
-      "desktop/ibus/general/hotkey" = {
-        triggers = [ "ISO_Next_Group" ];
-      };
       "desktop/ibus/panel" = {
         show = 0;
         show-icon-on-systray = true;
@@ -3986,23 +3983,30 @@ in
             let
               makeAutostartItem = args: makeDesktopItem (args // { destination = "/etc/xdg/autostart"; });
             in
-            builtins.map makeAutostartItem [
-              {
-                name = "tailscale-systray";
-                desktopName = "Tailscale SysTray";
-                exec = "${tailscale-systray}/bin/tailscale-systray";
-              }
-              {
-                name = "ibus-daemon";
-                desktopName = "Ibus";
-                type = "Application";
-                exec = "ibus start --type wayland";
-                notShowIn = [
-                  # GNOME will launch ibus using systemd
-                  "GNOME"
-                ];
-              }
-            ];
+            builtins.map makeAutostartItem (
+              [
+                {
+                  name = "tailscale-systray";
+                  desktopName = "Tailscale SysTray";
+                  exec = "${tailscale-systray}/bin/tailscale-systray";
+                }
+              ]
+              ++
+                lib.optionals
+                  (moduleArgs.osConfig.i18n.inputMethod.enable && moduleArgs.osConfig.i18n.inputMethod.type == "ibus")
+                  [
+                    {
+                      name = "ibus-daemon";
+                      desktopName = "Ibus";
+                      type = "Application";
+                      exec = "ibus start --type wayland";
+                      notShowIn = [
+                        # GNOME will launch ibus using systemd
+                        "GNOME"
+                      ];
+                    }
+                  ]
+            );
         })
         unstable.xdg-terminal-exec
         unstable.app2unit
