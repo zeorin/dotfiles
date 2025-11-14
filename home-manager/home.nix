@@ -182,6 +182,7 @@ in
         WGETRC = "${configHome}/wget/wgetrc";
         LESSHISTFILE = "${cacheHome}/less/history";
         PSQL_HISTORY = "${cacheHome}/pg/psql_history";
+        XCOMPOSEFILE = "${configHome}/X11/xcompose";
         XCOMPOSECACHE = "${cacheHome}/X11/xcompose";
         GOPATH = "${dataHome}/go";
         MYSQL_HISTFILE = "${dataHome}/mysql_history";
@@ -3693,6 +3694,11 @@ in
         '';
         "wget/wgetrc".text = ''
           hsts-file = ${cacheHome}/wget-hsts
+        '';
+        "X11/xcompose".text = ''
+          include "%L"
+
+          <Multi_key> <apostrophe> <apostrophe>	: "ʹ"	U02B9 # MODIFIER LETTER PRIME
         '';
         "xkb".source = "${pkgs.big-bag-kbd-trix-xkb}/share/X11/xkb";
       };
