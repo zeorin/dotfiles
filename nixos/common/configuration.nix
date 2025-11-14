@@ -299,11 +299,20 @@
         "B48EAD"
       ];
       earlySetup = true;
-      useXkbConfig = true;
-    };
-
-    environment.sessionVariables = {
-      XKB_CONFIG_ROOT = config.services.xserver.xkb.dir;
+      keyMap =
+        with config.services.xserver;
+        pkgs.runCommand "xkb-console-keymap" { preferLocalBuild = true; } ''
+          '${pkgs.buildPackages.ckbcomp}/bin/ckbcomp' \
+            ${
+              lib.optionalString (
+                config.environment.sessionVariables ? XKB_CONFIG_ROOT
+              ) "-I${config.environment.sessionVariables.XKB_CONFIG_ROOT}"
+            } \
+            -model '${xkb.model}' -layout '${xkb.layout}' \
+            -option '${
+              lib.replaceString "grp:win_space_toggle" "grp:alt_space_toggle" xkb.options
+            }' -variant '${xkb.variant}' > "$out"
+        '';
     };
 
     services.xserver = {
@@ -315,7 +324,7 @@
         dir = "${pkgs.big-bag-kbd-trix-xkb}/etc/X11/xkb";
         layout = "us,us";
         variant = ",dvp";
-        options = "grp:win_space_toggle,shift:both_capslock";
+        options = "grp:win_space_toggle,shift:both_capslock,compose:menu";
       };
       exportConfiguration = true;
     };
@@ -362,6 +371,7 @@
             rightalt = "overload(meta, compose)";
             leftcontrol = "layer(layer1)";
             rightcontrol = "layer(layer1)";
+            rightshift = "rightshift";
           };
           layer1 = {
             # Like wasd, but aligned with home row
@@ -407,10 +417,6 @@
 
             a = "brightnessup";
             z = "brightnessdown";
-          };
-          shift = {
-            leftshift = "capslock";
-            rightshift = "capslock";
           };
         };
         extraConfig = ''

@@ -148,11 +148,7 @@ in
     home = {
       username = "zeorin";
       homeDirectory = "/home/${config.home.username}";
-      keyboard = {
-        layout = "us,us";
-        variant = "dvp,";
-        options = "grp:win_space_toggle,shift:both_capslock";
-      };
+      keyboard = null;
       sessionVariables = with config.xdg; {
         LESS = "-FRXix2$";
         # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
@@ -2929,7 +2925,7 @@ in
         input = {
           kb_layout = "us,us";
           kb_variant = "dvp,";
-          kb_options = "grp:win_space_toggle,shift:both_capslock";
+          kb_options = "grp:win_space_toggle,shift:both_capslock,compose:menu";
         };
         bind =
           let
