@@ -3,7 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 {
-  inputs,
+  nixos-hardware,
   lib,
   config,
   pkgs,
@@ -11,7 +11,7 @@
 }:
 
 {
-  imports = with inputs.nixos-hardware.nixosModules; [
+  imports = with nixos-hardware.nixosModules; [
     common-pc-laptop
     common-pc-laptop-ssd
     common-cpu-intel

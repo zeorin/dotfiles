@@ -2,7 +2,7 @@
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
 {
-  inputs,
+  nixpkgs,
   config,
   lib,
   pkgs,
@@ -10,7 +10,7 @@
 }:
 
 {
-  imports = [ inputs.nixpkgs.nixosModules.notDetected ];
+  imports = [ nixpkgs.nixosModules.notDetected ];
 
   boot.initrd.availableKernelModules = [
     "nvme"

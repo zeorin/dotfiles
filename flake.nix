@@ -39,9 +39,6 @@
       flake-utils,
       ...
     }@inputs:
-    let
-      inherit (self) outputs;
-    in
     flake-utils.lib.eachDefaultSystem (
       system:
       let
@@ -55,14 +52,14 @@
         # Acessible through 'nix develop' or 'nix-shell' (legacy)
         devShells = import ./shell.nix {
           pkgs = pkgs.appendOverlays (
-            (builtins.attrValues outputs.overlays) ++ [ inputs.sops-nix.overlays.default ]
+            (builtins.attrValues self.outputs.overlays) ++ [ inputs.sops-nix.overlays.default ]
           );
         };
       }
     )
     // {
       # Your custom packages and modifications, exported as overlays
-      overlays = import ./overlays { inherit inputs; };
+      overlays = import ./overlays inputs;
 
       # Reusable nixos modules you might want to export
       # These are usually stuff you would upstream into nixpkgs
@@ -76,21 +73,15 @@
       # Available through 'nixos-rebuild --flake .#your-hostname'
       nixosConfigurations = {
         guru = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs outputs;
-          };
+          specialArgs = inputs;
           modules = [ ./nixos/guru ];
         };
         monarch = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs outputs;
-          };
+          specialArgs = inputs;
           modules = [ ./nixos/monarch ];
         };
         ruby = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs outputs;
-          };
+          specialArgs = inputs;
           modules = [ ./nixos/ruby ];
         };
       };

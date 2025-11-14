@@ -2,19 +2,23 @@
 # Use this to configure your system environment (it replaces /etc/nixos/configuration.nix)
 
 {
-  inputs,
-  outputs,
   lib,
   config,
   pkgs,
+  self,
+  nur,
+  home-manager,
+  sops-nix,
+  devenv,
+  nix-software-center,
   ...
-}:
+}@moduleArgs:
 
 {
-  imports = (builtins.attrValues outputs.nixosModules) ++ [
-    inputs.nur.modules.nixos.default
-    inputs.home-manager.nixosModules.home-manager
-    inputs.sops-nix.nixosModules.sops
+  imports = (builtins.attrValues self.outputs.nixosModules) ++ [
+    nur.modules.nixos.default
+    home-manager.nixosModules.home-manager
+    sops-nix.nixosModules.sops
     ./cachix.nix
     ./logiops.nix
   ];
@@ -25,11 +29,11 @@
 
       overlays = [
         # Add overlays your own flake exports (from overlays and pkgs dir):
-        outputs.overlays.additions
-        outputs.overlays.modifications
-        outputs.overlays.unstable-packages
+        self.outputs.overlays.additions
+        self.outputs.overlays.modifications
+        self.outputs.overlays.unstable-packages
 
-        inputs.devenv.overlays.default
+        devenv.overlays.default
 
         # Bugfix for steam client to not inhibit screensaver unless there's a game active
         # https://github.com/ValveSoftware/steam-for-linux/issues/5607
@@ -99,7 +103,7 @@
       # This will add each flake input as a registry
       # To make nix3 commands consistent with your flake
       registry = (lib.mapAttrs (_: flake: { inherit flake; })) (
-        (lib.filterAttrs (_: lib.isType "flake")) inputs
+        (lib.filterAttrs (name: value: lib.isType "flake" value && name != "self")) moduleArgs
       );
       nixPath = [ "/etc/nix/path" ];
 
@@ -195,7 +199,7 @@
     };
 
     environment.systemPackages = with pkgs; [
-      inputs.nix-software-center.packages.${system}.nix-software-center
+      nix-software-center.packages.${system}.nix-software-center
       moreutils
       usbutils
       pciutils
@@ -493,9 +497,7 @@
     };
     users.groups.zeorin = { };
     home-manager = {
-      extraSpecialArgs = {
-        inherit inputs outputs;
-      };
+      extraSpecialArgs = (lib.filterAttrs (_: lib.isType "flake")) moduleArgs;
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "bak";

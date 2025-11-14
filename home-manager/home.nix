@@ -5,8 +5,8 @@
   lib,
   config,
   pkgs,
-  inputs,
-  outputs,
+  self,
+  nix-index-database,
   ...
 }@moduleArgs:
 
@@ -137,8 +137,8 @@ let
 in
 {
   # You can import other home-manager modules here
-  imports = (builtins.attrValues outputs.homeModules) ++ [
-    inputs.nix-index-database.homeModules.nix-index
+  imports = (builtins.attrValues self.outputs.homeModules) ++ [
+    nix-index-database.homeModules.nix-index
     ./emacs
     ./oama
     ./email
