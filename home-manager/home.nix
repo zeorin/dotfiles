@@ -4,11 +4,12 @@
 {
   lib,
   config,
+  osConfig,
   pkgs,
   self,
   nix-index-database,
   ...
-}@moduleArgs:
+}:
 
 let
   myKey = "863F 093A CF82 D2C8 6FD7 FB74 5E1C 0971 FE4F 665A";
@@ -130,8 +131,8 @@ let
         background_image_right="${./backgrounds/martian-terrain-light-right.jpg}"
       fi
 
-      ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl hyprpaper wallpaper "HDMI-A-1,contain:$background_image_left"
-      ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl hyprpaper wallpaper "DP-1,contain:$background_image_right"
+      ${osConfig.programs.hyprland.package}/bin/hyprctl hyprpaper wallpaper "HDMI-A-1,contain:$background_image_left"
+      ${osConfig.programs.hyprland.package}/bin/hyprctl hyprpaper wallpaper "DP-1,contain:$background_image_right"
     '';
   };
 in
@@ -1293,7 +1294,7 @@ in
                 monitor = "";
                 text = "$LAYOUT[dvp,en]";
                 font_size = 24;
-                onclick = "${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl switchxkblayout all next";
+                onclick = "${osConfig.programs.hyprland.package}/bin/hyprctl switchxkblayout all next";
 
                 position = "250, -20";
                 halign = "center";
@@ -2810,7 +2811,7 @@ in
         settings =
           let
             brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
-            hyprctl = "${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl";
+            hyprctl = "${osConfig.programs.hyprland.package}/bin/hyprctl";
             hyprlock = "${config.programs.hyprlock.package}/bin/hyprlock";
             loginctl = "${pkgs.systemd}/bin/loginctl";
             systemctl = "${pkgs.systemd}/bin/systemctl";
@@ -2907,7 +2908,7 @@ in
       enable = true;
 
       # NixOS Hyprland integration options
-      inherit (moduleArgs.osConfig.programs.hyprland) package;
+      inherit (osConfig.programs.hyprland) package;
       portalPackage = null;
       systemd.enable = false;
 
@@ -2926,7 +2927,7 @@ in
         };
         permission = [
           "${config.programs.obs-studio.package}/bin/.obs-wrapped, screencopy, allow"
-          "${moduleArgs.osConfig.programs.hyprland.portalPackage}/libexec/.xdg-desktop-portal-hyprland-wrapped, screencopy, allow"
+          "${osConfig.programs.hyprland.portalPackage}/libexec/.xdg-desktop-portal-hyprland-wrapped, screencopy, allow"
           "${config.programs.hyprlock.package}/bin/hyprlock, screencopy, allow"
           "${pkgs.hyprland-preview-share-picker}/bin/hyprland-preview-share-picker, screencopy, allow"
           "${pkgs.grim}/bin/grim, screencopy, allow"
@@ -3005,33 +3006,33 @@ in
         bind =
           let
             changegroupactiveormovefocus = pkgs.writeShellScript "changegroupactiveormovefocus" ''
-              activewindow="$(${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl activewindow -j)"
+              activewindow="$(${osConfig.programs.hyprland.package}/bin/hyprctl activewindow -j)"
               readonly activewindow
               if ! ${pkgs.jq}/bin/jq -e '.grouped[]' <<< "$activewindow" >/dev/null; then
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch movefocus "$1"
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch movefocus "$1"
               elif [[ "$1" == l ]] && ${pkgs.jq}/bin/jq -e '.address == .grouped[0]' <<< "$activewindow" >/dev/null; then
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch movefocus l
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch movefocus l
               elif [[ "$1" == l ]]; then
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch changegroupactive b
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch changegroupactive b
               elif [[ "$1" == r ]] && ${pkgs.jq}/bin/jq -e '.address == .grouped[-1]' <<< "$activewindow" >/dev/null; then
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch movefocus r
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch movefocus r
               else
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch changegroupactive f
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch changegroupactive f
               fi
             '';
             movegroupwindowormovewindoworgroup = pkgs.writeShellScript "movegroupwindowormovewindoworgroup" ''
-              activewindow="$(${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl activewindow -j)"
+              activewindow="$(${osConfig.programs.hyprland.package}/bin/hyprctl activewindow -j)"
               readonly activewindow
               if ! ${pkgs.jq}/bin/jq -e '.grouped[]' <<< "$activewindow" >/dev/null; then
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch movewindoworgroup "$1"
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch movewindoworgroup "$1"
               elif [[ "$1" == l ]] && ${pkgs.jq}/bin/jq -e '.address == .grouped[0]' <<< "$activewindow" >/dev/null; then
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch movewindoworgroup l
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch movewindoworgroup l
               elif [[ "$1" == l ]]; then
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch movegroupwindow b
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch movegroupwindow b
               elif [[ "$1" == r ]] && ${pkgs.jq}/bin/jq -e '.address == .grouped[-1]' <<< "$activewindow" >/dev/null; then
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch movewindoworgroup r
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch movewindoworgroup r
               else
-                ${moduleArgs.osConfig.programs.hyprland.package}/bin/hyprctl dispatch movegroupwindow f
+                ${osConfig.programs.hyprland.package}/bin/hyprctl dispatch movegroupwindow f
               fi
             '';
           in
@@ -3991,21 +3992,18 @@ in
                   exec = "${tailscale-systray}/bin/tailscale-systray";
                 }
               ]
-              ++
-                lib.optionals
-                  (moduleArgs.osConfig.i18n.inputMethod.enable && moduleArgs.osConfig.i18n.inputMethod.type == "ibus")
-                  [
-                    {
-                      name = "ibus-daemon";
-                      desktopName = "Ibus";
-                      type = "Application";
-                      exec = "ibus start --type wayland";
-                      notShowIn = [
-                        # GNOME will launch ibus using systemd
-                        "GNOME"
-                      ];
-                    }
-                  ]
+              ++ lib.optionals (osConfig.i18n.inputMethod.enable && osConfig.i18n.inputMethod.type == "ibus") [
+                {
+                  name = "ibus-daemon";
+                  desktopName = "Ibus";
+                  type = "Application";
+                  exec = "ibus start --type wayland";
+                  notShowIn = [
+                    # GNOME will launch ibus using systemd
+                    "GNOME"
+                  ];
+                }
+              ]
             );
         })
         unstable.xdg-terminal-exec
