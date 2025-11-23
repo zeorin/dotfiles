@@ -265,6 +265,7 @@
       useDHCP = false;
     };
     systemd.network.wait-online.enable = false;
+    systemd.services.NetworkManager-wait-online.enable = false;
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_ZA.UTF-8";
