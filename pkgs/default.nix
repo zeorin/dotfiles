@@ -9,6 +9,8 @@
 with pkgs;
 
 {
+  argononed = callPackage ./argononed { };
+
   base16-tridactyl = callPackage ./base16-tridactyl { };
 
   big-bag-kbd-trix-xkb = callPackage ./big-bag-kbd-trix-xkb { };

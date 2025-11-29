@@ -4,4 +4,8 @@
 {
   # List your module files here
   # my-module = import ./my-module.nix;
+
+  argonone-v3 = import ./hardware/argonone-v3;
+
+  kodi = import ./services/kodi;
 }

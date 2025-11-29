@@ -17,7 +17,7 @@
 }@moduleArgs:
 
 {
-  imports = (builtins.attrValues self.outputs.nixosModules) ++ [
+  imports = [
     "${nixpkgs-unstable}/nixos/modules/programs/wayland/uwsm.nix"
     "${nixpkgs-unstable}/nixos/modules/programs/wayland/hyprland.nix"
     home-manager.nixosModules.home-manager
