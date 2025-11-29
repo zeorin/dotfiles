@@ -4364,7 +4364,6 @@ in
         keybase
         zeal
         dasht
-        codemod
 
         # For dark mode toggling
         xfce.xfconf

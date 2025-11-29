@@ -13,8 +13,6 @@ with pkgs;
 
   big-bag-kbd-trix-xkb = callPackage ./big-bag-kbd-trix-xkb { };
 
-  codemod = callPackage ./codemod { };
-
   chemacs2 = callPackage ./chemacs2 { };
 
   dedrm_tools = callPackage ./dedrm_tools { };
