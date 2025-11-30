@@ -15,11 +15,16 @@
     common-pc-laptop
     common-pc-laptop-ssd
     common-cpu-intel
+    common-gpu-intel
     ./hardware-configuration.nix
     ../common/configuration.nix
   ];
 
   networking.hostName = "ruby"; # Define your hostname.
+
+  hardware.graphics.extraPackages = with pkgs; [ intel-media-driver ];
+  hardware.graphics.extraPackages32 = with pkgs.pkgsi686Linux; [ intel-media-driver ];
+  environment.variables.LIBVA_DRIVER_NAME = "iHD";
 
   # Don't autostart `keyd`
   systemd.services.keyd.wantedBy = lib.mkForce [ ];

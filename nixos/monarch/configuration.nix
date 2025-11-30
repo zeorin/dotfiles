@@ -11,6 +11,7 @@
     common-pc
     common-pc-ssd
     common-cpu-amd
+    common-gpu-nvidia-nonprime
     ./hardware-configuration.nix
     ../common/configuration.nix
   ];
@@ -57,16 +58,26 @@
   # Don't autostart `keyd`
   systemd.services.keyd.wantedBy = lib.mkForce [ ];
 
-  environment.sessionVariables = {
-    LIBVA_DRIVER_NAME = "nvidia";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-  };
+  environment.variables.LIBVA_DRIVER_NAME = "nvidia";
+  environment.variables.MOZ_DISABLE_RDD_SANDBOX = "nvidia";
 
-  services.xserver.videoDrivers = lib.mkForce [ "nvidia" ];
   hardware.nvidia.open = false;
-  hardware.nvidia.powerManagement.enable = true;
-  hardware.graphics.extraPackages = with pkgs; [ nvidia-vaapi-driver ];
-  hardware.graphics.extraPackages32 = with pkgs.pkgsi686Linux; [ nvidia-vaapi-driver ];
+
+  programs.firefox.enable = true;
+  programs.firefox.preferences =
+    let
+      ffVersion = config.programs.firefox.package.version;
+    in
+    {
+      "media.ffmpeg.vaapi.enabled" = lib.versionOlder ffVersion "137.0.0";
+      "media.hardware-video-decoding.force-enabled" = lib.versionAtLeast ffVersion "137.0.0";
+      "media.rdd-ffmpeg.enabled" = lib.versionOlder ffVersion "97.0.0";
+
+      "gfx.x11-egl.force-enabled" = true;
+      "widget.dmabuf.force-enabled" = true;
+
+      "media.av1.enabled" = false;
+    };
 
   users.groups.uinput.gid = lib.mkForce 984;
 
