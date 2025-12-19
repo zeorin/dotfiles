@@ -42,7 +42,7 @@ let
       pname = "steam-redirector";
       inherit version;
       src = "${src}/steam-redirector";
-      buildInputs = [ windows.mingw_w64_pthreads ];
+      buildInputs = [ windows.pthreads ];
       installPhase = ''
         mkdir -p $out/bin
         cp main.exe $out/bin

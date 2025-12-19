@@ -11,12 +11,12 @@
   sops-nix,
   devenv,
   nix-software-center,
+  hyprland,
   ...
 }@moduleArgs:
 
 {
   imports = (builtins.attrValues self.outputs.nixosModules) ++ [
-    nur.modules.nixos.default
     home-manager.nixosModules.home-manager
     sops-nix.nixosModules.sops
     ./cachix.nix
@@ -33,6 +33,7 @@
         self.outputs.overlays.modifications
         self.outputs.overlays.unstable-packages
 
+        nur.overlays.default
         devenv.overlays.default
 
         # Bugfix for steam client to not inhibit screensaver unless there's a game active
@@ -155,7 +156,10 @@
         "quiet"
         "udev.log_level=3"
       ];
-      extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
+      extraModulePackages = with config.boot.kernelPackages; [
+        v4l2loopback
+        ddcci-driver
+      ];
       kernelModules = [ "v4l2loopback" ];
       extraModprobeConfig = ''
         options v4l2loopback devices=1 exclusive_caps=1 video_nr=10 card_label="OBS Camera"
@@ -199,7 +203,7 @@
     };
 
     environment.systemPackages = with pkgs; [
-      nix-software-center.packages.${system}.nix-software-center
+      # nix-software-center.packages.${stdenv.hostPlatform.system}.nix-software-center
       moreutils
       usbutils
       pciutils
@@ -218,7 +222,7 @@
       numactl
       tcpdump
       config.boot.kernelPackages.turbostat
-      config.boot.kernelPackages.perf
+      perf
       bcc
       bpftrace
       trace-cmd
@@ -235,13 +239,13 @@
     };
 
     systemd.sleep.extraConfig = "HibernateDelaySec=4h";
-    services.logind.lidSwitch = "suspend-then-hibernate";
-    services.logind.extraConfig = ''
-      HandlePowerKey=hibernate
-      HandleSuspendKey=suspend-then-hibernate
-      IdleAction=suspend-then-hibernate
-      IdleActionSec=1h
-    '';
+    services.logind.settings.Login = {
+      HandlePowerKey = "hibernate";
+      HandleSuspendKey = "suspend-then-hibernate";
+      HandleLidSwitch = "suspend-then-hibernate";
+      IdleAction = "suspend-then-hibernate";
+      IdleActionSec = "1h";
+    };
 
     # This will additionally add your inputs to the system's legacy channels
     # Making legacy nix commands consistent as well, awesome!
@@ -305,7 +309,9 @@
       ];
       earlySetup = true;
       keyMap =
-        with config.services.xserver;
+        let
+          inherit (config.services.xserver) xkb;
+        in
         pkgs.runCommand "xkb-console-keymap" { preferLocalBuild = true; } ''
           '${pkgs.buildPackages.ckbcomp}/bin/ckbcomp' \
             ${
@@ -322,7 +328,6 @@
 
     services.xserver = {
       enable = true;
-      displayManager.gdm.enable = true;
 
       # Configure keymap in X11
       xkb = {
@@ -335,14 +340,15 @@
     };
 
     # Enable the GNOME Desktop Environment.
-    services.xserver.desktopManager.gnome.enable = true;
+    services.displayManager.gdm.enable = true;
+    services.desktopManager.gnome.enable = true;
 
     # Web browsers
     programs.firefox.enable = true;
     programs.chromium.enable = true;
 
     i18n.inputMethod = {
-      enable = false;
+      enable = true;
       type = "ibus";
       ibus.engines = with pkgs.ibus-engines; [
         table
@@ -350,7 +356,15 @@
     };
 
     programs.hyprland.enable = true;
+    programs.hyprland.package = hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    programs.hyprland.portalPackage =
+      hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     programs.hyprland.withUWSM = true;
+    programs.uwsm.waylandCompositors.hyprland.binPath = lib.mkForce "${
+      hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland
+    }/bin/start-hyprland";
+    programs.evince.enable = true;
+    xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
 
     services.libinput.touchpad = {
       accelProfile = "adaptive";
@@ -621,7 +635,11 @@
 
     # Accelerated Video Playback
     hardware.graphics.enable = true;
+    hardware.graphics.package =
+      hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.mesa;
     hardware.graphics.enable32Bit = true;
+    hardware.graphics.package32 =
+      hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system}.pkgsi686Linux.mesa;
 
     virtualisation = {
       containers.enable = true;
@@ -652,6 +670,9 @@
 
     # Thumbnail previews for file managers
     services.tumbler.enable = true;
+
+    # Monitor brightness
+    services.ddccontrol.enable = true;
 
     # Enable the OpenSSH daemon.
     services.openssh = {
@@ -791,6 +812,6 @@
     };
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    system.stateVersion = "25.05"; # Did you read the comment?
+    system.stateVersion = "25.11"; # Did you read the comment?
   };
 }

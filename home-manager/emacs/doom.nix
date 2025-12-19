@@ -9,6 +9,7 @@ let
   inherit (pkgs) doomemacs;
   emacs = config.programs.emacs.finalPackage;
   doomScriptEnvVars = ''
+    export LSP_USE_PLISTS=true
     export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
     export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
     export PATH="${
@@ -16,7 +17,7 @@ let
         doomemacs
         emacs
       ]
-    }:$PATH"
+    }''${PATH:+:$PATH}"
   '';
 in
 {
@@ -101,7 +102,7 @@ in
               nodejs
               nodePackages.bash-language-server
               nodePackages.stylelint
-              nodePackages.dockerfile-language-server-nodejs
+              dockerfile-language-server
               nodePackages.js-beautify
               nodePackages.typescript-language-server
               nodePackages.typescript
@@ -122,11 +123,9 @@ in
                 require('${vscodium}/lib/vscode/resources/app/extensions/markdown-language-features/server/dist/node/workerMain.js')
               '')
               nodePackages.yaml-language-server
-              nodePackages.unified-language-server
               nodePackages.prettier
               jq
-              # nixfmt-classic
-              nixfmt-rfc-style
+              nixfmt
               nixd
               elixir-ls
               marksman
@@ -154,7 +153,7 @@ in
     };
     "doom/config.el" = {
       source = pkgs.replaceVars ./doom/config.el {
-        doom-png = ./doom.png;
+        doom-png = "${./doom.png}";
         inherit (pkgs) nodejs;
         inherit (pkgs.unstable) vscode-js-debug;
         inherit (pkgs.unstable.vscode-extensions.dbaeumer) vscode-eslint;

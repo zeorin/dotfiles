@@ -23,8 +23,6 @@ with pkgs;
 
   emoji-variation-sequences = callPackage ./emoji-variation-sequences { };
 
-  hyprland-preview-share-picker = callPackage ./hyprland-preview-share-picker { };
-
   firefox-csshacks = callPackage ./firefox-csshacks { };
 
   modorganizer2-linux-installer = callPackage ./modorganizer2-linux-installer { };
@@ -39,7 +37,7 @@ with pkgs;
 
   tmuxPlugins =
     prev.tmuxPlugins
-    // (recurseIntoAttrs (
+    // (lib.recurseIntoAttrs (
       prev.callPackage ./tmux-plugins {
         pkgs = prev.__splicedPackages;
       }

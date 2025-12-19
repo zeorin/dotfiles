@@ -4,9 +4,6 @@
   ...
 }:
 
-let
-  emacs = config.programs.emacs.finalPackage;
-in
 {
   imports = [
     ./vterm.nix
@@ -42,7 +39,7 @@ in
   xdg.desktopEntries = {
     org-protocol = {
       name = "org-protocol";
-      exec = ''${emacs}/bin/emacsclient --create-frame --alternate-editor="" %u'';
+      exec = ''emacsclient --create-frame --alternate-editor="" %u'';
       icon = "emacs";
       type = "Application";
       terminal = false;
@@ -52,7 +49,7 @@ in
     };
     my-emacs = {
       name = "My Emacs";
-      exec = "${emacs}/bin/emacs --with-profile default";
+      exec = "emacs --with-profile default";
       icon = "emacs";
       type = "Application";
       terminal = false;
