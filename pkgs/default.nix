@@ -39,7 +39,7 @@ with pkgs;
 
   tmuxPlugins =
     prev.tmuxPlugins
-    // (recurseIntoAttrs (
+    // (lib.recurseIntoAttrs (
       prev.callPackage ./tmux-plugins {
         pkgs = prev.__splicedPackages;
       }

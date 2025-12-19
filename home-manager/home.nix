@@ -150,6 +150,7 @@ in
       username = "zeorin";
       homeDirectory = "/home/${config.home.username}";
       keyboard = null;
+      shell.enableShellIntegration = true;
       sessionVariables = with config.xdg; {
         LESS = "-FRXix2$";
         # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
@@ -298,7 +299,6 @@ in
         enable = true;
         initExtra = ''
           eval "$(batman --export-env)"
-          eval "$(batpipe)"
         '';
       };
       bat = {
@@ -321,6 +321,20 @@ in
           "chrome"
           "chromium"
         ];
+      };
+      delta = {
+        enable = true;
+        enableGitIntegration = true;
+        options = {
+          hyperlinks = true;
+          hyperlinks-file-link-format = "editor://{path}:{line}:{column}";
+          features = lib.concatStringsSep " " [
+            "line-numbers"
+            "navigate"
+            "zebra-dark"
+            "collared-trogon"
+          ];
+        };
       };
       dircolors = {
         enable = true;
@@ -697,7 +711,6 @@ in
       };
       git = {
         enable = true;
-        userName = "Xandor Schiefer";
         includes = [
           {
             path = "${pkgs.delta.src}/themes.gitconfig";
@@ -709,8 +722,9 @@ in
             "${config.home.homeDirectory}/Code/nixpkgs"
           ];
         };
-        extraConfig = {
+        settings = {
           user.useConfigOnly = true;
+          user.name = "Xandor Schiefer";
           github.user = "zeorin";
           gitlab.user = "zeorin";
           bitbucket.user = "zeorin";
@@ -763,356 +777,343 @@ in
           "delta \"magit-delta\"" = {
             line-numbers = false;
           };
+          alias = {
+            a = "add";
+            b = "branch";
+            # Use commitizen if it’s installed, otherwise just use `git commit`
+            c = lib.strings.removeSuffix "\n" ''
+              !f() {
+                if command -v git-cz >/dev/null 2>&1; then
+                  git-cz "$@"
+                else
+                  git commit "$@"
+                fi
+              }
+              f
+            '';
+            co = "checkout";
+            d = "diff";
+            p = "push";
+            r = "rebase";
+            s = "status";
+            u = "unstage";
+            unstage = "reset HEAD --";
+            last = "log -1 HEAD";
+            stash-unapply = lib.strings.removeSuffix "\n" ''
+              !git stash show -p |
+                git apply -R
+            '';
+            assume = "update-index --assume-unchanged";
+            unassume = "update-index --no-assume-unchanged";
+            assumed = lib.strings.removeSuffix "\n" ''
+              !git ls-files -v |
+                ${pkgs.gnugrep}/bin/grep '^h' |
+                cut -c 3-
+            '';
+            assume-all = lib.strings.removeSuffix "\n" ''
+              !git status --porcelain |
+                ${pkgs.gawk}/bin/awk {'print $2'} |
+                ${pkgs.findutils}/bin/xargs -r git assume
+            '';
+            unassume-all = lib.strings.removeSuffix "\n" ''
+              !git assumed |
+                ${pkgs.findutils}/bin/xargs -r git unassume
+            '';
+            skip = "update-index --skip-worktree";
+            unskip = "update-index --no-skip-worktree";
+            skipped = lib.strings.removeSuffix "\n" ''
+              !git ls-files -t |
+                ${pkgs.gnugrep}/bin/grep '^S' |
+                cut -c 3-
+            '';
+            skip-all = lib.strings.removeSuffix "\n" ''
+              !git status --porcelain |
+                ${pkgs.gawk}/bin/awk {'print $2'} |
+                ${pkgs.findutils}/bin/xargs -r git skip
+            '';
+            unskip-all = lib.strings.removeSuffix "\n" ''
+              !git skipped |
+                ${pkgs.findutils}/bin/xargs -r git unskip
+            '';
+            edit-dirty = lib.strings.removeSuffix "\n" ''
+              !git status --porcelain |
+                ${pkgs.gnused}/bin/sed s/^...// |
+                ${pkgs.findutils}/bin/xargs -r "$EDITOR"
+            '';
+            tracked-ignores = lib.strings.removeSuffix "\n" ''
+              !git ls-files |
+                git check-ignore --no-index --stdin
+            '';
+            # https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
+            branch-purge = lib.strings.removeSuffix "\n" ''
+              !git for-each-ref \
+                --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' \
+                refs/heads |
+                ${pkgs.findutils}/bin/xargs -r git branch -d
+            '';
+          }
+          // (
+            let
+              git-ignore = "!${pkgs.writeShellScript "git-ignore" ''
+                # Unofficial Bash strict mode
+                set -euo pipefail
+
+                # Execute from the correct directory
+                cd "$GIT_PREFIX"
+
+                # What were we invoked as?
+                subcommand=ignore # ignore | exclude
+
+                # Utility functions
+                usage() {
+                    cat <<EOF
+                    Usage: git $subcommand [-h|--help] [-n|--dry-run]
+                        [-r|--relative] [-a|--absolute]
+                        [-c|--current] [-t|--toplevel] [-e|--exclude] [-g|--global]
+                        [--] <pattern>...
+
+                    Add the patterns to a gitignore(5) file, and remove any currently tracked
+                    files that match from the index. Does not delete the actual files from the
+                    disk, and does not commit the changes; their removal from the index is
+                    staged.
+
+                    -h, --help
+                        Display this help text and exit.
+
+                    -n, --dry-run
+                        Don't take any actions, instead print representation of actions to
+                        stdout.
+
+                    -r, --relative
+                        Patterns are interpreted relative to the current directory.
+                        This is the default behaviour.
+
+                    -a, --absolute
+                        Patterns are interpreted relative to the root of the worktree. Implies
+                        --toplevel if --exclude or --global are not supplied.
+
+                    -c, --current
+                        Add the patterns to a gitignore file in the current directory.$([ "$subcommand" = ignore ] && printf "\n        This is the default behaviour.")
+
+                    -t, --toplevel
+                        Add the patterns to a gitignore file at the top level of the worktree.
+
+                    -e, --exclude
+                        Add the patterns to \$GIT_DIR/info/exclude.$([ "$subcommand" = exclude ] && printf "\n        This is the default behaviour.")
+
+                    -g, --global
+                        Add the patterns to core.excludesFile (~/.config/git/ignore if not
+                        explicitly set).
+
+                EOF
+                }
+                die() {
+                  echo "$@" >&2
+                  exit 1
+                }
+
+                # Parse arguments
+                args=$(
+                  getopt --options neagtcrh? \
+                      --longoptions subcommand:,dry-run,exclude,absolute,global,toplevel,top-level,current,relative,help \
+                      --name "$(basename "$0")" \
+                      -- "$@"
+                )
+                if [ $? != 0 ]; then die "Terminating..."; fi
+                eval set -- "$args"
+
+                # Gather info
+                global_excludes_filename="$(git config --global --get --default="''${XDG_CONFIG_HOME:="$HOME/.config"}/git/ignore" core.excludesFile)"
+                git_dir="$(git rev-parse --path-format=absolute --git-dir | sed -e "s#/\$##g")"
+                toplevel="$(git rev-parse --path-format=absolute --show-toplevel | sed -e "s#/\$##g")"
+                prefix="$(git rev-parse --show-prefix | sed -e "s#/\$##g")"
+                cwd="$(pwd)"
+
+                # Defaults
+                exclude_file=current # current | toplevel | exclude | global
+                absolute=false # false | true
+                dry_run=false # false | true
+
+                # Set options
+                while true; do
+                  case "$1" in
+                    --subcommand)
+                      subcommand="$2"
+                      shift 2
+                      ;;
+                    -n | --dry-run)
+                      dry_run=true
+                      shift
+                      ;;
+                    -e | --exclude)
+                      exclude_file=exclude
+                      shift
+                      ;;
+                    -a | --absolute)
+                      absolute=true
+                      shift
+                      ;;
+                    -g | --global)
+                      exclude_file=global
+                      shift
+                      ;;
+                    -t | --toplevel | --top-level)
+                      exclude_file=toplevel
+                      shift
+                      ;;
+                    -c | --current)
+                      exclude_file=current
+                      shift
+                      ;;
+                    -r | --relative)
+                      absolute=false
+                      shift
+                      ;;
+                    -h | --help)
+                      usage
+                      exit 0
+                      ;;
+                    --)
+                      shift
+                      break
+                      ;;
+                    *)
+                      die "Internal error!"
+                      ;;
+                  esac
+                done
+
+                # Exit if called without patterns
+                [ $# = 0 ] && (usage; exit 1)
+
+                # Set exclude_file if called as exclude
+                [ "$subcommand" = exclude ] && exclude_file=exclude
+
+                # Set exclude_pattern_scope
+                # exclude_pattern_scope is prepended to each pattern the user gives us
+                case "$absolute" in
+                  true)
+                    # --toplevel is implied if --exclude or --global are not provided when
+                    # --absolute is
+                    [ "$exclude_file" != exclude ] && [ "$exclude_file" != global ] && exclude_file=toplevel
+                    exclude_pattern_scope=""
+                    prefix=""
+                    ;;
+                  false)
+                    exclude_pattern_scope="$(
+                      if [ "$exclude_file" = "current" ]; then
+                        echo ""
+                      else
+                        echo "$prefix"
+                      fi
+                    )"
+                    ;;
+                  *)
+                    die "Unknown \$absolute value $absolute!"
+                    ;;
+                esac
+
+                # Set excludes_filepath
+                case "$exclude_file" in
+                  current)
+                    excludes_filepath="$cwd/.gitignore"
+                    ;;
+                  toplevel)
+                    excludes_filepath="$toplevel/.gitignore"
+                    ;;
+                  exclude)
+                    excludes_filepath="$git_dir/info/exclude"
+                    ;;
+                  global)
+                    excludes_filepath="$global_excludes_filename"
+                    ;;
+                  *)
+                    die "Unknown \$exclude_file value $exclude_file!"
+                    ;;
+                esac
+
+                declare -a scoped_exclude_patterns
+                declare -a exclude_patterns
+
+                for pattern in "$@"; do
+                  # Prepend the scope to the user's patterns
+                  scoped_exclude_patterns+=("$(
+                    if [ -z "$exclude_pattern_scope" ]; then
+                      echo "$pattern"
+                    elif [[ "$pattern" == /* ]]; then
+                      echo "$exclude_pattern_scope$pattern"
+                    else
+                      echo "$exclude_pattern_scope/**/$pattern"
+                    fi
+                  )")
+
+                  # When matching currently tracked files against the user's provided patterns,
+                  # the patterns we provide to git-ls-files must be relative to the root of the
+                  # work tree, thus they might be different from what we actually put in the
+                  # excludes file
+                  exclude_patterns+=("$(
+                    if [ -z "$prefix" ]; then
+                      echo "$pattern"
+                    elif [[ "$pattern" == /* ]]; then
+                      echo "$prefix$pattern"
+                    else
+                      echo "$prefix/**/$pattern"
+                    fi
+                  )")
+                done
+
+                if $dry_run; then
+                  # Print pretty paths
+                  echo "cat <<EOF >>$([ "$exclude_file" != global ] && realpath --relative-to "$cwd" "$excludes_filepath" || echo "''${excludes_filepath/#"$HOME"/\~}")"
+                  printf "%s\n" "''${scoped_exclude_patterns[@]}"
+                  echo "EOF"
+                  tmp="$(mktemp)"
+                  printf "%s\n" "''${exclude_patterns[@]}" >>"$tmp"
+                  git ls-files --cached --ignored --exclude-from="$tmp" -- "$toplevel" |
+                    xargs printf "git rm --cached '%s'\n"
+                  rm "$tmp"
+                else
+                  printf "%s\n" "''${scoped_exclude_patterns[@]}" >>"$excludes_filepath"
+                  tmp="$(mktemp)"
+                  printf "%s\n" "''${exclude_patterns[@]}" >>"$tmp"
+                  git ls-files --cached --ignored --exclude-from="$tmp" -- "$toplevel" |
+                    xargs git rm --cached -- &>/dev/null
+                  rm "$tmp"
+                fi
+              ''}";
+            in
+            {
+              ignore = "${git-ignore} --subcommand ignore";
+              exclude = "${git-ignore} --subcommand exclude";
+            }
+          )
+          // {
+            # https://stackoverflow.com/a/34467298
+            l = "lg";
+            lg = "lg1";
+            lg1 = "lg1-specific --branches --decorate-refs-exclude=refs/remotes/*";
+            lg2 = "lg2-specific --branches --decorate-refs-exclude=refs/remotes/*";
+            lg3 = "lg3-specific --branches --decorate-refs-exclude=refs/remotes/*";
+            lg-all = "lg1-all";
+            lg1-all = "lg1-specific --all";
+            lg2-all = "lg2-specific --all";
+            lg3-all = "lg3-specific --all";
+            lg-specific = "lg1-specific";
+            lg1-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
+            lg2-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'";
+            lg3-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'";
+            # https://docs.gitignore.io/use/command-line
+            ignore-boilerplate = lib.strings.removeSuffix "\n" ''
+              !f() {
+                ${pkgs.curl}/bin/curl -sL "https://www.gitignore.io/api/$@" 2>/dev/null;
+              }
+              f
+            '';
+          };
         };
         signing = {
           key = myKey;
           signByDefault = true;
-        };
-        delta = {
-          enable = true;
-          options = {
-            hyperlinks = true;
-            hyperlinks-file-link-format = "editor://{path}:{line}:{column}";
-            features = lib.concatStringsSep " " [
-              "line-numbers"
-              "navigate"
-              "zebra-dark"
-              "collared-trogon"
-            ];
-          };
-        };
-        aliases = {
-          a = "add";
-          b = "branch";
-          # Use commitizen if it’s installed, otherwise just use `git commit`
-          c = lib.strings.removeSuffix "\n" ''
-            !f() {
-              if command -v git-cz >/dev/null 2>&1; then
-                git-cz "$@"
-              else
-                git commit "$@"
-              fi
-            }
-            f
-          '';
-          co = "checkout";
-          d = "diff";
-          p = "push";
-          r = "rebase";
-          s = "status";
-          u = "unstage";
-          unstage = "reset HEAD --";
-          last = "log -1 HEAD";
-          stash-unapply = lib.strings.removeSuffix "\n" ''
-            !git stash show -p |
-              git apply -R
-          '';
-          assume = "update-index --assume-unchanged";
-          unassume = "update-index --no-assume-unchanged";
-          assumed = lib.strings.removeSuffix "\n" ''
-            !git ls-files -v |
-              ${pkgs.gnugrep}/bin/grep '^h' |
-              cut -c 3-
-          '';
-          assume-all = lib.strings.removeSuffix "\n" ''
-            !git status --porcelain |
-              ${pkgs.gawk}/bin/awk {'print $2'} |
-              ${pkgs.findutils}/bin/xargs -r git assume
-          '';
-          unassume-all = lib.strings.removeSuffix "\n" ''
-            !git assumed |
-              ${pkgs.findutils}/bin/xargs -r git unassume
-          '';
-          skip = "update-index --skip-worktree";
-          unskip = "update-index --no-skip-worktree";
-          skipped = lib.strings.removeSuffix "\n" ''
-            !git ls-files -t |
-              ${pkgs.gnugrep}/bin/grep '^S' |
-              cut -c 3-
-          '';
-          skip-all = lib.strings.removeSuffix "\n" ''
-            !git status --porcelain |
-              ${pkgs.gawk}/bin/awk {'print $2'} |
-              ${pkgs.findutils}/bin/xargs -r git skip
-          '';
-          unskip-all = lib.strings.removeSuffix "\n" ''
-            !git skipped |
-              ${pkgs.findutils}/bin/xargs -r git unskip
-          '';
-          edit-dirty = lib.strings.removeSuffix "\n" ''
-            !git status --porcelain |
-              ${pkgs.gnused}/bin/sed s/^...// |
-              ${pkgs.findutils}/bin/xargs -r "$EDITOR"
-          '';
-          tracked-ignores = lib.strings.removeSuffix "\n" ''
-            !git ls-files |
-              git check-ignore --no-index --stdin
-          '';
-          # https://www.erikschierboom.com/2020/02/17/cleaning-up-local-git-branches-deleted-on-a-remote/
-          branch-purge = lib.strings.removeSuffix "\n" ''
-            !git for-each-ref \
-              --format='%(if:equals=[gone])%(upstream:track)%(then)%(refname:short)%(end)' \
-              refs/heads |
-              ${pkgs.findutils}/bin/xargs -r git branch -d
-          '';
-        }
-        // (
-          let
-            git-ignore = "!${pkgs.writeShellScript "git-ignore" ''
-              # Unofficial Bash strict mode
-              set -euo pipefail
-
-              # Execute from the correct directory
-              cd "$GIT_PREFIX"
-
-              # What were we invoked as?
-              subcommand=ignore # ignore | exclude
-
-              # Utility functions
-              usage() {
-                  cat <<EOF
-                  Usage: git $subcommand [-h|--help] [-n|--dry-run]
-                      [-r|--relative] [-a|--absolute]
-                      [-c|--current] [-t|--toplevel] [-e|--exclude] [-g|--global]
-                      [--] <pattern>...
-
-                  Add the patterns to a gitignore(5) file, and remove any currently tracked
-                  files that match from the index. Does not delete the actual files from the
-                  disk, and does not commit the changes; their removal from the index is
-                  staged.
-
-                  -h, --help
-                      Display this help text and exit.
-
-                  -n, --dry-run
-                      Don't take any actions, instead print representation of actions to
-                      stdout.
-
-                  -r, --relative
-                      Patterns are interpreted relative to the current directory.
-                      This is the default behaviour.
-
-                  -a, --absolute
-                      Patterns are interpreted relative to the root of the worktree. Implies
-                      --toplevel if --exclude or --global are not supplied.
-
-                  -c, --current
-                      Add the patterns to a gitignore file in the current directory.$([ "$subcommand" = ignore ] && printf "\n        This is the default behaviour.")
-
-                  -t, --toplevel
-                      Add the patterns to a gitignore file at the top level of the worktree.
-
-                  -e, --exclude
-                      Add the patterns to \$GIT_DIR/info/exclude.$([ "$subcommand" = exclude ] && printf "\n        This is the default behaviour.")
-
-                  -g, --global
-                      Add the patterns to core.excludesFile (~/.config/git/ignore if not
-                      explicitly set).
-
-              EOF
-              }
-              die() {
-                echo "$@" >&2
-                exit 1
-              }
-
-              # Parse arguments
-              args=$(
-                getopt --options neagtcrh? \
-                    --longoptions subcommand:,dry-run,exclude,absolute,global,toplevel,top-level,current,relative,help \
-                    --name "$(basename "$0")" \
-                    -- "$@"
-              )
-              if [ $? != 0 ]; then die "Terminating..."; fi
-              eval set -- "$args"
-
-              # Gather info
-              global_excludes_filename="$(git config --global --get --default="''${XDG_CONFIG_HOME:="$HOME/.config"}/git/ignore" core.excludesFile)"
-              git_dir="$(git rev-parse --path-format=absolute --git-dir | sed -e "s#/\$##g")"
-              toplevel="$(git rev-parse --path-format=absolute --show-toplevel | sed -e "s#/\$##g")"
-              prefix="$(git rev-parse --show-prefix | sed -e "s#/\$##g")"
-              cwd="$(pwd)"
-
-              # Defaults
-              exclude_file=current # current | toplevel | exclude | global
-              absolute=false # false | true
-              dry_run=false # false | true
-
-              # Set options
-              while true; do
-                case "$1" in
-                  --subcommand)
-                    subcommand="$2"
-                    shift 2
-                    ;;
-                  -n | --dry-run)
-                    dry_run=true
-                    shift
-                    ;;
-                  -e | --exclude)
-                    exclude_file=exclude
-                    shift
-                    ;;
-                  -a | --absolute)
-                    absolute=true
-                    shift
-                    ;;
-                  -g | --global)
-                    exclude_file=global
-                    shift
-                    ;;
-                  -t | --toplevel | --top-level)
-                    exclude_file=toplevel
-                    shift
-                    ;;
-                  -c | --current)
-                    exclude_file=current
-                    shift
-                    ;;
-                  -r | --relative)
-                    absolute=false
-                    shift
-                    ;;
-                  -h | --help)
-                    usage
-                    exit 0
-                    ;;
-                  --)
-                    shift
-                    break
-                    ;;
-                  *)
-                    die "Internal error!"
-                    ;;
-                esac
-              done
-
-              # Exit if called without patterns
-              [ $# = 0 ] && (usage; exit 1)
-
-              # Set exclude_file if called as exclude
-              [ "$subcommand" = exclude ] && exclude_file=exclude
-
-              # Set exclude_pattern_scope
-              # exclude_pattern_scope is prepended to each pattern the user gives us
-              case "$absolute" in
-                true)
-                  # --toplevel is implied if --exclude or --global are not provided when
-                  # --absolute is
-                  [ "$exclude_file" != exclude ] && [ "$exclude_file" != global ] && exclude_file=toplevel
-                  exclude_pattern_scope=""
-                  prefix=""
-                  ;;
-                false)
-                  exclude_pattern_scope="$(
-                    if [ "$exclude_file" = "current" ]; then
-                      echo ""
-                    else
-                      echo "$prefix"
-                    fi
-                  )"
-                  ;;
-                *)
-                  die "Unknown \$absolute value $absolute!"
-                  ;;
-              esac
-
-              # Set excludes_filepath
-              case "$exclude_file" in
-                current)
-                  excludes_filepath="$cwd/.gitignore"
-                  ;;
-                toplevel)
-                  excludes_filepath="$toplevel/.gitignore"
-                  ;;
-                exclude)
-                  excludes_filepath="$git_dir/info/exclude"
-                  ;;
-                global)
-                  excludes_filepath="$global_excludes_filename"
-                  ;;
-                *)
-                  die "Unknown \$exclude_file value $exclude_file!"
-                  ;;
-              esac
-
-              declare -a scoped_exclude_patterns
-              declare -a exclude_patterns
-
-              for pattern in "$@"; do
-                # Prepend the scope to the user's patterns
-                scoped_exclude_patterns+=("$(
-                  if [ -z "$exclude_pattern_scope" ]; then
-                    echo "$pattern"
-                  elif [[ "$pattern" == /* ]]; then
-                    echo "$exclude_pattern_scope$pattern"
-                  else
-                    echo "$exclude_pattern_scope/**/$pattern"
-                  fi
-                )")
-
-                # When matching currently tracked files against the user's provided patterns,
-                # the patterns we provide to git-ls-files must be relative to the root of the
-                # work tree, thus they might be different from what we actually put in the
-                # excludes file
-                exclude_patterns+=("$(
-                  if [ -z "$prefix" ]; then
-                    echo "$pattern"
-                  elif [[ "$pattern" == /* ]]; then
-                    echo "$prefix$pattern"
-                  else
-                    echo "$prefix/**/$pattern"
-                  fi
-                )")
-              done
-
-              if $dry_run; then
-                # Print pretty paths
-                echo "cat <<EOF >>$([ "$exclude_file" != global ] && realpath --relative-to "$cwd" "$excludes_filepath" || echo "''${excludes_filepath/#"$HOME"/\~}")"
-                printf "%s\n" "''${scoped_exclude_patterns[@]}"
-                echo "EOF"
-                tmp="$(mktemp)"
-                printf "%s\n" "''${exclude_patterns[@]}" >>"$tmp"
-                git ls-files --cached --ignored --exclude-from="$tmp" -- "$toplevel" |
-                  xargs printf "git rm --cached '%s'\n"
-                rm "$tmp"
-              else
-                printf "%s\n" "''${scoped_exclude_patterns[@]}" >>"$excludes_filepath"
-                tmp="$(mktemp)"
-                printf "%s\n" "''${exclude_patterns[@]}" >>"$tmp"
-                git ls-files --cached --ignored --exclude-from="$tmp" -- "$toplevel" |
-                  xargs git rm --cached -- &>/dev/null
-                rm "$tmp"
-              fi
-            ''}";
-          in
-          {
-            ignore = "${git-ignore} --subcommand ignore";
-            exclude = "${git-ignore} --subcommand exclude";
-          }
-        )
-        // {
-          # https://stackoverflow.com/a/34467298
-          l = "lg";
-          lg = "lg1";
-          lg1 = "lg1-specific --branches --decorate-refs-exclude=refs/remotes/*";
-          lg2 = "lg2-specific --branches --decorate-refs-exclude=refs/remotes/*";
-          lg3 = "lg3-specific --branches --decorate-refs-exclude=refs/remotes/*";
-          lg-all = "lg1-all";
-          lg1-all = "lg1-specific --all";
-          lg2-all = "lg2-specific --all";
-          lg3-all = "lg3-specific --all";
-          lg-specific = "lg1-specific";
-          lg1-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
-          lg2-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'";
-          lg3-specific = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset) %C(bold cyan)(committed: %cD)%C(reset) %C(auto)%d%C(reset)%n''          %C(white)%s%C(reset)%n''          %C(dim white)- %an <%ae> %C(reset) %C(dim white)(committer: %cn <%ce>)%C(reset)'";
-          # https://docs.gitignore.io/use/command-line
-          ignore-boilerplate = lib.strings.removeSuffix "\n" ''
-            !f() {
-              ${pkgs.curl}/bin/curl -sL "https://www.gitignore.io/api/$@" 2>/dev/null;
-            }
-            f
-          '';
         };
         ignores = [
           "*~"
@@ -1380,7 +1381,7 @@ in
       };
       less = {
         enable = true;
-        keys = ''
+        config = ''
           #line-edit
           ^P  up
           ^N  down
@@ -1520,6 +1521,7 @@ in
           ]
         );
         settings = {
+          PASSWORD_STORE_DIR = "${config.xdg.dataHome}/password-store";
           PASSWORD_STORE_GPG_OPTS = "--no-throw-keyids";
           PASSWORD_STORE_GENERATED_LENGTH = "128";
           PASSWORD_STORE_CHARACTER_SET = "[:print:]"; # All printable characters
@@ -1527,7 +1529,6 @@ in
       };
       rofi = {
         enable = true;
-        package = pkgs.rofi-wayland;
         pass = {
           enable = true;
           package = pkgs.rofi-pass-wayland;
@@ -1751,28 +1752,31 @@ in
       };
       ssh = {
         enable = true;
-        # By default add the key to the agent so we're not asked for the passphrase again
-        addKeysToAgent = "yes";
-        # Enable compression for slow networks, for fast ones this slows it down
-        # compression = true;
-        # Share connections to same host
-        controlMaster = "auto";
-        controlPath = "\${XDG_RUNTIME_DIR}/master-%r@%n:%p";
-        controlPersist = "5m";
-        extraConfig = ''
-          # Only attempt explicitly specified identities
-          IdentitiesOnly yes
-          IdentityFile ~/.ssh/id_ed25519
+        enableDefaultConfig = false;
+        matchBlocks."*" = {
+          # Enable compression for slow networks, for fast ones this slows it down
+          # compression = true;
+          # By default add the key to the agent so we're not asked for the passphrase again
+          addKeysToAgent = "yes";
+          # Share connections to same host
+          controlMaster = "auto";
+          controlPath = "\${XDG_RUNTIME_DIR}/master-%r@%n:%p";
+          controlPersist = "5m";
+          extraOptions = {
+            # Only attempt explicitly specified identities
+            IdentitiesOnly = "yes";
+            IdentityFile = "~/.ssh/id_ed25519";
 
-          # Use a faster cipher
-          Ciphers aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+            # Use a faster cipher
+            Ciphers = "aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr";
 
-          # Login more quickly by bypassing IPv6 lookup
-          AddressFamily inet
+            # Login more quickly by bypassing IPv6 lookup
+            AddressFamily = "inet";
 
-          # Update GPG's startup tty for every ssh command
-          Match host * exec "${config.programs.gpg.package}/bin/gpg-connect-agent updatestartuptty /bye"
-        '';
+            # Update GPG's startup tty for every ssh command
+            # exec = ''"${config.programs.gpg.package}/bin/gpg-connect-agent updatestartuptty /bye"'';
+          };
+        };
         includes = [ "config_local" ];
       };
       starship = {
@@ -2624,70 +2628,6 @@ in
           dbusserver = true;
           portal = true;
         };
-        darkModeScripts = {
-          gtk-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${
-              builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
-            }"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${
-              builtins.replaceStrings [ "Light" ] [ "Dark" ] config.gtk.theme.name
-            }'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
-            ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-dark'"
-          '';
-          kvantum-theme = ''
-            ${pkgs.kdePackages.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNordDark
-          '';
-          icon-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.iconTheme.name
-            }"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.iconTheme.name
-            }'"
-          '';
-          cursor-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
-            }"
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${toString config.gtk.cursorTheme.size}
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
-            }'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${toString config.gtk.cursorTheme.size}
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${
-              builtins.replaceStrings [ "light" ] [ "dark" ] config.gtk.cursorTheme.name
-            }/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
-          '';
-          wallpaper = ''
-            ${scripts.setWallpaper}
-          '';
-        };
-        lightModeScripts = {
-          gtk-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/ThemeName --set "${config.gtk.theme.name}"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/gtk-theme "'${config.gtk.theme.name}'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/color-scheme "'prefer-light'"
-            ${pkgs.dconf}/bin/dconf write /org/freedesktop/appearance/color-scheme "'prefer-light'"
-          '';
-          kvantum-theme = ''
-            ${pkgs.kdePackages.qtstyleplugin-kvantum}/bin/kvantummanager --set ColloidNord
-          '';
-          icon-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Net/IconThemeName --set "${config.gtk.iconTheme.name}"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/icon-theme "'${config.gtk.iconTheme.name}'"
-          '';
-          cursor-theme = ''
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type string --channel xsettings --property /Gtk/CursorThemeName --set "${config.gtk.cursorTheme.name}"
-            ${pkgs.xfce.xfconf}/bin/xfconf-query --create --type int --channel xsettings --property /Gtk/CursorThemeSize --set ${toString config.gtk.cursorTheme.size}
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-theme "'${config.gtk.cursorTheme.name}'"
-            ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/interface/cursor-size ${toString config.gtk.cursorTheme.size}
-            ${pkgs.xorg.xsetroot}/bin/xsetroot -xcf "${config.gtk.cursorTheme.package}/share/icons/${config.gtk.cursorTheme.name}/cursors/left_ptr" ${toString config.gtk.cursorTheme.size}
-          '';
-          wallpaper = ''
-            ${scripts.setWallpaper}
-          '';
-        };
       };
       dunst = {
         enable = true;
@@ -2751,40 +2691,8 @@ in
             showStartupLaunchMessage = true;
             startupLaunch = false;
             uiColor = "#003396";
+            useGrimAdapter = true;
             disabledGrimWarning = true;
-          };
-          Shortcuts = {
-            TYPE_ARROW = "A";
-            TYPE_CIRCLE = "C";
-            TYPE_CIRCLECOUNT = "";
-            TYPE_COMMIT_CURRENT_TOOL = "Ctrl+Return";
-            TYPE_COPY = "Ctrl+C";
-            TYPE_DRAWER = "D";
-            TYPE_EXIT = "Ctrl+Q";
-            TYPE_IMAGEUPLOADER = "Return";
-            TYPE_MARKER = "M";
-            TYPE_MOVESELECTION = "Ctrl+M";
-            TYPE_MOVE_DOWN = "Down";
-            TYPE_MOVE_LEFT = "Left";
-            TYPE_MOVE_RIGHT = "Right";
-            TYPE_MOVE_UP = "Up";
-            TYPE_OPEN_APP = "Ctrl+O";
-            TYPE_PENCIL = "P";
-            TYPE_PIN = "";
-            TYPE_PIXELATE = "B";
-            TYPE_RECTANGLE = "R";
-            TYPE_REDO = "Ctrl+Shift+Z";
-            TYPE_RESIZE_DOWN = "Shift+Down";
-            TYPE_RESIZE_LEFT = "Shift+Left";
-            TYPE_RESIZE_RIGHT = "Shift+Right";
-            TYPE_RESIZE_UP = "Shift+Up";
-            TYPE_SAVE = "Ctrl+S";
-            TYPE_SELECTION = "S";
-            TYPE_SELECTIONINDICATOR = "";
-            TYPE_SELECT_ALL = "Ctrl+A";
-            TYPE_TEXT = "T";
-            TYPE_TOGGLE_PANEL = "Space";
-            TYPE_UNDO = "Ctrl+Z";
           };
         };
       };
@@ -2866,27 +2774,16 @@ in
       };
       hyprsunset = {
         enable = true;
-        transitions = {
-          sunrise = {
-            calendar = "*-*-* 06:00:00";
-            requests = [
-              [
-                "temperature"
-                "6500"
-              ]
-              [ "gamma 100" ]
-            ];
-          };
-          sunset = {
-            calendar = "*-*-* 19:00:00";
-            requests = [
-              [
-                "temperature"
-                "3500"
-              ]
-            ];
-          };
-        };
+        settings.profile = [
+          {
+            time = "06:00";
+            temperature = "6500";
+          }
+          {
+            time = "19:00";
+            temperature = "3500";
+          }
+        ];
       };
       hyprpolkitagent.enable = true;
       kdeconnect = {
@@ -2909,9 +2806,10 @@ in
       enable = true;
 
       # NixOS Hyprland integration options
-      inherit (osConfig.programs.hyprland) package;
+      package = null;
       portalPackage = null;
       systemd.enable = false;
+      systemd.variables = [ "--all" ];
 
       settings = {
         "$mod" = "SUPER";
@@ -3136,16 +3034,25 @@ in
         ];
         windowrule = [
           # "Smart gaps" / "No gaps when only"
-          "bordersize 0, floating:0, onworkspace:w[tv1]"
-          "rounding 0, floating:0, onworkspace:w[tv1]"
-          "bordersize 0, floating:0, onworkspace:f[1]"
-          "rounding 0, floating:0, onworkspace:f[1]"
+          "match:float false, match:workspace w[tv1], border_size 0"
+          "match:float false, match:workspace w[tv1], rounding 0"
+          "match:float false, match:workspace f[1], border_size 0"
+          "match:float false, match:workspace f[1], rounding 0"
           # Fix some dragging issues with XWayland
-          "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
+          "match:class ^$, match:title ^$, match:xwayland true, float true, fullscreen false, pin false, no_focus true"
+          # Flameshot
+          "match:class flameshot, no_anim true"
+          "match:class flameshot, float true"
+          "match:class flameshot, move 0 0"
+          "match:class flameshot, pin true"
+          "match:class flameshot, no_initial_focus true"
+          # set this to your leftmost monitor id, otherwise you have to move your cursor to the leftmost monitor
+          # before executing flameshot
+          "match:class flameshot, monitor 1"
           # Fix IBus
           # https://github.com/hyprwm/Hyprland/issues/288
-          "nofocus, class:^(ibus-ui-gtk3)$"
-          "float, class:^(ibus-ui-gtk3)$"
+          "match:class ^(ibus-ui-gtk3)$, no_focus true"
+          "match:class ^(ibus-ui-gtk3)$, float true"
         ];
       };
     };
@@ -3301,20 +3208,6 @@ in
           color7   #E5E9F0
           color15  #ECEFF4
         '';
-        "Kvantum/ColloidNord".source = "${
-          pkgs.colloid-kde.overrideAttrs (oldAttrs: {
-            postInstall = (oldAttrs.postInstall or "") + ''
-              rm -r $out/share/Kvantum/ColloidNord/ColloidNordDark.*
-            '';
-          })
-        }/share/Kvantum/ColloidNord";
-        "Kvantum/ColloidNordDark".source = "${
-          pkgs.colloid-kde.overrideAttrs (oldAttrs: {
-            postInstall = (oldAttrs.postInstall or "") + ''
-              rm -r $out/share/Kvantum/ColloidNord/ColloidNord.*
-            '';
-          })
-        }/share/Kvantum/ColloidNord";
         "npm/npmrc".text = ''
           init-author-name=Xandor Schiefer
           init-author-email=me@xandor.co.za
@@ -3489,31 +3382,6 @@ in
               "\C-n": history-search-forward
           $endif
         '';
-        "starship.toml" =
-          let
-            tomlFormat = pkgs.formats.toml { };
-            cfg = config.programs.starship;
-            settings = tomlFormat.generate "starship-config" (cfg.settings);
-            nerdFonts = pkgs.runCommandLocal "nerd-font-symbols.toml" { } ''
-              ${cfg.package}/bin/starship preset nerd-font-symbols -o $out
-            '';
-          in
-          lib.mkForce (
-            lib.mkIf cfg.enable {
-              source = lib.mkMerge [
-                (lib.mkIf (cfg.settings != null) (
-                  pkgs.concatTextFile {
-                    name = "starship.toml";
-                    files = [
-                      settings
-                      nerdFonts
-                    ];
-                  }
-                ))
-                (lib.mkIf (cfg.settings == null) nerdFonts)
-              ];
-            }
-          );
         "todo/config".text = ''
           export TODO_DIR="${userDirs.documents}/todo"
           export TODO_FILE="$TODO_DIR/todo.txt"
@@ -3763,6 +3631,24 @@ in
         pager = "${pkgs.ccze}/bin/ccze -A | ${pkgs.less}/bin/less -RSFXin"
         prompt="\n[\d] "
       '';
+      "${config.xdg.configHome}/starship.toml" =
+        let
+          tomlFormat = pkgs.formats.toml { };
+          cfg = config.programs.starship;
+          settings = tomlFormat.generate "starship-config" (cfg.settings);
+          nerdFonts = pkgs.runCommandLocal "nerd-font-symbols.toml" { } ''
+            echo -e "\n" > $out
+            ${cfg.package}/bin/starship preset nerd-font-symbols >> $out
+          '';
+        in
+        lib.mkIf cfg.enable {
+          source = lib.mkForce (
+            pkgs.concatTextFile {
+              name = "starship.toml";
+              files = (lib.optionals (cfg.settings != null) [ settings ]) ++ [ nerdFonts ];
+            }
+          );
+        };
     };
 
     xresources = {
@@ -3827,125 +3713,6 @@ in
           }
         }/src/nord"
       '';
-    };
-
-    gtk = {
-      enable = true;
-      theme = {
-        package = pkgs.colloid-gtk-theme.override {
-          tweaks = [
-            "nord"
-            "rimless"
-          ];
-        };
-        name = "Colloid-Light-Nord";
-      };
-      iconTheme = {
-        package = pkgs.colloid-icon-theme.override { schemeVariants = [ "nord" ]; };
-        name = "Colloid-nord-light";
-      };
-      cursorTheme = {
-        package =
-          let
-            version = "2024-02-28";
-          in
-          pkgs.stdenv.mkDerivation {
-            inherit version;
-            pname = "colloid-cursor-theme";
-            src = "${
-              pkgs.fetchFromGitHub {
-                owner = "vinceliuice";
-                repo = "Colloid-icon-theme";
-                rev = version;
-                hash = "sha256-bTN6x3t88yBL4WsPfOJIiNGWTywdIVi7E2VJKgMzEso=";
-              }
-            }/cursors";
-            nativeBuildInputs = with pkgs; [
-              inkscape
-              xorg.xcursorgen
-              jdupes
-            ];
-            postPatch = ''
-              sed -i \
-                -e 's/#000000/#2e3440/g' \
-                -e 's/#1191f4/#5e81ac/g' \
-                -e 's/#14adf6/#88c0d0/g' \
-                -e 's/#1a1a1a/#2e3440/g' \
-                -e 's/#1b9aeb/#5e81ac/g' \
-                -e 's/#2a2a2a/#3b4252/g' \
-                -e 's/#2c2c2c/#3b4252/g' \
-                -e 's/#3bbd1c/#a3be8c/g' \
-                -e 's/#4caf50/#a3be8c/g' \
-                -e 's/#52cf30/#a3be8c/g' \
-                -e 's/#5b9bf8/#81a1c1/g' \
-                -e 's/#666666/#4c566a/g' \
-                -e 's/#6fce55/#a3be8c/g' \
-                -e 's/#ac44ca/#b48ead/g' \
-                -e 's/#b452cb/#b48ead/g' \
-                -e 's/#c7c7c7/#d8dee9/g' \
-                -e 's/#ca70e1/#b48ead/g' \
-                -e 's/#cecece/#d8dee9/g' \
-                -e 's/#d1d1d1/#d8dee9/g' \
-                -e 's/#dcdcdc/#d8dee9/g' \
-                -e 's/#ed1515/#bf616a/g' \
-                -e 's/#f5f5f5/#e5e9f0/g' \
-                -e 's/#f67400/#d08770/g' \
-                -e 's/#f83f31/#bf616a/g' \
-                -e 's/#faa91e/#d08770/g' \
-                -e 's/#fbb114/#d08770/g' \
-                -e 's/#fbd939/#ebcb8b/g' \
-                -e 's/#fdcf01/#ebcb8b/g' \
-                -e 's/#ff2a2a/#bf616a/g' \
-                -e 's/#ff4332/#bf616a/g' \
-                -e 's/#ff645d/#bf616a/g' \
-                -e 's/#ff9508/#d08770/g' \
-                -e 's/#ffaa07/#d08770/g' \
-                -e 's/#ffd305/#ebcb8b/g' \
-                -e 's/#ffffff/#eceff4/g' \
-                src/svg/*.svg \
-                src/svg-white/*.svg
-
-              patchShebangs build.sh
-
-              substituteInPlace build.sh \
-                --replace 'THEME="Colloid Cursors"' 'THEME="Colloid-nord-light-cursors"' \
-                --replace 'THEME="Colloid-dark Cursors"' 'THEME="Colloid-nord-dark-cursors"'
-
-              patchShebangs install.sh
-
-              substituteInPlace install.sh \
-                --replace '$HOME/.local' $out \
-                --replace '$THEME_NAME-cursors' '$THEME_NAME-nord-light-cursors' \
-                --replace '$THEME_NAME-dark-cursors' '$THEME_NAME-nord-dark-cursors'
-            '';
-            buildPhase = ''
-              runHook preBuild
-              ./build.sh
-              runHook postBuild
-            '';
-            installPhase = ''
-              runHook preInstall
-              mkdir -p $out/share/icons
-              ./install.sh
-              jdupes --quiet --link-soft --recurse $out/share
-              runHook postInstall
-            '';
-          };
-        name = "Colloid-nord-light-cursors";
-        size = 24;
-      };
-      font = {
-        package = pkgs.geist-font;
-        name = "Geist Light";
-        size = 10;
-      };
-      gtk2.configLocation = "${config.xdg.configHome}/gtk-2.0/gtkrc";
-    };
-
-    qt = {
-      enable = true;
-      platformTheme.name = "qtct";
-      style.name = "kvantum";
     };
 
     fonts.fontconfig = {
@@ -4028,8 +3795,8 @@ in
             en-science
           ]
         ))
-        (hunspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
-        (nuspellWithDicts (with hunspellDicts; [ en_GB-ise ]))
+        (hunspell.withDicts (dicts: with dicts; [ en_GB-ise ]))
+        (nuspell.withDicts (dicts: with dicts; [ en_GB-ise ]))
         enchant
         languagetool
         webcamoid
@@ -4045,7 +3812,7 @@ in
         wineWowPackages.stableFull
         winetricks
         protontricks
-        protonup
+        protonup-ng
         wget
         wireshark
         websocat
@@ -4066,13 +3833,12 @@ in
         lxappearance
         tailscale-systray
         protonvpn-gui
-        protonvpn-cli
         thunderbird
         neomutt
         zathura
         sigil
         calibre
-        (pkgs.nur.repos.milahu.kindle_1_17_0.override { wine = wineWowPackages.stableFull; })
+        # (pkgs.nur.repos.milahu.kindle_1_17_0.override { wine = wineWowPackages.stableFull; })
         gnome-calculator
         file-roller
         yt-dlp
@@ -4085,8 +3851,6 @@ in
         newpipelist
         weechat
         yubikey-manager
-        yubikey-personalization
-        yubikey-personalization-gui
         yubioath-flutter
         pcmanfm
         lxmenu-data
@@ -4105,18 +3869,16 @@ in
         inkscape
         krita
         libreoffice
-        onlyoffice-bin
+        # onlyoffice-desktopeditors
         pdfchain
         hledger
         fava
         arandr
-        barrier
         ethtool
         pavucontrol
         ncdu
         qutebrowser
         luakit
-        surf
         (qmk.overrideAttrs (oldAttrs: {
           propagatedBuildInputs =
             oldAttrs.propagatedBuildInputs
@@ -4335,16 +4097,16 @@ in
         ungoogled-chromium
         google-chrome
         netflix
-        tor-browser-bundle-bin
+        tor-browser
         virt-manager
         virt-viewer
         qemu_full
         quickemu
         slack
         zulip
-        whatsapp-for-linux
+        wasistlos
         discord
-        tdesktop
+        telegram-desktop
         signal-desktop
         zoom-us
         element-desktop
@@ -4377,7 +4139,6 @@ in
         ))
 
         mangohud
-        protonup
 
       ]
       ++ [
@@ -4407,7 +4168,7 @@ in
 
         # Microsoft fonts
         corefonts
-        vistafonts
+        vista-fonts
 
         # Metrically-compatible font replacements
         liberation_ttf
@@ -4601,7 +4362,6 @@ in
         freefont_ttf
         unifont
         noto-fonts
-        noto-fonts-extra
         noto-fonts-cjk-sans
 
       ];
@@ -4610,6 +4370,6 @@ in
     systemd.user.startServices = "sd-switch";
 
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    home.stateVersion = "25.05";
+    home.stateVersion = "25.11";
   };
 }

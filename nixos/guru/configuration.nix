@@ -68,9 +68,7 @@
     };
 
     kernelPackages = pkgs.linuxPackages_lqx;
-    extraModulePackages = with config.boot.kernelPackages; [ ddcci-driver ];
     kernelModules = [
-      "ddcci-backlight"
       "nct6775"
     ];
     extraModprobeConfig = ''
@@ -81,37 +79,8 @@
   };
   services.udev.packages = with pkgs; [
     vial
-    android-udev-rules
     sane-airscan
   ];
-  services.udev.extraRules = ''
-    SUBSYSTEM=="i2c-dev", ACTION=="add", ATTR{name}=="AMDGPU DM i2c hw bus *", TAG+="ddcci", TAG+="systemd", ENV{SYSTEMD_WANTS}+="ddcci@$kernel.service"
-  '';
-
-  # https://gitlab.com/ddcci-driver-linux/ddcci-driver-linux/-/issues/7#note_151296583
-  systemd.services."ddcci@" = {
-    description = "ddcci handler";
-    after = [ "graphical.target" ];
-    before = [ "shutdown.target" ];
-    conflicts = [ "shutdown.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.writeShellScript "attach-ddcci" ''
-        echo "Trying to attach ddcci to $1"
-        success=0
-        i=0
-        id=$(echo $1 | cut -d "-" -f 2)
-        while ((success < 1)) && ((i++ < 5)); do
-          ${pkgs.ddcutil}/bin/ddcutil getvcp 10 -b $id && {
-            success=1
-            echo "ddcci 0x37" > /sys/bus/i2c/devices/$1/new_device
-            echo "ddcci attached to $1";
-          } || sleep 5
-        done
-      ''} %i";
-      Restart = "no";
-    };
-  };
 
   fileSystems = {
     "/".options = [
@@ -135,8 +104,6 @@
   hardware.amdgpu = {
     opencl.enable = true;
     initrd.enable = true;
-    amdvlk.enable = true;
-    amdvlk.support32Bit.enable = true;
   };
 
   environment.systemPackages = with pkgs; [
