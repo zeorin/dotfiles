@@ -659,9 +659,6 @@
       libvirtd.enable = true;
     };
 
-    # Enable CUPS to print documents.
-    services.printing.enable = true;
-
     # Security/crypto
     services.gnome.gnome-keyring.enable = true;
 
@@ -729,23 +726,27 @@
 
     environment.shells = [ pkgs.fish ];
 
+    # Enable CUPS to print documents.
+    services.printing.enable = true;
+    # Disable CUPS Browse-d to prevent random hangs on shutdown
+    services.printing.browsed.enable = true;
+    services.printing.drivers = with pkgs; [ cups-brother-mfcj2340dw ];
     hardware.printers = {
-      ensureDefaultPrinter = "MFC-2340DW";
+      ensureDefaultPrinter = "Brother-MFC-J2340DW";
       ensurePrinters = [
         {
           deviceUri = "ipps://brn94ddf82613d1.lan:443/ipp";
           location = "Xandor's Office";
-          name = "MFC-2340DW";
-          description = "Brother MFC-2340DW Inkjet Printer";
-          model = "everywhere";
+          name = "Brother-MFC-J2340DW";
+          description = "Brother MFC-J2340DW Inkjet Printer";
+          model = "brother_mfcj2340dw_printer_en.ppd";
           ppdOptions = {
-            PageSize = "A4"; # 215x345mm 3.5x5 3.5x5.Borderless 4x6 4x6.Borderless 5x7 5x7.Borderless 5x8 5x8.Borderless A3 A3.Borderless A4 A4.Borderless A5 A6 A6.Borderless Env10 EnvC5 EnvDL EnvMonarch Executive FanFoldGermanLegal Legal Letter Letter.Borderless Oficio Tabloid Tabloid.Borderless Custom.WIDTHxHEIGHT
-            InputSlot = "Auto"; # Auto Main
-            MediaType = "StationeryInkjet"; # Stationery PhotographicGlossy StationeryInkjet Com.brotherBp71
-            cupsPrintQuality = "Draft"; # Draft Normal High
-            ColorModel = "Gray"; # RGB Gray
-            Duplex = "None"; # None DuplexNoTumble DuplexTumble
-            OutputBin = "Faceup"; # FaceUp
+            PageSize = "BrA4_B"; # A3 BrA3_B_B B4_S Tabloid_S BrLedger_B_B A4 BrA4_B Letter BrLetter_B Legal Executive A5 A6 BrA6_B B5 JISB6 BrPostC4x6_S BrPostC4x6_B BrIndexC5x8_S BrIndexC5x8_B BrPhotoL_S BrPhotoL_B BrPhoto2L_S BrPhoto2L_B Postcard BrHagaki_B DoublePostcardRotated EnvDL EnvC5 Env10 EnvMonarch FanFoldGermanLegal EnvYou4 EnvChou3 EnvChou4 EnvYou2 195x270mm MexicanLegal IndianLegal
+            Duplex = "DuplexNoTumble"; # None DuplexNoTumble DuplexTumble
+            BRInputSlot = "AutoSelect"; # AutoSelect
+            BRResolution = "Draft"; # Draft Normal Fine
+            BRMonoColor = "Mono"; # FullColor Mono
+            BRMediaType = "Plain"; # Plain Glossy Inkjet IJHagakiCom GlossyHagakiCom PlainHagakiCom IJHagakiAddr GlossyHagakiAddr PlainHagakiAddr
           };
         }
       ];

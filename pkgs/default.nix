@@ -15,6 +15,8 @@ with pkgs;
 
   chemacs2 = callPackage ./chemacs2 { };
 
+  cups-brother-mfcj2340dw = callPackage ./cups-brother-mfcj2340dw { };
+
   dedrm_tools = callPackage ./dedrm_tools { };
 
   doomemacs = callPackage ./doomemacs { };
