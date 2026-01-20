@@ -198,9 +198,6 @@ in
         DIRENV_LOG_FORMAT = "";
 
         DASHT_DOCSETS_DIR = "${dataFile.docsets.source}";
-
-        XDG_CURRENT_DESKTOP = "Hyprland";
-        XDG_SESSION_DESKTOP = "Hyprland";
       };
       activation = with config.xdg; {
         createXdgCacheAndDataDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
