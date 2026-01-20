@@ -199,6 +199,10 @@ in
 
         DASHT_DOCSETS_DIR = "${dataFile.docsets.source}";
       };
+      sessionVariablesExtra = ''
+        unset GTK_IM_MODULE
+        unset QT_IM_MODULE
+      '';
       activation = with config.xdg; {
         createXdgCacheAndDataDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           # Cache dirs
@@ -3053,8 +3057,8 @@ in
           "match:class flameshot, monitor 1"
           # Fix IBus
           # https://github.com/hyprwm/Hyprland/issues/288
-          "match:class ^(ibus-ui-gtk3)$, no_focus true"
-          "match:class ^(ibus-ui-gtk3)$, float true"
+          "match:class ^(Ibus-ui-gtk3)$, no_focus true"
+          "match:class ^(Ibus-ui-gtk3)$, float true"
         ];
       };
     };
@@ -3770,6 +3774,8 @@ in
                   name = "ibus-daemon";
                   desktopName = "Ibus";
                   type = "Application";
+                  noDisplay = true;
+                  icon = "ibus";
                   exec = "ibus start --type wayland";
                   notShowIn = [
                     # GNOME will launch ibus using systemd
