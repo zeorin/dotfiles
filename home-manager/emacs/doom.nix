@@ -105,6 +105,7 @@ in
               dockerfile-language-server
               nodePackages.js-beautify
               nodePackages.typescript-language-server
+              unstable.typescript-go
               nodePackages.typescript
               (writeScriptBin "vscode-css-language-server" ''
                 #!${nodejs}/bin/node
