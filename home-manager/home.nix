@@ -4327,14 +4327,14 @@ in
             name = "san-francisco-pro";
             src = pkgs.fetchurl {
               url = "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg";
-              hash = "sha256-Lk14U5iLc03BrzO5IdjUwORADqwxKSSg6rS3OlH9aa4=";
+              hash = "sha256-u7cLbIRELSNFUa2OW/ZAgIu6vbmK/8kXXqU97xphA+0=";
             };
           })
           (mkAppleFont {
             name = "san-francisco-compact";
             src = pkgs.fetchurl {
               url = "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg";
-              hash = "sha256-CMNP+sL5nshwK0lGBERp+S3YinscCGTi1LVZVl+PuOM=";
+              hash = "sha256-mcMM/cbmOA5ykyIb74bid9vU6wyl8nVwkvkd+VlOdwo=";
             };
           })
           (mkAppleFont {
