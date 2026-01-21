@@ -528,15 +528,6 @@ in
             # CTRL+Backspace deletes work
             bind --user \b backward-kill-path-component
             bind --user -M insert \b backward-kill-path-component
-
-            # Inhibit empty command line submissions
-            # https://github.com/fish-shell/fish-shell/issues/7797
-            bind --user \r 'commandline | string trim | string length -q \
-              && transient_execute \
-              || commandline -r ""'
-            bind --user -M insert \r 'commandline | string trim | string length -q \
-              && transient_execute \
-              || commandline -r ""'
           '';
           mkcd = {
             description = "Create a directory and change into it";
