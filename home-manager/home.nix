@@ -1429,7 +1429,7 @@ in
           "O" = "script-binding uosc/show-in-directory #! Utils > Show in directory";
           # "#" = "script-binding uosc/open-config-directory #! Utils > Open config directory";
           # "#" = "script-binding uosc/update #! Utils > Update uosc";
-          "R" = ''script-message-to uosc show-submenu #! Utils > Aspect ratio'';
+          "R" = "script-message-to uosc show-submenu #! Utils > Aspect ratio";
           "F" = "script-binding quality_menu/video_formats_toggle";
           "Alt+f" = "script-binding quality_menu/audio_formats_toggle";
         };
