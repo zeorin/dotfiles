@@ -4,15 +4,16 @@
   python312,
   ensureNewerSourcesForZipFilesHook,
   unzip,
+  nix-update-script,
 }:
 
 stdenvNoCC.mkDerivation (finalArgs: {
   pname = "DeDRM_tools";
-  version = "10.0.9-unstable-2024-11-10";
+  version = "10.0.9";
   src = fetchFromGitHub {
     owner = "noDRM";
     repo = "DeDRM_tools";
-    rev = "v${finalArgs.version}";
+    rev = "v10.0.9";
     hash = "sha256-BPNnIZwpafNa566BHK9IKG2PHVU8N8HJ4rR3ECSvyps=";
   };
 
@@ -43,4 +44,6 @@ stdenvNoCC.mkDerivation (finalArgs: {
 
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { };
 })

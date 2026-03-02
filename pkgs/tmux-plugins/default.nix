@@ -11,13 +11,13 @@ in
 {
   mighty-scroll = mkTmuxPlugin {
     pluginName = "mighty-scroll";
-    version = "0-unstable-2025-04-14";
+    version = "0-unstable-2025-12-10";
     rtpFilePath = "mighty-scroll.tmux";
     src = fetchFromGitHub {
       owner = "noscript";
       repo = "tmux-mighty-scroll";
-      rev = "ea328618bab21b7078616438cc7928a4ca35b032";
-      hash = "sha256-FBDSOfdE3eYrZCYpLzHi37kw6mSP511sgNx+QPA/+2I=";
+      rev = "fa5db0718e9e9f7278520ecf63b96b84b0cc57d6";
+      hash = "sha256-F62qF3rGhvSIP5MKamTZHswt8rvuBspRCi2iDjcZuTI=";
     };
     buildPhase = ''
       mkdir -p $out/bin

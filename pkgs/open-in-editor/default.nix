@@ -5,11 +5,12 @@
   makeWrapper,
   python3,
   makeDesktopItem,
+  nix-update-script,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "open-in-editor";
-  version = "unstable-2023-06-01";
+  version = "0-unstable-2023-06-01";
   src = fetchFromGitHub {
     owner = "dandavison";
     repo = "open-in-editor";
@@ -44,4 +45,5 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       "x-scheme-handler/editor"
     ];
   };
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 })

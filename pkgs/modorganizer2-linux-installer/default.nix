@@ -14,12 +14,12 @@
 }:
 
 let
-  version = "4.6.2";
+  version = "rewrite-pre-refactor";
   src = fetchFromGitHub {
     owner = "rockerbacon";
     repo = "modorganizer2-linux-installer";
     rev = version;
-    hash = "sha256-+lVB7Yai7SvK5XtE9bCM/LiH9VIf3pIFA/W9FDm/szM=";
+    hash = "sha256-yYcH/PhsbNkSQoZv3294cEclTwzQzB29XtgVAQu4K2c=";
   };
 
   useWin32ThreadModel =
