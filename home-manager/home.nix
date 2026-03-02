@@ -3835,7 +3835,7 @@ in
         zathura
         sigil
         calibre
-        # (pkgs.nur.repos.milahu.kindle_1_17_0.override { wine = wineWowPackages.stableFull; })
+        (pkgs.nur.repos.milahu.kindle_1_17_0.override { wine = wineWowPackages.stableFull; })
         gnome-calculator
         file-roller
         yt-dlp
@@ -4321,14 +4321,14 @@ in
             name = "san-francisco-pro";
             src = pkgs.fetchurl {
               url = "https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg";
-              hash = "sha256-u7cLbIRELSNFUa2OW/ZAgIu6vbmK/8kXXqU97xphA+0=";
+              hash = "sha256-W0sZkipBtrduInk0oocbFAXX1qy0Z+yk2xUyFfDWx4s=";
             };
           })
           (mkAppleFont {
             name = "san-francisco-compact";
             src = pkgs.fetchurl {
               url = "https://devimages-cdn.apple.com/design/resources/download/SF-Compact.dmg";
-              hash = "sha256-mcMM/cbmOA5ykyIb74bid9vU6wyl8nVwkvkd+VlOdwo=";
+              hash = "sha256-RWeq4GFt01r8NLrWvvVH5y/R5lhFMFozlzBkUY0dU0g=";
             };
           })
           (mkAppleFont {
