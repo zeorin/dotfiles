@@ -12,6 +12,7 @@
   devenv,
   nix-software-center,
   hyprland,
+  determinate,
   nixpkgs-unstable,
   ...
 }@moduleArgs:
@@ -22,6 +23,7 @@
     "${nixpkgs-unstable}/nixos/modules/programs/wayland/hyprland.nix"
     home-manager.nixosModules.home-manager
     sops-nix.nixosModules.sops
+    determinate.nixosModules.default
     ./caches.nix
     ./logiops.nix
   ];
@@ -549,6 +551,10 @@
           group = config.users.users.zeorin.group;
         };
       };
+    };
+
+    environment.variables = {
+      DETSYS_IDS_TELEMETRY = "disabled";
     };
 
     environment.pathsToLink = [
