@@ -22,7 +22,7 @@
     "${nixpkgs-unstable}/nixos/modules/programs/wayland/hyprland.nix"
     home-manager.nixosModules.home-manager
     sops-nix.nixosModules.sops
-    ./cachix.nix
+    ./caches.nix
     ./logiops.nix
   ];
   disabledModules = [
