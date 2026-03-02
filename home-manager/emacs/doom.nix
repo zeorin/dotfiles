@@ -19,6 +19,12 @@ let
       ]
     }''${PATH:+:$PATH}"
   '';
+
+  nodejs = pkgs.unstable.nodejs_25.overrideAttrs (oldAttrs: {
+    configureFlags = (oldAttrs.configureFlags or [ ]) ++ [
+      "--experimental-enable-pointer-compression"
+    ];
+  });
 in
 {
   home.sessionPath = [ "${doomemacs}/bin" ];
@@ -33,6 +39,9 @@ in
           name = "doomemacs-deps";
           pathsToLink = [ "/bin" ];
           paths = map lib.getBin (
+            let
+              nodePackages = nodejs.passthru.pkgs;
+            in
             with pkgs;
             [
               git
@@ -155,7 +164,7 @@ in
     "doom/config.el" = {
       source = pkgs.replaceVars ./doom/config.el {
         doom-png = "${./doom.png}";
-        inherit (pkgs) nodejs;
+        inherit nodejs;
         inherit (pkgs.unstable) vscode-js-debug;
         inherit (pkgs.unstable.vscode-extensions.dbaeumer) vscode-eslint;
         inherit (pkgs.unstable.vscode-extensions.firefox-devtools) vscode-firefox-debug;
