@@ -55,6 +55,7 @@ in
               python3
               binutils
               (ripgrep.override { withPCRE2 = true; })
+              ast-grep
               fd
               gnutls
               imagemagick

@@ -67,3 +67,5 @@
 (package! flycheck-hledger)
 
 (package! magit-tbdiff)
+
+(package! ast-grep)
