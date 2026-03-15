@@ -129,8 +129,8 @@
           "zeorin"
           "@wheel"
         ];
-        # keep-outputs = true;
-        # keep-derivations = true;
+        keep-outputs = true;
+        keep-derivations = true;
         # https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-use-xdg-base-directories
         # use-xdg-base-directories = true;
       };
