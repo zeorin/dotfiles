@@ -472,3 +472,8 @@ tasks."
 
 (after! latex
   (setq +latex-viewers '(zathura)))
+
+(use-package! kdl-mode
+  :ensure
+  :mode
+  (("\\.kdl\\'" . kdl-mode)))

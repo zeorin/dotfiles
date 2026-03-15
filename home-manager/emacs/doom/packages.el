@@ -69,3 +69,5 @@
 (package! magit-tbdiff)
 
 (package! ast-grep)
+
+(package! kdl-mode)
