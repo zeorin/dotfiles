@@ -41,7 +41,7 @@
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
-    devenv.url = "github:cachix/devenv/latest";
+    devenv.url = "github:cachix/devenv/v1.11.2";
 
     hyprland.url = "github:hyprwm/Hyprland";
 
