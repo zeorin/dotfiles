@@ -709,9 +709,6 @@ in
             autoStash = true;
             conflictStyle = "diff3";
           };
-          mergetool.prompt = false;
-          "mergetool \"nvimdiff\"".cmd =
-            ''$VISUAL -d -c '4wincmd w | wincmd J'  "$LOCAL" "$BASE" "$REMOTE" "$MERGED"'';
           branch.autosetupmerge = true;
           rerere = {
             enabled = true;
@@ -1329,6 +1326,7 @@ in
           ^N  down
         '';
       };
+      mergiraf.enable = true;
       mpv = {
         enable = true;
         config = {
