@@ -3664,7 +3664,7 @@ in
 
     dconf.settings = {
       "desktop/ibus/general" = {
-        embed-preedit-text = true;
+        embed-preedit-text = false;
         use-global-engine = true;
         use-system-keyboard-layout = true;
         switcher-delay-time = -1;
