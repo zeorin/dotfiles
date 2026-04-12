@@ -155,8 +155,6 @@ in
         LESS = "-FRXix2$";
         # Non-standard env var, found in https://github.com/i3/i3/blob/next/i3-sensible-terminal
         TERMINAL = "${pkgs.unstable.app2unit}/bin/app2unit-term";
-        BATDIFF_USE_DELTA = "true";
-        DELTA_FEATURES = "+side-by-side";
 
         EDITOR_URL = "editor://{path}:{line}";
         # Non-standard env var, found in https://github.com/yyx990803/launch-editor
@@ -326,19 +324,10 @@ in
           "chromium"
         ];
       };
-      delta = {
+      difftastic = {
         enable = true;
-        enableGitIntegration = true;
-        options = {
-          hyperlinks = true;
-          hyperlinks-file-link-format = "editor://{path}:{line}:{column}";
-          features = lib.concatStringsSep " " [
-            "line-numbers"
-            "navigate"
-            "zebra-dark"
-            "collared-trogon"
-          ];
-        };
+        git.enable = true;
+        git.diffToolMode = true;
       };
       dircolors = {
         enable = true;
@@ -626,36 +615,6 @@ in
               end
             '';
           };
-          # https://dandavison.github.io/delta/tips-and-tricks/toggling-delta-features.html
-          delta-toggle = {
-            description = "Toggle delta features such as side-by-side";
-            body = ''
-              set --export --global DELTA_FEATURES "$(${
-                pkgs.stdenvNoCC.mkDerivation {
-                  pname = "-delta-features-toggle";
-                  version = "unstable-2024-12-28";
-                  preferLocalBuild = true;
-                  allowSubstitutes = false;
-                  src = pkgs.fetchurl {
-                    url = "https://raw.githubusercontent.com/dandavison/tools/b9522d5ed542bf08c0cb62adddcfaf61a6876873/python/-delta-features-toggle";
-                    hash = "sha256-c0/Cqp4giyp+oZ3LD+44qDmqzBNM16ezoAqVV7UKxLo=";
-                  };
-                  dontUnpack = true;
-                  dontConfigure = true;
-                  dontBuild = true;
-                  installPhase = ''
-                    runHook preInstall
-
-                    substitute $src $out \
-                      --replace "/usr/bin/python3" "${pkgs.python3}/bin/python"
-                    chmod +x $out
-
-                    runHook postInstall
-                  '';
-                }
-              } $argv[1] | tee /dev/stderr)"
-            '';
-          };
         };
         interactiveShellInit = ''
           # Clear greeting message
@@ -706,11 +665,6 @@ in
       };
       git = {
         enable = true;
-        includes = [
-          {
-            path = "${pkgs.delta.src}/themes.gitconfig";
-          }
-        ];
         maintenance = {
           enable = true;
           repositories = [
@@ -745,19 +699,15 @@ in
             pushNonFastForward = false;
           };
           diff = {
-            algorithm = "histogram";
+            algorithm = "minimal";
             renames = "copies";
             mnemonicprefix = true;
-            tool = "nvimdiff";
             colorMoved = "default";
           };
-          difftool.prompt = false;
-          "difftool \"nvimdiff\"".cmd = ''$VISUAL -d "$LOCAL" "$REMOTE"'';
           merge = {
             stat = true;
-            tool = "nvimdiff";
             autoStash = true;
-            conflictStyle = "zdiff3";
+            conflictStyle = "diff3";
           };
           mergetool.prompt = false;
           "mergetool \"nvimdiff\"".cmd =
@@ -769,9 +719,6 @@ in
           };
           log.abbrevCommit = true;
           blame.ignoreRevsFile = ".git-blame-ignore-revs";
-          "delta \"magit-delta\"" = {
-            line-numbers = false;
-          };
           alias = {
             a = "add";
             b = "branch";
