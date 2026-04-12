@@ -20,11 +20,7 @@ let
     }''${PATH:+:$PATH}"
   '';
 
-  nodejs = pkgs.unstable.nodejs_25.overrideAttrs (oldAttrs: {
-    configureFlags = (oldAttrs.configureFlags or [ ]) ++ [
-      "--experimental-enable-pointer-compression"
-    ];
-  });
+  nodejs = pkgs.nodejs_latest;
 in
 {
   home.sessionPath = [ "${doomemacs}/bin" ];

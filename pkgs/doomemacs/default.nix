@@ -7,13 +7,13 @@
 
 stdenvNoCC.mkDerivation {
   pname = "doomemacs";
-  version = "2.0.9-unstable-2026-03-02";
+  version = "2.2.0-unstable-2026-06-24";
 
   src = fetchFromGitHub {
     owner = "doomemacs";
     repo = "doomemacs";
-    rev = "470e653f08cfe85bbc02516af65e44d3b9c735b8";
-    hash = "sha256-0dm0Oc5yd1vwqQoa3lAJznnocyCLkOC7zHkUTqCVI94=";
+    rev = "555dc5f0459344e86c01e9a72bceea92631f0db0";
+    hash = "sha256-n1wy8M3u+21vUZFAVVfD64TOHSuqzj/V4/J8VB+Zjco=";
   };
 
   nativeBuildInputs = [ makeWrapper ];

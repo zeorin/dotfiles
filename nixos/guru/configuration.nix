@@ -67,7 +67,7 @@
       };
     };
 
-    kernelPackages = pkgs.linuxPackages_lqx;
+    kernelPackages = pkgs.linuxPackages_zen;
     kernelModules = [
       "nct6775"
     ];

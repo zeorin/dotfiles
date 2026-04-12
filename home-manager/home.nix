@@ -458,9 +458,6 @@ in
               # "network.http.max-persistent-connections-per-server" = 6; # default
               # "network.http.max-persistent-connections-per-server" = 10;
             };
-            enableUserChrome = {
-              "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-            };
             saneNewTab = {
               # Don't open links in new tabs, except when it makes sense
               "browser.link.open_newwindow" = 1; # force new window into same tab
@@ -473,13 +470,7 @@ in
             personal = {
               id = 0;
               isDefault = true;
-              settings =
-                commonSettings // noNoiseSuppression // performanceSettings // enableUserChrome // saneNewTab;
-              userChrome = ''
-                @import url('${pkgs.firefox-csshacks}/chrome/window_control_placeholder_support.css');
-                @import url('${pkgs.firefox-csshacks}/chrome/hide_tabs_toolbar.css');
-                @import url('${pkgs.firefox-csshacks}/chrome/autohide_toolbox.css');
-              '';
+              settings = commonSettings // noNoiseSuppression // performanceSettings // saneNewTab;
               extensions.packages = extensions;
             };
             developer-edition = {

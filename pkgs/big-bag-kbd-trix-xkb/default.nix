@@ -16,19 +16,19 @@ in
 
 stdenvNoCC.mkDerivation {
   pname = "big-bag-kbd-trix-xkb";
-  version = "0-unstable-2026-01-08";
+  version = "0-unstable-2026-01-31";
 
   src = fetchFromGitHub {
     owner = "DreymaR";
     repo = "BigBagKbdTrixXKB";
-    rev = "2b58b33922c7aaa3171cc597c32848ad70b7edaa";
-    hash = "sha256-jjgLmfC4JWBuC2Bakt+ymIqRWKwazBWY3FCOqxgNlew=";
+    rev = "bcbf7f09d4277419f49b1c778d0d9559619f6bfa";
+    hash = "sha256-UyODm668nNue6HGfwZKE5BZeN9IG3LxBfcCt2aqaDaU=";
   };
 
   postPatch = ''
     substituteInPlace install-dreymar-xmod.sh \
       --replace-fail "DModFix='d'" "DModFix='''" \
-      --replace-fail "cp -a" "cp -a --no-preserve=mode"
+      --replace-fail "cp -aZ" "cp -aZ --no-preserve=mode"
 
     patchShebangs install-dreymar-xmod.sh
   '';
