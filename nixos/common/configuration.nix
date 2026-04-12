@@ -557,6 +557,10 @@
       DETSYS_IDS_TELEMETRY = "disabled";
     };
 
+    environment.sessionVariables = {
+      XKB_CONFIG_ROOT = config.services.xserver.xkb.dir;
+    };
+
     environment.pathsToLink = [
       "/share/xdg-desktop-portal"
       "/share/applications"
