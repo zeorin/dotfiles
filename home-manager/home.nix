@@ -146,6 +146,8 @@ in
   ];
 
   config = {
+    nix.assumeXdg = true;
+
     home = {
       username = "zeorin";
       homeDirectory = "/home/${config.home.username}";
@@ -345,6 +347,7 @@ in
       };
       firefox = {
         enable = true;
+        configPath = "${config.xdg.configHome}/mozilla/firefox";
         package = pkgs.firefox.override {
           nativeMessagingHosts = with pkgs; [
             browserpass
@@ -1220,7 +1223,10 @@ in
           ^N  down
         '';
       };
-      mergiraf.enable = true;
+      mergiraf = {
+        enable = true;
+        enableGitIntegration = true;
+      };
       mpv = {
         enable = true;
         config = {
@@ -1587,16 +1593,16 @@ in
       ssh = {
         enable = true;
         enableDefaultConfig = false;
-        matchBlocks."*" = {
-          # Enable compression for slow networks, for fast ones this slows it down
-          # compression = true;
-          # By default add the key to the agent so we're not asked for the passphrase again
-          addKeysToAgent = "yes";
-          # Share connections to same host
-          controlMaster = "auto";
-          controlPath = "\${XDG_RUNTIME_DIR}/master-%r@%n:%p";
-          controlPersist = "5m";
-          extraOptions = {
+        settings = {
+          "*" = {
+            # Enable compression for slow networks, for fast ones this slows it down
+            # compression = true;
+            # By default add the key to the agent so we're not asked for the passphrase again
+            AddKeysToAgent = "yes";
+            # Share connections to same host
+            ControlMaster = "auto";
+            ControlPath = "\${XDG_RUNTIME_DIR}/master-%r@%n:%p";
+            ControlPersist = "5m";
             # Only attempt explicitly specified identities
             IdentitiesOnly = "yes";
             IdentityFile = "~/.ssh/id_ed25519";
@@ -1608,7 +1614,7 @@ in
             AddressFamily = "inet";
 
             # Update GPG's startup tty for every ssh command
-            # exec = ''"${config.programs.gpg.package}/bin/gpg-connect-agent updatestartuptty /bye"'';
+            # Exec = ''"${config.programs.gpg.package}/bin/gpg-connect-agent updatestartuptty /bye"'';
           };
         };
         includes = [ "config_local" ];
@@ -1688,68 +1694,6 @@ in
             '';
           }
           {
-            plugin = tmux-which-key.overrideAttrs (oldAttrs: {
-              configYaml = lib.generators.toYAML { } {
-                # The starting index to use for the command-alias option, used for macros
-                # (required). This value must be at least 200
-                command_alias_start_index = 200;
-                # The keybindings that open the action menu (required)
-                keybindings = {
-                  prefix_table = "Space"; # The keybinding for the prefix key table (required)
-                  root_table = "C-Space"; # The keybinding for the root key table (optional)
-                };
-                # The menu title config (optional)
-                title = {
-                  style = "align=centre,bold"; # The title style
-                  prefix = "tmux"; # A prefix added to every menu title
-                  prefix_style = "fg=green,align=centre,bold"; # The prefix style
-                };
-                # The menu position (optional)
-                position = {
-                  x = "R";
-                  y = "P";
-                };
-                # The root menu items (required)
-                items = [
-                  {
-                    name = "Next pane";
-                    key = "space"; # The key that triggers this action
-                    command = "next-pane"; # A command to run
-                  }
-                  {
-                    name = "Respawn pane";
-                    key = "R";
-                    macro = "restart-pane"; # A custom macro (defined above)
-                  }
-                  {
-                    separator = true; # A menu separator
-                  }
-                  {
-                    name = "+Layout"; # A submenu
-                    key = "l";
-                    # The submenu items
-                    menu = [
-                      {
-                        name = "Next";
-                        key = "l";
-                        command = "nextl";
-                        transient = true; # Whether to keep the menu open until ESC is pressed
-                      }
-                    ];
-                  }
-                ];
-              };
-              passAsFile = (oldAttrs.passAsFile or [ ]) ++ [ "configYaml" ];
-              preInstall = (oldAttrs.preInstall or "") + ''
-                mkdir -p $out/plugin
-                cp $configYamlPath $out/plugin/config.yaml
-              '';
-            });
-            extraConfig = ''
-              set -g @tmux-which-key-disable-autobuild 1
-            '';
-          }
-          {
             plugin = transient-status;
             extraConfig = ''
               set-option -g status 'off'
@@ -1762,6 +1706,8 @@ in
         viAlias = true;
         vimAlias = true;
         vimdiffAlias = true;
+        withRuby = false;
+        withPython3 = false;
         extraConfig = ''
           " use visual terminal bell
           set vb
@@ -1940,6 +1886,7 @@ in
         plugins = with pkgs.vimPlugins; [
           {
             plugin = vim-gitgutter;
+            type = "viml";
             config = ''
               let g:gitgutter_map_keys = 0
               let g:gitgutter_sign_priority = 9
@@ -1947,12 +1894,14 @@ in
           }
           {
             plugin = nord-vim;
+            type = "viml";
             config = ''
               colorscheme nord
             '';
           }
           {
             plugin = vim-airline;
+            type = "viml";
             config = ''
               let g:airline_powerline_fonts = 1 " Use powerline glyphs
               let g:airline#extensions#tabline#enabled = 1 " Use tabline
@@ -1979,6 +1928,7 @@ in
           vim-surround
           {
             plugin = ale;
+            type = "viml";
             config = ''
               let g:ale_command_wrapper = 'env NODE_ENV=development'
               let g:airline#extensions#ale#enabled = 1
@@ -2011,6 +1961,7 @@ in
           }
           {
             plugin = nerdtree;
+            type = "viml";
             config = ''
               let g:NERDTreeShowHidden = 1
               let g:NERDTreeMinimalUI = 1
@@ -2019,6 +1970,7 @@ in
           }
           {
             plugin = nerdtree-git-plugin;
+            type = "viml";
             config = ''
               let g:NTPNames = ['.git*', 'package.json']
               let g:NTPNamesDirs = ['.git']
@@ -2026,6 +1978,7 @@ in
           }
           {
             plugin = vim-rooter;
+            type = "viml";
             config = ''
               let g:rooter_patterns = ['.git', '.git/', 'package.json']
               let g:rooter_silent_chdir = 1
@@ -2033,6 +1986,7 @@ in
           }
           {
             plugin = ack-vim;
+            type = "viml";
             config = ''
               if executable('ag')
               	let g:ackprg = "ag --nogroup --nocolor --column --hidden"
@@ -2047,6 +2001,7 @@ in
           vim-fugitive
           {
             plugin = delimitMate;
+            type = "viml";
             config = ''
               let delimitMate_expand_space = 1
               let delimitMate_expand_cr = 2
@@ -2059,6 +2014,7 @@ in
           vim-polyglot
           {
             plugin = vim-devicons;
+            type = "viml";
             config = ''
               let g:webdevicons_enable_nerdtree = 1
               let g:webdevicons_conceal_nerdtree_brackets = 1
@@ -2244,7 +2200,7 @@ in
           Install.WantedBy = [ "graphical-session.target" ];
           Service = {
             Environment = "PATH=${config.home.profileDirectory}/bin";
-            ExecStart = "${pkgs.xfce.xfce4-settings}/bin/xfsettingsd";
+            ExecStart = "${pkgs.xfce4-settings}/bin/xfsettingsd";
             Restart = "on-failure";
           };
         };
@@ -2265,7 +2221,10 @@ in
 
     xdg = {
       enable = true;
-      userDirs.enable = true;
+      userDirs = {
+        enable = true;
+        setSessionVariables = true;
+      };
       configFile = with config.xdg; {
         "curl/.curlrc".text = ''
           write-out "\n"
@@ -2854,6 +2813,7 @@ in
         usbutils
         pciutils
         inetutils
+        android-tools
         brightnessctl
         asciinema
         (symlinkJoin {
@@ -2916,7 +2876,7 @@ in
         httpie
         devenv
         xdg-user-dirs
-        wineWowPackages.stableFull
+        wineWow64Packages.stableFull
         winetricks
         protontricks
         protonup-ng
@@ -2934,12 +2894,11 @@ in
         silver-searcher
         ripgrep
         fd
-        xorg.xkill
         bc
         feh
         lxappearance
         tailscale-systray
-        protonvpn-gui
+        proton-vpn
         thunderbird
         neomutt
         zathura
@@ -3126,7 +3085,7 @@ in
                 {
                   buildInputs = with pkgs; [
                     makeWrapper
-                    xorg.lndir
+                    lndir
                   ];
                 }
                 // (removeAttrs args [
@@ -3211,7 +3170,7 @@ in
         quickemu
         slack
         zulip
-        wasistlos
+        whatsie
         discord
         telegram-desktop
         signal-desktop
@@ -3235,7 +3194,7 @@ in
         dasht
 
         # For dark mode toggling
-        xfce.xfconf
+        xfconf
 
         (retroarch.withCores (
           cores:
@@ -3254,9 +3213,6 @@ in
         # FONTS #
         #########
 
-        et-book
-        geist-font
-
         # Emoji
         # emojione
         twitter-color-emoji
@@ -3271,7 +3227,7 @@ in
         libre-bodoni
         libre-caslon
         libre-franklin
-        etBook
+        et-book
 
         # Microsoft fonts
         corefonts
@@ -3290,11 +3246,8 @@ in
         raleway
         comic-neue
         comic-relief
-        fira
-        fira-mono
         lato
         libertine
-        libertinus
         montserrat
         f5_6
         route159
@@ -3464,7 +3417,7 @@ in
 
         # Fallback fonts
         cm_unicode
-        xorg.fontcursormisc
+        fontcursormisc
         symbola
         freefont_ttf
         unifont

@@ -10,7 +10,6 @@
   home-manager,
   sops-nix,
   devenv,
-  nix-software-center,
   determinate,
   nixpkgs-unstable,
   ...
@@ -22,13 +21,16 @@
     sops-nix.nixosModules.sops
     determinate.nixosModules.default
     ./caches.nix
-    ./logiops.nix
     ./niri.nix
   ];
 
   config = {
     nixpkgs = {
       config.allowUnfree = true;
+      config.permittedInsecurePackages = [
+        # https://github.com/NixOS/nixpkgs/issues/525631
+        "electron-39.8.10"
+      ];
 
       overlays = [
         # Add overlays your own flake exports (from overlays and pkgs dir):
@@ -126,7 +128,7 @@
         keep-outputs = true;
         keep-derivations = true;
         # https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-use-xdg-base-directories
-        # use-xdg-base-directories = true;
+        use-xdg-base-directories = true;
       };
     };
 
@@ -206,7 +208,6 @@
     };
 
     environment.systemPackages = with pkgs; [
-      # nix-software-center.packages.${stdenv.hostPlatform.system}.nix-software-center
       moreutils
       usbutils
       pciutils
@@ -241,7 +242,9 @@
       cpuFreqGovernor = lib.mkDefault "performance";
     };
 
-    systemd.sleep.extraConfig = "HibernateDelaySec=4h";
+    systemd.sleep.settings.Sleep = {
+      HibernateDelaySec = "4h";
+    };
     services.logind.settings.Login = {
       HandlePowerKey = "hibernate";
       HandleSuspendKey = "suspend-then-hibernate";
@@ -312,8 +315,6 @@
         ];
       };
     };
-    systemd.network.wait-online.enable = false;
-    systemd.services.NetworkManager-wait-online.enable = false;
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_ZA.UTF-8";
@@ -548,6 +549,7 @@
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "bak";
+      startAsUserService = true;
       users.zeorin = import ../../home-manager/home.nix;
     };
 
@@ -685,20 +687,24 @@
 
     services.logiops = {
       enable = true;
-      extraConfig = ''
-        devices: ({
-          name: "Wireless Mouse MX Master 3";
-          smartshift: {
-            on: false;
-            threshold: 10;
-          };
-          dpi: 2000;
-          thumbwheel: {
-            invert: true;
-          };
-        });
-      '';
+      config = {
+        devices = [
+          {
+            name = "Wireless Mouse MX Master 3";
+            dpi = 2000;
+            smartshift = {
+              on = false;
+              threshold = 10;
+            };
+            thumbwheel = {
+              invert = true;
+            };
+          }
+        ];
+      };
     };
+
+    services.nohang.enable = true;
 
     programs.fish.enable = true;
 
@@ -715,7 +721,6 @@
     programs.seahorse.enable = true;
     programs.dconf.enable = true;
     programs.wireshark.enable = true;
-    programs.adb.enable = true;
     programs.steam.enable = true;
     programs.gamemode.enable = true;
 
@@ -789,20 +794,20 @@
         stdenv.cc.cc
         systemd
         vulkan-loader
-        xorg.libX11
-        xorg.libXScrnSaver
-        xorg.libXcomposite
-        xorg.libXcursor
-        xorg.libXdamage
-        xorg.libXext
-        xorg.libXfixes
-        xorg.libXi
-        xorg.libXrandr
-        xorg.libXrender
-        xorg.libXtst
-        xorg.libxcb
-        xorg.libxkbfile
-        xorg.libxshmfence
+        libX11
+        libXScrnSaver
+        libXcomposite
+        libXcursor
+        libXdamage
+        libXext
+        libXfixes
+        libXi
+        libXrandr
+        libXrender
+        libXtst
+        libxcb
+        libxkbfile
+        libxshmfence
         zlib
       ];
     };

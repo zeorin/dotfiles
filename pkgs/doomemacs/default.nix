@@ -11,9 +11,10 @@ stdenvNoCC.mkDerivation {
 
   src = fetchFromGitHub {
     owner = "doomemacs";
-    repo = "doomemacs";
-    rev = "555dc5f0459344e86c01e9a72bceea92631f0db0";
-    hash = "sha256-n1wy8M3u+21vUZFAVVfD64TOHSuqzj/V4/J8VB+Zjco=";
+    repo = "core";
+    rev = "2698abb722d770a3c62db5090f5b17fa0387a8dd";
+    hash = "sha256-PQWHRIlh2aWCiQh+ux5f9HoBRBOs7Y4rh3y/S9CwdAM=";
+    fetchSubmodules = true;
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -26,9 +27,10 @@ stdenvNoCC.mkDerivation {
     install -m644 -t $out $src/.dir-locals.el
     install -m644 -t $out $src/.doom
     install -m644 -t $out $src/README.md
+    install -m644 -t $out $src/LICENSE
     install -m644 -t $out $src/early-init.el
 
-    for dir in docs lisp modules profiles static; do
+    for dir in docs lisp modules profiles sources static; do
       cp -r $src/$dir $out/$dir
     done
 

@@ -1,14 +1,14 @@
 {
   stdenvNoCC,
   fetchFromGitHub,
-  xorg,
+  xkeyboardconfig_custom,
   nix-update-script,
   extraLayouts ? { },
 }:
 
 let
 
-  xkeyboardconfig = xorg.xkeyboardconfig_custom {
+  xkeyboardconfig = xkeyboardconfig_custom {
     layouts = extraLayouts;
   };
 

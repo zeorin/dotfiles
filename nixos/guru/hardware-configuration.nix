@@ -27,14 +27,21 @@
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/757cf7da-9ad2-457a-b402-96e34a21cf42";
     fsType = "ext4";
+    options = [
+      "x-systemd.device-timeout=infinity"
+    ];
   };
 
   fileSystems."/data" = {
     device = "/dev/disk/by-uuid/6ee6e25c-fe6f-4c50-b7fb-985260cf8ca9";
     fsType = "ext4";
+    options = [
+      "x-systemd.device-timeout=infinity"
+    ];
   };
 
-  boot.initrd.luks.devices."cryptdata".device = "/dev/disk/by-uuid/14924ada-f427-411b-b426-e9db44ab0752";
+  boot.initrd.luks.devices."cryptdata".device =
+    "/dev/disk/by-uuid/14924ada-f427-411b-b426-e9db44ab0752";
 
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/F471-068C";
