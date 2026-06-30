@@ -35,9 +35,6 @@ in
           name = "doomemacs-deps";
           pathsToLink = [ "/bin" ];
           paths = map lib.getBin (
-            let
-              nodePackages = nodejs.passthru.pkgs;
-            in
             with pkgs;
             [
               git
@@ -61,7 +58,7 @@ in
               shellcheck
               sqlite
               editorconfig-core-c
-              nodePackages.mermaid-cli
+              mermaid-cli
               pandoc
               gcc
               gdb
@@ -106,13 +103,13 @@ in
               fava
               html-tidy
               nodejs
-              nodePackages.bash-language-server
-              nodePackages.stylelint
+              bash-language-server
+              stylelint
               dockerfile-language-server
-              nodePackages.js-beautify
-              nodePackages.typescript-language-server
-              unstable.typescript-go
-              nodePackages.typescript
+              js-beautify
+              typescript-language-server
+              typescript-go
+              typescript
               (writeScriptBin "vscode-css-language-server" ''
                 #!${nodejs}/bin/node
                 require('${vscodium}/lib/vscode/resources/app/extensions/css-language-features/server/dist/node/cssServerMain.js')
@@ -129,8 +126,8 @@ in
                 #!${nodejs}/bin/node
                 require('${vscodium}/lib/vscode/resources/app/extensions/markdown-language-features/server/dist/node/workerMain.js')
               '')
-              nodePackages.yaml-language-server
-              nodePackages.prettier
+              yaml-language-server
+              prettier
               jq
               nixfmt
               nixd
@@ -145,9 +142,6 @@ in
               python3Packages.grip
               multimarkdown
               wl-clipboard
-              xdotool
-              xorg.xwininfo
-              xorg.xprop
               watchman
             ]
           );

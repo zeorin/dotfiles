@@ -10,9 +10,6 @@
   home-manager,
   sops-nix,
   devenv,
-  nix-software-center,
-  determinate,
-  nixpkgs-unstable,
   ...
 }@moduleArgs:
 
@@ -20,15 +17,17 @@
   imports = (builtins.attrValues self.outputs.nixosModules) ++ [
     home-manager.nixosModules.home-manager
     sops-nix.nixosModules.sops
-    determinate.nixosModules.default
     ./caches.nix
-    ./logiops.nix
     ./niri.nix
   ];
 
   config = {
     nixpkgs = {
       config.allowUnfree = true;
+      config.permittedInsecurePackages = [
+        # https://github.com/NixOS/nixpkgs/issues/525631
+        "electron-39.8.10"
+      ];
 
       overlays = [
         # Add overlays your own flake exports (from overlays and pkgs dir):
@@ -126,7 +125,7 @@
         keep-outputs = true;
         keep-derivations = true;
         # https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-use-xdg-base-directories
-        # use-xdg-base-directories = true;
+        use-xdg-base-directories = true;
       };
     };
 
@@ -206,7 +205,6 @@
     };
 
     environment.systemPackages = with pkgs; [
-      # nix-software-center.packages.${stdenv.hostPlatform.system}.nix-software-center
       moreutils
       usbutils
       pciutils
@@ -241,7 +239,9 @@
       cpuFreqGovernor = lib.mkDefault "performance";
     };
 
-    systemd.sleep.extraConfig = "HibernateDelaySec=4h";
+    systemd.sleep.settings.Sleep = {
+      HibernateDelaySec = "4h";
+    };
     services.logind.settings.Login = {
       HandlePowerKey = "hibernate";
       HandleSuspendKey = "suspend-then-hibernate";
@@ -312,8 +312,6 @@
         ];
       };
     };
-    systemd.network.wait-online.enable = false;
-    systemd.services.NetworkManager-wait-online.enable = false;
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_ZA.UTF-8";
@@ -509,6 +507,7 @@
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
+      extraLadspaPackages = with pkgs; [ rnnoise-plugin ];
     };
 
     services.flatpak.enable = true;
@@ -548,7 +547,7 @@
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "bak";
-      users.zeorin = import ../../home-manager/home.nix;
+      users.zeorin = ../../home-manager/home.nix;
     };
 
     sops = {
@@ -562,18 +561,9 @@
       };
     };
 
-    environment.variables = {
-      DETSYS_IDS_TELEMETRY = "disabled";
-    };
-
     environment.sessionVariables = {
       XKB_CONFIG_ROOT = config.services.xserver.xkb.dir;
     };
-
-    environment.pathsToLink = [
-      "/share/xdg-desktop-portal"
-      "/share/applications"
-    ];
 
     services.samba = {
       enable = true;
@@ -685,20 +675,24 @@
 
     services.logiops = {
       enable = true;
-      extraConfig = ''
-        devices: ({
-          name: "Wireless Mouse MX Master 3";
-          smartshift: {
-            on: false;
-            threshold: 10;
-          };
-          dpi: 2000;
-          thumbwheel: {
-            invert: true;
-          };
-        });
-      '';
+      config = {
+        devices = [
+          {
+            name = "Wireless Mouse MX Master 3";
+            dpi = 2000;
+            smartshift = {
+              on = false;
+              threshold = 10;
+            };
+            thumbwheel = {
+              invert = true;
+            };
+          }
+        ];
+      };
     };
+
+    services.nohang.enable = true;
 
     programs.fish.enable = true;
 
@@ -715,7 +709,6 @@
     programs.seahorse.enable = true;
     programs.dconf.enable = true;
     programs.wireshark.enable = true;
-    programs.adb.enable = true;
     programs.steam.enable = true;
     programs.gamemode.enable = true;
 
@@ -744,66 +737,6 @@
             BRMediaType = "Plain"; # Plain Glossy Inkjet IJHagakiCom GlossyHagakiCom PlainHagakiCom IJHagakiAddr GlossyHagakiAddr PlainHagakiAddr
           };
         }
-      ];
-    };
-
-    # Compatibility for binaries
-    services.envfs.enable = true;
-    programs.nix-ld = {
-      enable = true;
-      # https://github.com/Mic92/dotfiles/blob/main/nixos/modules/nix-ld.nix
-      libraries = with pkgs; [
-        alsa-lib
-        at-spi2-atk
-        at-spi2-core
-        atk
-        cairo
-        cups
-        curl
-        dbus
-        expat
-        fontconfig
-        freetype
-        fuse3
-        gdk-pixbuf
-        glib
-        gtk3
-        icu
-        libGL
-        libappindicator-gtk3
-        libdrm
-        libglvnd
-        libnotify
-        libpulseaudio
-        libunwind
-        libusb1
-        libuuid
-        libxkbcommon
-        libxml2
-        mesa
-        nspr
-        nss
-        openssl
-        pango
-        pipewire
-        stdenv.cc.cc
-        systemd
-        vulkan-loader
-        xorg.libX11
-        xorg.libXScrnSaver
-        xorg.libXcomposite
-        xorg.libXcursor
-        xorg.libXdamage
-        xorg.libXext
-        xorg.libXfixes
-        xorg.libXi
-        xorg.libXrandr
-        xorg.libXrender
-        xorg.libXtst
-        xorg.libxcb
-        xorg.libxkbfile
-        xorg.libxshmfence
-        zlib
       ];
     };
 

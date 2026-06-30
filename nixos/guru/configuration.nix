@@ -134,6 +134,8 @@
 
   users.groups.uinput.gid = lib.mkForce 987;
 
+  services.udisks2.enable = true;
+
   # i2c
   hardware.i2c.enable = true;
 

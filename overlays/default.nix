@@ -29,6 +29,11 @@
           }
       '';
     });
+
+    # https://github.com/NixOS/nixpkgs/issues/534670
+    openblas = prev.openblas.overrideAttrs (old: {
+      doCheck = final.stdenv.hostPlatform.system != "i686-linux";
+    });
   };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will

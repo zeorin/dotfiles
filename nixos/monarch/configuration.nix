@@ -44,6 +44,7 @@
         "noatime"
         "nodiratime"
         "discard"
+        "x-systemd.device-timeout=infinity"
       ];
     };
 
@@ -62,6 +63,7 @@
   environment.variables.MOZ_DISABLE_RDD_SANDBOX = "nvidia";
 
   hardware.nvidia.open = false;
+  hardware.nvidia.branch = "legacy_580";
 
   programs.firefox.enable = true;
   programs.firefox.preferences =
