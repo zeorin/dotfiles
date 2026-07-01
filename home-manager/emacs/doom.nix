@@ -171,8 +171,11 @@ in
     };
   };
 
+  home.extraDependencies = [
+    "${doomemacs}/out"
+  ];
+
   home.packages = with pkgs; [
     emacs-all-the-icons-fonts
-    doomemacs
   ];
 }
