@@ -6,28 +6,23 @@
 }:
 
 let
-  inherit (pkgs) doomemacs;
   emacs = config.programs.emacs.finalPackage;
-  doomScriptEnvVars = ''
-    export LSP_USE_PLISTS=true
-    export DOOMDIR="${config.home.sessionVariables.DOOMDIR}"
-    export DOOMLOCALDIR="${config.home.sessionVariables.DOOMLOCALDIR}"
-    export PATH="${
-      lib.makeBinPath [
-        doomemacs
-        emacs
-      ]
-    }''${PATH:+:$PATH}"
-  '';
-
+  doomemacs = pkgs.symlinkJoin {
+    name = "doomemacs";
+    paths = [ pkgs.doomemacs ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram "$out/bin/doom" \
+        --set LSP_USE_PLISTS true \
+        --set DOOMDIR "${config.xdg.configHome}/doom" \
+        --set DOOMLOCALDIR "${config.xdg.dataHome}/doom" \
+        --prefix PATH : "${lib.makeBinPath [ emacs ]}"
+    '';
+  };
   nodejs = pkgs.nodejs_latest;
 in
 {
   home.sessionPath = [ "${doomemacs}/bin" ];
-  home.sessionVariables = {
-    DOOMDIR = "${config.xdg.configHome}/doom";
-    DOOMLOCALDIR = "${config.xdg.dataHome}/doom";
-  };
   xdg.configFile = {
     "doom/init.el" = {
       source = pkgs.replaceVars ./doom/init.el {
@@ -148,31 +143,35 @@ in
         };
       };
       onChange = "${pkgs.writeShellScript "on-doomemacs-init-el-change" ''
-        ${doomScriptEnvVars}
-        doom --force sync
+        ${doomemacs}/bin/doom --force sync
       ''}";
     };
     "doom/config.el" = {
       source = pkgs.replaceVars ./doom/config.el {
         doom-png = "${./doom.png}";
+        DOOMLOCALDIR = "${config.xdg.dataHome}/doom";
+        XDG_DOCUMENTS_DIR = "${config.xdg.userDirs.documents}";
+        XDG_DATA_HOME = "${config.xdg.dataHome}";
+
         inherit nodejs;
         inherit (pkgs.unstable) vscode-js-debug;
         inherit (pkgs.unstable.vscode-extensions.dbaeumer) vscode-eslint;
         inherit (pkgs.unstable.vscode-extensions.firefox-devtools) vscode-firefox-debug;
-        inherit (config.home.sessionVariables) DOOMLOCALDIR XDG_DOCUMENTS_DIR XDG_DATA_HOME;
       };
     };
     "doom/packages.el" = {
       source = ./doom/packages.el;
       onChange = "${pkgs.writeShellScript "on-doomemacs-packages-el-change" ''
-        ${doomScriptEnvVars}
-        doom --force sync
+        ${doomemacs}/bin/doom --force sync
       ''}";
     };
   };
 
+  home.extraDependencies = [
+    "${doomemacs}"
+  ];
+
   home.packages = with pkgs; [
     emacs-all-the-icons-fonts
-    doomemacs
   ];
 }

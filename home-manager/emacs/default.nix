@@ -29,8 +29,9 @@
   xdg.configFile = {
     "chemacs/profiles.el".source = pkgs.replaceVars ./chemacs/profiles.el {
       my-emacs = "${config.xdg.configHome}/my-emacs";
-      DOOMEMACSDIR = toString pkgs.doomemacs;
-      inherit (config.home.sessionVariables) DOOMDIR DOOMLOCALDIR;
+      DOOMEMACSDIR = "${pkgs.doomemacs}";
+      DOOMDIR = "${config.xdg.configHome}/doom";
+      DOOMLOCALDIR = "${config.xdg.dataHome}/doom";
     };
     "chemacs/profile".text = "doom";
     emacs.source = pkgs.chemacs2;

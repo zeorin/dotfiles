@@ -416,10 +416,10 @@ tasks."
 (after! dash-docs
   (setq dash-docs-docsets-path "@XDG_DATA_HOME@/docsets"))
 
-(set-docsets! js2-mode "JavaScript" "NodeJS")
-(set-docsets! rjsx-mode "JavaScript" "React")
-(set-docsets! typescript-mode "JavaScript" "NodeJS")
-(set-docsets! typescript-tsx-mode "JavaScript" "React")
+(set-docsets! js-ts-mode "JavaScript" "NodeJS")
+(set-docsets! js-jsx-mode "JavaScript" "React")
+(set-docsets! typescript-ts-mode "JavaScript" "NodeJS")
+(set-docsets! tsx-ts-mode "JavaScript" "React")
 
 (use-package! langtool
   :config
