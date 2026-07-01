@@ -10,8 +10,6 @@
   home-manager,
   sops-nix,
   devenv,
-  determinate,
-  nixpkgs-unstable,
   ...
 }@moduleArgs:
 
@@ -19,7 +17,6 @@
   imports = (builtins.attrValues self.outputs.nixosModules) ++ [
     home-manager.nixosModules.home-manager
     sops-nix.nixosModules.sops
-    determinate.nixosModules.default
     ./caches.nix
     ./niri.nix
   ];

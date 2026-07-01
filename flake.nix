@@ -4,7 +4,6 @@
   nixConfig = {
     extra-substituters = [
       "https://cuda-maintainers.cachix.org"
-      "https://install.determinate.systems"
       "https://devenv.cachix.org"
       "https://nix-community.cachix.org"
     ];
@@ -36,8 +35,6 @@
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-utils.inputs.systems.follows = "systems";
-
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
     devenv.url = "github:cachix/devenv/latest";
 
