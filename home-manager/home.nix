@@ -2145,38 +2145,44 @@ in
               After = [ "network.target" ];
             };
             Install.WantedBy = [ "default.target" ];
+            Service.Restart = "on-failure";
             Service.ExecStart = ''
-              ${pkgs.languagetool}/bin/languagetool-http-server \
+              "${lib.getExe pkgs.languagetool.jre}" \
+                -cp "${pkgs.languagetool}/share/languagetool-server.jar" \
+                org.languagetool.server.HTTPServer \
                 --port 8081 \
-                --allow-origin '*' \
-                --config ${
-                  settingsFormat.generate "languagetool.cfg" {
+                --allow-origin "*" \
+                --premium-always \
+                --languageModel "${
+                  pkgs.linkFarm "ngram-data" [
+                    {
+                      name = "en";
+                      path = pkgs.fetchzip {
+                        url = "https://languagetool.org/download/ngram-data/ngrams-en-20150817.zip";
+                        hash = "sha256-v3Ym6CBJftQCY5FuY6s5ziFvHKAyYD3fTHr99i6N8sE=";
+                      };
+                    }
+                    {
+                      name = "nl";
+                      path = pkgs.fetchzip {
+                        url = "https://languagetool.org/download/ngram-data/ngrams-nl-20181229.zip";
+                        hash = "sha256-bHOEdb2R7UYvXjqL7MT4yy3++hNMVwnG7TJvvd3Feg8=";
+                      };
+                    }
+                  ]
+                }" \
+                --config "${
+                  settingsFormat.generate "server.properties" {
                     cacheSize = "1000";
                     pipelineCaching = "true";
                     pipelinePrewarming = "true";
-                    # https://dev.languagetool.org/finding-errors-using-n-gram-data
-                    languageModel = "${pkgs.linkFarm "languagetool-languageModel" [
-                      {
-                        name = "en";
-                        path = pkgs.fetchzip {
-                          url = "https://languagetool.org/download/ngram-data/ngrams-en-20150817.zip";
-                          hash = "sha256-v3Ym6CBJftQCY5FuY6s5ziFvHKAyYD3fTHr99i6N8sE=";
-                        };
-                      }
-                      {
-                        name = "nl";
-                        path = pkgs.fetchzip {
-                          url = "https://languagetool.org/download/ngram-data/ngrams-nl-20181229.zip";
-                          hash = "sha256-bHOEdb2R7UYvXjqL7MT4yy3++hNMVwnG7TJvvd3Feg8=";
-                        };
-                      }
-                    ]}";
-                    fasttextBinary = pkgs.fetchurl {
+                    fasttextBinary = lib.getExe pkgs.fasttext;
+                    fasttextModel = pkgs.fetchurl {
                       url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin";
                       hash = "sha256-fmnsVFG8JhzHhE5J5HkqhdfwnAZ4nsgA/EpErsNidk4=";
                     };
                   }
-                }
+                }"
             '';
           };
         tmux = {
