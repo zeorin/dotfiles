@@ -36,7 +36,10 @@
         self.outputs.overlays.unstable-packages
 
         nur.overlays.default
-        devenv.overlays.default
+
+        (final: prev: {
+          devenv = devenv.packages.${prev.stdenv.hostPlatform.system}.default;
+        })
 
         # Bugfix for steam client to not inhibit screensaver unless there's a game active
         # https://github.com/ValveSoftware/steam-for-linux/issues/5607
