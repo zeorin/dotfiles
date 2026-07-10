@@ -1,8 +1,9 @@
 {
   config,
+  osConfig,
   pkgs,
   ...
-}@moduleArgs:
+}:
 
 let
   common = {
@@ -80,7 +81,7 @@ in
         userName = address;
         inherit gpg;
         passwordCommand = "${pkgs.coreutils}/bin/cat ${
-          moduleArgs.osConfig.sops.secrets."mail.xandor.co.za/me@xandor.co.za".path
+          osConfig.sops.secrets."mail.xandor.co.za/me@xandor.co.za".path
         }";
         imap = {
           host = "mail.xandor.co.za";

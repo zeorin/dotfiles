@@ -42,8 +42,7 @@
     nur.url = "github:nix-community/NUR";
     nur.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
-    flake-utils.url = "github:numtide/flake-utils";
-    flake-utils.inputs.systems.follows = "systems";
+    flake-parts.url = "github:hercules-ci/flake-parts";
 
     devenv.url = "github:cachix/devenv/latest";
 
@@ -52,57 +51,75 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      ...
-    }@inputs:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
-        # Your custom packages
-        # Acessible through 'nix build', 'nix shell', etc
-        packages = import ./pkgs { inherit pkgs; };
-        # Devshell for bootstrapping
-        # Acessible through 'nix develop' or 'nix-shell' (legacy)
-        devShells = import ./shell.nix {
-          pkgs = pkgs.appendOverlays (
-            (builtins.attrValues self.outputs.overlays) ++ [ inputs.sops-nix.overlays.default ]
-          );
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      { withSystem, ... }: {
+        debug = true;
+
+        systems = import inputs.systems;
+
+        perSystem = { system, pkgs, ... }: {
+          _module.args.pkgs = import inputs.nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+            overlays = builtins.attrValues (import ./overlays { inherit inputs; });
+          };
+          legacyPackages = import ./pkgs { inherit pkgs; };
+          devShells = {
+            default = pkgs.mkShell {
+              sopsPGPKeyDirs = [
+                "${toString ./.}/keys/hosts"
+                "${toString ./.}/keys/users"
+              ];
+              nativeBuildInputs =
+                let
+                  pkgs' = pkgs.appendOverlays [ inputs.sops-nix.overlays.default ];
+                in
+                with pkgs';
+                [
+                  nix-update
+                  sops
+                  sops-import-keys-hook
+                  nixfmt
+                ];
+            };
+          };
+        };
+
+        flake = {
+          nixosConfigurations =
+            let
+              myPkgs = (
+                { config, ... }: {
+                  # imports = [ inputs.nixpkgs.nixosModules.readOnlyPkgs ];
+                  nixpkgs.pkgs = withSystem config.nixpkgs.hostPlatform.system ({ pkgs, ... }: pkgs);
+                }
+              );
+            in
+            {
+              guru = inputs.nixpkgs.lib.nixosSystem {
+                specialArgs = { inherit inputs; };
+                modules = [
+                  ./nixos/guru
+                  myPkgs
+                ];
+              };
+              monarch = inputs.nixpkgs.lib.nixosSystem {
+                specialArgs = { inherit inputs; };
+                modules = [
+                  ./nixos/monarch
+                  myPkgs
+                ];
+              };
+              ruby = inputs.nixpkgs.lib.nixosSystem {
+                specialArgs = { inherit inputs; };
+                modules = [
+                  ./nixos/ruby
+                  myPkgs
+                ];
+              };
+            };
         };
       }
-    )
-    // {
-      # Your custom packages and modifications, exported as overlays
-      overlays = import ./overlays inputs;
-
-      # Reusable nixos modules you might want to export
-      # These are usually stuff you would upstream into nixpkgs
-      nixosModules = import ./modules/nixos;
-
-      # Reusable home-manager modules you might want to export
-      # These are usually stuff you would upstream into home-manager
-      homeModules = import ./modules/home-manager;
-
-      # NixOS configuration entrypoint
-      # Available through 'nixos-rebuild --flake .#your-hostname'
-      nixosConfigurations = {
-        guru = nixpkgs.lib.nixosSystem {
-          specialArgs = inputs;
-          modules = [ ./nixos/guru ];
-        };
-        monarch = nixpkgs.lib.nixosSystem {
-          specialArgs = inputs;
-          modules = [ ./nixos/monarch ];
-        };
-        ruby = nixpkgs.lib.nixosSystem {
-          specialArgs = inputs;
-          modules = [ ./nixos/ruby ];
-        };
-      };
-    };
+    );
 }

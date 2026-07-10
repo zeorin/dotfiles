@@ -1,5 +1,3 @@
-{ ... }:
-
 {
   programs.oama = {
     enable = true;

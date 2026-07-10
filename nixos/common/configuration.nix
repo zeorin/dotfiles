@@ -5,21 +5,15 @@
   lib,
   config,
   pkgs,
-  self,
-  nur,
-  home-manager,
-  sops-nix,
-  devenv,
-  emacs-overlay,
-  noctalia-greeter,
+  inputs,
   ...
-}@moduleArgs:
+}:
 
 {
-  imports = (builtins.attrValues self.outputs.nixosModules) ++ [
-    home-manager.nixosModules.home-manager
-    sops-nix.nixosModules.sops
-    noctalia-greeter.nixosModules.default
+  imports = [
+    inputs.home-manager.nixosModules.home-manager
+    inputs.sops-nix.nixosModules.sops
+    inputs.noctalia-greeter.nixosModules.default
     ./caches.nix
     ./niri.nix
     ./noctalia-shell.nix
@@ -27,25 +21,14 @@
 
   config = {
     nixpkgs = {
-      config.allowUnfree = true;
-      config.permittedInsecurePackages = [
-        # https://github.com/NixOS/nixpkgs/issues/525631
-        "electron-39.8.10"
-      ];
-
       overlays = [
-        # Add overlays your own flake exports (from overlays and pkgs dir):
-        self.outputs.overlays.additions
-        self.outputs.overlays.modifications
-        self.outputs.overlays.unstable-packages
-
-        nur.overlays.default
+        inputs.nur.overlays.default
 
         (final: prev: {
-          devenv = devenv.packages.${prev.stdenv.hostPlatform.system}.default;
+          devenv = inputs.devenv.packages.${prev.stdenv.hostPlatform.system}.default;
         })
 
-        emacs-overlay.overlays.default
+        inputs.emacs-overlay.overlays.default
 
         # Bugfix for steam client to not inhibit screensaver unless there's a game active
         # https://github.com/ValveSoftware/steam-for-linux/issues/5607
@@ -115,7 +98,7 @@
       # This will add each flake input as a registry
       # To make nix3 commands consistent with your flake
       registry = (lib.mapAttrs (_: flake: { inherit flake; })) (
-        (lib.filterAttrs (name: value: lib.isType "flake" value && name != "self")) moduleArgs
+        (lib.filterAttrs (name: value: lib.isType "flake" value && name != "self")) inputs
       );
       nixPath = [ "/etc/nix/path" ];
 
@@ -579,7 +562,7 @@
     };
     users.groups.zeorin = { };
     home-manager = {
-      extraSpecialArgs = (lib.filterAttrs (_: lib.isType "flake")) moduleArgs;
+      extraSpecialArgs = { inherit inputs; };
       useGlobalPkgs = true;
       useUserPackages = true;
       backupFileExtension = "bak";

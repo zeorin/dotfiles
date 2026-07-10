@@ -3,15 +3,14 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 {
-  nixos-hardware,
+  inputs,
   lib,
-  config,
   pkgs,
   ...
 }:
 
 {
-  imports = with nixos-hardware.nixosModules; [
+  imports = with inputs.nixos-hardware.nixosModules; [
     common-pc-laptop
     common-pc-laptop-ssd
     common-cpu-intel

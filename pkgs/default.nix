@@ -1,13 +1,12 @@
 # Custom packages, that can be defined similarly to ones from nixpkgs
 # You can build them using 'nix build .#example' or (legacy) 'nix-build -A example'
 
-{
-  pkgs ? (import ../nixpkgs.nix) { },
-  prev ? (import <nixpkgs>) { },
-}:
+{ pkgs }:
 
-with pkgs;
+let
+  inherit (pkgs) callPackage lib;
 
+in
 {
   base16-tridactyl = callPackage ./base16-tridactyl { };
 
@@ -37,11 +36,5 @@ with pkgs;
 
   open-in-editor = callPackage ./open-in-editor { };
 
-  tmuxPlugins =
-    prev.tmuxPlugins
-    // (lib.recurseIntoAttrs (
-      prev.callPackage ./tmux-plugins {
-        pkgs = prev.__splicedPackages;
-      }
-    ));
+  tmuxPlugins = lib.recurseIntoAttrs (callPackage ./tmux-plugins { });
 }

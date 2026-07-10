@@ -1,12 +1,12 @@
 {
-  nixos-hardware,
+  inputs,
   lib,
   pkgs,
   ...
 }:
 
 {
-  imports = with nixos-hardware.nixosModules; [
+  imports = with inputs.nixos-hardware.nixosModules; [
     common-pc
     common-pc-ssd
     common-cpu-amd

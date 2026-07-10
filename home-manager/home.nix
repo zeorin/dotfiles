@@ -2,12 +2,11 @@
 # Use this to configure your home environment (it replaces ~/.config/nixpkgs/home.nix)
 
 {
+  inputs,
   lib,
   config,
   osConfig,
   pkgs,
-  self,
-  nix-index-database,
   ...
 }:
 
@@ -124,8 +123,9 @@ let
 in
 {
   # You can import other home-manager modules here
-  imports = (builtins.attrValues self.outputs.homeModules) ++ [
-    nix-index-database.homeModules.nix-index
+  imports = [
+    inputs.nix-index-database.homeModules.nix-index
+    ../modules/home-manager/oama.nix
     ./emacs
     ./oama
     ./email

@@ -1,21 +1,15 @@
 # This file defines overlays
-{ self, nixpkgs-unstable, ... }:
+{ inputs, ... }:
 {
-  # This one brings our custom packages from the 'pkgs' directory
+  # Add custom packages from the 'pkgs' directory
   additions =
     final: prev:
-    import ../pkgs {
-      pkgs = final;
-      inherit prev;
-    };
+    let
+      pkgs = import ../pkgs { pkgs = prev; };
+    in
+    pkgs // { tmuxPlugins = prev.tmuxPlugins // pkgs.tmuxPlugins; };
 
-  # This one contains whatever you want to overlay
-  # You can change versions, add patches, set compilation flags, anything really.
-  # https://nixos.wiki/wiki/Overlays
   modifications = final: prev: {
-    # example = prev.example.overrideAttrs (oldAttrs: rec {
-    # ...
-    # });
     oama = prev.oama.overrideAttrs (old: {
       nativeBuildInputs = [ final.makeBinaryWrapper ];
       postInstall = ''
@@ -32,18 +26,16 @@
 
     # https://github.com/NixOS/nixpkgs/issues/534670
     openblas = prev.openblas.overrideAttrs (old: {
-      doCheck = final.stdenv.hostPlatform.system != "i686-linux";
+      doCheck = prev.stdenv.hostPlatform.system != "i686-linux";
     });
   };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will
   # be accessible through 'pkgs.unstable'
-  unstable-packages = final: _: {
-    unstable = import nixpkgs-unstable {
-      inherit (final.stdenv.hostPlatform) system;
-      config = final.config // {
-        overlays = final.lib.filter (x: x != self.outputs.overlays.unstable-packages) final.config.overlays;
-      };
+  unstable-packages = final: prev: {
+    unstable = import inputs.nixpkgs-unstable {
+      inherit (prev.stdenv.hostPlatform) system;
+      inherit (prev) config overlays;
     };
   };
 }
