@@ -7,13 +7,13 @@
 
 stdenvNoCC.mkDerivation {
   pname = "doomemacs";
-  version = "2.2.0-unstable-2026-06-24";
+  version = "2.2.2-unstable-2026-08-06";
 
   src = fetchFromGitHub {
     owner = "doomemacs";
     repo = "core";
-    rev = "2698abb722d770a3c62db5090f5b17fa0387a8dd";
-    hash = "sha256-PQWHRIlh2aWCiQh+ux5f9HoBRBOs7Y4rh3y/S9CwdAM=";
+    rev = "ad55ed08df3a1d3398d136d07b60ba2ad00fb91b";
+    hash = "sha256-+QPxNQSF63eLkw1hODssS0p0hKqCzsmpTs5UhL0pofE=";
     fetchSubmodules = true;
   };
 
@@ -30,16 +30,17 @@ stdenvNoCC.mkDerivation {
     install -m644 -t $out $src/LICENSE
     install -m644 -t $out $src/early-init.el
 
-    for dir in docs lisp modules profiles sources static; do
-      cp -r $src/$dir $out/$dir
+    for dir in docs lisp modules profiles sources static bin; do
+      mkdir -p $out/$dir
+      cp -r $src/$dir/* $out/$dir/
     done
 
-    mkdir $out/bin
-
-    for f in doom doomscript org-capture; do
-      makeWrapper $src/bin/$f $out/bin/$f \
-        --set-default EMACSDIR $out
+    for f in $out/bin/*; do
+      patchShebangs --host $out/bin $f
     done
+
+    wrapProgram $out/bin/doomscript \
+      --set-default EMACSDIR $out
 
     runHook postInstall
   '';

@@ -22,7 +22,6 @@ let
   nodejs = pkgs.nodejs_latest;
 in
 {
-  home.sessionPath = [ "${doomemacs}/bin" ];
   xdg.configFile = {
     "doom/init.el" = {
       source = pkgs.replaceVars ./doom/init.el {
@@ -104,7 +103,6 @@ in
               js-beautify
               typescript-language-server
               typescript-go
-              typescript
               (writeScriptBin "vscode-css-language-server" ''
                 #!${nodejs}/bin/node
                 require('${vscodium}/lib/vscode/resources/app/extensions/css-language-features/server/dist/node/cssServerMain.js')
@@ -138,6 +136,14 @@ in
               multimarkdown
               wl-clipboard
               watchman
+              haskell-language-server
+              haskellPackages.hoogle
+              cabal-install
+              ledger
+              plantuml
+              rust-analyzer
+              cargo
+              rustc
             ]
           );
         };
@@ -157,6 +163,18 @@ in
         inherit (pkgs.unstable) vscode-js-debug;
         inherit (pkgs.unstable.vscode-extensions.dbaeumer) vscode-eslint;
         inherit (pkgs.unstable.vscode-extensions.firefox-devtools) vscode-firefox-debug;
+
+        ghostel-module-directory =
+          let
+            ghostel = lib.findSingle (
+              p: builtins.hasAttr "ename" p && p.ename == "ghostel"
+            ) null null emacs.explicitRequires;
+          in
+          assert ghostel != null;
+          pkgs.buildEnv {
+            name = "ghostel-module-directory";
+            paths = [ ghostel.module ];
+          };
       };
     };
     "doom/packages.el" = {
@@ -167,11 +185,8 @@ in
     };
   };
 
-  home.extraDependencies = [
-    "${doomemacs}"
-  ];
-
   home.packages = with pkgs; [
+    doomemacs
     emacs-all-the-icons-fonts
   ];
 }

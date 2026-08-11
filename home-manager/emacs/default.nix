@@ -6,7 +6,7 @@
 
 {
   imports = [
-    ./vterm.nix
+    ./ghostel.nix
     ./tsc.nix
     ./mu.nix
     ./doom.nix

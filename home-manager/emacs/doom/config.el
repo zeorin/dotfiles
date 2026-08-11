@@ -76,7 +76,6 @@
 
 ;; Fish shell compat
 (setq shell-file-name (executable-find "bash"))
-(setq-default vterm-shell (executable-find "fish"))
 (setq-default explicit-shell-file-name (executable-find "fish"))
 
 (setq Man-notify-method 'pushy)
@@ -290,7 +289,7 @@ tasks."
   :hook ((shell-mode . with-editor-export-editor)
 	 (eshell-mode . with-editor-export-editor)
 	 (term-exec . with-editor-export-editor)
-	 (vterm-mode . with-editor-export-editor))
+	 (ghostel-mode . with-editor-export-editor))
   :config (shell-command-with-editor-mode))
 
 (use-package! all-the-icons-nerd-fonts
@@ -377,8 +376,7 @@ tasks."
                                     "@vscode-eslint@/share/vscode/extensions/dbaeumer.vscode-eslint/server/out/eslintServer.js"
                                     "--stdio"))
   (setq lsp-enable-suggest-server-download nil
-	lsp-clients-typescript-prefer-use-project-ts-server t
-	+format-with-lsp nil)
+	lsp-clients-typescript-prefer-use-project-ts-server t)
 
   (advice-add (if (progn (require 'json)
 			 (fboundp 'json-parse-buffer))
@@ -416,10 +414,10 @@ tasks."
 (after! dash-docs
   (setq dash-docs-docsets-path "@XDG_DATA_HOME@/docsets"))
 
-(set-docsets! js-ts-mode "JavaScript" "NodeJS")
-(set-docsets! js-jsx-mode "JavaScript" "React")
-(set-docsets! typescript-ts-mode "JavaScript" "NodeJS")
-(set-docsets! tsx-ts-mode "JavaScript" "React")
+(set-docsets! 'js-ts-mode "JavaScript" "NodeJS")
+(set-docsets! 'js-jsx-mode "JavaScript" "React")
+(set-docsets! 'typescript-ts-mode "JavaScript" "NodeJS")
+(set-docsets! 'tsx-ts-mode "JavaScript" "React")
 
 (use-package! langtool
   :config
@@ -459,16 +457,9 @@ tasks."
   :config
   (setq flycheck-hledger-strict t))
 
-(defun me/vterm-toggle-scroll (&rest _)
-  (when (eq major-mode 'vterm-mode)
-    (if (> (window-end) (buffer-size))
-        (when vterm-copy-mode (vterm-copy-mode-done nil))
-      (vterm-copy-mode 1))))
-
-;; Prevent auto scrolling
-;; https://github.com/akermu/emacs-libvterm/issues/397
-(after! vterm
-  (advice-add 'set-window-vscroll :after #'me/vterm-toggle-scroll))
+(use-package! ghostel
+  :config
+  (setq ghostel-module-directory "@ghostel-module-directory@"))
 
 (after! latex
   (setq +latex-viewers '(zathura)))
