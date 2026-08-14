@@ -19,7 +19,7 @@
   };
 
   programs.emacs.enable = true;
-  programs.emacs.package = pkgs.emacs-pgtk;
+  programs.emacs.package = pkgs.emacs-unstable-pgtk;
 
   services.emacs = {
     enable = true;

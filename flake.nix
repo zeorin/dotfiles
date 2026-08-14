@@ -26,6 +26,10 @@
     home-manager.url = "github:nix-community/home-manager/release-26.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
+    # Never grab the very latest, we want to hit the binary cache
+    # https://github.com/nix-community/emacs-overlay/issues/122#issuecomment-1002770274
+    emacs-overlay.url = "https://github.com/nix-community/emacs-overlay/archive/master@%7B2%20hours%20ago%7D.tar.gz";
+
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
