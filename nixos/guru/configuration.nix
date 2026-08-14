@@ -1,6 +1,5 @@
 {
   nixos-hardware,
-  config,
   lib,
   pkgs,
   ...
@@ -134,6 +133,8 @@
 
   users.groups.uinput.gid = lib.mkForce 987;
 
+  services.geoclue2.enableDemoAgent = lib.mkForce true;
+
   services.udisks2.enable = true;
 
   # i2c
@@ -150,4 +151,24 @@
 
   # `hostctl` needs to be able to write to this file
   environment.etc.hosts.mode = "0644";
+
+  programs.noctalia-greeter = {
+    # TODO
+    enable = false;
+    settings = {
+      session.default = "niri";
+      user.default = "zeorin";
+      idle.timeout = "300";
+      appearance = {
+        scheme = "Synced";
+        hide_logo = true;
+        theme_mode = "auto";
+      };
+      keyboard = {
+        layout = "us,us";
+        variant = ",dvp";
+        options = "grp:win_space_toggle,shift:both_capslock,compose:menu";
+      };
+    };
+  };
 }

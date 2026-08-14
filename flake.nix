@@ -6,11 +6,13 @@
       "https://cuda-maintainers.cachix.org"
       "https://devenv.cachix.org"
       "https://nix-community.cachix.org"
+      "https://noctalia.cachix.org"
     ];
     extra-trusted-public-keys = [
       "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
       "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
     ];
   };
 
@@ -29,6 +31,10 @@
     # Never grab the very latest, we want to hit the binary cache
     # https://github.com/nix-community/emacs-overlay/issues/122#issuecomment-1002770274
     emacs-overlay.url = "https://github.com/nix-community/emacs-overlay/archive/master@%7B2%20hours%20ago%7D.tar.gz";
+
+    noctalia.url = "github:noctalia-dev/noctalia/cachix";
+    noctalia-greeter.url = "github:noctalia-dev/noctalia-greeter";
+    noctalia-greeter.inputs.nixpkgs.follows = "nixpkgs";
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";

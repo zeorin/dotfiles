@@ -120,19 +120,6 @@ let
         end
       '';
     };
-    setWallpaper = pkgs.writeShellScript "set-wallpaper" ''
-      color_scheme="$(${config.services.darkman.package}/bin/darkman get)"
-
-      if [ "$color_scheme" = "dark" ]; then
-        background_image_left="${./backgrounds/martian-terrain-dark-left.jpg}"
-        background_image_right="${./backgrounds/martian-terrain-dark-right.jpg}"
-      else
-        background_image_left="${./backgrounds/martian-terrain-light-left.jpg}"
-        background_image_right="${./backgrounds/martian-terrain-light-right.jpg}"
-      fi
-
-      # TODO: set wallpaper
-    '';
   };
 in
 {
@@ -143,6 +130,7 @@ in
     ./oama
     ./email
     ./niri
+    ./noctalia
   ];
 
   config = {
@@ -362,6 +350,7 @@ in
               ghosttext
               org-capture
               plasma-integration
+              pywalfox
               react-devtools
               reduxdevtools
               sponsorblock
@@ -2058,6 +2047,15 @@ in
           dbusserver = true;
           portal = true;
         };
+        scripts.gtk-theme = ''
+          if [ "$1" = "dark" ]; then
+            ${pkgs.dconf}/bin/dconf write \
+                /org/gnome/desktop/interface/color-scheme "'prefer-dark'"
+          else
+            ${pkgs.dconf}/bin/dconf write \
+                /org/gnome/desktop/interface/color-scheme "'prefer-light'"
+          fi
+        '';
       };
       flameshot = {
         enable = true;

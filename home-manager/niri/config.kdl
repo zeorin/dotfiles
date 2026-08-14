@@ -12,8 +12,8 @@ environment {
   XDG_CURRENT_DESKTOP "niri"
   QT_QPA_PLATFORM "wayland"
   ELECTRON_OZONE_PLATFORM_HINT "auto"
-  QT_QPA_PLATFORMTHEME "gtk3"
-  QT_QPA_PLATFORMTHEME_QT6 "gtk3"
+  QT_QPA_PLATFORMTHEME "qt5ct"
+  QT_QPA_PLATFORMTHEME_QT6 "qt6ct"
 }
 
 workspace "work" {
@@ -157,7 +157,7 @@ layout {
     // You can enable drop shadows for windows.
     shadow {
         // Uncomment the next line to enable shadows.
-        // on
+        on
 
         // By default, the shadow draws only around its window, and not behind it.
         // Uncomment this setting to make the shadow draw behind its window.
@@ -206,12 +206,6 @@ layout {
 
 layer-rule {
     match namespace="^quickshell$"
-    place-within-backdrop true
-}
-
-// If "Blur Layer" is enabled, you can place the blurred wallpaper on the overview.
-layer-rule {
-    match namespace="dms:blurwallpaper"
     place-within-backdrop true
 }
 
@@ -295,12 +289,6 @@ window-rule {
 
 window-rule {
     match app-id=r#"^org\.gnome\."#
-    draw-border-with-background false
-    geometry-corner-radius 12
-    clip-to-geometry true
-}
-
-window-rule {
     match app-id=r#"^org\.wezfurlong\.wezterm$"#
     match app-id="Alacritty"
     match app-id="zen"
@@ -310,20 +298,7 @@ window-rule {
 }
 
 window-rule {
-    geometry-corner-radius 12
-    clip-to-geometry true
-}
-
-// Open DMS windows as floating by default
-window-rule {
-    match app-id=r#"org.quickshell$"#
-    open-floating true
-}
-
-// Example: enable rounded corners for all windows.
-// (This example rule is commented out with a "/-" in front.)
-/-window-rule {
-    geometry-corner-radius 12
+    geometry-corner-radius 4
     clip-to-geometry true
 }
 
@@ -340,24 +315,24 @@ binds {
 
     Mod+Ctrl+Shift+Slash { show-hotkey-overlay; }
 
-    Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "@xdg-terminal-exec@"; }
-    Mod+D hotkey-overlay-title="Run an Application" { spawn "@dms@" "ipc" "call" "spotlight" "open"; }
-    Super+X hotkey-overlay-title="Lock the Screen" { spawn "@dms@" "ipc" "call" "lock" "lock"; }
-    // TODO: use loginctl
-    Super+Shift+X { quit; }
-    Mod+Shift+P { power-off-monitors; }
+    Mod+Return hotkey-overlay-title="Open a Terminal" { spawn "@xdg-terminal-exec@"; }
+    Mod+D hotkey-overlay-title="Run an Application" { spawn "@noctalia@" "msg" "panel-toggle" "launcher"; }
+    Super+X hotkey-overlay-title="Lock the Screen" { spawn "@noctalia@" "msg" "session" "lock"; }
+    Alt+Tab { spawn "@noctalia@" "msg" "window-switcher"; }
+    Super+Shift+X { spawn "@noctalia@" "msg" "session" "logout"; }
+    Mod+Shift+P allow-when-locked=true { spawn "@noctalia@" "msg" "dpms-off"; }
 
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "@wpctl@" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+" "-l" "1.0"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "@wpctl@" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-"; }
-    XF86AudioMute        allow-when-locked=true { spawn "@wpctl@" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn "@wpctl@" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
-    XF86AudioPlay        allow-when-locked=true { spawn "@playerctl@" "play-pause"; }
-    XF86AudioStop        allow-when-locked=true { spawn "@playerctl@" "stop"; }
-    XF86AudioPrev        allow-when-locked=true { spawn "@playerctl@" "previous"; }
-    XF86AudioNext        allow-when-locked=true { spawn "@playerctl@" "next"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "@noctalia@" "msg" "volume-up"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "@noctalia@" "msg" "volume-down"; }
+    XF86AudioMute        allow-when-locked=true { spawn "@noctalia@" "msg" "volume-mute"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn "@noctalia@" "msg" "mic-mute"; }
+    XF86AudioPlay        allow-when-locked=true { spawn "@noctalia@" "msg" "media" "toggle"; }
+    XF86AudioStop        allow-when-locked=true { spawn "@noctalia@" "msg" "media" "stop"; }
+    XF86AudioPrev        allow-when-locked=true { spawn "@noctalia@" "msg" "media" "previous"; }
+    XF86AudioNext        allow-when-locked=true { spawn "@noctalia@" "msg" "media" "next"; }
 
-    XF86MonBrightnessUp allow-when-locked=true { spawn "@brightnessctl@" "--class=backlight" "set" "+10%"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "@brightnessctl@" "--class=backlight" "set" "10%-"; }
+    XF86MonBrightnessUp allow-when-locked=true { spawn "@noctalia@" "msg" "brightness-up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "@noctalia@" "msg" "brightness-down"; }
 
     // Open/close the Overview: a zoomed-out view of workspaces and windows.
     // You can also move the mouse into the top-left hot corner,
@@ -466,9 +441,8 @@ binds {
     // rather than stacked on top of each other.
     Mod+W { toggle-column-tabbed-display; }
 
-    Print { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    Print { spawn "@noctalia@" "msg" "screenshot-region"; }
+    Ctrl+Print { spawn "@noctalia@" "msg" "screenshot-fullscreen" "pick"; }
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here
@@ -479,9 +453,64 @@ binds {
     // The allow-inhibiting=false property can be applied to other binds as well,
     // which ensures niri always processes them, even when an inhibitor is active.
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
+
+    Mod+Shift+D { spawn "@darkman@" "toggle"; }
 }
 
-include "dms/colors.kdl"
-include "dms/layout.kdl"
-include "dms/alttab.kdl"
-include "dms/binds.kdl"
+spawn-at-startup "@noctalia@"
+
+// Floating Noctalia settings window.
+window-rule {
+  match app-id="dev.noctalia.Noctalia"
+  open-floating true
+  default-column-width { fixed 1080; }
+  default-window-height { fixed 920; }
+}
+
+debug {
+  // Allows notification actions and window activation from Noctalia.
+  honor-xdg-activation-with-invalid-serial
+}
+
+layer-rule {
+  match namespace="^noctalia-backdrop"
+  place-within-backdrop true
+}
+
+/* Apps: blur them all without xray so it looks more realistic. */
+window-rule {
+  background-effect {
+    blur true
+    xray false
+  }
+}
+
+/*
+  Noctalia
+  Disable xray on all our surfaces so it looks more realistic.
+  Noctalia publishes blur regions automatically when ext-background-effects is available.
+*/
+layer-rule {
+  match namespace="^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd)$"
+  background-effect {
+    xray false
+    // blur false
+  }
+}
+
+/* Enable blur on noctalia's window switcher and disable xray. */
+layer-rule {
+    match namespace="noctalia-window-switcher"
+    background-effect {
+        blur true
+        xray false
+    }
+}
+
+/* You can also fine-tune the blur effect globally. */
+blur {
+  passes 2        // more passes = stronger blur (default: 3)
+  offset 3.0      // sample distance per pass (default: 3.0)
+  noise 0.03      // grain overlay (default: 0.02)
+  saturation 1.0  // color saturation boost (default: 1.5)
+}

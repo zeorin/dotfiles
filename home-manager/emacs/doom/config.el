@@ -491,3 +491,18 @@ tasks."
   :ensure
   :mode
   (("\\.kdl\\'" . kdl-mode)))
+
+(use-package! spacious-padding
+  :ensure t
+  :config
+  (setq spacious-padding-widths
+        '(:internal-border-width 16
+          :header-line-width 0
+          :mode-line-width 0
+          :custom-button-width 0
+          :tab-width 0
+          :right-divider-width 0
+          :scroll-bar-width 8
+          :fringe-width 8)
+	spacious-padding-subtle-frame-lines nil)
+  (spacious-padding-mode 1))

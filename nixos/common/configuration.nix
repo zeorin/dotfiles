@@ -11,6 +11,7 @@
   sops-nix,
   devenv,
   emacs-overlay,
+  noctalia-greeter,
   ...
 }@moduleArgs:
 
@@ -18,8 +19,10 @@
   imports = (builtins.attrValues self.outputs.nixosModules) ++ [
     home-manager.nixosModules.home-manager
     sops-nix.nixosModules.sops
+    noctalia-greeter.nixosModules.default
     ./caches.nix
     ./niri.nix
+    ./noctalia-shell.nix
   ];
 
   config = {
@@ -539,14 +542,14 @@
       enableCDMA = false;
       enableModemGPS = false;
       enableNmea = false;
-      enableWifi = false;
-      enableStatic = true;
+      # enableWifi = false;
+      # enableStatic = true;
       geoProviderUrl = "https://api.beacondb.net/v1/geolocate";
       # Johannesburg
-      staticAccuracy = 25000;
-      staticAltitude = 1767;
-      staticLatitude = -26.2023;
-      staticLongitude = 28.0436;
+      # staticAccuracy = 25000;
+      # staticAltitude = 1767;
+      # staticLatitude = -26.2023;
+      # staticLongitude = 28.0436;
     };
     location.provider = "geoclue2";
     services.localtimed.enable = true;

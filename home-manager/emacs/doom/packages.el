@@ -78,3 +78,5 @@
 ;; We use Nix to install these
 (package! ghostel :recipe (:type built-in))
 (package! evil-ghostel :recipe (:type built-in))
+
+(package! spacious-padding)

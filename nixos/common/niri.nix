@@ -4,7 +4,6 @@
   security.pam.services.swaylock = { };
 
   programs.niri.enable = true;
-  programs.dms-shell.enable = true;
 
   xdg = {
     autostart.enable = true;
