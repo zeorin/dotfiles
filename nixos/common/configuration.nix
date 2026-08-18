@@ -391,6 +391,18 @@
     services.displayManager.gdm.enable = true;
     services.desktopManager.gnome.enable = true;
 
+    # Font configuration
+    fonts = {
+      fontconfig.subpixel.rgba = "rgb";
+      fontDir.enable = true;
+      enableDefaultPackages = true;
+      packages = with pkgs; [
+        corefonts
+        noto-fonts
+        liberation-sans-narrow
+      ];
+    };
+
     # Web browsers
     programs.firefox.enable = true;
     programs.chromium.enable = true;

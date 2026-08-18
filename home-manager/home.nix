@@ -2774,8 +2774,10 @@ in
       hinting = "slight";
       subpixelRendering = "rgb";
       defaultFonts = {
-        monospace = [ "Iosevka" ];
-        emoji = [ "Twitter Color Emoji" ];
+        emoji = [
+          "Twitter Color Emoji"
+          "Noto Color Emoji"
+        ];
       };
     };
 
@@ -2797,6 +2799,20 @@ in
         ];
         unicode-hotkey = [ "<Control><Shift>u" ];
       };
+      "org/gnome/desktop/interface" = {
+        font-antialiasing = "rgba";
+        font-rgba-order = "rgb";
+        font-hinting = "slight";
+        font-rendering = "manual";
+      };
+    };
+
+    gtk.enable = true;
+    gtk.gtk4.extraConfig = {
+      gtk-font-rendering = "manual";
+      gtk-hint-font-metrics = true;
+      gtk-xft-hintstyle = "hintslight";
+      gtk-xft-rgba = "rgb";
     };
 
     home.packages =
@@ -2815,7 +2831,7 @@ in
             let
               makeAutostartItem = args: makeDesktopItem (args // { destination = "/etc/xdg/autostart"; });
             in
-            builtins.map makeAutostartItem (
+            map makeAutostartItem (
               [
                 {
                   name = "tailscale-systray";
