@@ -2054,8 +2054,6 @@ in
       darkman = {
         enable = true;
         settings = {
-          lat = -26.2;
-          lng = 28.0;
           usegeoclue = true;
           dbusserver = true;
           portal = true;

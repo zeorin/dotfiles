@@ -334,6 +334,8 @@
       LC_TIME = "en_ZA.UTF-8";
     };
 
+    time.timeZone = lib.mkDefault "Africa/Johannesburg";
+
     console = {
       font = lib.mkDefault "Lat2-Terminus16";
       # Nord
@@ -531,8 +533,21 @@
     services.flatpak.enable = true;
 
     # Location-based stuff
-    services.geoclue2.enable = true;
-    services.geoclue2.geoProviderUrl = "https://beacondb.net/v1/geolocate";
+    services.geoclue2 = {
+      enable = true;
+      enable3G = false;
+      enableCDMA = false;
+      enableModemGPS = false;
+      enableNmea = false;
+      enableWifi = false;
+      enableStatic = true;
+      geoProviderUrl = "https://api.beacondb.net/v1/geolocate";
+      # Johannesburg
+      staticAccuracy = 25000;
+      staticAltitude = 1767;
+      staticLatitude = -26.2023;
+      staticLongitude = 28.0436;
+    };
     location.provider = "geoclue2";
     services.localtimed.enable = true;
 
