@@ -71,6 +71,12 @@
 
 (setq doom-theme 'doom-nord)
 
+;; https://github.com/doomemacs/themes/issues/875
+(use-package! doom-themes :ensure t :defer t
+	      :config
+	      (setcdr (assoc 'gnus-group-news-low-empty doom-themes-base-faces)
+		      '(:inherit 'gnus-group-mail-1-empty :weight 'normal)))
+
 ;; Tabs > spaces
 (setq-default indent-tabs-mode t)
 
