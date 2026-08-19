@@ -329,6 +329,10 @@ tasks."
 ;; lsp-mode
 ;;
 
+(defun me/lsp--advice-client-capabilities (capabilities)
+  (setf (alist-get 'inlineCompletion (alist-get 'textDocument capabilities)) (make-hash-table))
+  capabilities)
+
 (defun me/lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."
   (or
@@ -386,6 +390,10 @@ tasks."
                                     "--stdio"))
   (setq lsp-enable-suggest-server-download nil
 	lsp-clients-typescript-prefer-use-project-ts-server t)
+
+  ;; https://github.com/emacs-lsp/lsp-mode/issues/5081
+  (advice-add 'lsp--make-notification :filter-return #'doom-plist-delete-nil)
+  (advice-add 'lsp--client-capabilities :filter-return #'me/lsp--advice-client-capabilities )
 
   (advice-add (if (progn (require 'json)
 			 (fboundp 'json-parse-buffer))
